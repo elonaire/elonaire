@@ -784,7 +784,7 @@ header.header-mobile #menu-btn {
 section {
     padding: 90px 0 90px 0;
     position: relative;
-    min-height: 100%;
+    /* min-height: 100%; */
     min-height: 100vh;
     min-width: 100%;
 }

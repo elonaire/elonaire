@@ -20,7 +20,7 @@ function App() {
                                     {/* logo begin */}
                                     <div id="logo">
                                         <a href="index.html">
-                                            {firstName} Aseneka Idiong'o
+                                            <img className='main-logo' src='images/logo.png' />
                                         </a>
                                     </div>
                                     {/* logo close */}
@@ -67,12 +67,12 @@ function App() {
                         <div className="row align-items-center">
                             <div className="col-md-6">
                                 <h1 className="wow fadeInRight" data-wow-delay=".4s">I'm <span className="id-color">{firstName}</span>  Aseneka Idiong'o</h1>
-                                <p className="lead wow fadeInRight" data-wow-delay=".5s">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+                                <p className="lead wow fadeInRight" data-wow-delay=".5s">I am a talented full-stack software engineer, with 6+ years of experience in full-stack development. I have an interest in Game Development and the Internet of Things technology.</p>
                                 <div className="spacer-single"></div>
                                 <a href="#section-about" className="btn-custom light wow fadeInRight scoll-to" data-wow-delay=".6s">Download CV</a>
                             </div>
 
-                            <div className="col-md-6 sm-hide"><blockquote className="text-light pull-right wow fadeInRight" data-wow-delay=".6s">Be creative and have fun!</blockquote></div>
+                            <div className="col-md-6 sm-hide"><blockquote className="text-light pull-right wow fadeInRight" data-wow-delay=".6s">Software Engineer</blockquote></div>
                         </div>
                     </div>
                 </section>
@@ -93,16 +93,9 @@ function App() {
                                 <h3 className="s_border">Education</h3>
                                 <ul className="d_timeline">
                                     <li className="d_timeline-item">
-                                        <h3 className="d_timeline-title">Feb 2002 - Mar 2003</h3>
-                                        <p className="d_timeline-text"><span className="d_title">Master in Design<span>New York University</span></span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi tempora perferendis vero officia enim impedit voluptatem dignissimos, veniam ratione est alias rerum aperiam, nam aliquam reprehenderit iste dolor.</p>
-                                    </li>
-                                    <li className="d_timeline-item">
-                                        <h3 className="d_timeline-title">Feb 2002 - Mar 2003</h3>
-                                        <p className="d_timeline-text"><span className="d_title">Bachelor of Arts<span>University of London</span></span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi tempora perferendis vero officia enim impedit voluptatem dignissimos, veniam ratione est alias rerum aperiam, nam aliquam reprehenderit iste dolor.</p>
-                                    </li>
-                                    <li className="d_timeline-item">
-                                        <h3 className="d_timeline-title">Feb 2002 - Mar 2003</h3>
-                                        <p className="d_timeline-text"><span className="d_title">Artist of College</span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi tempora perferendis vero officia enim impedit voluptatem dignissimos, veniam ratione est alias rerum aperiam, nam aliquam reprehenderit iste dolor.</p>
+                                        <h3 className="d_timeline-title">Sep 2014 - Dec 2018</h3>
+                                        <p className="d_timeline-text"><span className="d_title">
+                                            Bachelor of Science - BS, Industrial Chemistry<span>Multimedia University of Kenya</span></span>This is where I enrolled for my Bachelor's degree in Industrial Chemistry and later on discovered my passion for Computer Science in my second year. It was through a unit in that course titled "Introduction to Computer Programming".</p>
                                     </li>
                                 </ul>
                             </div>
@@ -110,16 +103,62 @@ function App() {
                                 <h3 className="s_border">Work Experiences</h3>
                                 <ul className="d_timeline">
                                     <li className="d_timeline-item">
-                                        <h3 className="d_timeline-title">Feb 2015 - 2019</h3>
-                                        <p className="d_timeline-text"><span className="d_title">Lead &amp; UI / UX Designer<span>Apple</span></span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi tempora perferendis vero officia enim impedit voluptatem dignissimos, veniam ratione est alias rerum aperiam, nam aliquam reprehenderit iste dolor.</p>
+                                        <h3 className="d_timeline-title">Dec 2021 - present</h3>
+                                        <p className="d_timeline-text"><span className="d_title">Senior Full-stack Software Engineer - React, NestJS, MySQL, AWS, Vagrant<span>Turing</span></span>
+                                        <ul>
+                                            <li>Developed web components using React.</li>
+                                            <li>Developed endpoints using NestJS framework.</li>
+                                            <li>Integrated third-party APIs such as Vungle and AppLovin to deliver ads into mobile games.</li>
+                                            <li>Used Vagrant to create and provision EC2 instances in AWS</li>
+                                            <li>Used SQS to queue system jobs to run in the background</li>
+                                            <li>Used S3 bucket to store assets for creating games</li>
+                                        </ul></p>
                                     </li>
                                     <li className="d_timeline-item">
-                                        <h3 className="d_timeline-title">Feb 2010 - Mar 2015</h3>
-                                        <p className="d_timeline-text"><span className="d_title">Senior &amp; UI / UX Designer<span>Google</span></span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi tempora perferendis vero officia enim impedit voluptatem dignissimos, veniam ratione est alias rerum aperiam, nam aliquam reprehenderit iste dolor.</p>
+                                        <h3 className="d_timeline-title">Aug 2021 - Jan 2022</h3>
+                                        <p className="d_timeline-text"><span className="d_title">Lead Frontend Engineer - Angular<span>Konza Silicon</span></span>
+                                        <ul>
+                                            <li>Chaired sprint meetings to ensure that tasks were well assigned and completed.</li>
+                                            <li>Ensured that the goals of the team were achieved fueled by the contribution of each and every member of the team.</li>
+                                            <li>Coordinated with other team leads to ensure that the overall mission and vision of the company are met.</li>
+                                        </ul>
+                                        </p>
                                     </li>
                                     <li className="d_timeline-item">
-                                        <h3 className="d_timeline-title">Feb 2006 - Mar 2010</h3>
-                                        <p className="d_timeline-text"><span className="d_title">Junior &amp; UI / UX Designer<span>Microsoft</span></span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi tempora perferendis vero officia enim impedit voluptatem dignissimos, veniam ratione est alias rerum aperiam, nam aliquam reprehenderit iste dolor.</p>
+                                        <h3 className="d_timeline-title">Jun 2019 - Jan 2022</h3>
+                                        <p className="d_timeline-text"><span className="d_title">Senior Frontend Engineer - Angular<span>Konza Silicon</span></span>
+                                        <ul>
+                                            <li>Worked together with the UI/UX team to ensure that the product designs have been fulfilled to the latter, using Angular and TypeScript, and SCSS for styling the web pages.</li>
+                                            <li>Reduced the Angular app build time from 2 hours to ~10 minutes, I achieved this by ensuring reusing of components and reducing redundant code.</li>
+                                            <li>Designed and implemented deployment strategy of the frontend application i.e creating pipelines to automate the development/release cycle and containerizing the app using Docker.</li>
+                                            <li>Wrote unit tests for components using Jasmine, therefore ensuring that only quality code free from bugs is shipped to production.</li>
+                                            <li>Defined the front-end architecture, hence ensuring that the code base is well structured and easy to maintain.</li>
+                                            <li>Optimized solutions, and applying suitable algorithms hence ensuring that the application is not expensive to the client in terms of computing resources.</li>
+                                            <li>Implemented lazy loading approach for the back office application. The app's performance improved by 50%. I achieved this by breaking the app into smaller lazy-loaded modules.</li>
+                                            <li>I orchestrated the containers using Docker Swarm which helped with the high availability of the application.</li>
+                                        </ul>
+                                        </p>
+                                    </li>
+                                    <li className="d_timeline-item">
+                                        <h3 className="d_timeline-title">Sep 2019 - Jan 2020</h3>
+                                        <p className="d_timeline-text"><span className="d_title">React Developer (remote)<span>Better Together Organization</span></span>
+                                        <ul>
+                                            <li>Consumed Instagram API to display the company's Instagram activity.</li>
+                                            <li>Split the application built in React (Next.js) into smaller components, therefore ensuring that the code base is organized and easier to maintain.</li>
+                                            <li>Used the Styled Components library in the project, which ensured that the code was much more concise and declarative.</li>
+                                        </ul>
+                                        </p>
+                                    </li>
+                                    <li className="d_timeline-item">
+                                        <h3 className="d_timeline-title">Jan 2016 - Jun 2018</h3>
+                                        <p className="d_timeline-text"><span className="d_title">Junior Web Developer (remote)<span>Safe Meet Organization</span></span>
+                                        <ul>
+                                            <li>Developed a system to enable students to report bullying cases in the United States of America. This was a mitigation measure for school shootouts as a consequence of bullying, following the Florida School shooting.</li>
+                                            <li>Developed a portal to allow students to fill forms for reporting the cases. The cases could be reported anonymously or through an adult on behalf of the student.</li>
+                                            <li>Developed a video streaming service that allowed students to upload videos of themselves to the platform.</li>
+                                            <li>Developed a mailing service in PHP to enable students to send and receive emails from the platform.</li>
+                                        </ul>
+                                        </p>
                                     </li>
                                 </ul>
                             </div>
@@ -127,7 +166,7 @@ function App() {
                         <div className="spacer-50"></div>
                         <div className="row">
                             <div className="col-md-6">
-                                <h3 className="s_border">Programming Skills</h3>
+                                <h3 className="s_border">Programming Skills (confidence)</h3>
                                 <div className="skill-bar">
                                     <h5>HTML &amp; CSS</h5>
                                     <div className="de-progress">
@@ -136,41 +175,76 @@ function App() {
                                     </div>
                                 </div>
                                 <div className="skill-bar">
-                                    <h5>Javascript</h5>
+                                    <h5>JavaScript</h5>
                                     <div className="de-progress">
                                         <div className="value"></div>
-                                        <div className="progress-bar" data-value="75%"></div>
+                                        <div className="progress-bar" data-value="98%"></div>
                                     </div>
                                 </div>
                                 <div className="skill-bar">
-                                    <h5>PHP</h5>
+                                    <h5>TypeScript</h5>
                                     <div className="de-progress">
                                         <div className="value"></div>
-                                        <div className="progress-bar" data-value="85%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-md-6">
-                                <h3 className="s_border">Other Skills</h3>
-                                <div className="skill-bar">
-                                    <h5>Copywritting</h5>
-                                    <div className="de-progress">
-                                        <div className="value"></div>
-                                        <div className="progress-bar" data-value="75%"></div>
+                                        <div className="progress-bar" data-value="98%"></div>
                                     </div>
                                 </div>
                                 <div className="skill-bar">
-                                    <h5>Drawing</h5>
+                                    <h5>Angular</h5>
                                     <div className="de-progress">
                                         <div className="value"></div>
                                         <div className="progress-bar" data-value="90%"></div>
                                     </div>
                                 </div>
                                 <div className="skill-bar">
-                                    <h5>Singing</h5>
+                                    <h5>React</h5>
                                     <div className="de-progress">
                                         <div className="value"></div>
-                                        <div className="progress-bar" data-value="80%"></div>
+                                        <div className="progress-bar" data-value="90%"></div>
+                                    </div>
+                                </div>
+                                <div className="skill-bar">
+                                    <h5>NestJS</h5>
+                                    <div className="de-progress">
+                                        <div className="value"></div>
+                                        <div className="progress-bar" data-value="90%"></div>
+                                    </div>
+                                </div>
+                                <div className="skill-bar">
+                                    <h5>Node.js</h5>
+                                    <div className="de-progress">
+                                        <div className="value"></div>
+                                        <div className="progress-bar" data-value="90%"></div>
+                                    </div>
+                                </div>
+                                <div className="skill-bar">
+                                    <h5>DevOps</h5>
+                                    <div className="de-progress">
+                                        <div className="value"></div>
+                                        <div className="progress-bar" data-value="75%"></div>
+                                    </div>
+                                </div>
+                                <div className="skill-bar">
+                                    <h5>AWS</h5>
+                                    <div className="de-progress">
+                                        <div className="value"></div>
+                                        <div className="progress-bar" data-value="70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <h3 className="s_border">Other Skills (confidence)</h3>
+                                <div className="skill-bar">
+                                    <h5>UI/UX</h5>
+                                    <div className="de-progress">
+                                        <div className="value"></div>
+                                        <div className="progress-bar" data-value="75%"></div>
+                                    </div>
+                                </div>
+                                <div className="skill-bar">
+                                    <h5>Figma</h5>
+                                    <div className="de-progress">
+                                        <div className="value"></div>
+                                        <div className="progress-bar" data-value="75%"></div>
                                     </div>
                                 </div>
                             </div>
@@ -184,7 +258,7 @@ function App() {
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12 wow fadeInRight">
-                                <h4 className="title">Who I Am</h4>
+                                <h4 className="title">Who Am I?</h4>
                                 <h2 className="title">About Me</h2>
                                 <div className="title-underline"></div>
                             </div>
@@ -205,17 +279,16 @@ function App() {
                                 </div>
                             </div>
                             <div className="col-lg-5 offset-md-1 wow fadeInRight" data-wow-delay=".5s">
-                                <h2>Hello, I'm <span className="id-color">Amalia Jördis</span></h2>
+                                <h2>Hello, I'm <span className="id-color">Elon Aseneka Idiong'o</span></h2>
                                 <p>
-                                    At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident,
-                                    similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Veniam dolore qui sunt dolor anim est proident culpa.
+                                I am a talented full-stack software engineer and I have 6+ years of experience in building robust small and enterprise applications. I have built various web applications using Node.js, NestJS, Angular, and React. I have built desktop applications using ElectronJS and mobile applications using React Native. Besides that, I use Figma for application designing and prototyping. I have an interest in Game Development and the Internet of Things.
                                 </p>
                                 <ul className="info-list text-white">
-                                    <li><span className="d_title">Age</span><span className="d_value">28</span></li>
-                                    <li><span className="d_title">Residence</span><span className="d_value">USA</span></li>
-                                    <li><span className="d_title">Address</span><span className="d_value">08 W 36th St, New York, NY 10001</span></li>
-                                    <li><span className="d_title">Email</span><span className="d_value">contactme@envato.com</span></li>
-                                    <li><span className="d_title">Phone</span><span className="d_value">+1 333 1224 6779</span></li>
+                                    <li><span className="d_title">Age</span><span className="d_value">26</span></li>
+                                    <li><span className="d_title">Residence</span><span className="d_value">Kenya</span></li>
+                                    <li><span className="d_title">Address</span><span className="d_value">Unity Homes, Unity West, Tatu City</span></li>
+                                    <li><span className="d_title">Email</span><span className="d_value">info@techietenka.com</span></li>
+                                    <li><span className="d_title">Phone</span><span className="d_value">+254(0) 704730039</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -229,16 +302,16 @@ function App() {
                                     <i className="fa fa-laptop id-color"></i>
                                     <div className="fb-text">
                                         <h4>Website Design</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+                                        <p>I have UI/UX skills. I am skilled in Figma and I am able to create wireframes, high fidelity mockups and prototypes.</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-lg-4 col-md-6 mb30 wow fadeInRight" data-wow-delay=".25s">
                                 <div className="f-box f-icon-left f-icon-box">
-                                    <i className="fa fa-paper-plane-o id-color"></i>
+                                    <i className="fa fa-globe id-color"></i>
                                     <div className="fb-text">
-                                        <h4>Email Marketing</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+                                        <h4>Responsive Web Applications</h4>
+                                        <p>I am able to apply the mobile-first principle to create web applications that display accurately across different viewports.</p>
                                     </div>
                                 </div>
                             </div>
@@ -246,40 +319,13 @@ function App() {
                                 <div className="f-box f-icon-left f-icon-box">
                                     <i className="fa fa-line-chart id-color"></i>
                                     <div className="fb-text">
-                                        <h4>Digital Analytics</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6 mb-sm-30 wow fadeInRight" data-wow-delay="0s">
-                                <div className="f-box f-icon-left f-icon-box">
-                                    <i className="fa fa-object-group id-color"></i>
-                                    <div className="fb-text">
-                                        <h4>Visual Editor</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6 mb-sm-30 wow fadeInRight" data-wow-delay=".25s">
-                                <div className="f-box f-icon-left f-icon-box">
-                                    <i className="fa fa-hdd-o id-color"></i>
-                                    <div className="fb-text">
-                                        <h4>Backup &amp; Security</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6 mb-sm-30 wow fadeInRight" data-wow-delay=".5s">
-                                <div className="f-box f-icon-left f-icon-box">
-                                    <i className="fa fa-comments-o id-color"></i>
-                                    <div className="fb-text">
-                                        <h4>IT Consultancy</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
+                                        <h4>Data Visualization</h4>
+                                        <p>With the help of visualization tools such as D3.js and other chart libraries, I am able to help users gain insights into their data.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="spacer-80"></div>
+                        {/* <div className="spacer-80"></div>
                         <div className="row">
                             <div className="col-md-12">
                                 <h3 className="s_border">Testimonials</h3>
@@ -312,7 +358,7 @@ function App() {
                                     </blockquote>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </section>
                 {/* section close */}
