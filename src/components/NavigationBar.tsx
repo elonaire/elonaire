@@ -39,10 +39,10 @@ const NavigationBar: FunctionComponent<NavigationBarProps> = () => {
                                 </div>
                                 <div className="align-self-center ml-auto header-col-right">
                                     <div className="social-icons s-border sm-hide">
-                                        <a href="#"><i className="fa fa-facebook fa-lg"></i></a>
-                                        <a href="#"><i className="fa fa-twitter fa-lg"></i></a>
-                                        <a href="#"><i className="fa fa-linkedin fa-lg"></i></a>
-                                        <a href="#"><i className="fa fa-instagram fa-lg"></i></a>
+                                        <a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><i className="fa fa-facebook fa-lg"></i></a>
+                                        <a href="https://twitter.com/elonaire" rel="noreferrer" target="_blank"><i className="fa fa-twitter fa-lg"></i></a>
+                                        <a href="https://www.linkedin.com/in/elon-aseneka-elonaire/" rel="noreferrer" target="_blank"><i className="fa fa-linkedin fa-lg"></i></a>
+                                        <a href="https://www.instagram.com/elonaire95/" rel="noreferrer" target="_blank"><i className="fa fa-instagram fa-lg"></i></a>
                                     </div>
                                     <span id="menu-btn"></span>
                                 </div>
