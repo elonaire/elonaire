@@ -16,7 +16,7 @@ const NavigationBar: FunctionComponent<NavigationBarProps> = () => {
                                     {/* logo begin */}
                                     <div id="logo">
                                         <a href="index.html">
-                                            <img className='main-logo' src='images/logo.png' />
+                                            <img className='main-logo' src='images/logo.png' alt="logo" />
                                         </a>
                                     </div>
                                     {/* logo close */}

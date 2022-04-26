@@ -31,7 +31,7 @@ const Portfolio: FunctionComponent<PortfolioProps> = () => {
                                             <span className="overlay">
                                                 <span className="d-title">Ardhisasa</span>
                                             </span>
-                                            <img src="images/portfolio/1.jpg" alt="" />
+                                            <img src="images/portfolio/1.jpg" alt="portfolio-pic" />
                                         </a>
                                     </div>
                                     {/* close gallery item */}

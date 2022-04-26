@@ -21,12 +21,12 @@ const About: FunctionComponent<AboutProps> = () => {
                                 <div className="de-images">
                                     <div className="d-hover-zoom wow fadeInRight">
                                         <a className="image-popup" href="images/misc/1.jpg">
-                                            <img className="img-fluid" src="images/misc/1.jpg" alt="" />
+                                            <img className="img-fluid" src="images/misc/1.jpg" alt="self-pic" />
                                         </a>
                                     </div>
                                     <div className="d-hover-zoom di-small-2 wow fadeInLeft">
                                         <a className="image-popup" href="images/misc/2.jpg">
-                                            <img src="images/misc/2.jpg" alt="" />
+                                            <img src="images/misc/2.jpg" alt="self-pic" />
                                         </a>
                                     </div>
                                 </div>

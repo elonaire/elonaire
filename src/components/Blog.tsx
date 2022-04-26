@@ -44,7 +44,7 @@ const Blog: FunctionComponent<BlogProps> = () => {
                                     <div className="post-content">
                                         <div className="post-image d-hover-zoom">
                                             <a className="image-popup" href={post?.url} rel="noreferrer" target="_blank">
-                                                <img alt="" src={post?.images[0].url} />
+                                                <img alt="blog-pic" src={post?.images[0].url} />
                                             </a>
                                             <div className="post-info">
                                                 <div className="inner">
