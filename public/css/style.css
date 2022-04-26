@@ -1481,16 +1481,15 @@ header.header-for-mobile {
 
 .post-text {
     padding: 10px 0;
-    max-height: 200px;
-  /* white-space: nowrap;
-  overflow: hidden; */
-  text-overflow: ellipsis;
 }
 
 .post-text h4 {
     font-size: 20px;
     margin-top: 10px;
-    margin-bottom: 10px
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .post-text h4 a {
