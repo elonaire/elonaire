@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
 import About from './components/About';
 import Blog from './components/Blog';
@@ -9,7 +9,6 @@ import Portfolio from './components/Portfolio';
 import Resume from './components/Resume';
 
 function App() {
-    const [firstName] = useState('Elon')
     return (
         <div id="wrapper">
             <div id="btn-exit">
