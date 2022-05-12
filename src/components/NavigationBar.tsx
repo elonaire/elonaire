@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react";
+import { NavLink } from "react-router-dom";
 
 interface NavigationBarProps {
     
@@ -15,9 +16,9 @@ const NavigationBar: FunctionComponent<NavigationBarProps> = () => {
                                 <div className="align-self-center header-col-left">
                                     {/* logo begin */}
                                     <div id="logo">
-                                        <a href="index.html">
+                                        <NavLink to="/">
                                             <img className='main-logo' src='images/logo.png' alt="logo" />
-                                        </a>
+                                        </NavLink>
                                     </div>
                                     {/* logo close */}
                                 </div>
