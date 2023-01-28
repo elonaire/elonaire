@@ -1,31 +1,12 @@
 use yew::prelude::*;
+
+use crate::views::home::Home;
+
 #[derive(Clone, Debug, PartialEq)]
-struct AppState {
-    title: String,
-    description: String,
-    full_name: String
-}
-
-#[function_component(Home)]
-pub fn home() -> Html {
-    let current_state = use_context::<AppState>().expect("no ctx found");
-    println!("current_state {:?}", current_state);
-
-    html! {
-        <main>
-            <h1>{ current_state.title }</h1>
-        </main>
-    }
-}
-
-#[function_component(Nav)]
-pub fn nav() -> Html {
-
-    html! {
-        <nav>
-        
-        </nav>
-    }
+pub struct AppState {
+    pub title: String,
+    pub description: String,
+    pub full_name: String
 }
 
 #[function_component(App)]
