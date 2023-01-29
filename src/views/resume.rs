@@ -1,11 +1,16 @@
 use yew::prelude::*;
 
+use crate::components::transition::Transition;
+
 #[function_component(Resume)]
 pub fn resume() -> Html {
 
     html! {
+        <>
+        <Transition />
         <main>
-            <h1>{ "This is the resume page" }</h1>
+            
         </main>
+        </>
     }
 }
