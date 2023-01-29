@@ -4,6 +4,7 @@ $text-color: #444544;
 $text-color-bg-primary: rgb(233, 233, 233);
 $dark-color: #111111;
 
+/* General styles */
 html,
 body {
   height: 100%;
@@ -145,16 +146,6 @@ main {
 .about {
   background-color: $dark-color;
   height: 100%;
-  .who {
-    font-size: larger;
-    text-align: center;
-    color: $primary-color;
-    margin-top: 0;
-  }
-  .about-head {
-    text-align: center;
-    color: $text-color-bg-primary;
-  }
 }
 
 /* Transition component styles */
@@ -209,6 +200,34 @@ main {
   }
 }
 
+/* Page header styles */
+.page-header {
+  .who {
+    font-size: larger;
+    text-align: center;
+    color: $primary-color;
+    margin-top: 0;
+  }
+  .about-head {
+    text-align: center;
+    color: $text-color-bg-primary;
+  }
+
+  .underline-container {
+    display: flex;
+    .left {
+      flex-basis: 40%;
+    }
+    .underline {
+      flex-basis: 20%;
+      border-bottom: 2px solid $primary-color;
+    }
+    .right {
+      flex-basis: 40%;
+    }
+  }
+}
+
 /* Animations */
 @keyframes slidein {
   from {
@@ -224,12 +243,12 @@ main {
 
 @keyframes slideintrans {
   from {
-    left: 100%;
+    left: -100%;
     width: 100%;
   }
 
   to {
-    left: -100%;
+    right: 100%;
     width: 100%;
   }
 }
