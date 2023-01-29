@@ -1,8 +1,8 @@
 [package]
-name = "trunk-template"
+name = "elonaire-frontend"
 version = "0.1.0"
 edition = "2021"
-description = "Template for starting a Yew project using Trunk"
+description = "My portfolio website"
 readme = "README.md"
 repository = "https://github.com/yewstack/yew-trunk-minimal-template"
 license = "MIT OR Apache-2.0"
@@ -12,3 +12,5 @@ categories = ["gui", "wasm", "web-programming"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 yew = { version="0.20", features=["csr"] }
+yew-router = "0.17"
+yew_icons = {version = "0.7", features = ["BootstrapFacebook", "BootstrapTwitter", "BootstrapLinkedin", "BootstrapInstagram"]}
