@@ -10,10 +10,11 @@ pub fn home() -> Html {
         <main>
         <Nav />
         <div class="home">
+        <img class="profile-image" src="img/me.png" alt="profile-image" />
         <div class="left">
         <h1>{ "I'm " } <span class="primary-color-text"></span>{ current_state.full_name }</h1>
         <p class="description">{ current_state.description }</p>
-        <button class="button button-primary">{"Download CV"}</button>
+        <button class="button button-primary glow-on-hover">{"Download CV"}</button>
         </div>
 
         <div class="right">
