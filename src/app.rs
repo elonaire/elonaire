@@ -39,15 +39,15 @@ pub fn switch(routes: Route) -> Html {
 pub fn app() -> Html {
     let state = use_state(
         || AppState {
-            title: "This is my first Yew app".to_owned(),
-            description: "This is my description".to_owned(),
+            title: "Software Engineer".to_owned(),
+            description: "I am a talented full-stack software engineer, with 6+ years of experience in full-stack development. I have an interest in Game Development and the Internet of Things technology.".to_owned(),
             full_name: "Elon Aseneka Idiong'o".to_owned(),
         });
 
     html! {
         <ContextProvider<AppState> context={(*state).clone()}>
         <BrowserRouter>
-            <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
+            <Switch<Route> render={switch} /> 
         </BrowserRouter>
         </ContextProvider<AppState>>
     }

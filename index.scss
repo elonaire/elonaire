@@ -1,19 +1,37 @@
+/* theme */
+$primary-color: #32b089;
+$text-color: #444544;
+$text-color-bg-primary: rgb(233, 233, 233);
+
 html,
 body {
   height: 100%;
   margin: 0;
-  // background: linear-gradient(to left, #009999 0%, #00cc99 100%);
 }
 
 main {
   font-family: sans-serif;
-  // text-align: center;
 }
 
-/* theme */
-$primary-color: #32b089;
-$text-color: #444544;
-$text-color-primary: rgb(233, 233, 233);
+.primary-color-text {
+  color: $primary-color;
+}
+
+/* Buttons styles */
+
+.button {
+  border: none;
+  padding: 2% 4%;
+  border-radius: 5px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.button-primary {
+  background-color: $primary-color;
+  color: $text-color-bg-primary;
+}
 
 /* Nav styles begin from here */
 .nav {
@@ -55,7 +73,6 @@ $text-color-primary: rgb(233, 233, 233);
         }
       }
       &:hover {
-        // background-color: $primary-color;
         color: $primary-color;
       }
     }
@@ -85,9 +102,42 @@ $text-color-primary: rgb(233, 233, 233);
         }
       }
       &:hover {
-        // background-color: $primary-color;
         color: $primary-color;
       }
     }
+  }
+}
+
+/* Home Page Styles */
+.home {
+  display: flex;
+  flex-direction: row;
+  color: $text-color;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20%;
+  .left {
+    flex-basis: 60%;
+    
+    animation: 2s ease alternate slidein;
+  }
+  .right {
+    border-left: 4px solid $primary-color;
+    .title {
+      padding-left: 20px;
+    }
+  }
+}
+
+/* Animations */
+@keyframes slidein {
+  from {
+    margin-left: 30%;
+    width: 100%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
   }
 }
