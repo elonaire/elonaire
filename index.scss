@@ -10,6 +10,7 @@ body {
   height: 100%;
   margin: 0;
   background-color: $text-color-bg-primary;
+  overflow: hidden;
 }
 
 main {
@@ -146,6 +147,34 @@ main {
 .about {
   background-color: $dark-color;
   height: 100%;
+  .details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 2%;
+    .images-container {
+      flex-basis: 50%;
+      animation: 1.5s ease alternate slidein;
+      .main-img {
+        width: 70%;
+        margin: 2%;
+      }
+      .sub-img {
+        width: 30%;
+        margin-left: -10%;
+      }
+    }
+    .autobio {
+      color: $text-color-bg-primary;
+      flex-basis: 50%;
+      .name {
+        color: $primary-color;
+      }
+      strong {
+        color: $primary-color;
+      }
+    }
+  }
 }
 
 /* Transition component styles */
@@ -202,6 +231,7 @@ main {
 
 /* Page header styles */
 .page-header {
+  animation: 1.5s ease alternate slidein;
   .who {
     font-size: larger;
     text-align: center;
@@ -243,7 +273,7 @@ main {
 
 @keyframes slideintrans {
   from {
-    left: -100%;
+    left: -10%;
     width: 100%;
   }
 

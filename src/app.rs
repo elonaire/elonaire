@@ -22,7 +22,12 @@ pub enum Route {
 pub struct AppState {
     pub title: String,
     pub description: String,
-    pub full_name: String
+    pub full_name: String,
+    pub auto_bio: String,
+    pub first_name: String,
+    pub middle_name: String,
+    pub last_name: String,
+    // pub date_of_birth: String,
 }
 
 pub fn switch(routes: Route) -> Html {
@@ -42,6 +47,10 @@ pub fn app() -> Html {
             title: "Software Engineer".to_owned(),
             description: "I am a talented full-stack software engineer, with 6+ years of experience in full-stack development. I have an interest in Game Development and the Internet of Things technology.".to_owned(),
             full_name: "Elon Aseneka Idiong'o".to_owned(),
+            first_name: "Elon".to_owned(),
+            middle_name: "Aseneka".to_owned(),
+            last_name: "Idiong'o".to_owned(),
+            auto_bio: "I am a talented full-stack software engineer and I have 6+ years of experience in building robust small and enterprise applications. I have built various web applications using Node.js, NestJS, Angular, and React. I have built desktop applications using ElectronJS and mobile applications using React Native. Besides that, I use Figma for application designing and prototyping. I have an interest in Game Development and the Internet of Things.".to_owned()
         });
 
     html! {

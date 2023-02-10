@@ -12,7 +12,7 @@ pub fn home() -> Html {
         <div class="home">
         <img class="profile-image" src="img/me.png" alt="profile-image" />
         <div class="left">
-        <h1>{ "I'm " } <span class="primary-color-text"></span>{ current_state.full_name }</h1>
+        <h1>{ "I'm " } <span class="primary-color-text">{current_state.first_name + " "}</span>{ current_state.middle_name + " " +  &current_state.last_name}</h1>
         <p class="description">{ current_state.description }</p>
         <button class="button button-primary glow-on-hover">{"Download CV"}</button>
         </div>
