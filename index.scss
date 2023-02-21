@@ -7,10 +7,10 @@ $dark-color: #111111;
 /* General styles */
 html,
 body {
-  height: 100%;
+  min-height: 100vh;
   margin: 0;
   background-color: $text-color-bg-primary;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 main {
@@ -146,7 +146,7 @@ main {
 /* About page styles */
 .about {
   background-color: $dark-color;
-  height: 100%;
+  min-height: 100vh;
   .details {
     display: flex;
     flex-direction: row;
@@ -175,6 +175,16 @@ main {
       }
     }
   }
+
+  .heading-container {
+    padding: 2%;
+  }
+
+  .service-cards {
+    padding: 2%;
+    display: flex;
+    flex-direction: row;
+  }
 }
 
 /* Transition component styles */
@@ -198,34 +208,40 @@ main {
     position: relative;
     border: none;
     padding: 0;
-    width: 5em; height: 5em;
+    width: 5em;
+    height: 5em;
     border-radius: 50%;
     background: transparent;
     color: $text-color-bg-primary;
     font: inherit;
     text-indent: 100%;
     cursor: pointer;
-    
+
     &:focus {
       outline: solid 0 transparent;
       box-shadow: 0 0 0 2px lighten($primary-color, 15%);
     }
-    
+
     &:hover {
       background: lighten($primary-color, 15%);
     }
-    
-    &:before, &:after {
+
+    &:before,
+    &:after {
       position: absolute;
-      top: 15%; left: calc(50% - .0625em);
-      width: .125em; height: 70%;
-      border-radius: .125em;
+      top: 15%;
+      left: calc(50% - 0.0625em);
+      width: 0.125em;
+      height: 70%;
+      border-radius: 0.125em;
       transform: rotate(45deg);
       background: currentcolor;
-      content: ''
+      content: '';
     }
-    
-    &:after { transform: rotate(-45deg); }
+
+    &:after {
+      transform: rotate(-45deg);
+    }
   }
 }
 
@@ -258,6 +274,103 @@ main {
   }
 }
 
+/* Service Card Component styles */
+.service-card {
+  background-color: transparent;
+  width: 300px;
+  height: 200px;
+  perspective: 1000px;
+  overflow: hidden;
+  cursor: pointer;
+  margin-right: 1%;
+
+  &:hover .wrapper {
+    transform: rotateY(180deg);
+  }
+
+  .wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+    .flip-front,
+    .flip-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    .flip-front {
+      background-color: $text-color-bg-primary;
+      color: $text-color;
+      img {
+        width: 300px;
+        object-fit: contain;
+      }
+    }
+
+    .flip-back {
+      background-color: $primary-color;
+      color: $text-color-bg-primary;
+      transform: rotateY(180deg);
+    }
+  }
+}
+
+.loader {
+  /* Backdrop */
+  background-color: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  overflow: hidden;
+  z-index: 1000;
+  /* CSS loader */
+  .lds-hourglass {
+    margin: auto;
+    top: 48%;
+    // display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    &:after {
+      content: ' ';
+      display: block;
+      border-radius: 50%;
+      width: 0;
+      height: 0;
+      margin: 8px;
+      box-sizing: border-box;
+      border: 32px solid $primary-color;
+      border-color: $primary-color transparent $primary-color transparent;
+      animation: lds-hourglass 1.2s infinite;
+    }
+  }
+}
+
+/* Styled Heading component styles */
+.styled-heading {
+  border: 3px solid $text-color;
+  text-align: center;
+  width: fit-content;
+  padding: 0 20px;
+  color: $text-color-bg-primary;
+  h2 {
+    padding: 10px 0;
+    margin: 0;
+  }
+}
+
 /* Animations */
 @keyframes slidein {
   from {
@@ -283,6 +396,7 @@ main {
   }
 }
 
+/* Button hover effect */
 .glow-on-hover {
   border: none;
   outline: none;
@@ -290,52 +404,51 @@ main {
   background: $primary-color;
   cursor: pointer;
   position: relative;
-}
+  &:before {
+    content: '';
+    background: linear-gradient(
+      45deg,
+      $primary-color,
+      lighten($primary-color, 15%),
+      $dark-color
+    );
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
 
-.glow-on-hover:before {
-  content: '';
-  background: linear-gradient(
-    45deg,
-    $primary-color,
-    lighten($primary-color, 15%),
-    $dark-color
-  );
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  background-size: 400%;
-  z-index: -1;
-  filter: blur(5px);
-  width: calc(100% + 4px);
-  height: calc(100% + 4px);
-  animation: glowing 20s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  border-radius: 10px;
-}
+  &:active {
+    color: $text-color;
+  }
 
-.glow-on-hover:active {
-  color: $text-color;
-}
+  &:active:after {
+    background: transparent;
+  }
 
-.glow-on-hover:active:after {
-  background: transparent;
-}
+  &:hover:before {
+    opacity: 1;
+  }
 
-.glow-on-hover:hover:before {
-  opacity: 1;
-}
-
-.glow-on-hover:after {
-  z-index: -1;
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: $primary-color;
-  left: 0;
-  top: 0;
-  border-radius: 10px;
+  &:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: $primary-color;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
 }
 
 @keyframes glowing {
@@ -348,4 +461,40 @@ main {
   100% {
     background-position: 0 0;
   }
+}
+
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+/* Custom Scrollbar */
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 50%;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $text-color-bg-primary;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $primary-color;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: $primary-color;
 }
