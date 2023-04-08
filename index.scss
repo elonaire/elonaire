@@ -229,6 +229,24 @@ main {
   }
 }
 
+/* Portfolio Page styles */
+.portfolio {
+  background-color: $dark-color;
+  min-height: 100vh;
+  .tabs-container {
+    padding: 20px;
+    animation: 1.5s ease alternate slidein;
+  }
+
+  .projects {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: 1.5s ease alternate slidein;
+  }
+}
+
 /* Timeline styles */
 .timeline {
   position: relative;
@@ -288,6 +306,59 @@ main {
         color: $light-gray;
         ol {
           list-style-type: circle;
+        }
+      }
+    }
+  }
+}
+
+/* Project Card styles */
+.project {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  // padding: 2%;
+  margin: 2%;
+  border-radius: 0.25em;
+  background-color: $text-color-bg-primary;
+  width: 300px;
+  height: 200px;
+
+  img[alt=project-image] {
+    width: 100%;
+    margin: 2%;
+    height: 200px;
+    object-fit: contain;
+  }
+
+  a {
+    color: $text-color;
+  }
+
+  .project-details {
+    flex-basis: 60%;
+    .project-title {
+      color: $text-color-bg-primary;
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .project-description {
+      color: $text-color-bg-primary;
+      font-size: 15px;
+    }
+    .project-links {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      .project-link {
+        color: $text-color-bg-primary;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        &:hover {
+          color: $primary-color;
         }
       }
     }
@@ -535,6 +606,28 @@ main {
   .right {
     transform: rotateY(-15deg);
   }
+}
+
+/* Contact component styles */
+.tabs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  color: $light-gray;
+  list-style: none;
+  li {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+}
+
+/* utility classes */
+.active-tab {
+  background: $primary-color;
+  color: $text-color-bg-primary;
 }
 
 /* Animations */

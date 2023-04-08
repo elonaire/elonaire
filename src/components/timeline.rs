@@ -23,8 +23,7 @@ pub fn timeline_item(props: &TimelineItemProps) -> Html {
         None => format!(" - Present"),
         Some(d) => NaiveDate::parse_from_str(d, "%Y-%m-%d").unwrap().format(" - %b %e %Y").to_string(),
     };
-    let mut split_description = props.description.split(".").collect::<Vec<&str>>();
-    let _ = &split_description.pop(); // remove last empty string
+    let split_description = props.description.split("\n").collect::<Vec<&str>>(); // split description into list of strings based on new line. Note: it adds a full stop to the end of each string
 
     html! {
         <li class="timeline-item">

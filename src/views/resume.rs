@@ -21,7 +21,7 @@ pub fn resume() -> Html {
             end_date: Some("2020-06-01".to_owned()),
             title: "Bachelor of Science in Industrial Chemistry".to_owned(),
             more_info: Some("Multimedia University of Kenya".to_owned()),
-            description: "This is where I enrolled for my Bachelor's degree in Industrial Chemistry and later on discovered my passion for Computer Science in my second year. It was through a unit in that course entitled \"Introduction to Computer Programming\".".to_owned(),
+            description: "This is where I enrolled for my Bachelor's degree in Industrial Chemistry and later on discovered my passion for Computer Science in my second year. It was through a unit in that course entitled \"Introduction to Computer Programming\"".to_owned(),
         },
         // TimelineItemProps {
         //     date: "2015-06-01".to_owned(),
@@ -37,54 +37,54 @@ pub fn resume() -> Html {
             end_date: None,
             title: "Senior Full-stack Software Engineer - React, NestJS, MySQL, AWS, Vagrant".to_owned(),
             more_info: None,
-            description: "Developed web components using React.
-            Developed endpoints using NestJS framework.
-            Integrated third-party APIs such as Vungle and AppLovin to deliver ads into mobile games.
-            Used Vagrant to create and provision EC2 instances in AWS.
-            Used SQS to queue system jobs to run in the background.
-            Used S3 bucket to store assets for creating games.".to_owned(),
+            description: "Developed web components using React
+            Developed endpoints using NestJS framework
+            Integrated third-party APIs such as Vungle and AppLovin to deliver ads into mobile games
+            Used Vagrant to create and provision EC2 instances in AWS
+            Used SQS to queue system jobs to run in the background
+            Used S3 bucket to store assets for creating games".to_owned(),
         },
         TimelineItemProps {
             start_date: "2019-06-01".to_owned(),
             end_date: Some("2020-06-01".to_owned()),
             title: "Lead Frontend Engineer - Angular".to_owned(),
             more_info: None,
-            description: "Chaired sprint meetings to ensure that tasks were well assigned and completed.
-            Ensured that the goals of the team were achieved fueled by the contribution of each and every member of the team.
-            Coordinated with other team leads to ensure that the overall mission and vision of the company are met.".to_owned(),
+            description: "Chaired sprint meetings to ensure that tasks were well assigned and completed on time
+            Ensured that the goals of the team were achieved fueled by the contribution of each and every member of the team
+            Coordinated with other team leads to ensure that the overall mission and vision of the company are met".to_owned(),
         },
         TimelineItemProps {
             start_date: "2018-06-01".to_owned(),
             end_date: Some("2020-06-01".to_owned()),
             title: "Senior Frontend Engineer - Angular".to_owned(),
             more_info: None,
-            description: "Worked together with the UI/UX team to ensure that the product designs have been fulfilled to the latter, using Angular and TypeScript, and SCSS for styling the web pages.
-            Reduced the Angular app build time from 2 hours to ~10 minutes, I achieved this by ensuring reusing of components and reducing redundant code.
-            Designed and implemented deployment strategy of the frontend application and created pipelines to automate the development/release cycle and containerizing the app using Docker.
-            Wrote unit tests for components using Jasmine, therefore ensuring that only quality code free from bugs is shipped to production.
-            Defined the front-end architecture, hence ensuring that the code base is well structured and easy to maintain.
-            Optimized solutions, and applying suitable algorithms hence ensuring that the application is not expensive to the client in terms of computing resources.
-            Implemented lazy loading approach for the back office application. The app's performance improved by 50%. I achieved this by breaking the app into smaller lazy-loaded modules.
-            I orchestrated the containers using Docker Swarm which helped with the high availability of the application.".to_owned(),
+            description: "Worked together with the UI/UX team to ensure that the product designs have been fulfilled to the latter, using Angular and TypeScript, and SCSS for styling the web pages
+            Reduced the Angular app build time from 2 hours to ~10 minutes. I achieved this by ensuring reusing of components and reducing redundant code
+            Designed and implemented deployment strategy of the frontend application and created pipelines to automate the development/release cycle and containerizing the app using Docker
+            Wrote unit tests for components using Jasmine, therefore ensuring that only quality code free from bugs is shipped to production
+            Defined the front-end architecture, hence ensuring that the code base is well structured and easy to maintain
+            Optimized solutions, and applying suitable algorithms hence ensuring that the application is not expensive to the client in terms of computing resources
+            Implemented lazy loading approach for the back office application. The app's performance improved by 50%. I achieved this by breaking the app into smaller lazy-loaded modules
+            I orchestrated the containers using Docker Swarm which helped with the high availability of the application".to_owned(),
         },
         TimelineItemProps {
             start_date: "2017-06-01".to_owned(),
             end_date: Some("2020-06-01".to_owned()),
             title: "React Developer (remote)".to_owned(),
             more_info: None,
-            description: "Consumed Instagram API to display the company's Instagram activity.
-            Split the application built in React (Next.js) into smaller components, therefore ensuring that the code base is organized and easier to maintain.
-            Used the Styled Components library in the project, which ensured that the code was much more concise and declarative.".to_owned(),
+            description: "Consumed Instagram API to display the company's Instagram activity
+            Split the application built in React (Next.js) into smaller components, therefore ensuring that the code base is organized and easier to maintain
+            Used the Styled Components library in the project, which ensured that the code was much more concise and declarative".to_owned(),
         },
         TimelineItemProps {
             start_date: "2017-06-01".to_owned(),
             end_date: Some("2020-06-01".to_owned()),
             title: "Junior Web Developer (remote)".to_owned(),
             more_info: None,
-            description: "Developed a system to enable students to report bullying cases in the United States of America. This was a mitigation measure for school shootouts as a consequence of bullying, following the Florida School shooting.
-            Developed a portal to allow students to fill forms for reporting the cases. The cases could be reported anonymously or through an adult on behalf of the student.
-            Developed a video streaming service that allowed students to upload videos of themselves to the platform.
-            Developed a mailing service in PHP to enable students to send and receive emails from the platform.".to_owned(),
+            description: "Developed a system to enable students to report bullying cases in the United States of America. This was a mitigation measure for school shootouts as a consequence of bullying, following the Florida School shooting
+            Developed a portal to allow students to fill forms for reporting the cases. The cases could be reported anonymously or through an adult on behalf of the student
+            Developed a video streaming service that allowed students to upload videos of themselves to the platform
+            Developed a mailing service in PHP to enable students to send and receive emails from the platform".to_owned(),
         },
     ]);
 

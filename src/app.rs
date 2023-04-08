@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::views::{about::About, home::Home, portfolio::Portfolio, resume::Resume};
+use crate::{views::{about::About, home::Home, portfolio::Portfolio, resume::Resume}, components::tabs::TabProps};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -14,13 +14,26 @@ pub enum Route {
     #[at("/resume")]
     Resume,
     #[at("/portfolio")]
-    Portfolio,
+    PortfolioRoot,
+    #[at("/portfolio/*")]
+    PortfolioMain,
     #[not_found]
     #[at("/404")]
     NotFound,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Routable, PartialEq, Debug, Eq)]
+pub enum PortfolioRoute {
+    #[at("/portfolio")]
+    Portfolio,
+    #[at("/portfolio/:id")]
+    Projects { id: String },
+    #[not_found]
+    #[at("/portfolio/404")]
+    NotFound,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct AppState {
     pub title: String,
     pub description: String,
@@ -32,7 +45,8 @@ pub struct AppState {
     pub residence: String,
     pub address: String,
     pub email: String,
-    pub phone: u32
+    pub phone: u32,
+    pub portfolio_tabs: Vec<TabProps>,
 }
 
 impl Reducible for AppState {
@@ -40,17 +54,7 @@ impl Reducible for AppState {
 
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
         AppState {
-            title: action.title,
-            description: action.description,
-            auto_bio: action.auto_bio,
-            first_name: action.first_name,
-            middle_name: action.middle_name,
-            last_name: action.last_name,
-            date_of_birth: action.date_of_birth,
-            residence: action.residence,
-            address: action.address,
-            email: action.email,
-            phone: action.phone,
+            ..action
         }
         .into()
     }
@@ -63,8 +67,16 @@ pub fn switch(routes: Route) -> Html {
         Route::Home => html! { <Home /> },
         Route::About => html! { <About /> },
         Route::Resume => html! { <Resume /> },
-        Route::Portfolio => html! { <Portfolio /> },
+        Route::PortfolioRoot | Route::PortfolioMain => html! { <Switch<PortfolioRoute> render={portfolio_switch} />  },
         Route::NotFound => html! { <h1>{ "404" }</h1> },
+    }
+}
+
+pub fn portfolio_switch(routes: PortfolioRoute) -> Html {
+    match routes {
+        PortfolioRoute::Portfolio => html! { <Redirect<PortfolioRoute> to={PortfolioRoute::Projects { id: "javascript".to_owned() }} /> },
+        PortfolioRoute::Projects { id: _ } => html! { <Portfolio /> },
+        PortfolioRoute::NotFound => html! {<Redirect<Route> to={Route::NotFound} />}
     }
 }
 
@@ -82,15 +94,47 @@ pub fn app() -> Html {
             residence: "Kenya".to_owned(),
             address: "Unity West, Tatu City".to_owned(),
             email: "elon@techietenka.com".to_owned(),
-            phone: 0704730039
+            phone: 0704730039,
+            portfolio_tabs: vec![
+                TabProps {
+                    title: "JavaScript/TypeScript".to_owned(),
+                    active: true,
+                    url: "javascript".to_owned(),
+                },
+                TabProps {
+                    title: "Rust".to_owned(),
+                    active: false,
+                    url: "rust".to_owned(),
+                },
+                TabProps {
+                    title: "Databases".to_owned(),
+                    active: false,
+                    url: "databases".to_owned(),
+                },
+                TabProps {
+                    title: "Cloud".to_owned(),
+                    active: false,
+                    url: "cloud".to_owned(),
+                },
+                TabProps {
+                    title: "DevOps".to_owned(),
+                    active: false,
+                    url: "devops".to_owned(),
+                },
+                TabProps {
+                    title: "Mobile".to_owned(),
+                    active: false,
+                    url: "mobile".to_owned(),
+                },
+            ],
         }
     });
 
     html! {
         <ContextProvider<AppStateContext> context={state}>
-        <BrowserRouter>
-            <Switch<Route> render={switch} />
-        </BrowserRouter>
+            <BrowserRouter>
+                <Switch<Route> render={switch} />
+            </BrowserRouter>
         </ContextProvider<AppStateContext>>
     }
 }

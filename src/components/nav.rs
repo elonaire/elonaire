@@ -28,7 +28,7 @@ pub fn nav() -> Html {
                 id: 1,
             },
             NavItem {
-                link: Route::Portfolio,
+                link: Route::PortfolioRoot,
                 label: "Portfolio".to_owned(),
                 is_active: false,
                 id: 2,

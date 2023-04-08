@@ -7,3 +7,5 @@ pub mod service_card;
 pub mod loader;
 pub mod timeline;
 pub mod skill;
+pub mod tabs;
+pub mod project_card;
