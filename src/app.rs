@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{views::{about::About, home::Home, portfolio::Portfolio, resume::Resume}, components::tabs::TabProps};
+use crate::{components::tabs::TabProps, data::models::user::User, views::{about::About, blog::Blog, home::Home, portfolio::Portfolio, resume::Resume}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -13,12 +13,27 @@ pub enum Route {
     About,
     #[at("/resume")]
     Resume,
+    #[at("/blog")]
+    BlogRoot,
+    #[at("/blog/*")]
+    BlogMain,
     #[at("/portfolio")]
     PortfolioRoot,
     #[at("/portfolio/*")]
     PortfolioMain,
     #[not_found]
     #[at("/404")]
+    NotFound,
+}
+
+#[derive(Clone, Routable, PartialEq, Debug, Eq)]
+pub enum BlogRoute {
+    #[at("/blog")]
+    Blog,
+    #[at("/blog/:id")]
+    BlogPost { id: String },
+    #[not_found]
+    #[at("/blog/404")]
     NotFound,
 }
 
@@ -33,8 +48,14 @@ pub enum PortfolioRoute {
     NotFound,
 }
 
+pub enum StateAction {
+    UpdateUserInfo(User),
+    UpdatePortfolioTabs(Vec<TabProps>)
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct AppState {
+    pub user_details: User,
     pub title: String,
     pub description: String,
     pub auto_bio: String,
@@ -50,13 +71,26 @@ pub struct AppState {
 }
 
 impl Reducible for AppState {
-    type Action = AppState;
+    type Action = StateAction;
 
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
-        AppState {
-            ..action
-        }
-        .into()
+        let updated_state = match action {
+            StateAction::UpdateUserInfo(user) => {
+                AppState {
+                    user_details: user,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdatePortfolioTabs(tabs) => {
+                AppState {
+                    portfolio_tabs: tabs,
+                    ..self.as_ref().clone()
+                }
+            }
+        };
+        
+        Self { ..updated_state }.into()
     }
 }
 
@@ -67,8 +101,17 @@ pub fn switch(routes: Route) -> Html {
         Route::Home => html! { <Home /> },
         Route::About => html! { <About /> },
         Route::Resume => html! { <Resume /> },
+        Route::BlogRoot | Route::BlogMain => html! { <Switch<BlogRoute> render={blog_switch} /> },
         Route::PortfolioRoot | Route::PortfolioMain => html! { <Switch<PortfolioRoute> render={portfolio_switch} />  },
         Route::NotFound => html! { <h1>{ "404" }</h1> },
+    }
+}
+
+pub fn blog_switch(routes: BlogRoute) -> Html {
+    match routes {
+        BlogRoute::Blog => html! { <Blog /> },
+        BlogRoute::BlogPost { id: _ } => html! { <Blog /> },
+        BlogRoute::NotFound => html! {<Redirect<Route> to={Route::NotFound} />}
     }
 }
 
@@ -84,6 +127,7 @@ pub fn portfolio_switch(routes: PortfolioRoute) -> Html {
 pub fn app() -> Html {
     let state = use_reducer(|| {
         AppState {
+            user_details: User::default(),
             title: "Software Engineer".to_owned(),
             description: "I am a talented full-stack software engineer, with 6+ years of experience in full-stack development. I have an interest in Game Development and the Internet of Things technology.".to_owned(),
             first_name: "Elon".to_owned(),

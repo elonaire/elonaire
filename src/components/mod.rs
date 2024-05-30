@@ -9,3 +9,8 @@ pub mod timeline;
 pub mod skill;
 pub mod tabs;
 pub mod project_card;
+pub mod blog_nav;
+pub mod line_separator;
+pub mod blog;
+pub mod ad;
+pub mod footer;

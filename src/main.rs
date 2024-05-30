@@ -1,6 +1,7 @@
 mod app;
 mod views;
 mod components;
+mod data;
 
 use app::App;
 

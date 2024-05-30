@@ -3,7 +3,7 @@ use yew::prelude::*;
 use crate::components::{
     back_home::BackHome,
     page_header::{PageHeader, PageHeaderProps},
-    styled_heading::{StyledHeading},
+    styled_heading::StyledHeading,
     timeline::{Timeline, TimelineItemProps},
     transition::Transition, skill::{Skills, SkillProps},
 };

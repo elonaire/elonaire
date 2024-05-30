@@ -69,7 +69,7 @@ pub fn about() -> Html {
 
                 <div class="details">
                     <div class="images-container">
-                        <img class={classes!("main-img")} src="img/1.jpg" alt="logo" />
+                        <img class={classes!("main-img")} src="img/me.jpeg" alt="logo" />
                         <img class={classes!("sub-img")} src="img/2.jpg" alt="logo" />
                     </div>
 

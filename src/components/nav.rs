@@ -33,10 +33,23 @@ pub fn nav() -> Html {
                 is_active: false,
                 id: 2,
             },
+            NavItem {
+                link: Route::BlogRoot,
+                label: "Blog".to_owned(),
+                is_active: false,
+                id: 3,
+            },
         ]
     });
 
+    let is_mobile_menu_open = use_state(|| false);
+    let toggle_mobile_menu = {
+        let is_mobile_menu_open = is_mobile_menu_open.clone();
+        Callback::from(move |_| is_mobile_menu_open.set(!*is_mobile_menu_open))
+    };
+
     html! {
+        <>
         <nav class="nav">
         <Link<Route> classes={classes!("logo")} to={Route::Home}>
         <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
@@ -49,7 +62,7 @@ pub fn nav() -> Html {
                     </li>}
             }).collect::<Html>()
         }
-        <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+        // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
         </ul>
         <ul class="nav-social-list">
         <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>
@@ -58,5 +71,36 @@ pub fn nav() -> Html {
         <li class={classes!("nav-item")}><a href="https://www.instagram.com/elonaire95/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapInstagram}/></a></li>
         </ul>
         </nav>
+
+        /* Retractable Mobile Nav */
+        <nav class={classes!("nav-mobile", if *is_mobile_menu_open { "open" } else { "closed" })}>
+        <div class="nav-mobile-top">
+            <Link<Route> classes={classes!("logo")} to={Route::Home}>
+        <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
+        </Link<Route>>
+        <button class={"hamburger"} onclick={toggle_mobile_menu.clone()}>
+            { if *is_mobile_menu_open { "✖️" } else { "☰" } }
+        </button>
+        </div>
+        <div class={"mobile-menu-content"}>
+            <ul class="nav-list">
+        {
+            nav_items.iter().map(|nav_item| {
+                html!{<li key={nav_item.id} class={classes!("nav-item", if nav_item.is_active { "active" } else { "" })}>
+                <Link<Route> to={nav_item.link.clone()}>{nav_item.label.clone()}</Link<Route>>
+                    </li>}
+            }).collect::<Html>()
+        }
+        // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+        </ul>
+        <ul class="nav-social-list">
+        <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>
+        <li class={classes!("nav-item")}><a href="https://twitter.com/elonaire" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapTwitter}/></a></li>
+        <li class={classes!("nav-item")}><a href="https://www.linkedin.com/in/elon-aseneka-elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapLinkedin}/></a></li>
+        <li class={classes!("nav-item")}><a href="https://www.instagram.com/elonaire95/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapInstagram}/></a></li>
+        </ul>
+        </div>
+        </nav>
+        </>
     }
 }

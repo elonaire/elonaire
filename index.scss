@@ -1,12 +1,68 @@
 /* theme */
 $primary-color: #32b089;
-$text-color: #444544;
+$text-color: #000D1E;
 $text-color-bg-primary: rgb(233, 233, 233);
-$dark-color: #111111;
+$dark-color: #000D1E;
 $light-gray: #b6b6b6;
+$gray: #666;
+$red: #bd1550;
+$white: #ffffffef;
+
+:root {
+  /* fonts */
+  --font-inter: Inter;
+  --font-poppins: Poppins;
+
+  /* font sizes */
+  --font-size-xs: 0.75rem; // 12px / 16px = 0.75rem
+  --font-size-sm: 0.875rem; // 14px / 16px = 0.875rem
+  --font-size-lg: 1.125rem; // 18px / 16px = 1.125rem
+  --font-size-5lg: 1.2rem; // 19px / 16px = 1.2rem
+  --font-size-xl: 1.25rem; // 20px / 16px = 1.25rem
+  --font-size-5xl: 1.5rem; // 24px / 16px = 1.5rem
+  --font-size-17xl: 2.25rem; // 36px / 16px = 2.25rem
+  --font-size-29xl: 3rem; // 48px / 16px = 3rem
+  --font-size-32xl: 4rem; // 64px / 16px = 4rem
+
+  /* Border radiuses */
+  --br-5xs: 8px;
+  --br-3xs: 10px;
+}
 
 // Fonts
 @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+// Font sizes for mobile-first approach
+html {
+  font-size: var(--font-size-sm);
+}
+
+h1 {
+  font-size: var(--font-size-29xl);
+}
+
+h2 {
+  font-size: var(--font-size-17xl);
+}
+
+h3 {
+  font-size: var(--font-size-5xl);
+}
+
+h4 {
+  font-size: var(--font-size-xl);
+}
+
+h5 {
+  font-size: var(--font-size-lg);
+}
+
+h6 {
+  font-size: var(--font-size-sm);
+}
+
+p {
+  font-size: var(--font-size-xs);
+}
 
 /* General styles */
 html,
@@ -19,7 +75,8 @@ body {
   // font-family: 'Nunito', sans-serif;
 }
 
-main {
+main,
+nav {
   font-family: 'Nunito', sans-serif;
 }
 
@@ -27,14 +84,53 @@ main {
   color: $primary-color;
 }
 
+/* General elements */
+input[type='text'],
+input[type='password'],
+input[type='email'] {
+  border: 2px solid $light-gray;
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 100%;
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
+  &.error {
+    border-color: red;
+  }
+}
+
 /* Buttons styles */
 
 .button {
   border: none;
-  padding: 2% 4%;
+  // padding: 12px 20px;
+  padding: 8px 15px;
+  font-size:  var(--font-size-xs); // Smaller font-size
   border-radius: 5px;
   &:hover {
     cursor: pointer;
+  }
+}
+
+.button-outlined {
+  border: 2px solid $text-color;
+  color: $text-color;
+  background-color: transparent;
+  &:hover {
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+}
+
+.button-outlined-primary {
+  border: 2px solid $primary-color;
+  color: $primary-color;
+  background-color: transparent;
+  &:hover {
+    border-color: $text-color;
+    color: $text-color;
   }
 }
 
@@ -47,15 +143,19 @@ main {
 .nav {
   width: 100%;
   height: 60px;
-  display: flex;
+  display: none;
+  // display: flex;
   justify-content: space-between;
 
   .logo {
-    float: left;
-    margin-left: 2%;
-    width: 10%;
+    // float: left;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    // margin-left: 2%;
+    // width: 50%;
     .logo-img {
-      width: 70px;
+      width: 90px;
     }
   }
 
@@ -116,30 +216,173 @@ main {
       }
     }
   }
+
+  .search-bar {
+    padding: 10px;
+    margin-right: 2%;
+  }
+}
+
+/* Blog Nav styles */
+.blog-nav {
+  @extend .nav;
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  background-color: $text-color-bg-primary;
+  top: 0;
+  justify-content: normal;
+
+  .search-bar {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    width: 100%;
+    color: $dark-color;
+  }
+}
+
+/* Mobile Nav styles */
+.nav-mobile {
+  &.open .mobile-menu-content {
+    display: block;
+    width: 100%;
+  }
+
+  &.closed .mobile-menu-content {
+    display: none;
+  }
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  .nav-mobile-top {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .logo {
+      .logo-img {
+        width: 90px;
+      }
+    }
+
+    .hamburger {
+      font-size: 30px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .mobile-menu-content {
+    position: relative;
+    animation: 1s ease alternate slideinmenu;
+    background-color: $dark-color;
+    height: 100vh;
+    .nav-list {
+      list-style-type: none;
+      display: flex;
+      margin: 0;
+      flex-direction: column;
+      .nav-item {
+        cursor: pointer;
+        display: flex;
+        a {
+          display: flex;
+          padding: 1em;
+          text-decoration: none;
+          color: $text-color-bg-primary;
+          margin: 0;
+          width: 100%;
+          &:hover {
+            color: $primary-color;
+          }
+        }
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+
+    .nav-social-list {
+      list-style-type: none;
+      display: flex;
+      margin: 0;
+      width: 100%;
+      flex-direction: row;
+      .nav-item {
+        cursor: pointer;
+        display: flex;
+        a {
+          padding: 1em;
+          text-decoration: none;
+          color: $text-color-bg-primary;
+          margin: 0;
+          &:hover {
+            color: $primary-color;
+          }
+        }
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  .search-bar {
+    padding: 10px;
+    margin-right: 2%;
+  }
 }
 
 /* Home Page Styles */
 .home {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   color: $text-color;
   justify-content: center;
   align-items: center;
   margin-top: 18%;
+  padding: 0.2em;
   .profile-image {
-    position: absolute;
+    display: block;
+    // position: absolute;
     width: 40%;
-    right: 2%;
+    // right: 2%;
+    border-radius: 100%;
+    margin: 0 auto;
   }
   .left {
-    flex-basis: 60%;
+    // flex-basis: 60%;
     animation: 1.5s ease alternate slidein;
     z-index: 1;
+    h1 {
+      text-align: center;
+      margin: 10.5px;
+    }
     .description {
-      width: 60%;
+      // width: 60%;
+      text-align: center;
+      margin: 1em;
+      padding: 0;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1em;
     }
   }
   .right {
+    display: none;
     z-index: 1;
     border-left: 4px solid $primary-color;
     .title {
@@ -155,7 +398,7 @@ main {
   min-height: 100vh;
   .details {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
     padding: 2%;
     animation: 1.5s ease alternate slidein;
@@ -206,20 +449,22 @@ main {
     animation: 1.5s ease alternate slidein;
     margin-top: 1%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     .education {
       flex-basis: 50%;
+      padding: 0.8em;
     }
     .experience {
       flex-basis: 50%;
+      padding: 0.8em;
     }
   }
   .skills {
-    padding: 2%;
+    padding: 0.8em;
     animation: 1.5s ease alternate slidein;
     margin-top: 1%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     .technical {
       flex-basis: 50%;
     }
@@ -234,8 +479,15 @@ main {
   background-color: $dark-color;
   min-height: 100vh;
   .tabs-container {
+    display: flex;
+    overflow-x: scroll;
     padding: 20px;
     animation: 1.5s ease alternate slidein;
+  }
+
+  .tabs-container::-webkit-scrollbar {
+    height: 3px;
+    border-radius: 50%;
   }
 
   .projects {
@@ -244,6 +496,68 @@ main {
     justify-content: center;
     flex-wrap: wrap;
     animation: 1.5s ease alternate slidein;
+  }
+}
+
+/* Blog Page styles */
+.blog {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // justify-content: center;
+  align-items: center;
+  background-color: $text-color-bg-primary;
+}
+
+/* Blog Hot banner styles */
+.main-banner {
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  // padding: 50px 20px;
+
+  .content {
+    // max-width: 600px;
+    color: $dark-color;
+    background-color: rgba($white, 0.6);
+    h1 {
+      font-size: 2rem; // Default to a smaller size for mobile-first approach
+      margin-bottom: 0.5rem;
+      
+    }
+
+    p {
+      font-size: 1rem; // Default to a smaller size for mobile-first approach
+    }
+  }
+}
+
+/* Blog Section Styles */
+.blog-section {
+  .section-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5em 0;
+    span {
+      flex-basis: calc(80% - 20px);
+      color: $dark-color;
+      font-size: var(--font-size-5xl);
+      font-weight: bold;
+    }
+    button {
+      white-space: nowrap;
+    }
+  }
+
+  .blog-post-cards-container {
+    display: flex;
+    // gap: 20px; // Adjust the gap as necessary
+    flex-direction: column;
   }
 }
 
@@ -325,7 +639,7 @@ main {
   width: 300px;
   height: 200px;
 
-  img[alt=project-image] {
+  img[alt='project-image'] {
     width: 100%;
     margin: 2%;
     height: 200px;
@@ -543,7 +857,7 @@ main {
 .styled-heading {
   border: 3px solid $text-color;
   text-align: center;
-  width: fit-content;
+  // width: fit-content;
   padding: 0 20px;
   color: $text-color-bg-primary;
   h2 {
@@ -587,7 +901,7 @@ main {
   overflow: hidden;
   perspective: 1000px;
   .three-d-card {
-    width: 60%;
+    width: 100%;
     min-height: 300px;
     background: $primary-color;
     transform-style: preserve-3d;
@@ -608,7 +922,7 @@ main {
   }
 }
 
-/* Contact component styles */
+/* Tabs component styles */
 .tabs {
   display: flex;
   flex-direction: row;
@@ -624,10 +938,199 @@ main {
   }
 }
 
+/* Blog categories styles */
+.blog-categories {
+  display: flex;
+  flex-direction: row;
+  // justify-content: center;
+  margin: 0;
+  padding: 0;
+  color: $light-gray;
+  margin-top: 4rem;
+  flex-wrap: nowrap; /* Prevent flex items from wrapping */
+  // align-items: stretch; /* Ensure equal height */
+  overflow-x: scroll;
+  li {
+    padding: 10px 20px;
+    list-style-type: none;
+    // display: flex;
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+}
+
+/* Blog Post cards styles */
+.blog-post-card {
+  display: flex;
+  flex-direction: column;
+  // border: 1px solid $light-gray;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: $white;
+  // box-shadow: 0 2px 10px $dark-color;
+  // transition: box-shadow 0.3s ease;
+  margin-bottom: 2rem;
+
+  &:hover {
+    box-shadow: 0 2px 10px $dark-color;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .blog-post-image-container {
+    position: relative;
+
+    .blog-post-image {
+      width: 100%;
+      height: 10rem;
+      object-fit: cover;
+    }
+
+    .category {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: rgba($primary-color, 0.8); // Set opacity to 0.5
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: var(--font-size-xs);
+      color: $text-color-bg-primary;
+    }
+
+    .pub-date {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background-color: rgba($primary-color, 0.8); // Set opacity to 0.5
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: var(--font-size-xs);
+      color: $text-color-bg-primary;
+    }
+  }
+
+  .blog-post-content {
+    padding: 13px;
+
+    .blog-post-title {
+      margin: 0 0 8px 0;
+      font-size: 1.25rem;
+      color: $text-color;
+      text-decoration: underline;
+    }
+
+    .blog-post-description {
+      font-size: 1rem;
+      color: $gray;
+      margin-bottom: 16px;
+      overflow: hidden; // Ensures that the overflow text is hidden
+      white-space: nowrap; // Prevents the text from wrapping to the next line
+      text-overflow: ellipsis; // Adds ellipsis to the end of the text
+    }
+
+    .blog-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+      color: $gray;
+    }
+  }
+}
+
+.blog-categories::-webkit-scrollbar {
+  height: 3px;
+  border-radius: 50%;
+}
+
+/* Horizontal separator styles */
+.horizontal-separator {
+  border-bottom: 0.5px solid $light-gray;
+  width: 100%;
+  margin: 10px 0;
+}
+
 /* utility classes */
 .active-tab {
   background: $primary-color;
   color: $text-color-bg-primary;
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  .home {
+    display: flex;
+    flex-direction: row;
+    margin-top: 0;
+    .profile-image {
+      display: block;
+      // position: absolute;
+      width: 30%;
+      // right: 2%;
+      border-radius: 100%;
+      margin: 0 auto;
+    }
+    .left {
+      flex-basis: 60%;
+      animation: 1.5s ease alternate slidein;
+      z-index: 1;
+      h1 {
+        text-align: center;
+      }
+      .description {
+        // width: 60%;
+        text-align: center;
+        margin: 1em;
+      }
+      .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 1em;
+      }
+    }
+    .right {
+      display: block;
+      z-index: 1;
+      border-left: 4px solid $primary-color;
+      .title {
+        padding-left: 20px;
+        background: $text-color-bg-primary;
+      }
+    }
+  }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  html {
+    font-size: var(--font-size-5lg);
+  }
+
+  .nav {
+    display: flex;
+  }
+
+  .nav-mobile {
+    display: none;
+  }
+
+  // .main-banner {
+  //   padding: 100px 20px; // Increase padding on larger screens
+  //   .content {
+  //     max-width: 800px; // Allow more space for the content on large screens
+  //   }
+  // }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  // .main-banner {
+  //   .content {
+  //     h1 {
+  //       font-size: var(
+  //         --font-size-32xl
+  //       ); // Even larger text for very large screens
+  //     }
+  //   }
+  // }
 }
 
 /* Animations */
@@ -743,7 +1246,6 @@ main {
   100% {
     transform: rotateY(15deg);
   }
-  
 }
 
 /* Custom Scrollbar */
@@ -766,4 +1268,16 @@ main {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: $primary-color;
+}
+
+@keyframes slideinmenu {
+  from {
+    right: 100%;
+    width: 100%;
+  }
+
+  to {
+    right: 0%;
+    width: 100%;
+  }
 }

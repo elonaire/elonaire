@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::{components::{transition::Transition, page_header::{PageHeaderProps, PageHeader}, back_home::BackHome, tabs::{Tabs}, project_card::{ProjectProps, ProjectCard}}, app::AppStateContext};
+use crate::{components::{transition::Transition, page_header::{PageHeaderProps, PageHeader}, back_home::BackHome, tabs::Tabs, project_card::{ProjectProps, ProjectCard}}, app::AppStateContext};
 
 #[function_component(Portfolio)]
 pub fn portfolio() -> Html {

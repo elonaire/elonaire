@@ -1,9 +1,7 @@
-use std::ops::Deref;
-
-use yew::{prelude::*};
+use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::app::{AppStateContext, AppState, PortfolioRoute};
+use crate::app::{AppStateContext, PortfolioRoute, StateAction};
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct TabsProps {
@@ -45,7 +43,7 @@ pub fn tab(props: &TabProps) -> Html {
         
     let onclick = Callback::from(move |_| {
         let mut cloned_tabs = state_ctx_reducer.portfolio_tabs.clone();
-        let state_value = state_ctx_reducer.deref().to_owned();
+        // let state_value = state_ctx_reducer.deref().to_owned();
 
         for tab in cloned_tabs.iter_mut() {
             if tab.title == cl_props.title.clone() {
@@ -54,21 +52,8 @@ pub fn tab(props: &TabProps) -> Html {
                 tab.update_active(false);
             };
         };
-        
-        state_ctx_reducer.dispatch(AppState {
-            portfolio_tabs: cloned_tabs,
-            address: state_value.address,
-            auto_bio: state_value.auto_bio,
-            date_of_birth: state_value.date_of_birth,
-            description: state_value.description,
-            email: state_value.email,
-            first_name: state_value.first_name,
-            last_name: state_value.last_name,
-            middle_name: state_value.middle_name,
-            phone: state_value.phone,
-            residence: state_value.residence,
-            title: state_value.title,
-        });
+
+        state_ctx_reducer.dispatch(StateAction::UpdatePortfolioTabs(cloned_tabs.clone()));
 
         // log::info!("Clicked on tab: {:?}", cloned_tabs.deref().to_owned());
         navigator.push(&PortfolioRoute::Projects { id: cl_props.url.clone() })
