@@ -1,0 +1,27 @@
+/* Blog Hot banner styles */
+.main-banner {
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    // padding: 50px 20px;
+  
+    .content {
+      // max-width: 600px;
+      color: $white;
+      // background-color: rgba($white, 0.8);
+      h1 {
+        font-size: 2rem; // Default to a smaller size for mobile-first approach
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 8px rgba($dark-color, 0.9);
+      }
+  
+      p {
+        font-size: 1rem; // Default to a smaller size for mobile-first approach
+        text-shadow: 2px 2px 8px rgba($dark-color, 0.9);
+      }
+    }
+  }

@@ -1,0 +1,35 @@
+/* Blog categories styles */
+.blog-categories {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+  color: $dark-color;
+  margin-top: 4rem;
+  flex-wrap: nowrap; /* Prevent flex items from wrapping */
+  // align-items: stretch; /* Ensure equal height */
+  overflow-x: scroll;
+  li {
+    padding: 10px 20px;
+    list-style-type: none;
+    // display: flex;
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  .blog-categories {
+    justify-content: center;
+  }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  
+}

@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_router::prelude::Link;
 use yew_icons::{Icon, IconId};
 
-use crate::{app::Route, views::blog::BlogCategory, components::line_separator::LineSeparator};
+use crate::{app::Route, components::line_separator::LineSeparator, data::models::blog::BlogCategory};
 
 #[function_component(BlogNav)]
 pub fn blog_nav() -> Html {

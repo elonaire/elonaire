@@ -1,0 +1,108 @@
+// Font sizes for mobile-first approach
+html {
+    font-size: var(--font-size-sm);
+  }
+  
+  h1 {
+    font-size: var(--font-size-29xl);
+  }
+  
+  h2 {
+    font-size: var(--font-size-17xl);
+  }
+  
+  h3 {
+    font-size: var(--font-size-5xl);
+  }
+  
+  h4 {
+    font-size: var(--font-size-xl);
+  }
+  
+  h5 {
+    font-size: var(--font-size-lg);
+  }
+  
+  h6 {
+    font-size: var(--font-size-sm);
+  }
+  
+  p {
+    font-size: var(--font-size-sm);
+  }
+  
+  /* General styles */
+  html,
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background-color: $text-color-bg-primary;
+    overflow-x: hidden;
+    overflow-y: auto;
+    // font-family: 'Nunito', sans-serif;
+  }
+  
+  main,
+  nav {
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .primary-color-text {
+    color: $primary-color;
+  }
+  
+  /* General elements */
+  input[type='text'],
+  input[type='password'],
+  input[type='email'] {
+    border: 2px solid $light-gray;
+    border-radius: 4px;
+    padding: 0.5rem;
+    width: 100%;
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+    &.error {
+      border-color: red;
+    }
+  }
+  
+  /* Buttons styles */
+  
+  .button {
+    border: none;
+    // padding: 12px 20px;
+    padding: 10px 17px;
+    font-size:  var(--font-size-sm); // Smaller font-size
+    border-radius: 5px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  
+  .button-outlined {
+    border: 2px solid $text-color;
+    color: $text-color;
+    background-color: transparent;
+    &:hover {
+      border-color: $primary-color;
+      color: $primary-color;
+    }
+  }
+  
+  .button-outlined-primary {
+    border: 2px solid $primary-color;
+    color: $primary-color;
+    background-color: transparent;
+    &:hover {
+      border-color: $text-color;
+      color: $text-color;
+    }
+  }
+  
+  .button-primary {
+    background-color: $primary-color;
+    color: $text-color-bg-primary;
+  }
+

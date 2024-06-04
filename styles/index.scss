@@ -1,0 +1,411 @@
+@import '_theme';
+@import 'common';
+@import 'components/nav';
+@import 'components/service_card';
+@import 'components/blog_banner';
+@import 'components/blog_section';
+@import 'components/resume_timeline';
+@import 'components/portfolio_project';
+@import 'components/blog_filter';
+@import 'components/blog_post_card';
+@import 'components/footer';
+@import 'views/blog_post';
+@import 'views/home';
+@import 'views/about';
+@import 'views/resume';
+@import 'views/portfolio';
+@import 'views/blog';
+
+/* Transition component styles */
+.transition {
+  margin: 0;
+  position: fixed; // to span the entire viewport
+  left: 100%;
+  background: $primary-color;
+  animation: 1.5s ease alternate slideintrans;
+  height: 100%;
+  z-index: 1000;
+}
+
+/* BackHome component styles */
+.back-home {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  color: $text-color-bg-primary;
+  .icon-container {
+    overflow: hidden;
+    position: relative;
+    border: none;
+    padding: 0;
+    width: 5em;
+    height: 5em;
+    border-radius: 50%;
+    background: transparent;
+    color: $text-color-bg-primary;
+    font: inherit;
+    text-indent: 100%;
+    cursor: pointer;
+
+    &:focus {
+      outline: solid 0 transparent;
+      box-shadow: 0 0 0 2px lighten($primary-color, 15%);
+    }
+
+    &:hover {
+      background: lighten($primary-color, 15%);
+    }
+
+    &:before,
+    &:after {
+      position: absolute;
+      top: 15%;
+      left: calc(50% - 0.0625em);
+      width: 0.125em;
+      height: 70%;
+      border-radius: 0.125em;
+      transform: rotate(45deg);
+      background: currentcolor;
+      content: '';
+    }
+
+    &:after {
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+/* Page header styles */
+.page-header {
+  animation: 1.5s ease alternate slidein;
+  .who {
+    font-size: larger;
+    text-align: center;
+    color: $primary-color;
+    margin-top: 0;
+  }
+  .about-head {
+    text-align: center;
+    color: $text-color-bg-primary;
+  }
+
+  .underline-container {
+    display: flex;
+    .left {
+      flex-basis: 40%;
+    }
+    .underline {
+      flex-basis: 20%;
+      border-bottom: 2px solid $primary-color;
+    }
+    .right {
+      flex-basis: 40%;
+    }
+  }
+}
+
+.loader {
+  /* Backdrop */
+  background-color: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+  position: fixed; // to span the entire viewport
+  top: 0;
+  overflow: hidden;
+  z-index: 1000;
+  /* CSS loader */
+  .lds-hourglass {
+    margin: auto;
+    top: 48%;
+    // display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    &:after {
+      content: ' ';
+      display: block;
+      border-radius: 50%;
+      width: 0;
+      height: 0;
+      margin: 8px;
+      box-sizing: border-box;
+      border: 32px solid $primary-color;
+      border-color: $primary-color transparent $primary-color transparent;
+      animation: lds-hourglass 1.2s infinite;
+    }
+  }
+}
+
+/* Styled Heading component styles */
+.styled-heading {
+  border: 3px solid $light-gray;
+  text-align: center;
+  // width: fit-content;
+  padding: 0 20px;
+  color: $text-color-bg-primary;
+  h2 {
+    padding: 10px 0;
+    margin: 0;
+  }
+}
+
+/* Skill component styles */
+.skill {
+  display: flex;
+  flex-direction: row;
+  padding: 10px 20px;
+  cursor: pointer;
+  .skill-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+  }
+  .skill-name {
+    display: inline-block;
+    color: $text-color-bg-primary;
+    font-weight: bold;
+    margin: 0;
+    margin-left: 5px;
+  }
+
+  // border bottom dotted except last child
+  &:not(:last-child) {
+    border-bottom: 1px dotted $text-color-bg-primary;
+  }
+
+  &:hover {
+    background: $light-gray;
+    color: $text-color;
+  }
+}
+
+/* Skills component styles */
+.skills {
+  overflow: hidden;
+  perspective: 1000px;
+  .three-d-card {
+    width: 100%;
+    min-height: 300px;
+    background: $primary-color;
+    transform-style: preserve-3d;
+    margin-bottom: 10%;
+    margin-top: 5%;
+    &:hover {
+      animation: 1s ease alternate lift;
+      transform: rotateY(15deg);
+    }
+  }
+
+  .left {
+    transform: rotateY(15deg);
+  }
+
+  .right {
+    transform: rotateY(-15deg);
+  }
+}
+
+/* Tabs component styles */
+.tabs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  color: $light-gray;
+  list-style: none;
+  li {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+}
+
+.blog-categories::-webkit-scrollbar {
+  height: 3px;
+  border-radius: 50%;
+}
+
+/* Horizontal separator styles */
+.horizontal-separator {
+  border-bottom: 0.5px solid $light-gray;
+  width: 100%;
+  margin: 10px 0;
+}
+
+/* utility classes */
+.active-tab {
+  background: $primary-color;
+  color: $text-color-bg-primary;
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  html {
+    font-size: var(--font-size-md);
+  }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  html {
+    font-size: var(--font-size-md);
+  }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  
+}
+
+/* Animations */
+@keyframes slidein {
+  from {
+    margin-left: 30%;
+    width: 100%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+@keyframes slideintrans {
+  from {
+    left: 0%;
+    width: 100%;
+  }
+
+  to {
+    right: 100%;
+    width: 100%;
+  }
+}
+
+/* Button hover effect */
+.glow-on-hover {
+  border: none;
+  outline: none;
+  color: $text-color-bg-primary;
+  background: $primary-color;
+  cursor: pointer;
+  position: relative;
+  &:before {
+    content: '';
+    background: linear-gradient(
+      45deg,
+      $primary-color,
+      lighten($primary-color, 15%),
+      $dark-color
+    );
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+
+  &:active {
+    color: $text-color;
+  }
+
+  &:active:after {
+    background: transparent;
+  }
+
+  &:hover:before {
+    opacity: 1;
+  }
+
+  &:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: $primary-color;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
+}
+
+@keyframes glowing {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+@keyframes lift {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(15deg);
+  }
+}
+
+/* Custom Scrollbar */
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 50%;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $text-color-bg-primary;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $primary-color;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: $primary-color;
+}
+
+@keyframes slideinmenu {
+  from {
+    right: 100%;
+    width: 100%;
+  }
+
+  to {
+    right: 0%;
+    width: 100%;
+  }
+}

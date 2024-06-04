@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::tabs::TabProps, data::models::user::User, views::{about::About, blog::Blog, home::Home, portfolio::Portfolio, resume::Resume}};
+use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, user::User}, views::{about::About, blog::Blog, home::Home, portfolio::Portfolio, resume::Resume, blog_post::BlogPostDetails}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -30,8 +30,8 @@ pub enum Route {
 pub enum BlogRoute {
     #[at("/blog")]
     Blog,
-    #[at("/blog/:id")]
-    BlogPost { id: String },
+    #[at("/blog/read/:id")]
+    BlogPostDetails { id: String },
     #[not_found]
     #[at("/blog/404")]
     NotFound,
@@ -41,7 +41,7 @@ pub enum BlogRoute {
 pub enum PortfolioRoute {
     #[at("/portfolio")]
     Portfolio,
-    #[at("/portfolio/:id")]
+    #[at("/portfolio/details/:id")]
     Projects { id: String },
     #[not_found]
     #[at("/portfolio/404")]
@@ -50,7 +50,8 @@ pub enum PortfolioRoute {
 
 pub enum StateAction {
     UpdateUserInfo(User),
-    UpdatePortfolioTabs(Vec<TabProps>)
+    UpdatePortfolioTabs(Vec<TabProps>),
+    UpdateBlogPosts(Vec<BlogPost>),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
@@ -68,6 +69,7 @@ pub struct AppState {
     pub email: String,
     pub phone: u32,
     pub portfolio_tabs: Vec<TabProps>,
+    pub blog_posts: Vec<BlogPost>,
 }
 
 impl Reducible for AppState {
@@ -85,6 +87,13 @@ impl Reducible for AppState {
             StateAction::UpdatePortfolioTabs(tabs) => {
                 AppState {
                     portfolio_tabs: tabs,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdateBlogPosts(posts) => {
+                AppState {
+                    blog_posts: posts,
                     ..self.as_ref().clone()
                 }
             }
@@ -110,7 +119,7 @@ pub fn switch(routes: Route) -> Html {
 pub fn blog_switch(routes: BlogRoute) -> Html {
     match routes {
         BlogRoute::Blog => html! { <Blog /> },
-        BlogRoute::BlogPost { id: _ } => html! { <Blog /> },
+        BlogRoute::BlogPostDetails { id } => html! { <BlogPostDetails {id} /> },
         BlogRoute::NotFound => html! {<Redirect<Route> to={Route::NotFound} />}
     }
 }
@@ -171,6 +180,7 @@ pub fn app() -> Html {
                     url: "mobile".to_owned(),
                 },
             ],
+            blog_posts: vec![],
         }
     });
 

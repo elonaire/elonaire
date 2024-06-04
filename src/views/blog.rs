@@ -1,62 +1,50 @@
+use std::ops::Deref;
+
 use yew::prelude::*;
 
-use crate::components::{blog_nav::BlogNav, blog::{blog_section::BlogSection, main_banner::MainBanner, blog_post_card::BlogPostCardProps}, line_separator::LineSeparator, ad::AdComponent};
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum BlogCategory {
-    All,
-    WebDevelopment,
-    MobileDevelopment,
-    ArtificialIntelligence,
-    Technology,
-    Lifestyle,
-    Travel,
-    LatestRelease,
-}
-
-impl BlogCategory {
-    pub fn to_string(&self) -> String {
-        match self {
-            BlogCategory::All => "All".to_string(),
-            BlogCategory::WebDevelopment => "Web Development".to_string(),
-            BlogCategory::MobileDevelopment => "Mobile Development".to_string(),
-            BlogCategory::ArtificialIntelligence => "Artificial Intelligence".to_string(),
-            BlogCategory::Technology => "Technology".to_string(),
-            BlogCategory::Lifestyle => "Lifestyle".to_string(),
-            BlogCategory::Travel => "Travel".to_string(),
-            BlogCategory::LatestRelease => "Latest Release".to_string(),
-        }
-    }
-}
+use crate::{components::{ad::AdComponent, blog::{blog_section::BlogSection, main_banner::MainBanner}, blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator}, data::{graphql::api_call::perform_query_without_vars, models::blog::{GetBlogPostsResponse, BlogCategory}}};
+use crate::app::{AppStateContext, StateAction};
 
 #[function_component(Blog)]
 pub fn blog() -> Html {
-    let posts: Vec<BlogPostCardProps> = vec![
-        BlogPostCardProps {
-            image_url: "img/unsplash10mwi2uawfg@2x.png".to_string(),
-            title: "Miami Dolphins won the match and officially qualified for the final".to_string(),
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit".to_string(),
-            is_hot_topic: true,
-            pub_date: "2021-01-01".to_string(),
-            category: BlogCategory::LatestRelease,
-        },
-        BlogPostCardProps {
-            image_url: "img/unsplash10mwi2uawfg@2x.png".to_string(),
-            title: "Miami Dolphins won the match and officially qualified for the final".to_string(),
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit".to_string(),
-            is_hot_topic: false,
-            pub_date: "2021-01-01".to_string(),
-            category: BlogCategory::WebDevelopment,
-        },
-        BlogPostCardProps {
-            image_url: "img/unsplash10mwi2uawfg@2x.png".to_string(),
-            title: "Miami Dolphins won the match and officially qualified for the final".to_string(),
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit".to_string(),
-            is_hot_topic: false,
-            pub_date: "2021-01-01".to_string(),
-            category: BlogCategory::MobileDevelopment,
-        },
-    ];
+    let state_ctx_reducer = use_context::<AppStateContext>().unwrap();
+
+    use_effect({
+        let endpoint = "http://localhost:3002";
+        let query = r#"
+            query Query {
+                getBlogPosts {
+                    id
+                    title
+                    shortDescription
+                    image
+                    createdAt
+                    content
+                    category
+                    publishedDate
+                    status
+                    link
+                    author
+                }
+            }
+        "#;
+        let state_clone = state_ctx_reducer.clone();
+        wasm_bindgen_futures::spawn_local(async move {
+            let posts = perform_query_without_vars::<GetBlogPostsResponse>(endpoint, query).await;
+
+            log::info!("posts: {:?}", posts);
+
+            state_clone.dispatch(StateAction::UpdateBlogPosts(
+                // posts.get_data().unwrap().get_blog_posts.clone(),
+                match posts.get_data() {
+                    Some(data) => data.get_blog_posts.clone(),
+                    None => vec![],
+                }
+            ));
+        }); // Await the async block
+        || {}
+    });
+
     html! {
         <>
         <header>
@@ -67,21 +55,22 @@ pub fn blog() -> Html {
             <MainBanner
                 title="\"In the world of code, the best debugging tool is a fresh perspective."
                 subtitle="~Chat GPT"
-                background_url="img/bg.jpg"
+                background_url="img/bg.jpeg"
             />
-            <BlogSection category={BlogCategory::LatestRelease} posts={posts.clone()} />
+            <BlogSection category={BlogCategory::LatestRelease} posts={state_ctx_reducer.deref().blog_posts.to_vec()} />
             <AdComponent />
-            <BlogSection category={BlogCategory::WebDevelopment} posts={posts.clone()} />
-            <AdComponent />
-            <BlogSection category={BlogCategory::MobileDevelopment} posts={posts.clone()} />
-            <AdComponent />
-            <BlogSection category={BlogCategory::ArtificialIntelligence} posts={posts.clone()} />
-            <AdComponent />
-            <BlogSection category={BlogCategory::Technology} posts={posts.clone()} />
-            <AdComponent />
-            <BlogSection category={BlogCategory::Lifestyle} posts={posts.clone()} />
-            <AdComponent />
-            <BlogSection category={BlogCategory::Travel} posts={posts} />
+            // <BlogSection category={BlogCategory::WebDevelopment} posts={posts.clone()} />
+            // <AdComponent />
+            // <BlogSection category={BlogCategory::MobileDevelopment} posts={posts.clone()} />
+            // <AdComponent />
+            // <BlogSection category={BlogCategory::ArtificialIntelligence} posts={posts.clone()} />
+            // <AdComponent />
+            // <BlogSection category={BlogCategory::Technology} posts={posts.clone()} />
+            // <AdComponent />
+            // <BlogSection category={BlogCategory::Lifestyle} posts={posts.clone()} />
+            // <AdComponent />
+            // <BlogSection category={BlogCategory::Travel} posts={posts} />
+            <Footer />
         </main>
         </>
     }
