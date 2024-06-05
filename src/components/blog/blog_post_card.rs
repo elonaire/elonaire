@@ -15,7 +15,7 @@ pub fn release_card(props: &BlogPost) -> Html {
     });
     html! {
         <div class="blog-post-card">
-            <div onclick={view_blog} class="blog-post-image-container">
+            <div onclick={view_blog.clone()} class="blog-post-image-container">
                 <img class="blog-post-image" src={props.image.clone()} alt="release-image" />
                 <div class="category">
                     { &props.category.to_string() }
@@ -23,7 +23,7 @@ pub fn release_card(props: &BlogPost) -> Html {
                 <span class="pub-date">{ &props.published_date.clone().unwrap_or("".to_string()) }</span>
             </div>
             <div class="blog-post-content">
-                <h3 class="blog-post-title">{ &props.title }</h3>
+                <h3 onclick={view_blog.clone()} class="blog-post-title">{ &props.title }</h3>
                 <p class="blog-post-description">{ &props.short_description }</p>
                 <div class="blog-stats">
                     <div class="blog-stat">
