@@ -24,7 +24,13 @@ pub fn home() -> Html {
         </div>
 
         <div class="right">
-        <h2 class="title">{ current_state.title.clone() }</h2>
+            <h2 class="title">{ current_state.title.clone() }</h2>
+            <ul class="nav-social-list">
+                <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>
+                <li class={classes!("nav-item")}><a href="https://twitter.com/elonaire" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapXCircle}/></a></li>
+                <li class={classes!("nav-item")}><a href="https://www.linkedin.com/in/elon-aseneka-elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapLinkedin}/></a></li>
+                <li class={classes!("nav-item")}><a href="https://www.instagram.com/elonaire95/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapInstagram}/></a></li>
+            </ul>
         </div>
         </div>
         </main>

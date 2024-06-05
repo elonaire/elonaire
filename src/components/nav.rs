@@ -51,25 +51,23 @@ pub fn nav() -> Html {
     html! {
         <>
         <nav class="nav">
-        <Link<Route> classes={classes!("logo")} to={Route::Home}>
-        <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
-        </Link<Route>>
-        <ul class="nav-list">
-        {
-            nav_items.iter().map(|nav_item| {
-                html!{<li key={nav_item.id} class={classes!("nav-item", if nav_item.is_active { "active" } else { "" })}>
-                <Link<Route> to={nav_item.link.clone()}>{nav_item.label.clone()}</Link<Route>>
-                    </li>}
-            }).collect::<Html>()
-        }
-        // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
-        </ul>
-        <ul class="nav-social-list">
-        <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>
-        <li class={classes!("nav-item")}><a href="https://twitter.com/elonaire" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapTwitter}/></a></li>
-        <li class={classes!("nav-item")}><a href="https://www.linkedin.com/in/elon-aseneka-elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapLinkedin}/></a></li>
-        <li class={classes!("nav-item")}><a href="https://www.instagram.com/elonaire95/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapInstagram}/></a></li>
-        </ul>
+            <Link<Route> classes={classes!("logo")} to={Route::Home}>
+            <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
+            </Link<Route>>
+            <ul class="nav-list">
+            {
+                nav_items.iter().map(|nav_item| {
+                    html!{<li key={nav_item.id} class={classes!("nav-item", if nav_item.is_active { "active" } else { "" })}>
+                    <Link<Route> to={nav_item.link.clone()}>{nav_item.label.clone()}</Link<Route>>
+                        </li>}
+                }).collect::<Html>()
+            }
+            // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+            </ul>
+            
+            <div class="hire-me">
+                <button class="button button-primary">{"Hire Me"}</button>
+            </div>
         </nav>
 
         /* Retractable Mobile Nav */
