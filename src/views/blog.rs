@@ -24,7 +24,6 @@ pub fn blog() -> Html {
                     publishedDate
                     status
                     link
-                    author
                 }
             }
         "#;

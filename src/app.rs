@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, user::User}, views::{about::About, blog::Blog, home::Home, portfolio::Portfolio, resume::Resume, blog_post::BlogPostDetails}};
+use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{ResumeAchievements, UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -52,6 +52,9 @@ pub enum StateAction {
     UpdateUserInfo(User),
     UpdatePortfolioTabs(Vec<TabProps>),
     UpdateBlogPosts(Vec<BlogPost>),
+    UpdateUserResources(UserResources),
+    UpdateActiveProfessionalInfo(UserProfessionalInfo),
+    UpdateResumeAchievements(ResumeAchievements),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
@@ -70,6 +73,9 @@ pub struct AppState {
     pub phone: u32,
     pub portfolio_tabs: Vec<TabProps>,
     pub blog_posts: Vec<BlogPost>,
+    pub user_resources: UserResources,
+    pub active_professional_info: UserProfessionalInfo,
+    pub resume_achievements: ResumeAchievements,
 }
 
 impl Reducible for AppState {
@@ -94,6 +100,27 @@ impl Reducible for AppState {
             StateAction::UpdateBlogPosts(posts) => {
                 AppState {
                     blog_posts: posts,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdateUserResources(resources) => {
+                AppState {
+                    user_resources: resources,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdateActiveProfessionalInfo(info) => {
+                AppState {
+                    active_professional_info: info,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdateResumeAchievements(achievements) => {
+                AppState {
+                    resume_achievements: achievements,
                     ..self.as_ref().clone()
                 }
             }
@@ -181,6 +208,9 @@ pub fn app() -> Html {
                 },
             ],
             blog_posts: vec![],
+            user_resources: UserResources::default(),
+            active_professional_info: UserProfessionalInfo::default(),
+            resume_achievements: ResumeAchievements::default(),
         }
     });
 

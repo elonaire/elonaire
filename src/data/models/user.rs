@@ -2,23 +2,50 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub struct User {
-    pub id: String,
-    pub user_name: String,
-    pub first_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(rename = "userName", skip_serializing_if = "Option::is_none")]
+    pub user_name: Option<String>,
+    #[serde(rename = "firstName", skip_serializing_if = "Option::is_none")]
+    pub first_name: Option<String>,
+    #[serde(rename = "middleName", skip_serializing_if = "Option::is_none")]
     pub middle_name: Option<String>,
-    pub last_name: String,
-    pub full_name: String,
-    pub age: u32,
-    pub gender: Gender,
-    pub dob: String,
-    pub email: String,
-    pub country: String,
-    pub phone: String,
-    pub password: String,
-    pub created_at: String,
-    pub updated_at: String,
-    pub roles: Vec<String>,
+    #[serde(rename = "lastName", skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+    #[serde(rename = "fullName", skip_serializing_if = "Option::is_none")]
+    pub full_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bio: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub age: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gender: Option<Gender>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dob: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub password: Option<String>,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+    #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+    #[serde(rename = "roles", skip_serializing_if = "Option::is_none")]
+    pub roles: Option<Vec<String>>,
+    #[serde(rename = "oauthClient", skip_serializing_if = "Option::is_none")]
     pub oauth_client: Option<OAuthClientName>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GetUserResponse {
+    #[serde(rename = "getUser")]
+    pub get_user: User,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]

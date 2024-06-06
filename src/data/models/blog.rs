@@ -16,7 +16,6 @@ pub struct BlogPost {
     pub published_date: Option<String>,
     #[serde(rename = "createdAt")]
     pub created_at: String,
-    pub author: String,
 }
 
 #[derive(Debug, Deserialize)]
