@@ -8,13 +8,18 @@ pub fn home() -> Html {
     let current_state = use_context::<AppStateContext>().unwrap();
     let state_clone = current_state.clone();
     let resoures_state_clone = current_state.clone();
+    let state_clone_for_effects = current_state.clone();
 
-    use_effect({
+    use_effect(move || {
         wasm_bindgen_futures::spawn_local(async move {
-            let _ = get_user_by_id("pni9fr7u9gf2bzkf6dmf".to_string(), state_clone).await;
-            let _user_resources = get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone).await;
+            if state_clone_for_effects.user_details.id.is_none() {
+                let _user = get_user_by_id("pni9fr7u9gf2bzkf6dmf".to_string(), state_clone).await;
+            }
+            if state_clone_for_effects.user_resources.professional_info.is_none() {
+                let _user_resources = get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone).await;
+            }
         }); // Await the async block
-        || {} 
+        || ()
     });
 
     html! {

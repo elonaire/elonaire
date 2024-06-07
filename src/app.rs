@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{ResumeAchievements, UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
+use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -54,28 +54,15 @@ pub enum StateAction {
     UpdateBlogPosts(Vec<BlogPost>),
     UpdateUserResources(UserResources),
     UpdateActiveProfessionalInfo(UserProfessionalInfo),
-    UpdateResumeAchievements(ResumeAchievements),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct AppState {
     pub user_details: User,
-    pub title: String,
-    pub description: String,
-    pub auto_bio: String,
-    pub first_name: String,
-    pub middle_name: String,
-    pub last_name: String,
-    pub date_of_birth: String,
-    pub residence: String,
-    pub address: String,
-    pub email: String,
-    pub phone: u32,
     pub portfolio_tabs: Vec<TabProps>,
     pub blog_posts: Vec<BlogPost>,
     pub user_resources: UserResources,
     pub active_professional_info: UserProfessionalInfo,
-    pub resume_achievements: ResumeAchievements,
 }
 
 impl Reducible for AppState {
@@ -114,13 +101,6 @@ impl Reducible for AppState {
             StateAction::UpdateActiveProfessionalInfo(info) => {
                 AppState {
                     active_professional_info: info,
-                    ..self.as_ref().clone()
-                }
-            }
-
-            StateAction::UpdateResumeAchievements(achievements) => {
-                AppState {
-                    resume_achievements: achievements,
                     ..self.as_ref().clone()
                 }
             }
@@ -164,17 +144,6 @@ pub fn app() -> Html {
     let state = use_reducer(|| {
         AppState {
             user_details: User::default(),
-            title: "Software Engineer".to_owned(),
-            description: "I am a talented full-stack software engineer, with 6+ years of experience in full-stack development. I have an interest in Game Development and the Internet of Things technology.".to_owned(),
-            first_name: "Elon".to_owned(),
-            middle_name: "Aseneka".to_owned(),
-            last_name: "Idiong'o".to_owned(),
-            auto_bio: "I am a talented full-stack software engineer and I have 6+ years of experience in building robust small and enterprise applications. I have built various web applications using Node.js, NestJS, Angular, and React. I have built desktop applications using ElectronJS and mobile applications using React Native. Besides that, I use Figma for application designing and prototyping. I have an interest in Game Development and the Internet of Things.".to_owned(),
-            date_of_birth: "".to_owned(),
-            residence: "Kenya".to_owned(),
-            address: "Unity West, Tatu City".to_owned(),
-            email: "elon@techietenka.com".to_owned(),
-            phone: 0704730039,
             portfolio_tabs: vec![
                 TabProps {
                     title: "JavaScript/TypeScript".to_owned(),
@@ -210,7 +179,6 @@ pub fn app() -> Html {
             blog_posts: vec![],
             user_resources: UserResources::default(),
             active_professional_info: UserProfessionalInfo::default(),
-            resume_achievements: ResumeAchievements::default(),
         }
     });
 

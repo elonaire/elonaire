@@ -2,46 +2,21 @@ use std::ops::Deref;
 
 use yew::prelude::*;
 
-use crate::{components::{ad::AdComponent, blog::{blog_section::BlogSection, main_banner::MainBanner}, blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator}, data::{graphql::api_call::perform_query_without_vars, models::blog::{GetBlogPostsResponse, BlogCategory}}};
-use crate::app::{AppStateContext, StateAction};
+use crate::{components::{ad::AdComponent, blog::{blog_section::BlogSection, main_banner::MainBanner}, blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator}, data::{context::blog::get_blog_posts, models::blog::BlogCategory}};
+use crate::app::AppStateContext;
 
 #[function_component(Blog)]
 pub fn blog() -> Html {
     let state_ctx_reducer = use_context::<AppStateContext>().unwrap();
+    let state_ctx_reducer_clone = state_ctx_reducer.clone();
 
-    use_effect({
-        let endpoint = "http://localhost:3002";
-        let query = r#"
-            query Query {
-                getBlogPosts {
-                    id
-                    title
-                    shortDescription
-                    image
-                    createdAt
-                    content
-                    category
-                    publishedDate
-                    status
-                    link
-                }
-            }
-        "#;
-        let state_clone = state_ctx_reducer.clone();
+    use_effect(move || {
         wasm_bindgen_futures::spawn_local(async move {
-            let posts = perform_query_without_vars::<GetBlogPostsResponse>(endpoint, query).await;
-
-            log::info!("posts: {:?}", posts);
-
-            state_clone.dispatch(StateAction::UpdateBlogPosts(
-                // posts.get_data().unwrap().get_blog_posts.clone(),
-                match posts.get_data() {
-                    Some(data) => data.get_blog_posts.clone(),
-                    None => vec![],
-                }
-            ));
+            if state_ctx_reducer_clone.blog_posts.is_empty() {
+                let _ = get_blog_posts(state_ctx_reducer_clone).await;
+            }
         }); // Await the async block
-        || {}
+        || ()
     });
 
     html! {

@@ -10,7 +10,7 @@ pub struct BlogSectionProps {
 
 #[function_component(BlogSection)]
 pub fn blog_section(props: &BlogSectionProps) -> Html {
-    log::info!("posts: {:?}", &props.posts);
+    // log::info!("posts: {:?}", &props.posts);
     // Map over the remaining releases to create their HTML representations
     let release_cards_html = &props.posts.iter().map(|release| {
         html! { <BlogPostCard category={release.category.clone()} published_date={release.published_date.clone()} image={release.image.clone()} title={release.title.clone()} short_description={release.short_description.clone()} created_at={release.created_at.clone()} id={release.id.clone()} link={release.link.clone()} content={release.content.clone()} /> }

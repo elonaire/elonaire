@@ -17,6 +17,8 @@ pub struct UserResources {
     pub skills: Option<Vec<UserSkill>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub services: Option<Vec<UserService>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub achievements: Option<ResumeAchievements>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
@@ -57,7 +59,7 @@ pub struct UserProfessionalInfo {
     pub start_date: Option<String>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default, Properties)]
 pub struct UserPortfolio {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -79,7 +81,7 @@ pub struct UserPortfolio {
     pub updated_at: Option<String>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default, Properties)]
 pub struct UserResume {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -87,10 +89,8 @@ pub struct UserResume {
     pub section: Option<UserResumeSection>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", rename = "moreInfo")]
     pub more_info: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub image: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "startDate")]
@@ -111,7 +111,7 @@ pub struct ResumeAchievement {
     pub description: Option<String>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default, Properties)]
 pub struct UserSkill {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -188,10 +188,4 @@ pub struct GetUserResourcesResponse {
     pub get_user_resources: UserResources,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct GetResumeAchievementsResponse {
-    #[serde(rename = "getResumeAchievements")]
-    pub get_resume_achievements: Vec<ResumeAchievement>,
-}
-
-pub type ResumeAchievements = HashMap<String, Vec<ResumeAchievement>>;
+pub type ResumeAchievements = HashMap<String, Vec<String>>;

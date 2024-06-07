@@ -35,7 +35,7 @@ pub async fn get_user_by_id(id: String, state_clone: UseReducerHandle<AppState>)
 
     let user = perform_mutation_or_query_with_vars::<GetUserResponse, GetUserVar>(endpoint, query, variables).await;
 
-    log::info!("user: {:?}", user);
+    // log::info!("user: {:?}", user);
 
     state_clone.dispatch(StateAction::UpdateUserInfo(
         match user.get_data() {
