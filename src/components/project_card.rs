@@ -7,8 +7,8 @@ pub fn project_card(props: &UserPortfolio) -> Html {
 
     html! {
         <div class="project">
-            <img src={props.image.clone()} alt="project-image" />
-            <a rel="noreferrer" target="_blank" href={props.link.clone()}>{ format!("{}: ", props.title.clone().unwrap()) } { "View Project" }</a>
+            <img src={props.image.clone().unwrap()} alt="project-image" />
+            <a rel="noreferrer" target="_blank" href={props.link.clone().unwrap()}>{ format!("{}: ", props.title.clone().unwrap()) } { "View Project" }</a>
         </div>
     }
 }

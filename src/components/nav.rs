@@ -62,11 +62,11 @@ pub fn nav() -> Html {
                         </li>}
                 }).collect::<Html>()
             }
-            // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+            
             </ul>
             
             <div class="hire-me">
-                <button class="button button-primary">{"Hire Me"}</button>
+                <button class="button button-primary" disabled={true}>{"Hire Me"}</button>
             </div>
         </nav>
 
@@ -89,7 +89,7 @@ pub fn nav() -> Html {
                     </li>}
             }).collect::<Html>()
         }
-        // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+        
         </ul>
         <ul class="nav-social-list">
         <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>

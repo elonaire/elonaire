@@ -41,6 +41,10 @@ pub async fn get_user_resources(
                         id
                         title
                         description
+                        link
+                        image
+                        startDate
+                        endDate
                     }
                     services {
                         id

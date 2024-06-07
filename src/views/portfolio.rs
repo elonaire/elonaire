@@ -21,7 +21,9 @@ pub fn portfolio() -> Html {
     use_effect({
         wasm_bindgen_futures::spawn_local(async move {
             log::info!("Resume component: {:?}", current_state.user_resources.resume.clone());
-            let _user_resources = get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone).await;
+            if current_state.user_resources.portfolio.is_none() {
+                let _user_resources = get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone).await; 
+            }
         }); // Await the async block
         || () 
     });

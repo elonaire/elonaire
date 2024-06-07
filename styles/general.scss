@@ -274,3 +274,10 @@ html {
   color: $text-color-bg-primary;
 }
 
+:disabled {
+  opacity: 0.5;
+  &:hover {
+    cursor: not-allowed;
+  }
+}
+
