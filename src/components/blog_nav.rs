@@ -25,7 +25,7 @@ pub fn blog_nav() -> Html {
 
             <div class="search-bar">
                 // <input type="text" placeholder="Search" />
-                <Icon icon_id={IconId::BootstrapSearch}/>
+                <button disabled={true} class="button-transparent"><Icon icon_id={IconId::BootstrapSearch}/></button>
             </div>
         </nav>
         <LineSeparator />

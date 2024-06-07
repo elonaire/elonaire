@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::app::{AppStateContext, PortfolioRoute, StateAction};
+use crate::{app::{AppStateContext, PortfolioRoute, StateAction}, data::models::resource::UserPortfolioCategory};
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct TabsProps {
@@ -13,6 +13,7 @@ pub struct TabProps {
     pub title: String,
     pub active: bool,
     pub url: String,
+    pub category: UserPortfolioCategory,
 }
 
 impl TabProps {
@@ -28,7 +29,7 @@ pub fn tabs(props: &TabsProps) -> Html {
         <ul class="tabs">
             {
                 props.tabs.clone().iter().map(|tab| {
-                    html!{<Tab url={tab.url.clone()} title={tab.title.clone()} active={tab.active.clone()} />}
+                    html!{<Tab url={tab.url.clone()} category={tab.category.clone()} title={tab.title.clone()} active={tab.active.clone()} />}
                 }).collect::<Html>()
             }
         </ul>

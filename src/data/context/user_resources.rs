@@ -45,6 +45,7 @@ pub async fn get_user_resources(
                         image
                         startDate
                         endDate
+                        category
                     }
                     services {
                         id

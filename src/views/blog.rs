@@ -29,7 +29,7 @@ pub fn blog() -> Html {
             <MainBanner
                 title="\"In the world of code, the best debugging tool is a fresh perspective."
                 subtitle="~Chat GPT"
-                background_url="img/bg.jpeg"
+                background_url="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/e4079939-5afe-46da-364a-a7524d266100/public"
             />
             <BlogSection category={BlogCategory::LatestRelease} posts={state_ctx_reducer.deref().blog_posts.to_vec()} />
             <AdComponent />

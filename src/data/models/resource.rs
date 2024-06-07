@@ -71,6 +71,8 @@ pub struct UserPortfolio {
     pub image: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub category: Option<UserPortfolioCategory>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "startDate")]
     pub start_date: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "endDate")]
@@ -79,6 +81,16 @@ pub struct UserPortfolio {
     pub created_at: Option<String>,
     #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]
+pub enum UserPortfolioCategory {
+    JavaScript,
+    Rust,
+    Database,
+    DevOps,
+    Cloud,
+    Mobile,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default, Properties)]

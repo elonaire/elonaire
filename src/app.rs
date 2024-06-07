@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
+use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{UserPortfolioCategory, UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -149,31 +149,37 @@ pub fn app() -> Html {
                     title: "JavaScript/TypeScript".to_owned(),
                     active: true,
                     url: "javascript".to_owned(),
+                    category: UserPortfolioCategory::JavaScript,
                 },
                 TabProps {
                     title: "Rust".to_owned(),
                     active: false,
                     url: "rust".to_owned(),
+                    category: UserPortfolioCategory::Rust,
                 },
                 TabProps {
                     title: "Databases".to_owned(),
                     active: false,
                     url: "databases".to_owned(),
+                    category: UserPortfolioCategory::Database,
                 },
                 TabProps {
                     title: "Cloud".to_owned(),
                     active: false,
                     url: "cloud".to_owned(),
+                    category: UserPortfolioCategory::Cloud,
                 },
                 TabProps {
                     title: "DevOps".to_owned(),
                     active: false,
                     url: "devops".to_owned(),
+                    category: UserPortfolioCategory::DevOps,
                 },
                 TabProps {
                     title: "Mobile".to_owned(),
                     active: false,
                     url: "mobile".to_owned(),
+                    category: UserPortfolioCategory::Mobile,
                 },
             ],
             blog_posts: vec![],

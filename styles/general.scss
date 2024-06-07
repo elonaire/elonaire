@@ -109,6 +109,16 @@ html {
     }
   }
 
+  .button-transparent {
+    background-color: transparent;
+    // color: $text-color-bg-primary;
+    border: none;
+    // &:active, &:focus, &:visited {
+    //   color: $text-color-bg-primary;
+    // }
+    cursor: pointer;
+  }
+
   /* Transition component styles */
 .transition {
   margin: 0;
@@ -279,5 +289,12 @@ html {
   &:hover {
     cursor: not-allowed;
   }
+}
+
+.no-content {
+  text-align: center;
+  color: $light-gray;
+  font-size: var(--font-size-5xl);
+  padding: 5em;
 }
 
