@@ -1,8 +1,20 @@
 use yew::prelude::*;
 
-use crate::{app::AppStateContext, components::{
-    back_home::BackHome, page_header::{PageHeader, PageHeaderProps}, skill::Skills, styled_heading::StyledHeading, timeline::Timeline, transition::Transition
-}, data::{context::user_resources::get_user_resources, models::resource::{UserResume, UserResumeSection, UserSkill, UserSkillType}}};
+use crate::{
+    app::AppStateContext,
+    components::{
+        back_home::BackHome,
+        page_header::{PageHeader, PageHeaderProps},
+        skill::Skills,
+        styled_heading::StyledHeading,
+        timeline::Timeline,
+        transition::Transition,
+    },
+    data::{
+        context::user_resources::get_user_resources,
+        models::resource::{UserResume, UserResumeSection, UserSkill, UserSkillType},
+    },
+};
 
 #[function_component(Resume)]
 pub fn resume() -> Html {
@@ -12,21 +24,32 @@ pub fn resume() -> Html {
     let state_clone_for_deps = current_state.clone();
 
     let education_items = use_state_eq(|| match current_state.user_resources.resume.clone() {
-        Some(items) => items.into_iter().filter(|item| item.section.unwrap() == UserResumeSection::Education).collect::<Vec<UserResume>>(),
+        Some(items) => items
+            .into_iter()
+            .filter(|item| item.section.unwrap() == UserResumeSection::Education)
+            .collect::<Vec<UserResume>>(),
         None => vec![],
     });
     let experience_items = use_state_eq(|| match current_state.user_resources.resume.clone() {
-        Some(items) => items.into_iter().filter(|item| item.section.unwrap() == UserResumeSection::Experience).collect::<Vec<UserResume>>(),
+        Some(items) => items
+            .into_iter()
+            .filter(|item| item.section.unwrap() == UserResumeSection::Experience)
+            .collect::<Vec<UserResume>>(),
         None => vec![],
     });
 
-    
     let technical_skills = use_state_eq(|| match current_state.user_resources.skills.clone() {
-        Some(skills) => skills.into_iter().filter(|skill| skill.r#type.unwrap() == UserSkillType::Technical).collect::<Vec<UserSkill>>(),
+        Some(skills) => skills
+            .into_iter()
+            .filter(|skill| skill.r#type.unwrap() == UserSkillType::Technical)
+            .collect::<Vec<UserSkill>>(),
         None => vec![],
     });
     let soft_skills = use_state_eq(|| match current_state.user_resources.skills.clone() {
-        Some(skills) => skills.into_iter().filter(|skill| skill.r#type.unwrap() == UserSkillType::Soft).collect::<Vec<UserSkill>>(),
+        Some(skills) => skills
+            .into_iter()
+            .filter(|skill| skill.r#type.unwrap() == UserSkillType::Soft)
+            .collect::<Vec<UserSkill>>(),
         None => vec![],
     });
 
@@ -39,10 +62,12 @@ pub fn resume() -> Html {
         wasm_bindgen_futures::spawn_local(async move {
             // log::info!("Resume component: {:?}", current_state.user_resources.resume.clone());
             if current_state.user_resources.resume.is_none() {
-                let _user_resources = get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone).await;
+                let _user_resources =
+                    get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone)
+                        .await;
             }
         }); // Await the async block
-        || () 
+        || ()
     });
 
     let education_items_clone = education_items.clone();
@@ -53,16 +78,41 @@ pub fn resume() -> Html {
         move |_| {
             match state_clone.user_resources.resume.clone() {
                 Some(resume) => {
-                    education_items_clone.set(resume.clone().into_iter().filter(|item| item.section.unwrap() == UserResumeSection::Education).collect::<Vec<UserResume>>());
-                        experience_items_clone.set(resume.clone().into_iter().filter(|item| item.section.unwrap() == UserResumeSection::Experience).collect::<Vec<UserResume>>());
+                    education_items_clone.set(
+                        resume
+                            .clone()
+                            .into_iter()
+                            .filter(|item| item.section.unwrap() == UserResumeSection::Education)
+                            .collect::<Vec<UserResume>>(),
+                    );
+                    let mut items = resume
+                        .clone()
+                        .into_iter()
+                        .filter(|item| item.section.unwrap() == UserResumeSection::Experience)
+                        .collect::<Vec<UserResume>>();
+
+                    items.sort_by(|a, b| b.start_date.cmp(&a.start_date));
+                    experience_items_clone.set(items);
                 }
                 None => {}
             }
 
             match state_clone.user_resources.skills.clone() {
                 Some(skills) => {
-                    technical_skills_clone.set(skills.clone().into_iter().filter(|skill| skill.r#type.unwrap() == UserSkillType::Technical).collect::<Vec<UserSkill>>());
-                        soft_skills_clone.set(skills.clone().into_iter().filter(|skill| skill.r#type.unwrap() == UserSkillType::Soft).collect::<Vec<UserSkill>>());
+                    technical_skills_clone.set(
+                        skills
+                            .clone()
+                            .into_iter()
+                            .filter(|skill| skill.r#type.unwrap() == UserSkillType::Technical)
+                            .collect::<Vec<UserSkill>>(),
+                    );
+                    soft_skills_clone.set(
+                        skills
+                            .clone()
+                            .into_iter()
+                            .filter(|skill| skill.r#type.unwrap() == UserSkillType::Soft)
+                            .collect::<Vec<UserSkill>>(),
+                    );
                 }
                 None => {}
             }
