@@ -30,11 +30,13 @@ jobs:
         version: 'latest'
     - name: Build
       run: trunk build --release
+    - name: 'Tar files'
+      run: tar -cvf dist.tar dist/
     - name: Archive production artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dist
-        path: dist/
+        path: dist.tar
 
   push_docker_image:
     needs: build
@@ -46,6 +48,8 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: dist
+    - name: Unpack the artifact
+      run: tar -xvf dist.tar
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
     - name: Set up Docker Buildx
