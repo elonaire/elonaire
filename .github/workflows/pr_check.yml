@@ -35,7 +35,7 @@ jobs:
       with:
         name: dist
         path: |
-          dist/
+          /dist
 
   push_docker_image:
     needs: build
