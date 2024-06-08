@@ -22,6 +22,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # # Copy the build artifact from the build stage
 # COPY --from=0 /app/dist /usr/share/nginx/html
+RUN ls
 COPY dist /usr/share/nginx/html
 
 # # Copy the nginx configuration
