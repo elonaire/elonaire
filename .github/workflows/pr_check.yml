@@ -61,10 +61,32 @@ jobs:
         ls
         docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t ${{ secrets.DOCKER_USERNAME }}/tt-frontend:latest --push .
 
+  deploy_to_server:
+    needs: push_docker_image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Deploy to server via SSH
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        # key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        script: |
+            CI=true docker service stop
+            echo "${{ secrets.DOCKER_PASSWORD }}" | CI=true docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            CI=true docker service start
+            CI=true docker container prune -f
+            CI=true docker image prune -a -f
+            CI=true docker compose --env-file prod.env -f docker-compose.yml -f docker-compose.acl.yml -f docker-compose.shared.yml up -d --force-recreate
+
   automerge:
     runs-on: ubuntu-latest
 
-    needs: [build, push_docker_image]
+    needs: [build, push_docker_image, push_docker_image]
     if: |
       always() &&
       (needs.build.result == 'success' && needs.push_docker_image.result == 'success')
