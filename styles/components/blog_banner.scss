@@ -1,0 +1,51 @@
+/* Blog Hot banner styles */
+.main-banner {
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+
+  .content {
+    color: $white;
+    h1 {
+      font-size: 2rem; // Default to a smaller size for mobile-first approach
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 8px rgba($dark-color, 0.9);
+      mix-blend-mode: difference;
+    }
+
+    p {
+      font-size: 1rem; // Default to a smaller size for mobile-first approach
+      text-shadow: 2px 2px 8px rgba($dark-color, 0.9);
+      mix-blend-mode: difference;
+    }
+  }
+}
+
+// Medium devices (tablets, 500px and up)
+@media (min-width: 500px) {
+  .main-banner {
+    width: 100%;
+  }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  .main-banner {
+    width: 80%;
+    min-height: 200px;
+  }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  
+}

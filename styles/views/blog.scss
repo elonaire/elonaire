@@ -1,0 +1,9 @@
+/* Blog Page styles */
+.blog {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    // justify-content: center;
+    align-items: center;
+    background-color: $text-color-bg-primary;
+  }
