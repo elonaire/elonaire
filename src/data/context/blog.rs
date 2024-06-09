@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
-    let endpoint = "http://localhost:3002";
+    let endpoint = "http://tt-shared-service:3002";
     let query = r#"
             query Query {
                 getBlogPosts {
