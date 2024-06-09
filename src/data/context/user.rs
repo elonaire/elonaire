@@ -11,7 +11,7 @@ pub struct GetUserVar {
 }
 
 pub async fn get_user_by_id(id: String, state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
-    let endpoint = "http://tt-acl-service:3001";
+    let endpoint = "https://techietenka.com/tt-acl-service";
     let query = r#"
             query Query($id: String!) {
                 getUser(id: $id) {

@@ -27,7 +27,7 @@ pub async fn get_user_resources(
     user_id: String,
     state_clone: UseReducerHandle<AppState>,
 ) -> Result<(), Error> {
-    let endpoint = "http://tt-shared-service:3002";
+    let endpoint = "https://techietenka.com/tt-shared-service";
     let query = r#"
             query Query($userId: String!) {
                 getUserResources(userId: $userId) {
