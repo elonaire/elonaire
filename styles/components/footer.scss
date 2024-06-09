@@ -1,0 +1,80 @@
+/* Footer Styles */
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: $dark-color;
+  width: 100%;
+  margin-bottom: auto;
+  margin-top: 3em;
+  flex: 1;
+  padding: 1em;
+  .socials {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .nav-social-list {
+      list-style-type: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+      width: 70%;
+      justify-content: space-evenly;
+      .nav-item {
+        cursor: pointer;
+        width: 25%;
+        display: flex;
+        a {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-decoration: none;
+          width: 100%;
+          height: 100%;
+          color: $light-gray;
+          margin: 0;
+          text-align: center;
+          font-size: var(--font-size-md);
+          &:hover {
+            color: $primary-color;
+          }
+        }
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  .separator-container {
+    padding: 2em;
+  }
+  .footer-text {
+    color: $light-gray;
+    font-size: var(--font-size-md);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  .footer {
+    .socials {
+      .nav-social-list {
+        width: 40%;
+      }
+    }
+  
+  }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  
+}

@@ -1,0 +1,186 @@
+@import '_theme';
+@import 'general';
+@import 'components/nav';
+@import 'components/service_card';
+@import 'components/blog_banner';
+@import 'components/blog_section';
+@import 'components/resume_timeline';
+@import 'components/skills';
+@import 'components/portfolio_project';
+@import 'components/blog_filter';
+@import 'components/blog_post_card';
+@import 'components/footer';
+@import 'views/blog_post';
+@import 'views/home';
+@import 'views/about';
+@import 'views/resume';
+@import 'views/portfolio';
+@import 'views/blog';
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  html {
+    font-size: var(--font-size-md);
+  }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+  html {
+    font-size: var(--font-size-md);
+  }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+  
+}
+
+/* Animations */
+@keyframes slidein {
+  from {
+    margin-left: 30%;
+    width: 100%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+@keyframes slideintrans {
+  from {
+    left: 0%;
+    width: 100%;
+  }
+
+  to {
+    right: 100%;
+    width: 100%;
+  }
+}
+
+/* Button hover effect */
+.glow-on-hover {
+  border: none;
+  outline: none;
+  color: $text-color-bg-primary;
+  background: $primary-color;
+  cursor: pointer;
+  position: relative;
+  &:before {
+    content: '';
+    background: linear-gradient(
+      45deg,
+      $primary-color,
+      lighten($primary-color, 15%),
+      $dark-color
+    );
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing 20s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+
+  &:active {
+    color: $text-color;
+  }
+
+  &:active:after {
+    background: transparent;
+  }
+
+  &:hover:before {
+    opacity: 1;
+  }
+
+  &:after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: $primary-color;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
+}
+
+@keyframes glowing {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+@keyframes lift {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(15deg);
+  }
+}
+
+/* Custom Scrollbar */
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 50%;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $text-color-bg-primary;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $primary-color;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: $primary-color;
+}
+
+@keyframes slideinmenu {
+  from {
+    right: 100%;
+    width: 100%;
+  }
+
+  to {
+    right: 0%;
+    width: 100%;
+  }
+}

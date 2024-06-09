@@ -1,0 +1,38 @@
+/* theme */
+$primary-color: #32b089;
+$text-color: #000D1E;
+$text-color-bg-primary: rgb(233, 233, 233);
+$dark-color: #000D1E;
+$light-gray: #b6b6b6;
+$gray: #666;
+$red: #bd1550;
+$white: #ffffffef;
+$light-blue: #18a3b5;
+$brown: #dd5b00;
+
+:root {
+  /* fonts */
+  --font-inter: Inter;
+  --font-poppins: Poppins;
+
+  /* font sizes */
+  --font-size-xs: 0.75rem; // 12px / 16px = 0.75rem
+  --font-size-sm: 0.875rem; // 14px / 16px = 0.875rem
+  --font-size-md: 1rem; // 16px / 16px = 1rem
+  --font-size-lg: 1.125rem; // 18px / 16px = 1.125rem
+  --font-size-5lg: 1.2rem; // 19px / 16px = 1.2rem
+  --font-size-xl: 1.25rem; // 20px / 16px = 1.25rem
+  --font-size-5xl: 1.5rem; // 24px / 16px = 1.5rem
+  --font-size-6xl: 1.75rem; // 28px / 16px = 1.75rem
+  --font-size-7xl: 2rem; // 32px / 16px = 2rem
+  --font-size-17xl: 2.25rem; // 36px / 16px = 2.25rem
+  --font-size-29xl: 3rem; // 48px / 16px = 3rem
+  --font-size-32xl: 4rem; // 64px / 16px = 4rem
+
+  /* Border radiuses */
+  --br-5xs: 8px;
+  --br-3xs: 10px;
+}
+
+// Fonts
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');

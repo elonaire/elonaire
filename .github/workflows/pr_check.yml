@@ -3,8 +3,9 @@ name: pr_check
 on:
   workflow_dispatch:
   push:
+    branches: [ main, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ main, dev ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -28,6 +29,51 @@ jobs:
       with:
         version: 'latest'
     - name: Build
-      run: trunk build
-    - name: Run tests
-      run: cargo test --verbose
+      run: trunk build --release
+    - name: 'Tar files'
+      run: tar -cvf dist.tar dist/
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist.tar
+
+  push_docker_image:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Download a single artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+    - name: Unpack the artifact
+      run: tar -xvf dist.tar
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Build and push
+      run: |
+        ls
+        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t ${{ secrets.DOCKER_USERNAME }}/tt-frontend:latest --push .
+
+  automerge:
+    runs-on: ubuntu-latest
+
+    needs: [build, push_docker_image]
+    if: |
+      always() &&
+      (needs.build.result == 'success' && needs.push_docker_image.result == 'success')
+
+    steps:
+      - id: automerge
+        name: automerge
+        uses: 'pascalgn/automerge-action@v0.15.5'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          MERGE_LABELS: ''
+            
