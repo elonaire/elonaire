@@ -74,7 +74,7 @@ pub fn nav() -> Html {
         <nav class={classes!("nav-mobile", if *is_mobile_menu_open { "open" } else { "closed" })}>
         <div class="nav-mobile-top">
             <Link<Route> classes={classes!("logo")} to={Route::Home}>
-        <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
+        <img class={classes!("logo-img")} src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/3b98be8e-df1c-41c8-a03b-0c645e98fa00/public" alt="logo" />
         </Link<Route>>
         <button class={"hamburger"} onclick={toggle_mobile_menu.clone()}>
             { if *is_mobile_menu_open { "✖️" } else { "☰" } }
