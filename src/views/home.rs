@@ -41,6 +41,7 @@ pub fn home() -> Html {
         <div class="right">
             <h2 class="title">{ current_state.active_professional_info.occupation.clone() }</h2>
             <ul class="nav-social-list">
+                <li class={classes!("nav-item")}><a href="https://github.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapGithub}/></a></li>
                 <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>
                 <li class={classes!("nav-item")}><a href="https://twitter.com/elonaire" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapTwitter}/></a></li>
                 <li class={classes!("nav-item")}><a href="https://www.linkedin.com/in/elon-aseneka-elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapLinkedin}/></a></li>
