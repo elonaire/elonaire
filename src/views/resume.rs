@@ -123,8 +123,9 @@ pub fn resume() -> Html {
     html! {
         <>
             <Transition />
-            <main class="resume">
-                <BackHome />
+            <main class="resume-wrapper">
+                <div class="resume">
+                    <BackHome />
                 <PageHeader hint={page_header_props.hint.clone()} heading={page_header_props.heading.clone()} />
                 <div class="wrapper">
                     <div class="education">
@@ -146,6 +147,7 @@ pub fn resume() -> Html {
                         <StyledHeading heading={"Soft Skills".to_owned()} />
                         <Skills skills={soft_skills.to_vec()} />
                     </div>
+                </div>
                 </div>
             </main>
         </>

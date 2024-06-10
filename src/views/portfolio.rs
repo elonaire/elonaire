@@ -82,8 +82,9 @@ pub fn portfolio() -> Html {
     html! {
         <>
         <Transition />
-        <main class="portfolio">
-            <BackHome />
+        <main class="portfolio-wrapper">
+            <div class="portfolio">
+                <BackHome />
             <PageHeader hint={page_header_props.hint} heading={page_header_props.heading} />
             <div class="tabs-container">
                 <Tabs tabs={state_clone.portfolio_tabs.clone().to_vec()} />
@@ -99,6 +100,7 @@ pub fn portfolio() -> Html {
                         }).collect::<Html>()
                     }    
                 }
+            </div>
             </div>
         </main>
         </>

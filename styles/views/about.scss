@@ -1,97 +1,101 @@
 /* About page styles */
-.about {
-  background-color: $dark-color;
-  min-height: 100vh;
-  .details {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 1.5em;
-    animation: 1.5s ease alternate slidein;
-    .images-container {
-      flex-basis: 50%;
-      .main-img {
-        width: 70%;
-        margin: 2%;
-      }
-      .sub-img {
-        width: 30%;
-        margin-left: -10%;
-      }
-    }
-    .autobio {
-      color: $text-color-bg-primary;
-      flex-basis: 50%;
-      .name {
-        color: $primary-color;
-      }
-      .description {
-        margin-top: 1em;
-        font-size: var(--font-size-lg);
-      }
-      p {
-        font-size: var(--font-size-md);
-      }
-      strong {
-        color: $primary-color;
-      }
-    }
-  }
-
-  .heading-container {
-    padding: 2%;
-    animation: 1.5s ease alternate slidein;
-  }
-
-  .service-cards {
-    animation: 1.5s ease alternate slidein;
-    padding: 1.5em;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-}
-
-// Medium devices (tablets, 768px and up)
-@media (min-width: 768px) {
+.about-wrapper {
   .about {
+    background-color: $dark-color;
+    min-height: 100vh;
     .details {
-      flex-direction: row;
-    //   .images-container {
-    //     .main-img {
-    //       width: 50%;
-    //     }
-    //     .sub-img {
-    //       width: 50%;
-    //       margin-left: 0;
-    //     }
-    //   }
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5em;
+      animation: 1.5s ease alternate slidein;
+      .images-container {
+        flex-basis: 50%;
+        .main-img {
+          width: 70%;
+          margin: 2%;
+        }
+        .sub-img {
+          width: 30%;
+          margin-left: -10%;
+        }
+      }
       .autobio {
-        h2 {
-            margin-top: 0;
-            .name {
-                font-size: var(--font-size-7xl);
-              }
+        color: $text-color-bg-primary;
+        flex-basis: 50%;
+        .name {
+          color: $primary-color;
         }
         .description {
+          margin-top: 1em;
           font-size: var(--font-size-lg);
         }
         p {
           font-size: var(--font-size-md);
         }
+        strong {
+          color: $primary-color;
+        }
       }
     }
+  
     .heading-container {
       padding: 2%;
+      animation: 1.5s ease alternate slidein;
     }
+  
     .service-cards {
+      animation: 1.5s ease alternate slidein;
       padding: 1.5em;
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: center;
       flex-wrap: wrap;
-      // service card has its own styles in service_card.scss
+    }
+  }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  .about-wrapper {
+    .about {
+      .details {
+        flex-direction: row;
+      //   .images-container {
+      //     .main-img {
+      //       width: 50%;
+      //     }
+      //     .sub-img {
+      //       width: 50%;
+      //       margin-left: 0;
+      //     }
+      //   }
+        .autobio {
+          h2 {
+              margin-top: 0;
+              .name {
+                  font-size: var(--font-size-7xl);
+                }
+          }
+          .description {
+            font-size: var(--font-size-lg);
+          }
+          p {
+            font-size: var(--font-size-md);
+          }
+        }
+      }
+      .heading-container {
+        padding: 2%;
+      }
+      .service-cards {
+        padding: 1.5em;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        // service card has its own styles in service_card.scss
+      }
     }
   }
 }
@@ -105,4 +109,11 @@
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
+  .about-wrapper {
+    background-color: $dark-color;
+    .about {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  }
 }
