@@ -18,7 +18,7 @@ pub struct BlogPost {
     pub created_at: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct GetBlogPostsResponse {
     #[serde(rename = "getBlogPosts")]
     pub get_blog_posts: Vec<BlogPost>,

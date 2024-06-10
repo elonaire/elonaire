@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::{components::{blog::blog_post_card::BlogPostCard, line_separator::LineSeparator}, data::models::blog::{BlogPost, BlogCategory}};
+use crate::{components::{blog::blog_post_card::BlogPostCard, line_separator::LineSeparator, no_content_component::NoContent}, data::models::blog::{BlogPost, BlogCategory}};
 
 #[derive(Properties, PartialEq)]
 pub struct BlogSectionProps {
@@ -12,9 +12,15 @@ pub struct BlogSectionProps {
 pub fn blog_section(props: &BlogSectionProps) -> Html {
     // log::info!("posts: {:?}", &props.posts);
     // Map over the remaining releases to create their HTML representations
-    let release_cards_html = &props.posts.iter().map(|release| {
-        html! { <BlogPostCard category={release.category.clone()} published_date={release.published_date.clone()} image={release.image.clone()} title={release.title.clone()} short_description={release.short_description.clone()} created_at={release.created_at.clone()} id={release.id.clone()} link={release.link.clone()} content={release.content.clone()} /> }
-    }).collect::<Html>();
+    let release_cards_html = if props.posts.len() > 0 {
+        props.posts.iter().map(|release| {
+            html! { <BlogPostCard category={release.category.clone()} published_date={release.published_date.clone()} image={release.image.clone()} title={release.title.clone()} short_description={release.short_description.clone()} created_at={release.created_at.clone()} id={release.id.clone()} link={release.link.clone()} content={release.content.clone()} /> }
+        }).collect::<Html>()
+    } else {
+        html! {
+            <NoContent />
+        }
+    };
 
     html! {
         <section class="blog-section">
