@@ -16,7 +16,7 @@ pub struct GetBlogsVar {
 pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
     let endpoint = "https://techietenka.com/tt-shared-service";
     let query = r#"
-            query Query($id: String!) {
+            query Query($id: String) {
                 getBlogPosts(id: $id) {
                     id
                     title
