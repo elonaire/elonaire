@@ -25,8 +25,9 @@ pub fn blog() -> Html {
             <BlogNav />
         </header>
         <LineSeparator />
-        <main class="blog">
-            <MainBanner
+        <main class="blog-wrapper">
+            <div class="blog">
+                <MainBanner
                 title="\"In the world of code, the best debugging tool is a fresh perspective."
                 subtitle="~Chat GPT"
                 background_url="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/e4079939-5afe-46da-364a-a7524d266100/public"
@@ -44,6 +45,7 @@ pub fn blog() -> Html {
             // <BlogSection category={BlogCategory::Lifestyle} posts={posts.clone()} />
             // <AdComponent />
             // <BlogSection category={BlogCategory::Travel} posts={posts} />
+            </div>
             <Footer />
         </main>
         </>

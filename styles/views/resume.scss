@@ -1,58 +1,62 @@
 /* Resume Page styles */
-.resume {
-  background-color: $dark-color;
-  min-height: 100vh;
-  .wrapper {
-    padding: 2%;
-    animation: 1.5s ease alternate slidein;
-    margin-top: 1%;
-    display: flex;
-    flex-direction: column;
-    .education {
-      flex-basis: 50%;
-      padding: 0.8em;
+.resume-wrapper {
+  .resume {
+    background-color: $dark-color;
+    min-height: 100vh;
+    .wrapper {
+      padding: 2%;
+      animation: 1.5s ease alternate slidein;
+      margin-top: 1%;
+      display: flex;
+      flex-direction: column;
+      .education {
+        flex-basis: 50%;
+        padding: 0.8em;
+      }
+      .experience {
+        flex-basis: 50%;
+        padding: 0.8em;
+      }
     }
-    .experience {
-      flex-basis: 50%;
+    .skills {
       padding: 0.8em;
-    }
-  }
-  .skills {
-    padding: 0.8em;
-    animation: 1.5s ease alternate slidein;
-    margin-top: 1%;
-    display: flex;
-    flex-direction: column;
-    .technical {
-      flex-basis: 50%;
-      padding: 0.8em;
-    }
-    .soft {
-      flex-basis: 50%;
-      padding: 0.8em;
+      animation: 1.5s ease alternate slidein;
+      margin-top: 1%;
+      display: flex;
+      flex-direction: column;
+      .technical {
+        flex-basis: 50%;
+        padding: 0.8em;
+      }
+      .soft {
+        flex-basis: 50%;
+        padding: 0.8em;
+      }
     }
   }
 }
 
 // Medium devices (tablets, 768px and up)
 @media (min-width: 768px) {
-  .resume {
-    .wrapper {
-      flex-direction: row;
-      .education {
-        flex-basis: 50%;
+  .resume-wrapper {
+    .resume {
+      .wrapper {
+        flex-direction: row;
+        .education {
+          flex-basis: 50%;
+        }
+        .experience {
+          flex-basis: 50%;
+        }
       }
-      .experience {
-        flex-basis: 50%;
-      }
-    }
-    .skills {
-      flex-direction: row;
-      .technical {
-        flex-basis: 50%;
-      }
-      .soft {
-        flex-basis: 50%;
+      .skills {
+        flex-direction: row;
+        .technical {
+          flex-basis: 50%;
+        }
+        .soft {
+          flex-basis: 50%;
+        }
       }
     }
   }
@@ -67,4 +71,11 @@
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
+  .resume-wrapper {
+    background-color: $dark-color;
+    .resume {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  }
 }

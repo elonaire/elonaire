@@ -48,8 +48,9 @@ pub fn about() -> Html {
     html! {
         <>
             <Transition />
-            <main class="about">
-                <BackHome />
+            <main class="about-wrapper">
+                <div class="about">
+                    <BackHome />
                 <PageHeader hint={page_header_props.hint} heading={page_header_props.heading} />
 
                 <div class="details">
@@ -86,7 +87,7 @@ pub fn about() -> Html {
                         }
                     }
                 </div>
-
+                </div>
             </main>
         </>
     }

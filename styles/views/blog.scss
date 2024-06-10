@@ -1,9 +1,13 @@
 /* Blog Page styles */
-.blog {
+.blog-wrapper {
+  .blog {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     // justify-content: center;
     align-items: center;
     background-color: $text-color-bg-primary;
+    max-width: 1200px;
+    margin: 0 auto;
   }
+}
