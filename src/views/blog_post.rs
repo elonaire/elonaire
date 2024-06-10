@@ -23,7 +23,7 @@ pub fn blog_post_details(props: &RouteParams) -> Html {
     let blog_post = use_state_eq(|| None);
 
     use_effect({
-        let endpoint = "http://localhost:3002";
+        let endpoint = "https://techietenka.com/tt-shared-service";
         let query = r#"
             query Query($link: String!) {
                 getSingleBlogPost(link: $link) {
