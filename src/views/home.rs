@@ -34,7 +34,7 @@ pub fn home() -> Html {
         <img class="profile-image" src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/c9b133e5-fe4c-4899-4aad-f3a5cefe1400/public" alt="profile-image" />
         <p class="description">{ current_state.user_details.bio.clone().unwrap_or("".to_string()) }</p>
         <div class="button-container">
-            <button class="button button-primary glow-on-hover download"><a href="https://drive.google.com/uc?export=download&id=1tz2NyMb9NNhN8u9WgHwJC6IbwZ6Y1RfC">{"Download CV "}<Icon width={"1em".to_owned()} height={"1em".to_owned()} icon_id={IconId::BootstrapDownload}/></a></button>
+            <a class="button button-primary glow-on-hover" href="https://drive.google.com/uc?export=download&id=1tz2NyMb9NNhN8u9WgHwJC6IbwZ6Y1RfC">{"Download CV "}<Icon width={"1em".to_owned()} height={"1em".to_owned()} icon_id={IconId::BootstrapDownload}/></a>
         </div>
         </div>
 
