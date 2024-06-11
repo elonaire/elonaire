@@ -9,6 +9,7 @@ use crate::{
         styled_heading::StyledHeading,
         timeline::Timeline,
         transition::Transition,
+        loader::Loader,
     },
     data::{
         context::user_resources::get_user_resources,
@@ -22,6 +23,8 @@ pub fn resume() -> Html {
     let resoures_state_clone = current_state.clone();
     let state_clone = current_state.clone();
     let state_clone_for_deps = current_state.clone();
+    let state_clone_for_view = current_state.clone();
+
 
     let education_items = use_state_eq(|| match current_state.user_resources.resume.clone() {
         Some(items) => items
@@ -129,6 +132,7 @@ pub fn resume() -> Html {
         <>
             <Transition />
             <main class="resume-wrapper">
+                { if state_clone_for_view.user_resources.resume.is_none() { html!{ <Loader /> } } else { html!{ } } }
                 <div class="resume">
                     <BackHome />
                 <PageHeader hint={page_header_props.hint.clone()} heading={page_header_props.heading.clone()} />

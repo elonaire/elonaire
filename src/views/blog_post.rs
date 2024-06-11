@@ -1,5 +1,5 @@
 use crate::{
-    components::{blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator},
+    components::{blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator, loader::Loader},
     data::{
         graphql::api_call::perform_mutation_or_query_with_vars,
         models::blog::GetSingleBlogPostResponse,
@@ -77,6 +77,7 @@ pub fn blog_post_details(props: &RouteParams) -> Html {
             </header>
             <LineSeparator />
             <main class="blog-post">
+                { if blog_post.is_none() { html!{ <Loader /> } } else { html!{ } } }
                 // render blog post here using markdown
                 <div class="content-wrapper">
                     { inner }

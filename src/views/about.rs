@@ -9,6 +9,7 @@ use crate::{
         service_card::ServiceCard,
         styled_heading::{StyledHeading, StyledHeadingProps},
         transition::Transition,
+        loader::Loader,
     }, data::context::{user::get_user_by_id, user_resources::get_user_resources},
 };
 
@@ -54,6 +55,7 @@ pub fn about() -> Html {
         <>
             <Transition />
             <main class="about-wrapper">
+                { if current_state.user_details.id.is_none() || current_state.active_professional_info.occupation.is_none() { html!{ <Loader /> } } else { html!{ } } }
                 <div class="about">
                     <BackHome />
                 <PageHeader hint={page_header_props.hint} heading={page_header_props.heading} />
