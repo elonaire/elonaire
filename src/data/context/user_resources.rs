@@ -27,7 +27,11 @@ pub async fn get_user_resources(
     user_id: String,
     state_clone: UseReducerHandle<AppState>,
 ) -> Result<(), Error> {
-    let endpoint = "https://techietenka.com/tt-shared-service";
+    let endpoint = match option_env!("TRUNK_BUILD_SHARED_SERVICE_URL") {
+        Some(url) => url,
+        None => option_env!("TRUNK_SERVE_SHARED_SERVICE_URL").unwrap(),
+    };
+    
     let query = r#"
             query Query($userId: String!) {
                 getUserResources(userId: $userId) {

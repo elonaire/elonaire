@@ -61,9 +61,14 @@ pub fn resume() -> Html {
     use_effect(move || {
         wasm_bindgen_futures::spawn_local(async move {
             // log::info!("Resume component: {:?}", current_state.user_resources.resume.clone());
+            let user_id = match option_env!("TRUNK_BUILD_MAIN_USER_ID") {
+                Some(client) => client,
+                None => option_env!("TRUNK_SERVE_MAIN_USER_ID").unwrap(),
+            };
+
             if current_state.user_resources.resume.is_none() {
                 let _user_resources =
-                    get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone)
+                    get_user_resources(user_id.to_string(), resoures_state_clone)
                         .await;
             }
         }); // Await the async block
