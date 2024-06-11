@@ -31,7 +31,7 @@
   .three-d-card {
     width: 100%;
     min-height: 300px;
-    background: $primary-color;
+    background: lighten($primary-color, 5%);
     margin-bottom: auto;
     margin-top: 5%;
   }
