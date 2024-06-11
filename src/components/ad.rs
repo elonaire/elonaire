@@ -7,7 +7,11 @@ pub fn ad_component() -> Html {
 
     use_effect_with_deps({
         let ad_ref = ad_ref.clone();
-        let google_ad_client = option_env!("TRUNK_SERVE_GOOGLE_AD_CLIENT").unwrap_or("");
+        let google_ad_client = match option_env!("TRUNK_BUILD_GOOGLE_AD_CLIENT") {
+            Some(client) => client,
+            None => option_env!("TRUNK_SERVE_GOOGLE_AD_CLIENT").unwrap(),
+        };
+        
         log::info!("Google Ad Client: {}", google_ad_client);
         move |_| {
             if let Some(ad_div) = ad_ref.cast::<HtmlElement>() {

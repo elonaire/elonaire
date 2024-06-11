@@ -33,12 +33,17 @@ pub fn about() -> Html {
 
     use_effect(move || {
         wasm_bindgen_futures::spawn_local(async move {
+            let user_id = match option_env!("TRUNK_BUILD_MAIN_USER_ID") {
+                Some(client) => client,
+                None => option_env!("TRUNK_SERVE_MAIN_USER_ID").unwrap(),
+            };
+
             if state_clone_for_effects.user_details.id.is_none() {
-                let _user = get_user_by_id("pni9fr7u9gf2bzkf6dmf".to_string(), state_clone).await;
+                let _user = get_user_by_id(user_id.to_string(), state_clone).await;
                 
             }
             if state_clone_for_effects.user_resources.services.is_none() {
-                let _user_resources = get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone).await;
+                let _user_resources = get_user_resources(user_id.to_string(), resoures_state_clone).await;
                 
             }
         }); // Await the async block

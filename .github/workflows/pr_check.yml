@@ -28,6 +28,10 @@ jobs:
       uses: jetli/trunk-action@v0.1.0
       with:
         version: 'latest'
+    - name: Create .env file and export env variables
+      run: |
+        cat $GITHUB_ENV > .env
+        export $(cat .env | xargs)
     - name: Build
       run: trunk build --release
     - name: 'Tar files'
