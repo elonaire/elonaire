@@ -15,3 +15,4 @@ pub mod blog;
 pub mod ad;
 pub mod footer;
 pub mod no_content_component;
+pub mod modal;

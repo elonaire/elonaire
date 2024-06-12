@@ -10,6 +10,7 @@
 @import 'components/blog_filter';
 @import 'components/blog_post_card';
 @import 'components/footer';
+@import 'components/basic_modal';
 @import 'views/blog_post';
 @import 'views/home';
 @import 'views/about';
@@ -182,5 +183,33 @@
   to {
     right: 0%;
     width: 100%;
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    transform: translateY(400px);
+    animation-timing-function: ease-out;
+  }
+  60% {
+    transform: translateY(-30px);
+    animation-timing-function: ease-in;
+  }
+  80% {
+    transform: translateY(10px);
+    animation-timing-function: ease-out;
+  }
+  100% {
+    transform: translateY(0px);
+    animation-timing-function: ease-in;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
