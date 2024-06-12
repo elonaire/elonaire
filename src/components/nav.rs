@@ -52,7 +52,7 @@ pub fn nav() -> Html {
         <>
         <nav class="nav">
             <Link<Route> classes={classes!("logo")} to={Route::Home}>
-            <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
+            <img class={classes!("logo-img")} src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/3b98be8e-df1c-41c8-a03b-0c645e98fa00/public" alt="logo" />
             </Link<Route>>
             <ul class="nav-list">
             {
@@ -62,11 +62,11 @@ pub fn nav() -> Html {
                         </li>}
                 }).collect::<Html>()
             }
-            // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+            
             </ul>
             
             <div class="hire-me">
-                <button class="button button-primary">{"Hire Me"}</button>
+                <button class="button button-primary" disabled={true}>{"Hire Me"}</button>
             </div>
         </nav>
 
@@ -74,7 +74,7 @@ pub fn nav() -> Html {
         <nav class={classes!("nav-mobile", if *is_mobile_menu_open { "open" } else { "closed" })}>
         <div class="nav-mobile-top">
             <Link<Route> classes={classes!("logo")} to={Route::Home}>
-        <img class={classes!("logo-img")} src="img/logo-black.png" alt="logo" />
+        <img class={classes!("logo-img")} src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/3b98be8e-df1c-41c8-a03b-0c645e98fa00/public" alt="logo" />
         </Link<Route>>
         <button class={"hamburger"} onclick={toggle_mobile_menu.clone()}>
             { if *is_mobile_menu_open { "✖️" } else { "☰" } }
@@ -89,7 +89,7 @@ pub fn nav() -> Html {
                     </li>}
             }).collect::<Html>()
         }
-        // <li class={classes!("nav-item")}><a href="https://blog.techietenka.com/" rel="noreferrer" target="_blank">{ "Blog" }</a></li>
+        
         </ul>
         <ul class="nav-social-list">
         <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>

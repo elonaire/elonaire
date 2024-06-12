@@ -169,7 +169,7 @@
 .blog-nav {
   @extend .nav;
   display: flex;
-  position: fixed;
+  // position: fixed;
   z-index: 1000;
   background-color: $text-color-bg-primary;
   top: 0;
@@ -203,5 +203,14 @@
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
-  
+  .nav {
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .blog-nav {
+    position: fixed;
+    width: 100%;
+    max-width: inherit;
+  }
 }

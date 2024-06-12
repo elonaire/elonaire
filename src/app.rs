@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, user::User}, views::{about::About, blog::Blog, home::Home, portfolio::Portfolio, resume::Resume, blog_post::BlogPostDetails}};
+use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{UserPortfolioCategory, UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -52,24 +52,17 @@ pub enum StateAction {
     UpdateUserInfo(User),
     UpdatePortfolioTabs(Vec<TabProps>),
     UpdateBlogPosts(Vec<BlogPost>),
+    UpdateUserResources(UserResources),
+    UpdateActiveProfessionalInfo(UserProfessionalInfo),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct AppState {
     pub user_details: User,
-    pub title: String,
-    pub description: String,
-    pub auto_bio: String,
-    pub first_name: String,
-    pub middle_name: String,
-    pub last_name: String,
-    pub date_of_birth: String,
-    pub residence: String,
-    pub address: String,
-    pub email: String,
-    pub phone: u32,
     pub portfolio_tabs: Vec<TabProps>,
     pub blog_posts: Vec<BlogPost>,
+    pub user_resources: UserResources,
+    pub active_professional_info: UserProfessionalInfo,
 }
 
 impl Reducible for AppState {
@@ -94,6 +87,20 @@ impl Reducible for AppState {
             StateAction::UpdateBlogPosts(posts) => {
                 AppState {
                     blog_posts: posts,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdateUserResources(resources) => {
+                AppState {
+                    user_resources: resources,
+                    ..self.as_ref().clone()
+                }
+            }
+
+            StateAction::UpdateActiveProfessionalInfo(info) => {
+                AppState {
+                    active_professional_info: info,
                     ..self.as_ref().clone()
                 }
             }
@@ -137,50 +144,47 @@ pub fn app() -> Html {
     let state = use_reducer(|| {
         AppState {
             user_details: User::default(),
-            title: "Software Engineer".to_owned(),
-            description: "I am a talented full-stack software engineer, with 6+ years of experience in full-stack development. I have an interest in Game Development and the Internet of Things technology.".to_owned(),
-            first_name: "Elon".to_owned(),
-            middle_name: "Aseneka".to_owned(),
-            last_name: "Idiong'o".to_owned(),
-            auto_bio: "I am a talented full-stack software engineer and I have 6+ years of experience in building robust small and enterprise applications. I have built various web applications using Node.js, NestJS, Angular, and React. I have built desktop applications using ElectronJS and mobile applications using React Native. Besides that, I use Figma for application designing and prototyping. I have an interest in Game Development and the Internet of Things.".to_owned(),
-            date_of_birth: "".to_owned(),
-            residence: "Kenya".to_owned(),
-            address: "Unity West, Tatu City".to_owned(),
-            email: "elon@techietenka.com".to_owned(),
-            phone: 0704730039,
             portfolio_tabs: vec![
                 TabProps {
                     title: "JavaScript/TypeScript".to_owned(),
                     active: true,
                     url: "javascript".to_owned(),
+                    category: UserPortfolioCategory::JavaScript,
                 },
                 TabProps {
                     title: "Rust".to_owned(),
                     active: false,
                     url: "rust".to_owned(),
+                    category: UserPortfolioCategory::Rust,
                 },
                 TabProps {
                     title: "Databases".to_owned(),
                     active: false,
                     url: "databases".to_owned(),
+                    category: UserPortfolioCategory::Database,
                 },
                 TabProps {
                     title: "Cloud".to_owned(),
                     active: false,
                     url: "cloud".to_owned(),
+                    category: UserPortfolioCategory::Cloud,
                 },
                 TabProps {
                     title: "DevOps".to_owned(),
                     active: false,
                     url: "devops".to_owned(),
+                    category: UserPortfolioCategory::DevOps,
                 },
                 TabProps {
                     title: "Mobile".to_owned(),
                     active: false,
                     url: "mobile".to_owned(),
+                    category: UserPortfolioCategory::Mobile,
                 },
             ],
             blog_posts: vec![],
+            user_resources: UserResources::default(),
+            active_professional_info: UserProfessionalInfo::default(),
         }
     });
 

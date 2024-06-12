@@ -6,10 +6,11 @@ use crate::{
     components::{
         back_home::BackHome,
         page_header::{PageHeader, PageHeaderProps},
-        service_card::{ServiceCard, ServiceCardProps},
+        service_card::ServiceCard,
         styled_heading::{StyledHeading, StyledHeadingProps},
         transition::Transition,
-    },
+        loader::Loader,
+    }, data::context::{user::get_user_by_id, user_resources::get_user_resources},
 };
 
 #[function_component(About)]
@@ -26,61 +27,53 @@ pub fn about() -> Html {
 
     // log::info!("today {}", today);
     let current_state = use_context::<AppStateContext>().unwrap();
+    let state_clone = current_state.clone();
+    let resoures_state_clone = current_state.clone();
+    let services = current_state.user_resources.services.clone();
+    let state_clone_for_effects = current_state.clone();
 
-    let service_cards = use_state(|| vec![
-        ServiceCardProps {
-            title: "Web Development".to_owned(),
-            description: "I can develop robust, scalable and responsive Web Applications using technologies such as JavaScript, TypeScript, Node.js, NestJS, React, Angular, Yew(Rust) and Rocket(Rust). I am also an expert in configuring Nginx Web server.".to_owned(),
-            cover_image: "https://thumbs.dreamstime.com/b/web-development-coding-programming-internet-technology-business-concept-web-development-coding-programming-internet-technology-121903546.jpg".to_owned(),
-        },
-        ServiceCardProps {
-            title: "Data Visualization".to_owned(),
-            description: "With the use of visualization tools such as D3.js and Plotters(Rust), I can help you gain insights into your data including metrics and logs.".to_owned(),
-            cover_image: "https://www.datameer.com/wp-content/uploads/2019/12/Data-Vizualisation-924x512.png".to_owned(),
-        },
-        ServiceCardProps {
-            title: "Embedded Systems & IoT".to_owned(),
-            description: "I can program embedded systems using Rust as the main language. I am also an IoT enthusiast.".to_owned(),
-            cover_image: "https://www.ul.com/sites/g/files/qbfpbp251/files/styles/hero_boxed_width/public/2019-11/CT_EPT_FunctionalSafety-Webinar_740x530.jpg?itok=yFA2BSuN".to_owned(),
-        },
-        ServiceCardProps {
-            title: "DevOps".to_owned(),
-            description: "I can help you setup your CI/CD pipeline using Github Actions, Gitlab CI/CD, Docker, Kubernetes and Terraform.".to_owned(),
-            cover_image: "https://imageio.forbes.com/specials-images/imageserve/60f1e792c7e89f933811814c/0x0.jpg?format=jpg&width=1200".to_owned(),
-        },
-        ServiceCardProps {
-            title: "Cloud Computing".to_owned(),
-            description: "I can help you setup your cloud infrastructure using AWS and GCP.".to_owned(),
-            cover_image: "https://imageio.forbes.com/specials-images/imageserve/5f9fa9e815da35da1356a28b/The-5-Biggest-Cloud-Computing-Trends-In-2021/960x0.jpg?format=jpg&width=960".to_owned(),
-        },
-        ServiceCardProps {
-            title: "Software Architecture".to_owned(),
-            description: "I can help you design your software architecture using the best practices. Whether you need to cut down on costs, improve fault tolerance, improve turnaround time, improve security or improve scalability. Most of the time, all these depend on the appropriate architecture.".to_owned(),
-            cover_image: "https://t3.ftcdn.net/jpg/01/09/47/78/360_F_109477885_MOzjguXVI1Q5exvurSlJjog9l0NZUPFh.jpg".to_owned(),
-        },
-    ]);
+    use_effect(move || {
+        wasm_bindgen_futures::spawn_local(async move {
+            let user_id = match option_env!("TRUNK_BUILD_MAIN_USER_ID") {
+                Some(client) => client,
+                None => option_env!("TRUNK_SERVE_MAIN_USER_ID").unwrap(),
+            };
+
+            if state_clone_for_effects.user_details.id.is_none() {
+                let _user = get_user_by_id(user_id.to_string(), state_clone).await;
+                
+            }
+            if state_clone_for_effects.user_resources.services.is_none() {
+                let _user_resources = get_user_resources(user_id.to_string(), resoures_state_clone).await;
+                
+            }
+        }); // Await the async block
+        || ()
+    });
 
     html! {
         <>
             <Transition />
-            <main class="about">
-                <BackHome />
+            <main class="about-wrapper">
+                { if current_state.user_details.id.is_none() || current_state.active_professional_info.occupation.is_none() { html!{ <Loader /> } } else { html!{ } } }
+                <div class="about">
+                    <BackHome />
                 <PageHeader hint={page_header_props.hint} heading={page_header_props.heading} />
 
                 <div class="details">
                     <div class="images-container">
-                        <img class={classes!("main-img")} src="img/me.jpeg" alt="logo" />
-                        <img class={classes!("sub-img")} src="img/2.jpg" alt="logo" />
+                        <img class={classes!("main-img")} src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/c9b133e5-fe4c-4899-4aad-f3a5cefe1400/public" alt="logo" />
+                        <img class={classes!("sub-img")} src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/83428774-45e2-4184-9577-dc8ed8b79000/public" alt="logo" />
                     </div>
 
                     <div class="autobio">
-                        <h2>{ "Hello, I'm " } <span class="name">{format!("{} {} {}", current_state.first_name.clone(), current_state.middle_name.clone(), current_state.last_name.clone())}</span></h2>
-                        <p class="description">{&current_state.auto_bio}</p>
+                        <h2>{ "Hello, I'm " } <span class="name">{ current_state.user_details.full_name.clone() }</span></h2>
+                        <p class="description">{current_state.active_professional_info.description.clone()}</p>
                         <p><strong>{"Age: "}</strong>{today.years_since(from_ymd)} {" years"}</p>
-                        <p><strong>{"Residence: "}</strong>{current_state.residence.clone()}</p>
-                        <p><strong>{"Address: "}</strong>{current_state.address.clone()}</p>
-                        <p><strong>{"Email: "}</strong>{current_state.email.clone()}</p>
-                        <p><strong>{"Phone: "}</strong>{current_state.phone.clone()}</p>
+                        <p><strong>{"Residence: "}</strong>{current_state.user_details.country.clone()}</p>
+                        <p><strong>{"Address: "}</strong>{current_state.user_details.address.clone()}</p>
+                        <p><strong>{"Email: "}</strong>{current_state.user_details.email.clone()}</p>
+                        <p><strong>{"Phone: (+254)"}</strong>{current_state.user_details.phone.clone()}</p>
                     </div>
                 </div>
 
@@ -89,14 +82,19 @@ pub fn about() -> Html {
                 </div>
                 <div class="service-cards">
                     {
-                        service_cards.iter().map(|service_card| {
-                            html! {
-                                <ServiceCard title={service_card.title.clone()} description={service_card.description.clone()} cover_image={service_card.cover_image.clone()} />
-                            }
-                        }).collect::<Html>()
+                        match services {
+                            Some(services) => {
+                                services.into_iter().map(|service_card| {
+                                    html! {
+                                        <ServiceCard title={service_card.title.clone()} description={service_card.description.clone()} image={service_card.image.clone()} />
+                                    }
+                                }).collect::<Html>()
+                            },
+                            None => html! { "No services available" }
+                        }
                     }
                 </div>
-
+                </div>
             </main>
         </>
     }

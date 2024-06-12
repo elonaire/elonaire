@@ -14,11 +14,13 @@
       font-size: 2rem; // Default to a smaller size for mobile-first approach
       margin-bottom: 0.5rem;
       text-shadow: 2px 2px 8px rgba($dark-color, 0.9);
+      mix-blend-mode: difference;
     }
 
     p {
       font-size: 1rem; // Default to a smaller size for mobile-first approach
       text-shadow: 2px 2px 8px rgba($dark-color, 0.9);
+      mix-blend-mode: difference;
     }
   }
 }

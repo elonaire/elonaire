@@ -1,0 +1,38 @@
+/* Skill component styles */
+.skill {
+  display: flex;
+  flex-direction: row;
+  padding: 10px 20px;
+  cursor: pointer;
+  .skill-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+  }
+  .skill-name {
+    display: inline-block;
+    color: $text-color-bg-primary;
+    font-weight: bold;
+    margin: 0;
+    margin-left: 5px;
+  }
+
+  border-bottom: 1px dotted $text-color-bg-primary;
+
+  &:hover {
+    background: $light-gray;
+    color: $text-color;
+  }
+}
+
+/* Skills component styles */
+.skills {
+  overflow: hidden;
+  .three-d-card {
+    width: 100%;
+    min-height: 300px;
+    background: lighten($primary-color, 5%);
+    margin-bottom: auto;
+    margin-top: 5%;
+  }
+}

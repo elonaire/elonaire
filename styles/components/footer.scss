@@ -4,7 +4,7 @@
   flex-direction: column;
   justify-content: center;
   background-color: $dark-color;
-  width: 100%;
+  // width: 100%;
   margin-bottom: auto;
   margin-top: 3em;
   flex: 1;
@@ -18,7 +18,7 @@
       display: flex;
       margin: 0;
       padding: 0;
-      width: 70%;
+      width: 50%;
       justify-content: space-evenly;
       .nav-item {
         cursor: pointer;
@@ -62,7 +62,7 @@
   .footer {
     .socials {
       .nav-social-list {
-        width: 40%;
+        width: 30%;
       }
     }
   
