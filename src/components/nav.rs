@@ -66,7 +66,7 @@ pub fn nav() -> Html {
             </ul>
             
             <div class="hire-me">
-                <button class="button button-primary" disabled={true}>{"Hire Me"}</button>
+                <button class="button button-primary">{"Hire Me"}</button>
             </div>
         </nav>
 
