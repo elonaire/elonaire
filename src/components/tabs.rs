@@ -56,7 +56,6 @@ pub fn tab(props: &TabProps) -> Html {
 
         state_ctx_reducer.dispatch(StateAction::UpdatePortfolioTabs(cloned_tabs.clone()));
 
-        // log::info!("Clicked on tab: {:?}", cloned_tabs.deref().to_owned());
         navigator.push(&PortfolioRoute::Projects { id: cl_props.url.clone() })
     });
 

@@ -32,8 +32,13 @@ pub fn portfolio() -> Html {
     use_effect({
         wasm_bindgen_futures::spawn_local(async move {
             if current_state.user_resources.portfolio.is_none() {
+                let user_id = match option_env!("TRUNK_BUILD_MAIN_USER_ID") {
+                    Some(client) => client,
+                    None => option_env!("TRUNK_SERVE_MAIN_USER_ID").unwrap(),
+                };
+
                 let _user_resources =
-                    get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone)
+                    get_user_resources(user_id.to_string(), resoures_state_clone)
                         .await;
             }
         }); // Await the async block
@@ -82,8 +87,9 @@ pub fn portfolio() -> Html {
     html! {
         <>
         <Transition />
-        <main class="portfolio">
-            <BackHome />
+        <main class="portfolio-wrapper">
+            <div class="portfolio">
+                <BackHome />
             <PageHeader hint={page_header_props.hint} heading={page_header_props.heading} />
             <div class="tabs-container">
                 <Tabs tabs={state_clone.portfolio_tabs.clone().to_vec()} />
@@ -99,6 +105,7 @@ pub fn portfolio() -> Html {
                         }).collect::<Html>()
                     }    
                 }
+            </div>
             </div>
         </main>
         </>

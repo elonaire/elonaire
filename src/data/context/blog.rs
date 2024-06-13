@@ -7,8 +7,13 @@ use crate::{
     data::{graphql::api_call::perform_query_without_vars, models::blog::GetBlogPostsResponse},
 };
 
+
 pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
-    let endpoint = "http://localhost:3002";
+    let endpoint = match option_env!("TRUNK_BUILD_SHARED_SERVICE_URL") {
+        Some(url) => url,
+        None => option_env!("TRUNK_SERVE_SHARED_SERVICE_URL").unwrap(),
+    };
+    
     let query = r#"
             query Query {
                 getBlogPosts {
@@ -28,10 +33,7 @@ pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(
 
     let posts = perform_query_without_vars::<GetBlogPostsResponse>(endpoint, query).await;
 
-    // log::info!("posts: {:?}", posts);
-
     state_clone.dispatch(StateAction::UpdateBlogPosts(
-        // posts.get_data().unwrap().get_blog_posts.clone(),
         match posts.get_data() {
             Some(data) => data.get_blog_posts.clone(),
             None => vec![],

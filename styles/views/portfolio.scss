@@ -1,33 +1,37 @@
 /* Portfolio Page styles */
-.portfolio {
-  background-color: $dark-color;
-  min-height: 100vh;
-  .tabs-container {
-    display: flex;
-    overflow-x: scroll;
-    padding: 20px;
-    animation: 1.5s ease alternate slidein;
-  }
-
-  .tabs-container::-webkit-scrollbar {
-    height: 3px;
-    border-radius: 50%;
-  }
-
-  .projects {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    animation: 1.5s ease alternate slidein;
+.portfolio-wrapper {
+  .portfolio {
+    background-color: $dark-color;
+    min-height: 100vh;
+    .tabs-container {
+      display: flex;
+      overflow-x: scroll;
+      padding: 20px;
+      animation: 1.5s ease alternate slidein;
+    }
+  
+    .tabs-container::-webkit-scrollbar {
+      height: 3px;
+      border-radius: 50%;
+    }
+  
+    .projects {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: 1.5s ease alternate slidein;
+    }
   }
 }
 
 // Medium devices (tablets, 768px and up)
 @media (min-width: 768px) {
-  .portfolio {
-    .tabs-container {
-      justify-content: center;
+  .portfolio-wrapper {
+    .portfolio {
+      .tabs-container {
+        justify-content: center;
+      }
     }
   }
 }
@@ -41,4 +45,11 @@
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
+  .portfolio-wrapper {
+    background-color: $dark-color;
+    .portfolio {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  }
 }

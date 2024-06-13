@@ -11,7 +11,11 @@ pub struct GetUserVar {
 }
 
 pub async fn get_user_by_id(id: String, state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
-    let endpoint = "http://localhost:3001";
+    let endpoint = match option_env!("TRUNK_BUILD_ACL_SERVICE_URL") {
+        Some(url) => url,
+        None => option_env!("TRUNK_SERVE_ACL_SERVICE_URL").unwrap(),
+    
+    };
     let query = r#"
             query Query($id: String!) {
                 getUser(id: $id) {
@@ -34,8 +38,6 @@ pub async fn get_user_by_id(id: String, state_clone: UseReducerHandle<AppState>)
     let variables = GetUserVar { id };
 
     let user = perform_mutation_or_query_with_vars::<GetUserResponse, GetUserVar>(endpoint, query, variables).await;
-
-    // log::info!("user: {:?}", user);
 
     state_clone.dispatch(StateAction::UpdateUserInfo(
         match user.get_data() {

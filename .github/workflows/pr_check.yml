@@ -29,7 +29,14 @@ jobs:
       with:
         version: 'latest'
     - name: Build
-      run: trunk build --release
+      run: |
+        touch .env
+        echo "TRUNK_BUILD_GOOGLE_AD_CLIENT=${{ vars.TRUNK_BUILD_GOOGLE_AD_CLIENT }}" >> .env
+        echo "TRUNK_BUILD_ACL_SERVICE_URL=${{ vars.TRUNK_BUILD_ACL_SERVICE_URL }}" >> .env
+        echo "TRUNK_BUILD_SHARED_SERVICE_URL=${{ vars.TRUNK_BUILD_SHARED_SERVICE_URL }}" >> .env
+        echo "TRUNK_BUILD_MAIN_USER_ID=${{ vars.TRUNK_BUILD_MAIN_USER_ID }}" >> .env
+        cat .env
+        export $(cat .env | xargs) && trunk build --release
     - name: 'Tar files'
       run: tar -cvf dist.tar dist/
     - name: Archive production artifacts
@@ -76,20 +83,16 @@ jobs:
         # key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
-            CI=true docker service stop
             echo "${{ secrets.DOCKER_PASSWORD }}" | CI=true docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            CI=true docker service start
-            CI=true docker container prune -f
-            CI=true docker image prune -a -f
             CI=true docker compose --env-file prod.env -f docker-compose.yml -f docker-compose.acl.yml -f docker-compose.shared.yml up -d --force-recreate
 
   automerge:
     runs-on: ubuntu-latest
 
-    needs: [build, push_docker_image, push_docker_image]
+    needs: [build, push_docker_image, deploy_to_server]
     if: |
       always() &&
-      (needs.build.result == 'success' && needs.push_docker_image.result == 'success')
+      (needs.build.result == 'success' && needs.push_docker_image.result == 'success' && needs.deploy_to_server.result == 'success')
 
     steps:
       - id: automerge

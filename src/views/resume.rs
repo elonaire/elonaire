@@ -9,6 +9,7 @@ use crate::{
         styled_heading::StyledHeading,
         timeline::Timeline,
         transition::Transition,
+        loader::Loader,
     },
     data::{
         context::user_resources::get_user_resources,
@@ -22,6 +23,8 @@ pub fn resume() -> Html {
     let resoures_state_clone = current_state.clone();
     let state_clone = current_state.clone();
     let state_clone_for_deps = current_state.clone();
+    let state_clone_for_view = current_state.clone();
+
 
     let education_items = use_state_eq(|| match current_state.user_resources.resume.clone() {
         Some(items) => items
@@ -60,10 +63,14 @@ pub fn resume() -> Html {
 
     use_effect(move || {
         wasm_bindgen_futures::spawn_local(async move {
-            // log::info!("Resume component: {:?}", current_state.user_resources.resume.clone());
+            let user_id = match option_env!("TRUNK_BUILD_MAIN_USER_ID") {
+                Some(client) => client,
+                None => option_env!("TRUNK_SERVE_MAIN_USER_ID").unwrap(),
+            };
+
             if current_state.user_resources.resume.is_none() {
                 let _user_resources =
-                    get_user_resources("pni9fr7u9gf2bzkf6dmf".to_string(), resoures_state_clone)
+                    get_user_resources(user_id.to_string(), resoures_state_clone)
                         .await;
             }
         }); // Await the async block
@@ -123,8 +130,10 @@ pub fn resume() -> Html {
     html! {
         <>
             <Transition />
-            <main class="resume">
-                <BackHome />
+            <main class="resume-wrapper">
+                { if state_clone_for_view.user_resources.resume.is_none() { html!{ <Loader /> } } else { html!{ } } }
+                <div class="resume">
+                    <BackHome />
                 <PageHeader hint={page_header_props.hint.clone()} heading={page_header_props.heading.clone()} />
                 <div class="wrapper">
                     <div class="education">
@@ -146,6 +155,7 @@ pub fn resume() -> Html {
                         <StyledHeading heading={"Soft Skills".to_owned()} />
                         <Skills skills={soft_skills.to_vec()} />
                     </div>
+                </div>
                 </div>
             </main>
         </>

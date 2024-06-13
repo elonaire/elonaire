@@ -5,10 +5,11 @@ $text-color-bg-primary: rgb(233, 233, 233);
 $dark-color: #000D1E;
 $light-gray: #b6b6b6;
 $gray: #666;
-$red: #bd1550;
+$red: #7a1a1a;
 $white: #ffffffef;
 $light-blue: #18a3b5;
 $brown: #dd5b00;
+$yellow: #fda41e;
 
 :root {
   /* fonts */
@@ -30,9 +31,27 @@ $brown: #dd5b00;
   --font-size-32xl: 4rem; // 64px / 16px = 4rem
 
   /* Border radiuses */
+  --br-7xs: 4px;
   --br-5xs: 8px;
   --br-3xs: 10px;
 }
 
 // Fonts
 @import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+.info {
+  color: $light-blue;
+}
+
+.error {
+  color: $red;
+}
+
+.success {
+  color: $primary-color;
+}
+
+.warning {
+  color: $yellow;
+}
+
