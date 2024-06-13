@@ -75,7 +75,7 @@ pub fn nav() -> Html {
             
             </ul>
             
-            <div class="hire-me" onclick={navigate_to_hire_me}>
+            <div class="hire-me" onclick={navigate_to_hire_me.clone()}>
                 {
                     match current_route_clone_inner {
                         Some(route) => {
@@ -110,7 +110,20 @@ pub fn nav() -> Html {
         }
         
         </ul>
+        <div class="hire-me-mobile" onclick={navigate_to_hire_me.clone()}>
+            {
+                match current_route {
+                    Some(route) => {
+                        if route.path() != "/hire-me" {
+                            html!{ <button class="button button-primary">{"Hire Me"}</button> }
+                        } else { html!() }
+                    }
+                    None => html!()
+                }
+            }
+        </div>
         <ul class="nav-social-list">
+        <li class={classes!("nav-item")}><a href="https://github.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapGithub}/></a></li>
         <li class={classes!("nav-item")}><a href="https://www.facebook.com/elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapFacebook}/></a></li>
         <li class={classes!("nav-item")}><a href="https://twitter.com/elonaire" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapTwitter}/></a></li>
         <li class={classes!("nav-item")}><a href="https://www.linkedin.com/in/elon-aseneka-elonaire/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapLinkedin}/></a></li>
