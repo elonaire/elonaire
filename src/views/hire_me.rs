@@ -4,7 +4,7 @@ use crate::{
     components::{
         bottom_svg::BottomSvg,
         input::InputField,
-        modal::basic_modal::{BasicModal, UseCase},
+        modal::basic_modal::{BasicModal, BasicModalProps, UseCase},
         nav::Nav,
         select::{SelectInput, SelectOption},
         textarea::TextArea,
@@ -23,7 +23,8 @@ pub fn hire_me() -> Html {
     let subject_ref = use_node_ref();
 
     let modal_is_open = use_state(|| false as bool);
-    // let modal_data = use_state(|| BasicModalProps::default());
+    let modal_data = use_state(|| BasicModalProps::default());
+    let modal_data_rsx = modal_data.clone();
     let modal_is_open_rsx = modal_is_open.clone();
     let contact_form = use_state(|| Message::default());
     let contact_form_clone_rsx = contact_form.clone();
@@ -90,9 +91,27 @@ pub fn hire_me() -> Html {
 
             let modal_is_open_clone = modal_is_open.clone();
             let contact_form_clone_submit_f = contact_form_clone_submit.clone();
+            let modal_data_clone = modal_data.clone();
             wasm_bindgen_futures::spawn_local(async move {
-                let _response = send_message(contact_form_clone_submit_f.deref().clone()).await;
+                let response = send_message(contact_form_clone_submit_f.deref().clone()).await;
+                let modal_data_update = match response {
+                    Ok(_) => BasicModalProps {
+                        title: "Message Sent".to_string(),
+                        use_case: UseCase::Success,
+                        is_open: true,
+                        ..BasicModalProps::default()
+                    },
+                    Err(_) => BasicModalProps {
+                        title: "Message Failed to Send".to_string(),
+                        use_case: UseCase::Error,
+                        ..BasicModalProps::default()
+                    },
+                    
+                };
 
+
+
+                modal_data_clone.set(modal_data_update);
                 modal_is_open_clone.set(true);
                 contact_form_clone_submit_f.set(Message::default());
             });
@@ -107,7 +126,6 @@ pub fn hire_me() -> Html {
     let contact_form_clone_deps = contact_form.clone();
     use_effect_with_deps(
         move |_| {
-            log::info!("Contact Form: {:?}", contact_form_clone_deps.deref());
             // set disabled to true if any of the fields are empty
             if contact_form_clone_deps.deref().sender_name.is_none()
                 || contact_form_clone_deps.deref().sender_email.is_none()
@@ -132,7 +150,7 @@ pub fn hire_me() -> Html {
                 <Nav />
             </header>
             <main class="hire-wrapper">
-                <BasicModal title={"Test Modal"} is_open={*modal_is_open_rsx} use_case={UseCase::Success} />
+                <BasicModal title={modal_data_rsx.title.clone()} is_open={*modal_is_open_rsx} use_case={modal_data_rsx.use_case.clone()} />
                 <div class="hire-form">
                     <h2 class="heading">{ "Contact Me" }</h2>
                     <form onsubmit={on_submit}>

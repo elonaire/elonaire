@@ -57,12 +57,6 @@ pub fn nav() -> Html {
         })
     };
 
-    let current_route_clone = current_route.clone();
-    use_effect_with_deps(move |_| {
-        log::info!("Current Route: {:?}", current_route_clone);
-        || ()
-
-    }, current_route);
 
     html! {
         <>

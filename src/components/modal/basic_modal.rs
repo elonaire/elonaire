@@ -31,18 +31,15 @@ pub enum UseCase {
 
 #[function_component]
 pub fn BasicModal(props: &BasicModalProps) -> Html {
-    let modal_state = use_state_eq(|| props.is_open);
 
     let on_click_ok = {
-        let modal_state = modal_state.clone();
         let on_close = props.on_close.clone();
         Callback::from(move |_: MouseEvent| {
             on_close.emit(());
-            modal_state.set(false);
         })
     };
     
-    if *modal_state {
+    if props.is_open {
         html! {
             <div class="backdrop">
             <div id="modal_host">
