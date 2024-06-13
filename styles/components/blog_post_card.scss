@@ -86,14 +86,14 @@
 // Medium devices (tablets, 500px and up)
 @media (min-width: 500px) {
   .blog-post-card {
-    max-width: 300px;
+    max-width: 20rem;
   }
 }
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
   .blog-post-card {
-    max-width: 400px;
+    max-width: 25rem;
   }
 }
 
