@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_icons::{Icon, IconId};
 use crate::components::{modal::precursor_modal::PrecursorModal, line_separator::LineSeparator};
 
-#[derive(Properties, PartialEq, Default, Debug)]
+#[derive(Properties, PartialEq, Default, Debug, Clone)]
 pub struct BasicModalProps {
     pub title: String,
     #[prop_or_default]
@@ -56,8 +56,8 @@ pub fn BasicModal(props: &BasicModalProps) -> Html {
                 }<span class="title-text">{ &props.title }</span>
             </div>
             <LineSeparator />
-            <div class="modal-content">
-                <PrecursorModal>{ for props.children.iter() }</PrecursorModal>
+            <div id="modal-content">
+                <PrecursorModal>{ props.children.clone() }</PrecursorModal>
             </div>
             <div class="modal-footer">
                 { if props.use_case == UseCase::Confirmation { html!{ <button class="button button-outlined">{"Cancel"}</button> } } else { html!() } }

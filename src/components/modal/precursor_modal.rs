@@ -9,8 +9,8 @@ pub struct ModalProps {
 #[function_component]
 pub fn PrecursorModal(props: &ModalProps) -> Html {
     let modal_host = gloo::utils::document()
-        .get_element_by_id("modal_host")
-        .expect("Expected to find a #modal_host element");
+        .get_element_by_id("modal-content")
+        .expect("Expected to find a #modal-content element");
 
     create_portal(
         html!{ {for props.children.iter()} },

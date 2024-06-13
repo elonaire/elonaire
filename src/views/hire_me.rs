@@ -22,10 +22,10 @@ use yew::prelude::*;
 pub fn hire_me() -> Html {
     let subject_ref = use_node_ref();
 
-    let modal_is_open = use_state(|| false as bool);
     let modal_data = use_state(|| BasicModalProps::default());
     let modal_data_rsx = modal_data.clone();
-    let modal_is_open_rsx = modal_is_open.clone();
+    let modal_data_clone_modal = modal_data.clone();
+    
     let contact_form = use_state(|| Message::default());
     let contact_form_clone_rsx = contact_form.clone();
     let send_button_disabled = use_state(|| false);
@@ -89,7 +89,6 @@ pub fn hire_me() -> Html {
         Callback::from(move |event: SubmitEvent| {
             event.prevent_default();
 
-            let modal_is_open_clone = modal_is_open.clone();
             let contact_form_clone_submit_f = contact_form_clone_submit.clone();
             let modal_data_clone = modal_data.clone();
             wasm_bindgen_futures::spawn_local(async move {
@@ -112,7 +111,6 @@ pub fn hire_me() -> Html {
 
 
                 modal_data_clone.set(modal_data_update);
-                modal_is_open_clone.set(true);
                 contact_form_clone_submit_f.set(Message::default());
             });
         })
@@ -122,6 +120,14 @@ pub fn hire_me() -> Html {
         .iter()
         .map(|subject| Subject::fmt(subject))
         .collect::<Vec<SelectOption>>();
+
+    
+    let handle_modal_close = {
+        
+        Callback::from(move |_: ()| {
+            modal_data_clone_modal.set(BasicModalProps::default());
+        })
+    };
 
     let contact_form_clone_deps = contact_form.clone();
     use_effect_with_deps(
@@ -150,7 +156,15 @@ pub fn hire_me() -> Html {
                 <Nav />
             </header>
             <main class="hire-wrapper">
-                <BasicModal title={modal_data_rsx.title.clone()} is_open={*modal_is_open_rsx} use_case={modal_data_rsx.use_case.clone()} />
+                <BasicModal on_close={handle_modal_close} title={modal_data_rsx.title.clone()} is_open={modal_data_rsx.is_open} use_case={modal_data_rsx.use_case.clone()}>
+                    {
+                        match modal_data_rsx.use_case.clone() {
+                            UseCase::Success => html! { <p>{ "Message Sent Successfully" }</p> },
+                            UseCase::Error => html! { <p>{ "Message Failed to Send" }</p> },
+                            _ => html! { },
+                        }
+                    }
+                </BasicModal>
                 <div class="hire-form">
                     <h2 class="heading">{ "Contact Me" }</h2>
                     <form onsubmit={on_submit}>
