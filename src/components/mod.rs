@@ -16,3 +16,7 @@ pub mod ad;
 pub mod footer;
 pub mod no_content_component;
 pub mod modal;
+pub mod bottom_svg;
+pub mod input;
+pub mod textarea;
+pub mod select;

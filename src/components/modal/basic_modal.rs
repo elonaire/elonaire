@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_icons::{Icon, IconId};
 use crate::components::{modal::precursor_modal::PrecursorModal, line_separator::LineSeparator};
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Default, Debug)]
 pub struct BasicModalProps {
     pub title: String,
     #[prop_or_default]
@@ -19,7 +19,7 @@ pub struct BasicModalProps {
     pub is_open: bool,
 }
 
-#[derive(Default, PartialEq)]
+#[derive(Default, PartialEq, Clone, Copy, Debug)]
 pub enum UseCase {
     Error,
     Success,

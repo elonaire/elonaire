@@ -11,12 +11,14 @@
 @import 'components/blog_post_card';
 @import 'components/footer';
 @import 'components/basic_modal';
+@import 'components/bottom_svg';
 @import 'views/blog_post';
 @import 'views/home';
 @import 'views/about';
 @import 'views/resume';
 @import 'views/portfolio';
 @import 'views/blog';
+@import 'views/hire_me';
 
 // Medium devices (tablets, 768px and up)
 @media (min-width: 768px) {

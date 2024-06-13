@@ -1,125 +1,169 @@
 // Font sizes for mobile-first approach
 html {
-    font-size: var(--font-size-sm);
-  }
-  
-  h1 {
-    font-size: var(--font-size-29xl);
-  }
-  
-  h2 {
-    font-size: var(--font-size-17xl);
-  }
-  
-  h3 {
-    font-size: var(--font-size-5xl);
-  }
-  
-  h4 {
-    font-size: var(--font-size-xl);
-  }
-  
-  h5 {
-    font-size: var(--font-size-lg);
-  }
-  
-  h6 {
-    font-size: var(--font-size-sm);
-  }
-  
-  p {
-    font-size: var(--font-size-sm);
-  }
-  
-  /* General styles */
-  html,
-  body {
-    min-height: 100vh;
-    margin: 0;
-    background-color: $text-color-bg-primary;
-    overflow-x: hidden;
-    overflow-y: auto;
-    // font-family: 'Nunito', sans-serif;
-  }
-  
-  main,
-  nav {
-    font-family: 'Nunito', sans-serif;
-  }
-  
-  .primary-color-text {
-    color: $primary-color;
-  }
-  
-  /* General elements */
-  input[type='text'],
-  input[type='password'],
-  input[type='email'] {
-    border: 2px solid $light-gray;
-    border-radius: var(--br-7xs);
-    padding: 0.5rem;
-    width: 100%;
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-    }
-    &.error {
-      border-color: red;
-    }
-  }
-  
-  /* Buttons styles */
-  
-  .button {
-    border: none;
-    // padding: 12px 20px;
-    padding: 10px 17px;
-    font-size:  var(--font-size-sm); // Smaller font-size
-    border-radius: var(--br-7xs);
-    &:hover {
-      cursor: pointer;
-    }
-  }
-  
-  .button-outlined {
-    border: 2px solid $text-color;
-    color: $text-color;
-    background-color: transparent;
-    &:hover {
-      border-color: $primary-color;
-      color: $primary-color;
-    }
-  }
-  
-  .button-outlined-primary {
-    border: 2px solid $primary-color;
-    color: $primary-color;
-    background-color: transparent;
-    &:hover {
-      border-color: $text-color;
-      color: $text-color;
-    }
-  }
-  
-  .button-primary {
-    background-color: $primary-color;
-    color: $text-color-bg-primary;
-    &:active, &:focus, &:visited {
-      color: $text-color-bg-primary;
-    }
-  }
+  font-size: var(--font-size-sm);
+}
 
-  .button-transparent {
-    background-color: transparent;
-    // color: $text-color-bg-primary;
+h1 {
+  font-size: var(--font-size-29xl);
+}
+
+h2 {
+  font-size: var(--font-size-17xl);
+}
+
+h3 {
+  font-size: var(--font-size-5xl);
+}
+
+h4 {
+  font-size: var(--font-size-xl);
+}
+
+h5 {
+  font-size: var(--font-size-lg);
+}
+
+h6 {
+  font-size: var(--font-size-sm);
+}
+
+p {
+  font-size: var(--font-size-sm);
+}
+
+/* General styles */
+html,
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: $text-color-bg-primary;
+  overflow-x: hidden;
+  overflow-y: auto;
+  // font-family: 'Nunito', sans-serif;
+}
+
+main,
+nav {
+  font-family: 'Nunito', sans-serif;
+}
+
+.primary-color-text {
+  color: $primary-color;
+}
+
+/* General elements */
+input[type='text'],
+input[type='password'],
+input[type='email'],
+textarea,
+select {
+  border: 2px solid lighten($light-gray, 15%);
+  border-radius: var(--br-7xs);
+  padding: 0.6rem;
+  box-sizing:border-box;
+  font-family:inherit;
+  &:readonly {
     border: none;
-    // &:active, &:focus, &:visited {
-    //   color: $text-color-bg-primary;
-    // }
+    background-color: $text-color-bg-primary;
+  }
+  &:focus {
+    outline: none;
+    border: 2px solid $primary-color;
+  }
+  &.error {
+    border-color: red;
+  }
+}
+
+select {
+  width: 100%;
+}
+
+textarea {
+  width: 100%;
+  resize: none;
+}
+
+/* Buttons styles */
+
+.button {
+  border: none;
+  // padding: 12px 20px;
+  padding: 10px 17px;
+  font-size: var(--font-size-sm); // Smaller font-size
+  border-radius: var(--br-7xs);
+  &:hover {
     cursor: pointer;
   }
+}
 
-  /* Transition component styles */
+.button-outlined {
+  border: 2px solid $text-color;
+  color: $text-color;
+  background-color: transparent;
+  &:hover {
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+}
+
+.button-outlined-primary {
+  border: 2px solid $primary-color;
+  color: $primary-color;
+  background-color: transparent;
+  &:hover {
+    border-color: $text-color;
+    color: $text-color;
+  }
+}
+
+.button-primary {
+  background-color: $primary-color;
+  color: $text-color-bg-primary;
+  &:active,
+  &:focus,
+  &:visited {
+    color: $text-color-bg-primary;
+  }
+}
+
+.button-transparent {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* Form Elements */
+
+.form-group {
+  margin-bottom: 20px;
+  width: 100%;
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  input {
+    width: 100%;
+  }
+  p.error {
+    margin: 0;
+    display: block;
+    height: 5px;
+    font-size: smaller;
+  }
+}
+
+.form-group-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Transition component styles */
 .transition {
   margin: 0;
   position: fixed; // to span the entire viewport
@@ -306,4 +350,3 @@ html {
 .hide {
   display: none;
 }
-

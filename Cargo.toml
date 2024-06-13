@@ -18,7 +18,7 @@ yew = { version="0.20", features=["csr"] }
 yew-router = "0.17"
 yew_icons = { version = "0.7.3", features = ["BootstrapFacebook", "BootstrapTwitter", "BootstrapLinkedin", "BootstrapInstagram", "BootstrapXCircle", "BootstrapHeart", "FontAwesomeRegularComments", "BootstrapShare", "BootstrapEye", "BootstrapSearch", "BootstrapHandThumbsUp", "BootstrapDownload", "OcticonsLinkExternal16", "BootstrapGithub", "BootstrapInfoCircleFill", "BootstrapExclamationCircleFill", "BootstrapCheckCircleFill", "BootstrapQuestionCircleFill"] } # crates: disable-check
 cynic = "3.3.0"
-web-sys = "0.3.66"
+web-sys = { version = "0.3.69", features = ["HtmlSelectElement"]}
 serde = "1.0.202"
 gql_client = "1.0.7"
 # gql_client = { git = "https://github.com/elonaire/gql-client-rs.git", branch = "elon-add-cookie-support" }
