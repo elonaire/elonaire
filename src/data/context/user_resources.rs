@@ -97,8 +97,6 @@ pub async fn get_user_resources(
     >(endpoint, query, variables)
     .await;
 
-    // log::info!("user: {:?}", user_resources_data);
-
     state_clone.dispatch(StateAction::UpdateUserResources(
         match user_resources_data.get_data() {
             Some(data) => {

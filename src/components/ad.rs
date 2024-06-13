@@ -12,7 +12,6 @@ pub fn ad_component() -> Html {
             None => option_env!("TRUNK_SERVE_GOOGLE_AD_CLIENT").unwrap(),
         };
         
-        log::info!("Google Ad Client: {}", google_ad_client);
         move |_| {
             if let Some(ad_div) = ad_ref.cast::<HtmlElement>() {
                 let window = window().expect("no global `window` exists");
