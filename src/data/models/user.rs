@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::components::select::SelectOption;
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub struct User {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,5 +82,79 @@ impl OAuthClientName {
             "Github" => OAuthClientName::Github,
             _ => panic!("Invalid OAuthClientName"),
         }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
+pub struct Message {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subject: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "senderName")]
+    pub sender_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "senderEmail")]
+    pub sender_email: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "createdAt")]
+    pub created_at: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]
+pub enum Subject {
+    JobOffer,
+    Consultation,
+    Feedback,
+    Complaint,
+    Enquiry,
+    Suggestion,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
+pub struct SubjectOption {
+    pub value: String,
+    pub label: String,
+}
+
+impl Subject {
+    pub fn fmt(&self) -> SelectOption {
+        match self {
+            Subject::JobOffer => SelectOption {
+                value: "JobOffer".to_string(),
+                label: "Job Offer".to_string(),
+            },
+            Subject::Consultation => SelectOption {
+                value: "Consultation".to_string(),
+                label: "Consultation".to_string(),
+            },
+            Subject::Feedback => SelectOption {
+                value: "Feedback".to_string(),
+                label: "Feedback".to_string(),
+            },
+            Subject::Complaint => SelectOption {
+                value: "Complaint".to_string(),
+                label: "Complaint".to_string(),
+            },
+            Subject::Enquiry => SelectOption {
+                value: "Enquiry".to_string(),
+                label: "Enquiry".to_string(),
+            },
+            Subject::Suggestion => SelectOption {
+                value: "".to_string(),
+                label: "--Select Subject".to_string(),
+            }
+        }
+    }
+
+    pub fn as_vec() -> Vec<Subject> {
+        vec![
+            Subject::JobOffer,
+            Subject::Consultation,
+            Subject::Feedback,
+            Subject::Complaint,
+            Subject::Enquiry,
+            Subject::Suggestion,
+        ]
     }
 }

@@ -3,7 +3,7 @@ use yew_icons::{Icon, IconId};
 
 use crate::{
     app::AppStateContext,
-    components::{nav::Nav, loader::Loader},
+    components::{nav::Nav, loader::Loader, bottom_svg::BottomSvg},
     data::context::{user::get_user_by_id, user_resources::get_user_resources},
 };
 
@@ -45,6 +45,7 @@ pub fn home() -> Html {
             <main class="home-wrapper">
             { if current_state.user_details.id.is_none() || current_state.active_professional_info.occupation.is_none() { html!{ <Loader /> } } else { html!{ } } }
             <div class="home">
+            // <BasicModal title={"Test Modal"} is_open={true} use_case={UseCase::Success} />
             <div class="left">
             <h1>{ "I'm " } <span class="primary-color-text">{current_state.user_details.first_name.clone().unwrap_or("".to_string()) + " "}</span>{ current_state.user_details.middle_name.clone().unwrap_or("".to_string()) + " " +  &current_state.user_details.last_name.clone().unwrap_or("".to_string())}</h1>
             <img class="profile-image" src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/c9b133e5-fe4c-4899-4aad-f3a5cefe1400/public" alt="profile-image" />
@@ -64,13 +65,7 @@ pub fn home() -> Html {
                     <li class={classes!("nav-item")}><a href="https://www.instagram.com/elonaire95/" rel="noreferrer" target="_blank"><Icon icon_id={IconId::BootstrapInstagram}/></a></li>
                 </ul>
             </div>
-            <section class="bottom">
-                <div class="custom-shape-divider-bottom-1718099208">
-                    <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
-                    </svg>
-                </div>
-            </section>
+            <BottomSvg />
             </div>
             </main>
             </>

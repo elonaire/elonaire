@@ -1,6 +1,6 @@
 use yew::prelude::*;
 use yew_icons::{Icon, IconId};
-use yew_router::prelude::Link;
+use yew_router::{hooks::{use_location, use_navigator}, prelude::Link};
 
 use crate::app::Route;
 
@@ -13,6 +13,9 @@ struct NavItem {
 
 #[function_component(Nav)]
 pub fn nav() -> Html {
+    let navigator = use_navigator().unwrap();
+    let current_route = use_location();
+    let current_route_clone_inner = current_route.clone();
     let nav_items = use_state(|| {
         vec![
             NavItem {
@@ -48,6 +51,13 @@ pub fn nav() -> Html {
         Callback::from(move |_| is_mobile_menu_open.set(!*is_mobile_menu_open))
     };
 
+    let navigate_to_hire_me = {
+        Callback::from(move |_: MouseEvent| {
+            navigator.push(&Route::HireMe);
+        })
+    };
+
+
     html! {
         <>
         <nav class="nav">
@@ -65,8 +75,17 @@ pub fn nav() -> Html {
             
             </ul>
             
-            <div class="hire-me">
-                <button class="button button-primary" disabled={true}>{"Hire Me"}</button>
+            <div class="hire-me" onclick={navigate_to_hire_me}>
+                {
+                    match current_route_clone_inner {
+                        Some(route) => {
+                            if route.path() != "/hire-me" {
+                                html!{ <button class="button button-primary">{"Hire Me"}</button> }
+                            } else { html!() }
+                        }
+                        None => html!()
+                    }
+                }
             </div>
         </nav>
 
