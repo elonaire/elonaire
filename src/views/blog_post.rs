@@ -56,8 +56,6 @@ pub fn blog_post_details(props: &RouteParams) -> Html {
             >(endpoint, query, var)
             .await;
 
-            // log::info!("posts: {:?}", post);
-
             blog_post_clone.set(Some(post.get_data().unwrap().get_single_blog_post.clone()));
         }); // Await the async block
         || {}

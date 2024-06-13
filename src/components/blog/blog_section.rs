@@ -10,7 +10,6 @@ pub struct BlogSectionProps {
 
 #[function_component(BlogSection)]
 pub fn blog_section(props: &BlogSectionProps) -> Html {
-    // log::info!("posts: {:?}", &props.posts);
     // Map over the remaining releases to create their HTML representations
     let release_cards_html = if props.posts.len() > 0 {
         props.posts.iter().map(|release| {

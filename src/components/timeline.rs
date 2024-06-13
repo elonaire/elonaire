@@ -10,7 +10,6 @@ pub struct TimelineProps {
 
 #[function_component(TimelineItem)]
 pub fn timeline_item(props: &UserResume) -> Html {
-    // log::info!("TimelineItem: {:?}", props);
     let current_state = use_context::<AppStateContext>().unwrap();
     let start_date = NaiveDateTime::parse_from_str(&props.start_date.clone().unwrap_or("".to_string()), "%Y-%m-%dT%H:%M:%S%.3fZ").unwrap().format("%b %0e %Y - ").to_string();
     
@@ -35,9 +34,7 @@ pub fn timeline_item(props: &UserResume) -> Html {
                                 Some(id) => {
                                     match current_state.user_resources.achievements.clone() {
                                         Some(achievements) => {
-                                            // log::info!("Achievements: {:?}", achievements);
                                             let hashed_achievements = achievements.get(&id.clone());
-                                            log::info!("Hashed Achievements: {:?}", hashed_achievements);
                                             match hashed_achievements {
                                                 Some(ach) => {
                                                     ach.into_iter().map(|s| html! { <li>{s.clone()}</li> }).collect::<Html>()

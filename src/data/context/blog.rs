@@ -33,10 +33,7 @@ pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(
 
     let posts = perform_query_without_vars::<GetBlogPostsResponse>(endpoint, query).await;
 
-    // log::info!("posts: {:?}", posts);
-
     state_clone.dispatch(StateAction::UpdateBlogPosts(
-        // posts.get_data().unwrap().get_blog_posts.clone(),
         match posts.get_data() {
             Some(data) => data.get_blog_posts.clone(),
             None => vec![],
