@@ -25,7 +25,6 @@ pub fn about() -> Html {
         heading: "My Services".to_owned(),
     };
 
-    // log::info!("today {}", today);
     let current_state = use_context::<AppStateContext>().unwrap();
     let state_clone = current_state.clone();
     let resoures_state_clone = current_state.clone();

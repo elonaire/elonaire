@@ -3,7 +3,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{UserPortfolioCategory, UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, home::Home, portfolio::Portfolio, resume::Resume}};
+use crate::{components::tabs::TabProps, data::models::{blog::BlogPost, resource::{UserPortfolioCategory, UserProfessionalInfo, UserResources}, user::User}, views::{about::About, blog::Blog, blog_post::BlogPostDetails, hire_me::HireMe, home::Home, portfolio::Portfolio, resume::Resume}};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -21,6 +21,8 @@ pub enum Route {
     PortfolioRoot,
     #[at("/portfolio/*")]
     PortfolioMain,
+    #[at("/hire-me")]
+    HireMe,
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -119,6 +121,7 @@ pub fn switch(routes: Route) -> Html {
         Route::Resume => html! { <Resume /> },
         Route::BlogRoot | Route::BlogMain => html! { <Switch<BlogRoute> render={blog_switch} /> },
         Route::PortfolioRoot | Route::PortfolioMain => html! { <Switch<PortfolioRoute> render={portfolio_switch} />  },
+        Route::HireMe => html! { <HireMe /> },
         Route::NotFound => html! { <h1>{ "404" }</h1> },
     }
 }
