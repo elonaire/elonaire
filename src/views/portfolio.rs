@@ -100,7 +100,7 @@ pub fn portfolio() -> Html {
                         0 => html! { <NoContent /> },
                         _ => projects.iter().map(|project| {
                             html! {
-                                <ProjectCard title={project.title.clone().unwrap()} description={project.description.clone().unwrap()} image={project.image.clone().unwrap()} link={project.link.clone().unwrap()} />
+                                <ProjectCard id={project.id.clone()} title={project.title.clone().unwrap()} description={project.description.clone().unwrap()} image={project.image.clone().unwrap()} link={project.link.clone().unwrap()} />
                             }
                         }).collect::<Html>()
                     }    
