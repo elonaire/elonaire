@@ -85,6 +85,7 @@ pub async fn get_user_resources(
                         section
                     }
                     achievements
+                    portfolioSkills
                 }
             }
         "#;

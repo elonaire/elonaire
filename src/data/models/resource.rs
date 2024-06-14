@@ -19,6 +19,8 @@ pub struct UserResources {
     pub services: Option<Vec<UserService>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub achievements: Option<ResumeAchievements>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "portfolioSkills")]
+    pub portfolio_skills: Option<UserPortfolioSkills>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
@@ -201,3 +203,4 @@ pub struct GetUserResourcesResponse {
 }
 
 pub type ResumeAchievements = HashMap<String, Vec<String>>;
+pub type UserPortfolioSkills = HashMap<String, Vec<UserSkill>>;
