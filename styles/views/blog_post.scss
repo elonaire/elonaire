@@ -9,8 +9,12 @@
         object-fit: contain;
       }
 
-      img[alt="non-full"] {
+      img[alt="w-50"] {
         width: 50%;
+      }
+
+      img[alt="w-60"] {
+        width: 60%;
       }
     }
 
