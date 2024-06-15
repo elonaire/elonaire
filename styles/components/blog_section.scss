@@ -30,7 +30,7 @@
     .blog-post-cards-container {
       flex-direction: row;
       flex-wrap: wrap;
-      justify-content: center;
+      // justify-content: center;
     }
   }
 }
@@ -39,7 +39,7 @@
 @media (min-width: 661px) {
   .blog-section {
     .blog-post-cards-container {
-      justify-content: center;
+      // justify-content: center;
     }
   }
 }
