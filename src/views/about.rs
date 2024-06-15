@@ -72,7 +72,7 @@ pub fn about() -> Html {
                         <p><strong>{"Residence: "}</strong>{current_state.user_details.country.clone()}</p>
                         <p><strong>{"Address: "}</strong>{current_state.user_details.address.clone()}</p>
                         <p><strong>{"Email: "}</strong>{current_state.user_details.email.clone()}</p>
-                        <p><strong>{"Phone: (+254)"}</strong>{current_state.user_details.phone.clone()}</p>
+                        // <p><strong>{"Phone: (+254)"}</strong>{current_state.user_details.phone.clone()}</p>
                     </div>
                 </div>
 

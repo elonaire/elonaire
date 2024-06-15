@@ -14,7 +14,7 @@
   justify-content: center;
   align-items: center;
   position: fixed;
-  z-index: 1000;
+  z-index: 1010;
   width: 100%;
   .nav-mobile-top {
     width: 100%;
@@ -70,6 +70,15 @@
           color: $primary-color;
         }
       }
+    }
+
+    .hire-me-mobile {
+      display: flex;
+      flex-direction: column;
+      width: 30%;
+      padding-left: 3.8rem;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
     }
 
     .nav-social-list {

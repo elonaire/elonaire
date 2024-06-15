@@ -20,3 +20,4 @@ pub mod bottom_svg;
 pub mod input;
 pub mod textarea;
 pub mod select;
+pub mod tooltip;
