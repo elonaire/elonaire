@@ -133,6 +133,13 @@ textarea {
   cursor: pointer;
 }
 
+.button-warn {
+  &:hover {
+    border-color: $yellow;
+    color: $yellow;
+  }
+}
+
 /* Form Elements */
 
 .form-group {

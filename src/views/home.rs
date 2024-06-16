@@ -3,7 +3,7 @@ use yew_icons::{Icon, IconId};
 
 use crate::{
     app::AppStateContext,
-    components::{nav::Nav, loader::Loader, bottom_svg::BottomSvg},
+    components::{nav::Nav, loader::Loader, bottom_svg::BottomSvg, cookie_consent::CookieConsent},
     data::context::{user::get_user_by_id, user_resources::get_user_resources},
 };
 
@@ -43,6 +43,7 @@ pub fn home() -> Html {
             { if current_state.user_details.id.is_none() || current_state.active_professional_info.occupation.is_none() { html!{ <Loader /> } } else { html!{ } } }
             <div class="home">
             // <BasicModal title={"Test Modal"} is_open={true} use_case={UseCase::Success} />
+            <CookieConsent />
             <div class="left">
             <h1>{ "I'm " } <span class="primary-color-text">{current_state.user_details.first_name.clone().unwrap_or("".to_string()) + " "}</span>{ current_state.user_details.middle_name.clone().unwrap_or("".to_string()) + " " +  &current_state.user_details.last_name.clone().unwrap_or("".to_string())}</h1>
             <img class="profile-image" src="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/c9b133e5-fe4c-4899-4aad-f3a5cefe1400/public" alt="profile-image" />
