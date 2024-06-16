@@ -21,3 +21,4 @@ pub mod input;
 pub mod textarea;
 pub mod select;
 pub mod tooltip;
+pub mod cookie_consent;
