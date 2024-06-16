@@ -35,6 +35,7 @@ pub fn select_input(props: &SelectInputProps) -> Html {
                 value={props.initial_value.clone().unwrap_or("".to_string())}
                 readonly={props.readonly.unwrap_or(false)}
                 onchange={props.onchange.clone().unwrap_or(Callback::noop())}
+                id={props.name.clone()}
             >
                 { for props.options.iter().map(|option| {
                     html! {

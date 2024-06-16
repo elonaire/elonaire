@@ -16,7 +16,7 @@ pub fn project_card(props: &UserPortfolio) -> Html {
                 match current_state.user_resources.portfolio_skills.as_ref() {
                     Some(skills) => {
                         let project_skills = skills.get(&props.id.clone().unwrap());
-                        log::info!("Project Skills: {:?}", project_skills);
+                        
                         match project_skills {
                             Some(project_skills) => {
                                 html!{

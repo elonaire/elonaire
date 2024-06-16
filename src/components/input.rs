@@ -47,6 +47,7 @@ pub fn input_field(props: &InputFieldProps) -> Html {
                     oninput={oninput.clone().unwrap_or(Callback::noop())}
                     placeholder={placeholder.clone().unwrap_or("".to_string())}
                     autocomplete="on"
+                    id={name.clone()}
                 />
                 <p class="error">{ if *display_error { "This field is required" } else { "" }  }</p>
     </div>
