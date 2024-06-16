@@ -28,6 +28,7 @@ pub fn blog() -> Html {
         <main class="blog-wrapper">
             <div class="blog">
             <FeaturedPosts />
+            <AdComponent />
             <BlogSection category={BlogCategory::LatestRelease} posts={state_ctx_reducer.deref().blog_posts.to_vec()} />
             <AdComponent />
             // <BlogSection category={BlogCategory::WebDevelopment} posts={posts.clone()} />

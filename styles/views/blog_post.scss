@@ -1,60 +1,66 @@
 .blog-post {
-  .content-wrapper {
-    padding: 2rem;
-    p {
-      width: 100%;
-      font-size: var(--font-size-lg);
-      img {
-        width: inherit;
-        object-fit: contain;
-      }
-
-      img[alt="w-50"] {
-        width: 50%;
-      }
-
-      img[alt="w-60"] {
-        width: 60%;
-      }
+  .blog-container {
+    .back {
+      position: fixed;
+      margin: 1rem;
     }
-
-    pre {
-      background-color: $dark-color;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-left: 3px solid $primary-color;
-      overflow-x: auto;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      border-radius: var(--br-7xs);
-
-      .language-html {
-        color: #dd5b00;
+    .content-wrapper {
+      padding: 2rem;
+      p {
+        width: 100%;
+        font-size: var(--font-size-md);
+        img {
+          width: inherit;
+          object-fit: contain;
+        }
+  
+        img[alt="w-50"] {
+          width: 50%;
+        }
+  
+        img[alt="w-60"] {
+          width: 60%;
+        }
       }
-
-      .language-typescript {
-        color: #2b7489;
+  
+      pre {
+        background-color: $dark-color;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 3px solid $primary-color;
+        overflow-x: auto;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        border-radius: var(--br-7xs);
+  
+        .language-html {
+          color: #dd5b00;
+        }
+  
+        .language-typescript {
+          color: #2b7489;
+        }
+  
+        .language-bash {
+          color: #89e051;
+        }
+  
+        .language-toml {
+          color: #fffc61;
+        }
+  
+        .language-rust {
+          color: #dea584;
+        }
+        .language-env {
+          color: #b0c4b1;
+        }
       }
-
-      .language-bash {
-        color: #89e051;
+  
+      pre::-webkit-scrollbar {
+        height: 3px;
+        border-radius: 50%;
       }
-
-      .language-toml {
-        color: #fffc61;
-      }
-
-      .language-rust {
-        color: #dea584;
-      }
-      .language-env {
-        color: #b0c4b1;
-      }
-    }
-
-    pre::-webkit-scrollbar {
-      height: 3px;
-      border-radius: 50%;
     }
   }
 }
@@ -65,15 +71,26 @@
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
+  .blog-post {
+    .blog-container {
+      display: grid;
+      grid-template-columns: 1fr 4fr 1fr;
+      .back {
+        position: fixed;
+        margin: 1rem;
+      }
+      .left {
+        padding: 2rem;
+      }
+    }
+  }
 }
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
   .blog-post {
-    .content-wrapper {
-      max-width: 80%;
-      margin-left: auto;
-      margin-right: auto;
+    .blog-container {
+      grid-template-columns: 1fr 4fr 1fr;
     }
   }
 }

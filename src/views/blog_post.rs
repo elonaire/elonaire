@@ -1,12 +1,13 @@
 use crate::{
-    components::{blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator, loader::Loader},
-    data::{
+    app::Route, components::{ad::AdComponent, footer::Footer, loader::Loader}, data::{
         graphql::api_call::perform_mutation_or_query_with_vars,
         models::blog::GetSingleBlogPostResponse,
-    },
+    }
 };
 use serde::{Deserialize, Serialize};
 use yew::prelude::*;
+use yew_icons::{Icon, IconId};
+use yew_router::hooks::use_navigator;
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Properties)]
 pub struct RouteParams {
@@ -21,12 +22,10 @@ pub struct GetSingleBlogVars {
 #[function_component(BlogPostDetails)]
 pub fn blog_post_details(props: &RouteParams) -> Html {
     let blog_post = use_state_eq(|| None);
+    let navigator = use_navigator().unwrap();
 
     use_effect({
-        let endpoint = match option_env!("TRUNK_BUILD_SHARED_SERVICE_URL") {
-            Some(url) => url,
-            None => option_env!("TRUNK_SERVE_SHARED_SERVICE_URL").unwrap(),
-        };
+        let endpoint = option_env!("SHARED_SERVICE_URL").expect("SHARED_SERVICE_URL env var not set");
         
         let query = r#"
             query Query($link: String!) {
@@ -69,17 +68,30 @@ pub fn blog_post_details(props: &RouteParams) -> Html {
             }
         }
     };
+
+    let navigate_to_blog_home = {
+        Callback::from(move |_: MouseEvent| {
+            navigator.push(&Route::BlogRoot);
+        })
+    };
+
     html! {
         <>
-            <header>
-                <BlogNav />
-            </header>
-            <LineSeparator />
             <main class="blog-post">
                 { if blog_post.is_none() { html!{ <Loader /> } } else { html!{ } } }
-                // render blog post here using markdown
-                <div class="content-wrapper">
-                    { inner }
+                <div class="blog-container">
+                    <button onclick={navigate_to_blog_home} class="button button-primary back"><Icon icon_id={IconId::BootstrapSkipBackward}/></button>
+                    <div class="left">
+                        
+                    </div>
+                    <div class="content-wrapper">
+                        { inner }
+                    </div>
+                    <div class="right">
+                        <AdComponent />
+                        <AdComponent />
+                        <AdComponent />
+                    </div>
                 </div>
                 <Footer />
             </main>
