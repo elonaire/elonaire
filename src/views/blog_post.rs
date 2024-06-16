@@ -41,6 +41,7 @@ pub fn blog_post_details(props: &RouteParams) -> Html {
                     publishedDate
                     status
                     link
+                    isFeatured
                 }
             }
         "#;

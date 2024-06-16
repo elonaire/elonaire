@@ -13,7 +13,7 @@ pub fn blog_section(props: &BlogSectionProps) -> Html {
     // Map over the remaining releases to create their HTML representations
     let release_cards_html = if props.posts.len() > 0 {
         props.posts.iter().map(|release| {
-            html! { <BlogPostCard category={release.category.clone()} published_date={release.published_date.clone()} image={release.image.clone()} title={release.title.clone()} short_description={release.short_description.clone()} created_at={release.created_at.clone()} id={release.id.clone()} link={release.link.clone()} content={release.content.clone()} /> }
+            html! { <BlogPostCard is_featured={release.is_featured} category={release.category.clone()} published_date={release.published_date.clone()} image={release.image.clone()} title={release.title.clone()} short_description={release.short_description.clone()} created_at={release.created_at.clone()} id={release.id.clone()} link={release.link.clone()} content={release.content.clone()} /> }
         }).collect::<Html>()
     } else {
         html! {

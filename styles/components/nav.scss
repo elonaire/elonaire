@@ -178,17 +178,19 @@
 .blog-nav {
   @extend .nav;
   display: flex;
-  // position: fixed;
+  // justify-content: space-between;
+  position: fixed;
   z-index: 1000;
   background-color: $text-color-bg-primary;
   top: 0;
-  justify-content: normal;
+  // justify-content: normal;
+  box-shadow: 0 0 0.5rem 0.3rem rgba($dark-color, 0.1);
 
   .search-bar {
     display: flex;
     justify-content: right;
     align-items: center;
-    width: 100%;
+    // width: 100%;
     color: $dark-color;
   }
 }

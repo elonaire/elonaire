@@ -25,8 +25,9 @@
 // Medium devices (tablets, 768px and up)
 @media (min-width: 768px) {
   .blog-categories {
-    justify-content: center;
-    flex-wrap: wrap;
+    // justify-content: center;
+    // flex-wrap: wrap;
+    display: none;
   }
 }
 

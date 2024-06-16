@@ -27,6 +27,7 @@ pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(
                     publishedDate
                     status
                     link
+                    isFeatured
                 }
             }
         "#;
