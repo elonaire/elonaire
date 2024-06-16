@@ -3,12 +3,12 @@
   .section-title {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin: 0.5em 0;
     span {
       flex-basis: calc(80% - 20px);
       color: $dark-color;
-      font-size: var(--font-size-5xl);
+      font-size: var(--font-size-xl);
       font-weight: bold;
     }
     button {
@@ -17,9 +17,9 @@
   }
 
   .blog-post-cards-container {
-    display: flex;
-    // gap: 20px; // Adjust the gap as necessary
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1em;
   }
 }
 
@@ -28,30 +28,28 @@
   .blog-section {
     width: 100%;
     .blog-post-cards-container {
-      flex-direction: row;
-      flex-wrap: wrap;
-      // justify-content: center;
+      grid-template-columns: 1fr 1fr;
     }
   }
 }
 
 // Large devices (tablets, 661px and up)
 @media (min-width: 661px) {
-  .blog-section {
-    .blog-post-cards-container {
-      // justify-content: center;
-    }
-  }
 }
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
   .blog-section {
-    width: 80%;
+    width: 90%;
+    
   }
 }
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
-  
+  .blog-section {
+    .blog-post-cards-container {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
 }
