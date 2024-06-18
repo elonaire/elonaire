@@ -1,5 +1,5 @@
 use crate::{
-    app::Route, components::{ad::AdComponent, footer::Footer, loader::Loader}, data::{
+    app::Route, components::{footer::Footer, loader::Loader}, data::{
         graphql::api_call::perform_mutation_or_query_with_vars,
         models::blog::GetSingleBlogPostResponse,
     }
@@ -88,9 +88,6 @@ pub fn blog_post_details(props: &RouteParams) -> Html {
                         { inner }
                     </div>
                     <div class="right">
-                        <AdComponent />
-                        <AdComponent />
-                        <AdComponent />
                     </div>
                 </div>
                 <Footer />
