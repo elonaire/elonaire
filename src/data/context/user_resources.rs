@@ -38,10 +38,7 @@ pub async fn get_user_resources(
     user_id: String,
     state_clone: UseReducerHandle<AppState>,
 ) -> Result<(), Error> {
-    let endpoint = match option_env!("TRUNK_BUILD_SHARED_SERVICE_URL") {
-        Some(url) => url,
-        None => option_env!("TRUNK_SERVE_SHARED_SERVICE_URL").unwrap(),
-    };
+    let endpoint = option_env!("SHARED_SERVICE_URL").expect("SHARED_SERVICE_URL env var not set");
 
     let query = r#"
             query Query($userId: String!) {
@@ -122,10 +119,7 @@ pub async fn get_user_resources(
 }
 
 pub async fn send_message(message: Message) -> Result<(), Error> {
-    let endpoint = match option_env!("TRUNK_BUILD_SHARED_SERVICE_URL") {
-        Some(url) => url,
-        None => option_env!("TRUNK_SERVE_SHARED_SERVICE_URL").unwrap(),
-    };
+    let endpoint = option_env!("SHARED_SERVICE_URL").expect("SHARED_SERVICE_URL env var not set");
 
     let query = r#"
             mutation Mutation($message: MessageInput!) {

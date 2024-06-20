@@ -12,6 +12,8 @@ pub struct BlogPost {
     pub category: BlogCategory,
     pub content: String,
     pub link: String,
+    #[serde(rename = "isFeatured")]
+    pub is_featured: bool,
     #[serde(rename = "publishedDate")]
     pub published_date: Option<String>,
     #[serde(rename = "createdAt")]

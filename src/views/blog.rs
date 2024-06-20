@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use yew::prelude::*;
 
-use crate::{components::{ad::AdComponent, blog::{blog_section::BlogSection, main_banner::MainBanner}, blog_nav::BlogNav, footer::Footer, line_separator::LineSeparator}, data::{context::blog::get_blog_posts, models::blog::BlogCategory}};
+use crate::{components::{ad::AdComponent, blog::{blog_section::BlogSection, main_banner::FeaturedPosts}, blog_nav::BlogNav, footer::Footer}, data::{context::blog::get_blog_posts, models::blog::BlogCategory}};
 use crate::app::AppStateContext;
 
 #[function_component(Blog)]
@@ -24,14 +24,11 @@ pub fn blog() -> Html {
         <header>
             <BlogNav />
         </header>
-        <LineSeparator />
+        // <LineSeparator />
         <main class="blog-wrapper">
             <div class="blog">
-                <MainBanner
-                title="\"In the world of code, the best debugging tool is a fresh perspective."
-                subtitle="~Chat GPT"
-                background_url="https://imagedelivery.net/fa3SWf5GIAHiTnHQyqU8IQ/e4079939-5afe-46da-364a-a7524d266100/public"
-            />
+            <FeaturedPosts />
+            <AdComponent />
             <BlogSection category={BlogCategory::LatestRelease} posts={state_ctx_reducer.deref().blog_posts.to_vec()} />
             <AdComponent />
             // <BlogSection category={BlogCategory::WebDevelopment} posts={posts.clone()} />

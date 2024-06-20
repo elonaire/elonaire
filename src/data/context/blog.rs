@@ -9,10 +9,7 @@ use crate::{
 
 
 pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
-    let endpoint = match option_env!("TRUNK_BUILD_SHARED_SERVICE_URL") {
-        Some(url) => url,
-        None => option_env!("TRUNK_SERVE_SHARED_SERVICE_URL").unwrap(),
-    };
+    let endpoint = option_env!("SHARED_SERVICE_URL").expect("SHARED_SERVICE_URL env var not set");
     
     let query = r#"
             query Query {
@@ -27,6 +24,7 @@ pub async fn get_blog_posts(state_clone: UseReducerHandle<AppState>) -> Result<(
                     publishedDate
                     status
                     link
+                    isFeatured
                 }
             }
         "#;

@@ -31,10 +31,10 @@ jobs:
     - name: Build
       run: |
         touch .env
-        echo "TRUNK_BUILD_GOOGLE_AD_CLIENT=${{ vars.TRUNK_BUILD_GOOGLE_AD_CLIENT }}" >> .env
-        echo "TRUNK_BUILD_ACL_SERVICE_URL=${{ vars.TRUNK_BUILD_ACL_SERVICE_URL }}" >> .env
-        echo "TRUNK_BUILD_SHARED_SERVICE_URL=${{ vars.TRUNK_BUILD_SHARED_SERVICE_URL }}" >> .env
-        echo "TRUNK_BUILD_MAIN_USER_ID=${{ vars.TRUNK_BUILD_MAIN_USER_ID }}" >> .env
+        echo "GOOGLE_AD_CLIENT=${{ vars.GOOGLE_AD_CLIENT }}" >> .env
+        echo "ACL_SERVICE_URL=${{ vars.ACL_SERVICE_URL }}" >> .env
+        echo "SHARED_SERVICE_URL=${{ vars.SHARED_SERVICE_URL }}" >> .env
+        echo "MAIN_USER_ID=${{ vars.MAIN_USER_ID }}" >> .env
         cat .env
         export $(cat .env | xargs) && trunk build --release
     - name: 'Tar files'

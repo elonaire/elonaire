@@ -1,8 +1,8 @@
 use yew::prelude::*;
-use yew_router::prelude::Link;
 use yew_icons::{Icon, IconId};
+use yew_router::prelude::Link;
 
-use crate::{app::Route, components::line_separator::LineSeparator, data::models::blog::BlogCategory};
+use crate::{app::Route, data::models::blog::BlogCategory};
 
 #[function_component(BlogNav)]
 pub fn blog_nav() -> Html {
@@ -24,11 +24,10 @@ pub fn blog_nav() -> Html {
             </Link<Route>>
 
             <div class="search-bar">
-                // <input type="text" placeholder="Search" />
                 <button disabled={true} class="button-transparent"><Icon icon_id={IconId::BootstrapSearch}/></button>
             </div>
         </nav>
-        <LineSeparator />
+        // <LineSeparator />
         <ul class="blog-categories">
                 {
                     for categories.iter().map(|category| {

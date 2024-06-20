@@ -2,17 +2,18 @@
 @import 'general';
 @import 'components/nav';
 @import 'components/service_card';
-@import 'components/blog_banner';
 @import 'components/blog_section';
 @import 'components/resume_timeline';
 @import 'components/skills';
 @import 'components/portfolio_project';
 @import 'components/blog_filter';
 @import 'components/blog_post_card';
+@import 'components/blog_banner';
 @import 'components/footer';
 @import 'components/basic_modal';
 @import 'components/bottom_svg';
 @import 'components/tooltip';
+@import 'components/cookie_consent';
 @import 'views/blog_post';
 @import 'views/home';
 @import 'views/about';
@@ -23,16 +24,16 @@
 
 // Medium devices (tablets, 768px and up)
 @media (min-width: 768px) {
-  html {
-    font-size: var(--font-size-md);
-  }
+  // html {
+  //   font-size: var(--font-size-md);
+  // }
 }
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
-  html {
-    font-size: var(--font-size-md);
-  }
+  // html {
+  //   font-size: var(--font-size-md);
+  // }
 }
 
 // Extra large devices (large desktops, 1200px and up)

@@ -11,11 +11,7 @@ pub struct GetUserVar {
 }
 
 pub async fn get_user_by_id(id: String, state_clone: UseReducerHandle<AppState>) -> Result<(), Error> {
-    let endpoint = match option_env!("TRUNK_BUILD_ACL_SERVICE_URL") {
-        Some(url) => url,
-        None => option_env!("TRUNK_SERVE_ACL_SERVICE_URL").unwrap(),
-    
-    };
+    let endpoint = option_env!("ACL_SERVICE_URL").expect("ACL_SERVICE_URL env var not set");
     let query = r#"
             query Query($id: String!) {
                 getUser(id: $id) {

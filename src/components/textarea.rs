@@ -42,6 +42,7 @@ pub fn text_area(props: &TextAreaProps) -> Html {
                 readonly={readonly.unwrap_or(false)}
                 oninput={oninput.clone().unwrap_or(Callback::noop())}
                 placeholder={placeholder.clone().unwrap_or("".to_string())}
+                id={name.clone()}
             />
             <p class="error">{ if *display_error { "This field is required" } else { "" }  }</p>
         </div>
