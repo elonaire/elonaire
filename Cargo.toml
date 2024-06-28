@@ -1,10 +1,10 @@
 [package]
 name = "elonaire-frontend"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
 description = "My portfolio website"
 readme = "README.md"
-repository = "https://github.com/yewstack/yew-trunk-minimal-template"
+repository = "https://github.com/elonaire/elonaire"
 license = "MIT OR Apache-2.0"
 keywords = ["yew", "trunk"]
 categories = ["gui", "wasm", "web-programming"]
