@@ -62,7 +62,6 @@ pub fn resume() -> Html {
 
     use_effect_with_deps(
         move |_| {
-            log::info!("rerenders");
             wasm_bindgen_futures::spawn_local(async move {
                 let user_id = option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
 
