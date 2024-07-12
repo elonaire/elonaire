@@ -4,11 +4,11 @@ use crate::{
     app::AppStateContext,
     components::{
         back_home::BackHome,
+        no_content_component::NoContent,
         page_header::{PageHeader, PageHeaderProps},
         project_card::ProjectCard,
         tabs::Tabs,
         transition::Transition,
-        no_content_component::NoContent,
     },
     data::context::user_resources::get_user_resources,
 };
@@ -29,18 +29,21 @@ pub fn portfolio() -> Html {
         None => vec![],
     });
 
-    use_effect({
-        wasm_bindgen_futures::spawn_local(async move {
-            if current_state.user_resources.portfolio.is_none() {
-                let user_id = option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
+    use_effect_with_deps(
+        move |_| {
+            wasm_bindgen_futures::spawn_local(async move {
+                if current_state.user_resources.portfolio.is_none() {
+                    let user_id =
+                        option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
 
-                let _user_resources =
-                    get_user_resources(user_id.to_string(), resoures_state_clone)
-                        .await;
-            }
-        }); // Await the async block
-        || ()
-    });
+                    let _user_resources =
+                        get_user_resources(user_id.to_string(), resoures_state_clone).await;
+                }
+            }); // Await the async block
+            || ()
+        },
+        (),
+    );
 
     let state_clone_for_filters = state_clone.clone();
     let projects_local_state_clone = projects.clone();
@@ -100,7 +103,7 @@ pub fn portfolio() -> Html {
                                 <ProjectCard id={project.id.clone()} title={project.title.clone().unwrap()} description={project.description.clone().unwrap()} image={project.image.clone().unwrap()} link={project.link.clone().unwrap()} />
                             }
                         }).collect::<Html>()
-                    }    
+                    }
                 }
             </div>
             </div>

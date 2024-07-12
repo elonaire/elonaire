@@ -5,12 +5,13 @@ use crate::{
     app::AppStateContext,
     components::{
         back_home::BackHome,
+        loader::Loader,
         page_header::{PageHeader, PageHeaderProps},
         service_card::ServiceCard,
         styled_heading::{StyledHeading, StyledHeadingProps},
         transition::Transition,
-        loader::Loader,
-    }, data::context::{user::get_user_by_id, user_resources::get_user_resources},
+    },
+    data::context::{user::get_user_by_id, user_resources::get_user_resources},
 };
 
 #[function_component(About)]
@@ -31,21 +32,24 @@ pub fn about() -> Html {
     let services = current_state.user_resources.services.clone();
     let state_clone_for_effects = current_state.clone();
 
-    use_effect(move || {
-        wasm_bindgen_futures::spawn_local(async move {
-            let user_id = option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
+    use_effect_with_deps(
+        move |_| {
+            log::info!("rerenders");
+            wasm_bindgen_futures::spawn_local(async move {
+                let user_id = option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
 
-            if state_clone_for_effects.user_details.id.is_none() {
-                let _user = get_user_by_id(user_id.to_string(), state_clone).await;
-                
-            }
-            if state_clone_for_effects.user_resources.services.is_none() {
-                let _user_resources = get_user_resources(user_id.to_string(), resoures_state_clone).await;
-                
-            }
-        }); // Await the async block
-        || ()
-    });
+                if state_clone_for_effects.user_details.id.is_none() {
+                    let _user = get_user_by_id(user_id.to_string(), state_clone).await;
+                }
+                if state_clone_for_effects.user_resources.services.is_none() {
+                    let _user_resources =
+                        get_user_resources(user_id.to_string(), resoures_state_clone).await;
+                }
+            }); // Await the async block
+            || ()
+        },
+        (),
+    );
 
     html! {
         <>
