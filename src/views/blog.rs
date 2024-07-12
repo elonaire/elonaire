@@ -2,22 +2,33 @@ use std::ops::Deref;
 
 use yew::prelude::*;
 
-use crate::{components::{ad::AdComponent, blog::{blog_section::BlogSection, main_banner::FeaturedPosts}, blog_nav::BlogNav, footer::Footer}, data::{context::blog::get_blog_posts, models::blog::BlogCategory}};
 use crate::app::AppStateContext;
+use crate::{
+    components::{
+        ad::AdComponent,
+        blog::{blog_section::BlogSection, main_banner::FeaturedPosts},
+        blog_nav::BlogNav,
+        footer::Footer,
+    },
+    data::{context::blog::get_blog_posts, models::blog::BlogCategory},
+};
 
 #[function_component(Blog)]
 pub fn blog() -> Html {
     let state_ctx_reducer = use_context::<AppStateContext>().unwrap();
     let state_ctx_reducer_clone = state_ctx_reducer.clone();
 
-    use_effect(move || {
-        wasm_bindgen_futures::spawn_local(async move {
-            if state_ctx_reducer_clone.blog_posts.is_empty() {
-                let _ = get_blog_posts(state_ctx_reducer_clone).await;
-            }
-        }); // Await the async block
-        || ()
-    });
+    use_effect_with_deps(
+        move |_| {
+            wasm_bindgen_futures::spawn_local(async move {
+                if state_ctx_reducer_clone.blog_posts.is_empty() {
+                    let _ = get_blog_posts(state_ctx_reducer_clone).await;
+                }
+            }); // Await the async block
+            || ()
+        },
+        (),
+    );
 
     html! {
         <>

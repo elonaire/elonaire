@@ -4,12 +4,12 @@ use crate::{
     app::AppStateContext,
     components::{
         back_home::BackHome,
+        loader::Loader,
         page_header::{PageHeader, PageHeaderProps},
         skill::Skills,
         styled_heading::StyledHeading,
         timeline::Timeline,
         transition::Transition,
-        loader::Loader,
     },
     data::{
         context::user_resources::get_user_resources,
@@ -24,7 +24,6 @@ pub fn resume() -> Html {
     let state_clone = current_state.clone();
     let state_clone_for_deps = current_state.clone();
     let state_clone_for_view = current_state.clone();
-
 
     let education_items = use_state_eq(|| match current_state.user_resources.resume.clone() {
         Some(items) => items
@@ -61,18 +60,20 @@ pub fn resume() -> Html {
         hint: "I'm available for hire".to_owned(),
     });
 
-    use_effect(move || {
-        wasm_bindgen_futures::spawn_local(async move {
-            let user_id = option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
+    use_effect_with_deps(
+        move |_| {
+            wasm_bindgen_futures::spawn_local(async move {
+                let user_id = option_env!("MAIN_USER_ID").expect("MAIN_USER_ID env var not set");
 
-            if current_state.user_resources.resume.is_none() {
-                let _user_resources =
-                    get_user_resources(user_id.to_string(), resoures_state_clone)
-                        .await;
-            }
-        }); // Await the async block
-        || ()
-    });
+                if current_state.user_resources.resume.is_none() {
+                    let _user_resources =
+                        get_user_resources(user_id.to_string(), resoures_state_clone).await;
+                }
+            }); // Await the async block
+            || ()
+        },
+        (),
+    );
 
     let education_items_clone = education_items.clone();
     let experience_items_clone = experience_items.clone();
