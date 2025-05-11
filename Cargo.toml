@@ -1,0 +1,19 @@
+[package]
+name = "techie-tenka"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4.41"
+cynic = { version = "3.10.0", features = ["http-reqwest"] }
+icondata = "0.5.0"
+leptos = { version = "0.8.2", features = ["csr"] }
+leptos_icons = "0.6.0"
+leptos_meta = "0.8.2"
+leptos_router = "0.8.2"
+reqwest = "0.12.15"
+serde = "1.0.219"
+wasm-bindgen-futures = "0.4.50"
+
+[build-dependencies]
+cynic-codegen = { version = "3" }
