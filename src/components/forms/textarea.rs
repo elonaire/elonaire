@@ -16,7 +16,7 @@ pub fn Textarea(
     #[prop(default = "".to_string(), optional)] ext_input_styles: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
-    let (display_error, set_display_error) = signal(false);
+    let (display_error, _set_display_error) = signal(false);
 
     view! {
         <div class="mb-4">

@@ -3,6 +3,7 @@ use leptos::html::*;
 use leptos::prelude::*;
 
 #[derive(Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum InputFieldType {
     Text,
     Email,
