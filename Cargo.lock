@@ -2610,9 +2610,10 @@ dependencies = [
  "leptos_icons",
  "leptos_meta",
  "leptos_router",
+ "reactive_stores",
  "reqwest",
  "serde",
- "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]

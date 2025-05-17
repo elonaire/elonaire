@@ -7,14 +7,16 @@ use leptos_icons::Icon;
 
 #[component]
 pub fn DatePicker(
-    #[prop(default = "".to_string())] label: String,
+    #[prop(default = "".to_string(), optional)] label: String,
     name: String,
-    #[prop(default = false)] required: bool,
+    #[prop(default = false, optional)] required: bool,
     #[prop(default = Local::now().date_naive())] initial_value: NaiveDate,
-    #[prop(default = None)] onchange: Option<Callback<NaiveDate>>,
+    #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<NaiveDate>,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
     let (selected_date, set_selected_date) = signal(initial_value);
+    let selected_date_string = move || selected_date.get().format("%b %0e %Y").to_string();
+    let (selected_date_value, _set_selected_date_value) = signal(selected_date_string());
 
     let toggle_calendar = Callback::new(move |_| {
         set_show_calendar.update(|val| *val = !*val);
@@ -22,9 +24,7 @@ pub fn DatePicker(
 
     let select_date = Callback::new(move |date: NaiveDate| {
         set_selected_date.set(date);
-        if let Some(cb) = onchange {
-            cb.run(date);
-        }
+        onchange.run(date);
         set_show_calendar.set(false);
     });
 
@@ -41,8 +41,8 @@ pub fn DatePicker(
             <div class="relative">
                 <InputField
                     readonly=true
-                    onclick=Some(Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev)))
-                    initial_value={selected_date.get().format("%b %0e %Y").to_string()}
+                    onclick=Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev))
+                    initial_value={selected_date_value}
                     name={name.clone()}
                     field_type={InputFieldType::Text}
                 />

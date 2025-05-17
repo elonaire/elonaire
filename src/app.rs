@@ -5,6 +5,7 @@ use leptos_router::{
     StaticSegment,
     components::{Route, Router, Routes},
 };
+use reactive_stores::Store;
 
 use crate::{
     components::{
@@ -17,26 +18,29 @@ use crate::{
             toggle_switch::ToggleSwitch,
         },
         general::button::{BasicButton, ButtonGroup},
+        hocs::protected_route::ProtectedRoute,
     },
+    schemas::general::acl::AppStateContext,
     views::login::SignIn,
 };
 
 #[component]
 pub fn App() -> impl IntoView {
+    provide_context(Store::new(AppStateContext::default()));
     provide_meta_context();
 
     view! {
         // <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
         <Router>
             <Routes fallback=|| "Page not found.">
-                <Route path=StaticSegment("") view=Home/>
+                <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
                 <Route path=StaticSegment("/sign-in") view=SignIn/>
             </Routes>
         </Router>
     }
 }
 
-#[component]
+#[island]
 fn Home() -> impl IntoView {
     let (value, set_value) = signal(0);
     let (active, set_active) = signal(false);
@@ -45,7 +49,7 @@ fn Home() -> impl IntoView {
     });
 
     view! {
-        <Title text="Leptos + Tailwindcss"/>
+        <Title text="Techie Tenka"/>
         <main>
             <div class="font-mono flex flex-col min-h-screen">
                 <div class="flex flex-col m-auto">

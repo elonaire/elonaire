@@ -13,18 +13,18 @@ pub struct SelectOption {
 // Define the Leptos component
 #[component]
 pub fn SelectInput(
-    #[prop(default = "".to_string())] initial_value: String,
+    #[prop(default = "".to_string(), optional)] initial_value: String,
     label: String,
     name: String,
-    #[prop(default = None)] input_node_ref: Option<NodeRef<Select>>,
-    #[prop(default = false)] readonly: bool,
+    #[prop(optional)] input_node_ref: NodeRef<Select>,
+    #[prop(default = false, optional)] readonly: bool,
     options: Vec<SelectOption>,
-    #[prop(default = false)] required: bool,
-    #[prop(default = None)] onchange: Option<Callback<ev::Event>>,
-    #[prop(default = "".to_string())] ext_input_styles: String,
+    #[prop(default = false, optional)] required: bool,
+    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
+    #[prop(default = "".to_string(), optional)] ext_input_styles: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
-    let (display_error, set_display_error) = signal(false);
+    let (display_error, _set_display_error) = signal(false);
 
     view! {
         <div class="mb-4">
@@ -37,7 +37,7 @@ pub fn SelectInput(
                 }}
             </label>
             <select
-                node_ref=input_node_ref.unwrap_or_default()
+                node_ref=input_node_ref
                 name={name.clone()}
                 class=move || format!(
                     "form-input ring-0 shadow appearance-none border border-slate-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
@@ -45,11 +45,7 @@ pub fn SelectInput(
                 )
                 // value={initial_value.clone()}
                 // readonly={readonly}
-                on:change=move |ev| {
-                    if let Some(onchange) = onchange {
-                        onchange.run(ev);
-                    }
-                }
+                on:change=move |ev| onchange.run(ev)
                 id={name.clone()}
             >
                 {options.into_iter()

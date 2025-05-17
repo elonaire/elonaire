@@ -5,7 +5,7 @@ use leptos::prelude::*;
 #[component]
 pub fn ToggleSwitch(
     #[prop(into)] active: Signal<bool>,
-    #[prop(default = Callback::new(|_| {}))] on_toggle: Callback<bool>,
+    #[prop(default = Callback::new(|_| {}), optional)] on_toggle: Callback<bool>,
     #[prop(default = "On".to_string())] label_active: String,
     #[prop(default = "Off".to_string())] label_inactive: String,
 ) -> impl IntoView {

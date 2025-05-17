@@ -11,9 +11,10 @@ leptos = { version = "0.8.2", features = ["csr"] }
 leptos_icons = "0.6.0"
 leptos_meta = "0.8.2"
 leptos_router = "0.8.2"
-reqwest = "0.12.15"
+reactive_stores = "0.2.2"
+reqwest = { version = "0.12.15", features = ["json"] }
 serde = "1.0.219"
-wasm-bindgen-futures = "0.4.50"
+web-sys = { version = "0.3.77", features = ["Storage"] }
 
 [build-dependencies]
 cynic-codegen = { version = "3" }

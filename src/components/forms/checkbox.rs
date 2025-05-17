@@ -4,17 +4,17 @@ use leptos::prelude::*;
 
 #[component]
 pub fn CheckboxInputField(
-    #[prop(default = "".to_string())] initial_value: String,
-    #[prop(default = "".to_string())] label: String,
+    #[prop(default = "".to_string(), optional)] initial_value: String,
+    #[prop(default = "".to_string(), optional)] label: String,
     name: String,
-    #[prop(optional)] input_node_ref: Option<NodeRef<Input>>,
-    #[prop(default = false)] readonly: bool,
-    #[prop(default = false)] required: bool,
-    #[prop(default = "".to_string())] placeholder: String,
-    #[prop(default = None)] oninput: Option<Callback<ev::Event>>,
+    #[prop(optional)] input_node_ref: NodeRef<Input>,
+    #[prop(default = false, optional)] readonly: bool,
+    #[prop(default = false, optional)] required: bool,
+    #[prop(default = "".to_string(), optional)] placeholder: String,
+    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     id_attr: String,
 ) -> impl IntoView {
-    let (display_error, set_display_error) = signal(false);
+    let (display_error, _set_display_error) = signal(false);
 
     view! {
         <div class="mb-4">
@@ -27,13 +27,9 @@ pub fn CheckboxInputField(
                     type="checkbox"
                     value={initial_value}
                     name={name.clone()}
-                    node_ref={input_node_ref.unwrap_or(NodeRef::new())}
+                    node_ref={input_node_ref}
                     readonly={readonly}
-                    on:input={move |ev| {
-                        if let Some(cb) = oninput {
-                            cb.run(ev);
-                        }
-                    }}
+                    on:input={move |ev| oninput.run(ev)}
                     placeholder={placeholder}
                     autocomplete="on"
                     id={id_attr.clone()}

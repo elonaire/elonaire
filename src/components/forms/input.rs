@@ -24,22 +24,22 @@ pub enum InputFieldType {
 
 #[component]
 pub fn InputField(
-    #[prop(default = "".to_string())] initial_value: String,
+    #[prop(into, optional)] initial_value: Signal<String>,
     #[prop(default = "".to_string())] label: String,
     field_type: InputFieldType,
     name: String,
-    #[prop(optional)] input_node_ref: Option<NodeRef<Input>>,
+    #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false)] readonly: bool,
     #[prop(default = false)] required: bool,
     #[prop(default = "".to_string())] placeholder: String,
-    #[prop(default = None)] oninput: Option<Callback<ev::Event>>,
-    #[prop(default = None)] onclick: Option<Callback<ev::MouseEvent>>,
+    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
+    #[prop(optional, default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(default = "".to_string())] ext_wrapper_styles: String,
     #[prop(default = "".to_string())] ext_label_styles: String,
     #[prop(default = "".to_string())] ext_input_styles: String,
     #[prop(default = "on".to_string())] autocomplete: String,
 ) -> impl IntoView {
-    let (display_error, set_display_error) = signal(false);
+    let (display_error, _set_display_error) = signal(false);
 
     let input_field_type_str = match field_type {
         InputFieldType::Text => "text",
@@ -81,21 +81,13 @@ pub fn InputField(
                 type={input_field_type_str}
                 value={initial_value}
                 name={name.clone()}
-                node_ref={input_node_ref.unwrap_or(NodeRef::new())}
+                node_ref={input_node_ref}
                 readonly={readonly}
-                on:input={move |ev| {
-                    if let Some(cb) = oninput {
-                        cb.run(ev);
-                    }
-                }}
+                on:input={move |ev| oninput.run(ev)}
                 placeholder={placeholder}
                 autocomplete={autocomplete}
                 id={name.clone()}
-                on:click={move |ev| {
-                    if let Some(cb) = onclick {
-                        cb.run(ev);
-                    }
-                }}
+                on:click={move |ev| onclick.run(ev)}
             />
             <p class="text-red-500 text-xs italic">
                 {move || {

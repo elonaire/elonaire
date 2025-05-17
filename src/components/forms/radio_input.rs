@@ -8,17 +8,17 @@ pub fn RadioInputField(
     #[prop(default = "".to_string())] initial_value: String,
     label: String,
     name: String,
-    #[prop(default = None)] input_node_ref: Option<NodeRef<Input>>,
-    #[prop(default = false)] readonly: bool,
-    #[prop(default = false)] required: bool,
-    #[prop(default = "".to_string())] placeholder: String,
-    #[prop(default = None)] oninput: Option<Callback<ev::Event>>,
+    #[prop(optional)] input_node_ref: NodeRef<Input>,
+    #[prop(default = false, optional)] readonly: bool,
+    #[prop(default = false, optional)] required: bool,
+    #[prop(default = "".to_string(), optional)] placeholder: String,
+    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     id_attr: String,
     children: Children,
     #[prop(default = "".to_string())] input_style_ext: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
-    let (display_error, set_display_error) = signal(false);
+    let (display_error, _set_display_error) = signal(false);
 
     view! {
         <div class="mb-4">
@@ -31,13 +31,9 @@ pub fn RadioInputField(
                     type="radio"
                     value={initial_value.clone()}
                     name={name.clone()}
-                    node_ref=input_node_ref.unwrap_or_default()
+                    node_ref=input_node_ref
                     readonly={readonly}
-                    on:input=move |ev| {
-                        if let Some(oninput) = oninput {
-                            oninput.run(ev);
-                        }
-                    }
+                    on:input=move |ev| oninput.run(ev)
                     placeholder={placeholder.clone()}
                     autocomplete="on"
                     id={id_attr.clone()}
