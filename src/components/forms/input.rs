@@ -25,7 +25,7 @@ pub enum InputFieldType {
 
 #[component]
 pub fn InputField(
-    #[prop(into, optional)] initial_value: Signal<String>,
+    #[prop(optional, default = Memo::new(|_| "".to_string()))] initial_value: Memo<String>,
     #[prop(default = "".to_string())] label: String,
     field_type: InputFieldType,
     name: String,

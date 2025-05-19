@@ -15,8 +15,9 @@ pub fn DatePicker(
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
     let (selected_date, set_selected_date) = signal(initial_value);
-    let selected_date_string = move || selected_date.get().format("%b %0e %Y").to_string();
-    let (selected_date_value, _set_selected_date_value) = signal(selected_date_string());
+
+    let selected_date_value =
+        Memo::new(move |_| selected_date.get().format("%b %0e %Y").to_string());
 
     let toggle_calendar = Callback::new(move |_| {
         set_show_calendar.update(|val| *val = !*val);
@@ -42,7 +43,7 @@ pub fn DatePicker(
                 <InputField
                     readonly=true
                     onclick=Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev))
-                    initial_value={selected_date_value}
+                    initial_value=selected_date_value
                     name={name.clone()}
                     field_type={InputFieldType::Text}
                 />

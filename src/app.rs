@@ -1,4 +1,5 @@
 use icondata as IconId;
+use leptos::ev;
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{
@@ -19,6 +20,7 @@ use crate::{
         },
         general::button::{BasicButton, ButtonGroup},
         hocs::protected_route::ProtectedRoute,
+        modal::modal::{BasicModal, UseCase},
     },
     schemas::general::acl::AppStateContext,
     views::login::SignIn,
@@ -31,9 +33,11 @@ pub fn App() -> impl IntoView {
 
     view! {
         // <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
+        <div id="modal-root"></div>
         <Router>
             <Routes fallback=|| "Page not found.">
-                <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
+                // <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
+                <Route path=StaticSegment("") view=Home />
                 <Route path=StaticSegment("/sign-in") view=SignIn/>
             </Routes>
         </Router>
@@ -47,11 +51,20 @@ fn Home() -> impl IntoView {
     let on_toggle = Callback::new(move |new_active: bool| {
         set_active.set(new_active);
     });
+    let (modal_open, set_modal_open) = signal(true);
+    let onclick_primary = Callback::new(move |_: ev::MouseEvent| {
+        set_modal_open.set(false);
+    });
+
+    let on_cancel = Callback::new(move |_: ev::MouseEvent| {
+        set_modal_open.set(false);
+    });
 
     view! {
         <Title text="Techie Tenka"/>
         <main>
             <div class="font-mono flex flex-col min-h-screen">
+        <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
                 <InputField field_type={InputFieldType::Text} name={"name".to_string()} />
                 <DatePicker name={"dob".to_string()} />
@@ -87,7 +100,7 @@ fn Home() -> impl IntoView {
                                         ext_input_styles="bg-gray-100".to_string()
                                     />
                                     <ToggleSwitch
-                                                    active={active}
+                                                    active=active
                                                     on_toggle=on_toggle
                                                     label_active="Enabled".to_string()
                                                     label_inactive="Disabled".to_string()
