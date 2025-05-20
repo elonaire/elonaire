@@ -7,12 +7,17 @@ use crate::components::{
         textarea::Textarea,
         toggle_switch::ToggleSwitch,
     },
-    general::button::{BasicButton, ButtonGroup},
+    general::{
+        accordion::Accordion,
+        badge::Badge,
+        button::{BasicButton, ButtonGroup},
+    },
     modal::modal::{BasicModal, UseCase},
 };
 use icondata as IconId;
 use leptos::ev;
 use leptos::prelude::*;
+use leptos_icons::Icon;
 use leptos_meta::*;
 
 #[island]
@@ -98,6 +103,11 @@ pub fn Home() -> impl IntoView {
                                                                     disabled=true
                                                                 />
                                                             </ButtonGroup>
+
+                    <Badge text="2".to_string() ><span>"Notifications"</span></Badge>
+                    <Accordion title="Elonaire".to_string() icon=|| view! {<Icon icon=IconId::BsNodePlusFill />} >
+                        <p>"Hey there, I am Mr Elonaire!"</p>
+                    </Accordion>
                 </div>
             </div>
         </main>
