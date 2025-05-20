@@ -17,7 +17,7 @@ pub fn Accordion(
         <div>
             <span
                 on:click=toggle_content
-                class="flex flex-row items-center justify-between gap-2 mb-2 p-2 rounded cursor-pointer hover:bg-blue-800 hover:text-white"
+                class="flex flex-row items-center justify-between gap-2 mb-2 p-2 rounded cursor-pointer hover:bg-primary hover:text-white"
             >
                 <span class="flex flex-row items-center gap-2">
                     { icon.run() }

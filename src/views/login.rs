@@ -8,6 +8,7 @@ use web_sys::window;
 
 use crate::components::forms::input::InputField;
 use crate::components::forms::input::InputFieldType;
+use crate::components::general::breadcrumbs::Breadcrumbs;
 use crate::components::general::button::BasicButton;
 use crate::schemas::general::acl::AuthCode;
 use crate::schemas::general::acl::AuthDetailsRest;
@@ -91,6 +92,7 @@ pub fn SignIn() -> impl IntoView {
         <Title text="Sign In"/>
 
         <div class="flex flex-col items-center justify-center p-8 bg-white">
+            <Breadcrumbs custom_route_names=vec!["Home", "Sign In"].into_iter().map(|name| name.to_owned()).collect() />
                         <h1 class="text-4xl font-bold my-4">{"Sign In"}</h1>
                         <div class="w-full max-w-md flex flex-col items-center gap-2 md:flex-row md:justify-between my-4">
                                                 <BasicButton
