@@ -11,6 +11,7 @@ use crate::components::{
         accordion::Accordion,
         badge::Badge,
         button::{BasicButton, ButtonGroup},
+        popover::Popover,
     },
     modal::modal::{BasicModal, UseCase},
 };
@@ -27,12 +28,18 @@ pub fn Home() -> impl IntoView {
         set_active.set(new_active);
     });
     let (modal_open, set_modal_open) = signal(true);
+    let (popover_open, set_popover_open) = signal(false);
+
     let onclick_primary = Callback::new(move |_: ev::MouseEvent| {
         set_modal_open.set(false);
     });
 
     let on_cancel = Callback::new(move |_: ev::MouseEvent| {
         set_modal_open.set(false);
+    });
+
+    let toggle_popover_handler = Callback::new(move |value: bool| {
+        set_popover_open.set(value);
     });
 
     view! {
@@ -108,6 +115,12 @@ pub fn Home() -> impl IntoView {
                     <Accordion title="Elonaire".to_string() icon=|| view! {<Icon icon=IconId::BsNodePlusFill />} >
                         <p>"Hey there, I am Mr Elonaire!"</p>
                     </Accordion>
+                    <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
+                        <div class="flex flex-row">
+                        <span class="text-gray-600">"Tenka"</span>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRij6dtiHizH96qpCOe8WeXXP3yLyQJkPdGVg&s" />
+                        </div>
+                    </Popover>
                 </div>
             </div>
         </main>

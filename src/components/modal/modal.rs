@@ -40,7 +40,7 @@ pub fn BasicModal(
     // };
 
     view! {
-        <div>
+        <>
             <Show when=move || is_open.get() fallback=|| ()>
                 <Portal mount=document().get_element_by_id("modal-root").unwrap()>
                     <div class="fixed inset-0 bg-gray-900 opacity-50 z-10"></div>
@@ -101,6 +101,6 @@ pub fn BasicModal(
                         </div>
                 </Portal>
             </Show>
-        </div>
+        </>
     }
 }
