@@ -39,7 +39,6 @@ pub fn BasicModal(
 
     let handle_backdrop_click = move |e: ev::MouseEvent| {
         e.stop_propagation();
-        leptos::logging::log!("handle_backdrop_click runs");
         if !disable_auto_close {
             on_cancel.run(false);
         };
