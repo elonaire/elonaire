@@ -114,7 +114,7 @@ pub fn Home() -> impl IntoView {
                                                             </ButtonGroup>
 
                     <Badge text="2".to_string() ><span>"Notifications"</span></Badge>
-                    <LabelTag label="Paused".to_string() color=ColorTemperature::Warning  />
+                    <LabelTag label="Failed".to_string() color=ColorTemperature::Danger  />
                     <Accordion title="Elonaire".to_string() icon=|| view! {<Icon icon=IconId::BsNodePlusFill />} >
                         <p>"Hey there, I am Mr Elonaire!"</p>
                     </Accordion>
