@@ -5,6 +5,7 @@ use leptos_icons::Icon;
 use crate::components::general::button::BasicButton;
 
 #[derive(Clone, PartialEq, Copy, Debug, Default)]
+#[allow(dead_code)]
 pub enum UseCase {
     Error,
     Success,
@@ -20,8 +21,7 @@ pub fn BasicModal(
     #[prop(optional)] children: Option<ChildrenFn>,
     #[prop(default = UseCase::General, optional)] use_case: UseCase,
     #[prop(default = Callback::new(|_| {}), optional)] on_click_primary: Callback<ev::MouseEvent>,
-    #[prop(default = Callback::new(|_| {}), optional)] on_confirm: Callback<ev::MouseEvent>,
-    #[prop(default = Callback::new(|_| {}), optional)] on_cancel: Callback<ev::MouseEvent>,
+    #[prop(default = Callback::new(|_| {}), optional)] on_cancel: Callback<bool>,
     #[prop(default = Signal::derive(move || false), into, optional)] is_open: Signal<bool>,
     #[prop(default = "OK".to_string())] primary_button_text: String,
     #[prop(default = true, optional)] disable_auto_close: bool,
@@ -30,7 +30,13 @@ pub fn BasicModal(
     let (primary_button_text, _set_primary_button_text) = signal(primary_button_text);
     let (children, _set_children) = signal(children);
 
-    // TODO: This cause a major leak bug that I couldn't fix, might look more into it.
+    let oncancel_handler = move |value: bool| {
+        Callback::new(move |_e: ev::MouseEvent| {
+            on_cancel.run(value);
+        })
+    };
+
+    // TODO: This cause a major mem leak bug that I couldn't fix, might look more into it.
     // let handle_backdrop_click = move |e: ev::MouseEvent| {
     //     e.stop_propagation();
     //     leptos::logging::log!("handle_backdrop_click runs");
@@ -84,7 +90,7 @@ pub fn BasicModal(
                                                                     <BasicButton
                                                                         button_text="Cancel".to_string()
                                                                         style_ext="bg-gray-400 text-white".to_string()
-                                                                        onclick=on_cancel
+                                                                        onclick=oncancel_handler(false)
                                                                     />
                                                             })
                                                         } else {

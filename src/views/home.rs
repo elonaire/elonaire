@@ -34,8 +34,8 @@ pub fn Home() -> impl IntoView {
         set_modal_open.set(false);
     });
 
-    let on_cancel = Callback::new(move |_: ev::MouseEvent| {
-        set_modal_open.set(false);
+    let on_cancel = Callback::new(move |value: bool| {
+        set_modal_open.set(value);
     });
 
     let toggle_popover_handler = Callback::new(move |value: bool| {
