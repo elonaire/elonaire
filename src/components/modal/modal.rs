@@ -20,7 +20,7 @@ pub fn BasicModal(
     title: String,
     #[prop(optional)] children: Option<ChildrenFn>,
     #[prop(default = UseCase::General, optional)] use_case: UseCase,
-    #[prop(default = Callback::new(|_| {}), optional)] on_click_primary: Callback<ev::MouseEvent>,
+    #[prop(default = Callback::new(|_| {}), optional)] on_click_primary: Callback<()>,
     #[prop(default = Callback::new(|_| {}), optional)] on_cancel: Callback<bool>,
     #[prop(default = Signal::derive(move || false), into, optional)] is_open: Signal<bool>,
     #[prop(default = "OK".to_string())] primary_button_text: String,
@@ -34,6 +34,13 @@ pub fn BasicModal(
         Callback::new(move |e: ev::MouseEvent| {
             e.stop_propagation();
             on_cancel.run(value);
+        })
+    };
+
+    let onclick_primary_handler = move || {
+        Callback::new(move |e: ev::MouseEvent| {
+            e.stop_propagation();
+            on_click_primary.run(());
         })
     };
 
@@ -99,7 +106,7 @@ pub fn BasicModal(
                                                     <BasicButton
                                                         button_text=primary_button_text.get()
                                                         style_ext="bg-blue-500 text-white".to_string()
-                                                        onclick=on_click_primary
+                                                        onclick=onclick_primary_handler()
                                                     />
                                                 </div>
                         </div>

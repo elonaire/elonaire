@@ -1,29 +1,21 @@
 use leptos::html::*;
 use leptos::prelude::*;
 
-#[derive(Clone, PartialEq)]
-#[allow(dead_code)]
-pub enum BadgeTemperature {
-    Danger,
-    Success,
-    Warning,
-    Info,
-    Primary,
-}
+use crate::components::schemas::props::ColorTemperature;
 
 #[component]
 pub fn Badge(
     text: String,
-    #[prop(default = BadgeTemperature::Primary)] color: BadgeTemperature,
+    #[prop(default = ColorTemperature::Primary)] color: ColorTemperature,
     #[prop(default = "".to_string())] parent_class: String,
     children: Children,
     #[prop(default = "".to_string())] badge_position: String,
 ) -> impl IntoView {
     let color_classes = move || match color {
-        BadgeTemperature::Danger => "bg-danger",
-        BadgeTemperature::Success => "bg-success",
-        BadgeTemperature::Warning => "bg-warning",
-        BadgeTemperature::Info => "bg-blue-100",
+        ColorTemperature::Danger => "bg-danger",
+        ColorTemperature::Success => "bg-success",
+        ColorTemperature::Warning => "bg-warning",
+        ColorTemperature::Info => "bg-info",
         _ => "bg-primary", // default color
     };
 

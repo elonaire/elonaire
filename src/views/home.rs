@@ -12,8 +12,10 @@ use crate::components::{
         badge::Badge,
         button::{BasicButton, ButtonGroup},
         popover::Popover,
+        tag::LabelTag,
     },
     modal::modal::{BasicModal, UseCase},
+    schemas::props::ColorTemperature,
 };
 use icondata as IconId;
 use leptos::ev;
@@ -30,7 +32,7 @@ pub fn Home() -> impl IntoView {
     let (modal_open, set_modal_open) = signal(true);
     let (popover_open, set_popover_open) = signal(false);
 
-    let onclick_primary = Callback::new(move |_: ev::MouseEvent| {
+    let onclick_primary = Callback::new(move |_| {
         set_modal_open.set(false);
     });
 
@@ -112,6 +114,7 @@ pub fn Home() -> impl IntoView {
                                                             </ButtonGroup>
 
                     <Badge text="2".to_string() ><span>"Notifications"</span></Badge>
+                    <LabelTag label="Paused".to_string() color=ColorTemperature::Warning  />
                     <Accordion title="Elonaire".to_string() icon=|| view! {<Icon icon=IconId::BsNodePlusFill />} >
                         <p>"Hey there, I am Mr Elonaire!"</p>
                     </Accordion>
