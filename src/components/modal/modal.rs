@@ -31,27 +31,27 @@ pub fn BasicModal(
     let (children, _set_children) = signal(children);
 
     let oncancel_handler = move |value: bool| {
-        Callback::new(move |_e: ev::MouseEvent| {
+        Callback::new(move |e: ev::MouseEvent| {
+            e.stop_propagation();
             on_cancel.run(value);
         })
     };
 
-    // TODO: This cause a major mem leak bug that I couldn't fix, might look more into it.
-    // let handle_backdrop_click = move |e: ev::MouseEvent| {
-    //     e.stop_propagation();
-    //     leptos::logging::log!("handle_backdrop_click runs");
-    //     if !disable_auto_close {
-    //         on_cancel.run(e);
-    //     };
-    // };
+    let handle_backdrop_click = move |e: ev::MouseEvent| {
+        e.stop_propagation();
+        leptos::logging::log!("handle_backdrop_click runs");
+        if !disable_auto_close {
+            on_cancel.run(false);
+        };
+    };
 
     view! {
         <>
             <Show when=move || is_open.get() fallback=|| ()>
                 <Portal mount=document().get_element_by_id("modal-root").unwrap()>
                     <div class="fixed inset-0 bg-gray-900 opacity-50 z-10"></div>
-                        <div class="fixed inset-0 flex items-center justify-center bg-transparent z-11">
-                        <div class="bg-slate-50 rounded shadow-lg -translate-y-1/4 w-full max-w-md m-2">
+                        <div on:click=handle_backdrop_click class="fixed inset-0 flex items-center justify-center bg-transparent z-11">
+                        <div on:click=move |e| e.stop_propagation() class="bg-slate-50 rounded shadow-lg -translate-y-1/4 w-full max-w-md m-2">
                             <div class="flex items-center mb-4 border-gray-300 border-b p-4">
                                 {
                                     move || match use_case {

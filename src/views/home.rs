@@ -46,7 +46,7 @@ pub fn Home() -> impl IntoView {
         <Title text="Techie Tenka"/>
         <main>
             <div class="font-mono flex flex-col min-h-screen">
-        <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
+        <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
                 <InputField field_type={InputFieldType::Text} name={"name".to_string()} />
                 <DatePicker name={"dob".to_string()} />
