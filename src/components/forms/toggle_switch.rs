@@ -10,7 +10,6 @@ pub fn ToggleSwitch(
 ) -> impl IntoView {
     // Define the onclick handler
     let onclick = move |_| {
-        leptos::logging::log!("clicked toggle");
         on_toggle.run(!active.get());
     };
 
