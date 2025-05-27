@@ -5,7 +5,9 @@ use leptos_router::{components::A, hooks::use_location};
 
 #[component]
 pub fn Breadcrumbs(
-    #[prop(default = vec!["Home".to_string()], optional)] custom_route_names: Vec<String>,
+    /// These routes are named in order of appearance and if the `custom_route_names` prop is not specified, the first route is by default named "Home". If specified, you need to provide a name for each route, including the first route.
+    #[prop(default = vec!["Home".to_string()], optional)]
+    custom_route_names: Vec<String>,
 ) -> impl IntoView {
     let location = use_location();
     let (breadcrumbs, set_breadcrumbs) = signal(vec![] as Vec<ViewFn>);

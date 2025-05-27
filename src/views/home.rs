@@ -12,10 +12,11 @@ use crate::components::{
         badge::Badge,
         button::{BasicButton, ButtonGroup},
         popover::Popover,
+        table::data_table::DataTable,
         tag::LabelTag,
     },
     modal::modal::{BasicModal, UseCase},
-    schemas::props::ColorTemperature,
+    schemas::{mock_data::database::get_transactions, props::ColorTemperature},
 };
 use icondata as IconId;
 use leptos::ev;
@@ -31,6 +32,9 @@ pub fn Home() -> impl IntoView {
     });
     let (modal_open, set_modal_open) = signal(true);
     let (popover_open, set_popover_open) = signal(false);
+    let (table_data, _set_table_data) = signal(get_transactions());
+    let table_rows = Memo::new(move |_| table_data.get().1);
+    let table_columns = Memo::new(move |_| table_data.get().0);
 
     let onclick_primary = Callback::new(move |_| {
         set_modal_open.set(false);
@@ -124,6 +128,7 @@ pub fn Home() -> impl IntoView {
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRij6dtiHizH96qpCOe8WeXXP3yLyQJkPdGVg&s" />
                         </div>
                     </Popover>
+                    <DataTable columns=table_columns data=table_rows />
                 </div>
             </div>
         </main>

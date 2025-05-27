@@ -1,0 +1,438 @@
+use std::collections::HashMap;
+use std::hash::Hash;
+use std::hash::Hasher;
+
+use chrono::DateTime;
+use chrono::Utc;
+use icondata as IconId;
+use leptos::html::*;
+use leptos::prelude::*;
+use leptos_icons::Icon;
+
+#[derive(Clone)]
+pub struct Column {
+    pub name: String,
+    pub sortable: bool,
+    pub sort_order: SortOrder,
+    pub sort_icon: ViewFn,
+}
+
+#[derive(Clone, PartialEq, Debug, Default)]
+pub enum SortOrder {
+    #[default]
+    Default,
+    Ascending,
+    Descending,
+}
+
+impl Column {
+    pub fn new(name: &str, sortable: bool) -> Self {
+        Column {
+            name: name.to_string(),
+            sortable,
+            sort_order: Default::default(),
+            sort_icon: (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> })
+                .into(),
+        }
+    }
+
+    pub fn toggle_sort(&mut self) {
+        self.sort_order = match self.sort_order {
+            SortOrder::Default => SortOrder::Ascending,
+            SortOrder::Ascending => SortOrder::Descending,
+            SortOrder::Descending => SortOrder::Default,
+        };
+    }
+
+    pub fn toggle_sort_icon(&mut self) {
+        self.sort_icon = match self.sort_order {
+            SortOrder::Default => {
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> }).into()
+            }
+            SortOrder::Ascending => {
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortUp /> }).into()
+            }
+            SortOrder::Descending => {
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortDown /> }).into()
+            }
+        };
+    }
+}
+
+impl PartialEq for Column {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+        // sort_icon (ViewFn) is not compared
+    }
+}
+
+#[derive(Clone)]
+#[allow(dead_code)]
+pub enum TableCellData {
+    String(String),
+    Int32(i32),
+    Int64(i64),
+    Html(ViewFn), // Simplified for Leptos; assumes HTML as ViewFn
+    Float32(f32),
+    Float64(f64),
+    UInt32(u32),
+    UInt64(u64),
+    UInt128(u128),
+    Bool(bool),
+    DateTime(DateTime<Utc>),
+}
+
+impl PartialEq for TableCellData {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (TableCellData::String(a), TableCellData::String(b)) => a == b,
+            (TableCellData::Int64(a), TableCellData::Int64(b)) => a == b,
+            (TableCellData::Float64(a), TableCellData::Float64(b)) => a == b,
+            (TableCellData::Html(_), TableCellData::Html(_)) => false, // ViewFn cannot be compared
+            _ => false, // Different variants are not equal
+        }
+    }
+}
+
+impl Eq for TableCellData {}
+
+impl Hash for TableCellData {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            TableCellData::String(s) => {
+                0u8.hash(state); // Variant discriminator
+                s.hash(state);
+            }
+            TableCellData::Int64(i) => {
+                1u8.hash(state);
+                i.hash(state);
+            }
+            TableCellData::Float64(f) => {
+                2u8.hash(state);
+                // Convert float to bits to handle NaN and other edge cases
+                f.to_bits().hash(state);
+            }
+            _ => {
+                3u8.hash(state);
+                // Since ViewFn can't be hashed, use a constant or skip
+            }
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct TableProps {
+    pub columns: Vec<Column>,
+    pub data: Vec<HashMap<String, TableCellData>>,
+    pub page_size: usize,
+    pub on_row_click: Callback<HashMap<String, TableCellData>>,
+    pub on_row_edit: Callback<HashMap<String, TableCellData>>,
+    pub on_row_delete: Callback<HashMap<String, TableCellData>>,
+    pub editable: bool,
+    pub deletable: bool,
+}
+
+// Manually implement PartialEq, ignoring Callback fields
+impl PartialEq for TableProps {
+    fn eq(&self, other: &Self) -> bool {
+        self.columns == other.columns
+            && self.data == other.data
+            && self.page_size == other.page_size
+            && self.editable == other.editable
+            && self.deletable == other.deletable
+        // Note: Callbacks are not compared
+    }
+}
+
+impl TableProps {
+    pub fn paginate(
+        &self,
+        current_page: usize,
+        data: Vec<HashMap<String, TableCellData>>,
+    ) -> (usize, usize, Vec<HashMap<String, TableCellData>>) {
+        let total_pages = (self.data.len() as f64 / self.page_size as f64).ceil() as usize;
+        let current_data = data
+            .into_iter()
+            .skip((current_page - 1) * self.page_size)
+            .take(self.page_size)
+            .collect();
+        (current_page, total_pages, current_data)
+    }
+
+    pub fn sort(&mut self, column: &Column) -> Vec<HashMap<String, TableCellData>> {
+        match column.sort_order {
+            SortOrder::Ascending => {
+                self.data
+                    .sort_by(|a, b| match (a.get(&column.name), b.get(&column.name)) {
+                        (Some(TableCellData::String(a)), Some(TableCellData::String(b))) => {
+                            a.cmp(b)
+                        }
+                        (Some(TableCellData::Int64(a)), Some(TableCellData::Int64(b))) => a.cmp(b),
+                        (Some(TableCellData::Float64(a)), Some(TableCellData::Float64(b))) => {
+                            a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+                        }
+                        _ => std::cmp::Ordering::Equal,
+                    });
+            }
+            SortOrder::Descending => {
+                self.data
+                    .sort_by(|a, b| match (a.get(&column.name), b.get(&column.name)) {
+                        (Some(TableCellData::String(a)), Some(TableCellData::String(b))) => {
+                            b.cmp(a)
+                        }
+                        (Some(TableCellData::Int64(a)), Some(TableCellData::Int64(b))) => b.cmp(a),
+                        (Some(TableCellData::Float64(a)), Some(TableCellData::Float64(b))) => {
+                            b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)
+                        }
+                        _ => std::cmp::Ordering::Equal,
+                    });
+            }
+            SortOrder::Default => {}
+        }
+        self.data.to_owned()
+    }
+}
+
+#[component]
+pub fn DataTable(
+    #[prop(into)] columns: Memo<Vec<Column>>,
+    #[prop(into)] data: Memo<Vec<HashMap<String, TableCellData>>>,
+    #[prop(optional, default = 10)] page_size: usize,
+    #[prop(optional, default = Callback::new(|_| {}))] on_row_click: Callback<
+        HashMap<String, TableCellData>,
+    >,
+    #[prop(optional, default = Callback::new(|_| {}))] on_row_edit: Callback<
+        HashMap<String, TableCellData>,
+    >,
+    #[prop(optional, default = Callback::new(|_| {}))] on_row_delete: Callback<
+        HashMap<String, TableCellData>,
+    >,
+    #[prop(default = false, optional)] editable: bool,
+    #[prop(default = false, optional)] deletable: bool,
+) -> impl IntoView {
+    let props = Memo::new(move |_| TableProps {
+        columns: columns.get(),
+        data: data.get(),
+        page_size,
+        on_row_click,
+        on_row_edit,
+        on_row_delete,
+        editable,
+        deletable,
+    });
+
+    let (current_page, set_current_page) = signal(1);
+    // let (pagination_state, set_pagination_state) =
+    //     signal(props.get().paginate(1, props.get().data));
+    // Derived signal for paginated data
+    let pagination_state = Memo::new(move |_| {
+        let data = data.get();
+        props.get().paginate(current_page.get(), data)
+    });
+    // let (working_data, set_working_data) = signal(props.get().data);
+    // let (working_columns, set_working_columns) = signal(props.get().columns);
+    let working_columns = Memo::new(move |_| {
+        let columns = columns.get();
+        columns.clone()
+    });
+
+    let on_page_change = Callback::new(move |page: usize| {
+        // set_pagination_state.set(props.get().paginate(page, working_data.get()));
+        set_current_page.set(page);
+    });
+
+    let on_click_sort = Callback::new(move |mut column: Column| {
+        column.toggle_sort();
+        column.toggle_sort_icon();
+        let sorted_data = props.get().sort(&column);
+        // set_working_data.set(sorted_data.clone());
+        let mut working_columns_vec = working_columns.get();
+        if let Some(c) = working_columns_vec
+            .iter_mut()
+            .find(|c| c.name == column.name)
+        {
+            *c = column.clone();
+        }
+        // set_working_columns.set(working_columns_vec);
+        // set_pagination_state.set(props.get().paginate(1, sorted_data));
+        set_current_page.set(1);
+    });
+
+    let on_click_edit_handler = move |row_data: HashMap<String, TableCellData>| {
+        props.get().on_row_edit.run(row_data);
+    };
+
+    let on_click_row_handler = move |row_data: HashMap<String, TableCellData>| {
+        props.get().on_row_click.run(row_data);
+    };
+
+    let on_click_delete_handler = move |row_data: HashMap<String, TableCellData>| {
+        props.get().on_row_delete.run(row_data);
+    };
+
+    // Effect::new(move |_| {
+    //     set_pagination_state.set(props.get().paginate(1, props.get().data));
+    //     set_working_data.set(props.get().data);
+    //     set_working_columns.set(props.get().columns);
+    // });
+
+    view! {
+        <div class="w-full flex flex-col justify-between h-5/6">
+            <div class="overflow-x-auto">
+                <table class="border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
+                <thead>
+                    <tr class="p-2">
+                        <For
+                            each=move || working_columns.get()
+                            key=|column| column.name.clone()
+                            let (column)
+                        >
+                            <th
+                                class="border-b p-2 border-gray-200 text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
+                                on:click=move |_| on_click_sort.run(column.clone())
+                            >
+                                <span class="flex flex-row items-center">
+                                    <span>{column.name.clone()}</span>
+                                    {if column.sortable {
+                                        Some(view! {
+                                            <span class="text-primary">
+                                                { column.sort_icon.run() }
+                                            </span>
+                                        })
+                                    } else {
+                                        None
+                                    }}
+                                </span>
+                            </th>
+                        </For>
+                        {move || if props.get().editable || props.get().deletable {
+                            Some(view! {
+                                <th class="border-b p-2 border-gray-200 text-nowrap font-bold text-gray-800 text-left min-w-[150px]">
+                                    "Actions"
+                                </th>
+                            })
+                        } else {
+                            None
+                        }}
+                    </tr>
+                </thead>
+                <tbody>
+                    <For
+                        each=move || pagination_state.get().2
+                        key=move |row| match row.get("id").clone() {
+                            Some(TableCellData::String(s)) => s.clone(),
+                            _ => String::new(),
+                        }
+                        let(row_data)
+                    >
+                        {
+                            let row_data_row_click = row_data.clone();
+                            let row_data_cols = row_data.clone();
+
+                            view! {
+                                <tr
+                                    class="border-b border-gray-200 p-2"
+                                    on:click=move |_| on_click_row_handler(row_data_row_click.clone())
+                                >
+                                    // Computed row columns
+                                    {
+                                        let id = match row_data.get("id").clone() {
+                                            Some(TableCellData::String(s)) => s.clone(),
+                                            _ => String::new(),
+                                        };
+
+                                        view! {
+                                            <For
+                                                each=move || props.get().columns.clone()
+                                                key=move |column| {
+                                                    format!("{}-{}", column.name.clone(), id)
+                                                }
+                                                let(column)
+                                            >
+                                                <td class="p-2 min-w-[150px]">
+                                                    {match row_data_cols.get(&column.name).clone() {
+                                                        Some(TableCellData::String(s)) => s.clone().into_any().into_view(),
+                                                        Some(TableCellData::Int32(i)) => i.to_string().into_any().into_view(),
+                                                        Some(TableCellData::Int64(i)) => i.to_string().into_any().into_view(),
+                                                        Some(TableCellData::UInt32(u)) => u.to_string().into_any().into_view(),
+                                                        Some(TableCellData::UInt64(u)) => u.to_string().into_any().into_view(),
+                                                        Some(TableCellData::UInt128(u)) => u.to_string().into_any().into_view(),
+                                                        Some(TableCellData::Html(html)) => html.run().into_view(),
+                                                        Some(TableCellData::Float32(f)) => f.to_string().into_any().into_view(),
+                                                        Some(TableCellData::Float64(f)) => f.to_string().into_any().into_view(),
+                                                        Some(TableCellData::Bool(b)) => b.to_string().into_any().into_view(),
+                                                        Some(TableCellData::DateTime(dt)) => dt.to_string().into_any().into_view(),
+                                                        None => "N/A".into_any().into_view(),
+                                                    }}
+                                                </td>
+                                            </For>
+                                            // Action columns
+                                            {if props.get().editable || props.get().deletable {
+                                                let row_data_edit = row_data.clone();
+
+                                                Some(view! {
+                                                    <td class="flex flex-row items-center gap-2 h-full py-2 min-w-[150px]">
+                                                        {if props.get().editable {
+                                                            Some(view! {
+                                                                <button
+                                                                    class="text-primary cursor-pointer"
+                                                                    on:click=move |_| on_click_edit_handler(row_data_edit.clone())
+                                                                >
+                                                                    <Icon width="1em" height="1em" icon=IconId::BsPencil />
+                                                                </button>
+                                                            })
+                                                        } else {
+                                                            None
+                                                        }}
+                                                        {if props.get().deletable {
+                                                            Some(view! {
+                                                                <button
+                                                                    class="text-theme-red cursor-pointer"
+                                                                        on:click=move |_| on_click_delete_handler(row_data.clone())
+                                                                >
+                                                                    <Icon width="1em" height="1em" icon=IconId::BsTrash />
+                                                                </button>
+                                                            })
+                                                        } else {
+                                                            None
+                                                        }}
+                                                    </td>
+                                                })
+                                            } else {
+                                                None
+                                            }}
+                                        }
+                                    }
+                                </tr>
+                            }
+                        }
+                    </For>
+                    {move || if pagination_state.get().2.is_empty() {
+                        Some(view! {
+                            <tr>
+                                <td colspan={props.get().columns.len()}>
+                                    <div class="py-2">"No Content"</div>
+                                </td>
+                                {if props.get().deletable || props.get().editable {
+                                    Some(view! {
+                                        <td></td>
+                                    })
+                                } else {
+                                    None
+                                }}
+                            </tr>
+                        })
+                    } else {
+                        None
+                    }}
+                </tbody>
+                </table>
+                // <Pagination
+                //     current_page={pagination_state.get().0}
+                //     total_pages={pagination_state.get().1}
+                //     on_page_change={on_page_change}
+                // />
+            </div>
+        </div>
+    }
+}
