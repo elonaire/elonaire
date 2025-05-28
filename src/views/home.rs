@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::components::{
     forms::{
         datepicker::DatePicker,
@@ -12,14 +14,14 @@ use crate::components::{
         badge::Badge,
         button::{BasicButton, ButtonGroup},
         popover::Popover,
-        table::data_table::DataTable,
+        table::data_table::{Column, DataTable, TableCellData},
         tag::LabelTag,
     },
     modal::modal::{BasicModal, UseCase},
     schemas::{mock_data::database::get_transactions, props::ColorTemperature},
 };
 use icondata as IconId;
-use leptos::ev;
+// use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_meta::*;
@@ -32,9 +34,16 @@ pub fn Home() -> impl IntoView {
     });
     let (modal_open, set_modal_open) = signal(true);
     let (popover_open, set_popover_open) = signal(false);
-    let (table_data, _set_table_data) = signal(get_transactions());
+    let table_data = Memo::new(move |_| get_transactions());
     let table_rows = Memo::new(move |_| table_data.get().1);
     let table_columns = Memo::new(move |_| table_data.get().0);
+
+    // let on_data_sorted_handler = Callback::new(
+    //     move |new_data: (Vec<Column>, Vec<HashMap<String, TableCellData>>)| {
+    //         leptos::logging::log!("updates received: {:?}", new_data.0);
+    //         set_table_data.set(new_data);
+    //     },
+    // );
 
     let onclick_primary = Callback::new(move |_| {
         set_modal_open.set(false);

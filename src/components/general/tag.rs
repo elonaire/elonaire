@@ -10,19 +10,15 @@ pub fn LabelTag(
 ) -> impl IntoView {
     // Function to return the corresponding tailwind classes
     let color_classes = match color {
-        ColorTemperature::Success => {
-            "text-success text-white border-2 border-success bg-success-light"
-        }
-        ColorTemperature::Warning => {
-            "text-warning text-white border-2 border-warning bg-warning-light"
-        }
-        ColorTemperature::Info => "text-info text-white border-2 border-info bg-info-light",
-        ColorTemperature::Danger => "text-danger text-white border-2 border-danger bg-danger-light",
+        ColorTemperature::Success => "text-success border-2 border-success bg-success-light",
+        ColorTemperature::Warning => "text-warning border-2 border-warning bg-warning-light",
+        ColorTemperature::Info => "text-info border-2 border-info bg-info-light",
+        ColorTemperature::Danger => "text-danger border-2 border-danger bg-danger-light",
         _ => "text-primary border-2 border-primary primary-light",
     };
 
     view! {
-        <div class=format!("inline-block px-3 text-center rounded {}", color_classes)>
+        <div class=format!("inline-block px-3 text-center rounded text-sm {}", color_classes)>
             {label}
         </div>
     }

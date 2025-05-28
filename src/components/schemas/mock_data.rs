@@ -14,9 +14,16 @@ pub struct Transaction {
 }
 
 pub mod database {
+    use leptos::prelude::*;
     use std::collections::HashMap;
 
-    use crate::components::general::table::data_table::{Column, TableCellData};
+    use crate::components::{
+        general::{
+            table::data_table::{Column, TableCellData},
+            tag::LabelTag,
+        },
+        schemas::props::ColorTemperature,
+    };
 
     use super::{Transaction, TransactionType};
 
@@ -94,6 +101,7 @@ pub mod database {
             Column::new("Transaction ID", false),
             Column::new("Date", true),
             Column::new("Description", true),
+            Column::new("Transaction Type", false),
             Column::new("Amount", true),
         ];
 
@@ -113,6 +121,15 @@ pub mod database {
                 hash_map_data.insert(
                     "Description".to_string(),
                     TableCellData::String(transaction.description.clone()),
+                );
+                hash_map_data.insert(
+                    "Transaction Type".to_string(),
+                    TableCellData::Html(
+                        match transaction.transaction_type {
+                            TransactionType::Credit => (|| view!{ <LabelTag label="Credit".to_string() color=ColorTemperature::Info  /> }).into(),
+                            TransactionType::Debit => (|| view!{ <LabelTag label="Debit".to_string() color=ColorTemperature::Warning  /> }).into(),
+                        }
+                    ),
                 );
                 hash_map_data.insert(
                     "Amount".to_string(),

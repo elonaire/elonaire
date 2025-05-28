@@ -17,6 +17,17 @@ pub struct Column {
     pub sort_icon: ViewFn,
 }
 
+impl std::fmt::Debug for Column {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Column")
+            .field("name", &self.name)
+            .field("sortable", &self.sortable)
+            .field("sort_order", &self.sort_order)
+            .field("sort_icon", &"<ViewFn>")
+            .finish()
+    }
+}
+
 #[derive(Clone, PartialEq, Debug, Default)]
 pub enum SortOrder {
     #[default]
@@ -36,15 +47,21 @@ impl Column {
         }
     }
 
-    pub fn toggle_sort(&mut self) {
+    pub fn toggle_sort(&mut self) -> &mut Self {
+        leptos::logging::log!(
+            "Toggling sort order for column: {}, order: {:?}",
+            self.name,
+            self.sort_order
+        );
         self.sort_order = match self.sort_order {
             SortOrder::Default => SortOrder::Ascending,
             SortOrder::Ascending => SortOrder::Descending,
             SortOrder::Descending => SortOrder::Default,
         };
+        self
     }
 
-    pub fn toggle_sort_icon(&mut self) {
+    pub fn toggle_sort_icon(&mut self) -> &mut Self {
         self.sort_icon = match self.sort_order {
             SortOrder::Default => {
                 (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> }).into()
@@ -56,6 +73,7 @@ impl Column {
                 (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortDown /> }).into()
             }
         };
+        self
     }
 }
 
@@ -146,15 +164,17 @@ impl PartialEq for TableProps {
 
 impl TableProps {
     pub fn paginate(
-        &self,
+        &mut self,
         current_page: usize,
-        data: Vec<HashMap<String, TableCellData>>,
+        // data: Vec<HashMap<String, TableCellData>>,
     ) -> (usize, usize, Vec<HashMap<String, TableCellData>>) {
         let total_pages = (self.data.len() as f64 / self.page_size as f64).ceil() as usize;
-        let current_data = data
-            .into_iter()
+        let current_data = self
+            .data
+            .iter()
             .skip((current_page - 1) * self.page_size)
             .take(self.page_size)
+            .map(|row| row.clone())
             .collect();
         (current_page, total_pages, current_data)
     }
@@ -222,39 +242,30 @@ pub fn DataTable(
     });
 
     let (current_page, set_current_page) = signal(1);
-    // let (pagination_state, set_pagination_state) =
-    //     signal(props.get().paginate(1, props.get().data));
+
     // Derived signal for paginated data
-    let pagination_state = Memo::new(move |_| {
-        let data = data.get();
-        props.get().paginate(current_page.get(), data)
-    });
-    // let (working_data, set_working_data) = signal(props.get().data);
-    // let (working_columns, set_working_columns) = signal(props.get().columns);
-    let working_columns = Memo::new(move |_| {
-        let columns = columns.get();
-        columns.clone()
-    });
+    let pagination_state = Memo::new(move |_| props.get().paginate(current_page.get()));
 
     let on_page_change = Callback::new(move |page: usize| {
-        // set_pagination_state.set(props.get().paginate(page, working_data.get()));
         set_current_page.set(page);
     });
 
     let on_click_sort = Callback::new(move |mut column: Column| {
-        column.toggle_sort();
-        column.toggle_sort_icon();
+        if !column.sortable {
+            return;
+        };
+        column.toggle_sort().toggle_sort_icon();
         let sorted_data = props.get().sort(&column);
-        // set_working_data.set(sorted_data.clone());
-        let mut working_columns_vec = working_columns.get();
-        if let Some(c) = working_columns_vec
-            .iter_mut()
-            .find(|c| c.name == column.name)
-        {
+        leptos::logging::log!("sorted_data");
+        let mut updated_columns = props.get().columns;
+        if let Some(c) = updated_columns.iter_mut().find(|c| c.name == column.name) {
             *c = column.clone();
         }
-        // set_working_columns.set(working_columns_vec);
-        // set_pagination_state.set(props.get().paginate(1, sorted_data));
+
+        // props
+        //     .get()
+        //     .on_data_sorted
+        //     .run((updated_columns, sorted_data));
         set_current_page.set(1);
     });
 
@@ -270,12 +281,6 @@ pub fn DataTable(
         props.get().on_row_delete.run(row_data);
     };
 
-    // Effect::new(move |_| {
-    //     set_pagination_state.set(props.get().paginate(1, props.get().data));
-    //     set_working_data.set(props.get().data);
-    //     set_working_columns.set(props.get().columns);
-    // });
-
     view! {
         <div class="w-full flex flex-col justify-between h-5/6">
             <div class="overflow-x-auto">
@@ -283,7 +288,7 @@ pub fn DataTable(
                 <thead>
                     <tr class="p-2">
                         <For
-                            each=move || working_columns.get()
+                            each=move || props.get().columns
                             key=|column| column.name.clone()
                             let (column)
                         >
