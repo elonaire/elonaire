@@ -9,6 +9,8 @@ use leptos::html::*;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
+use crate::components::general::button::BasicButton;
+
 #[derive(Clone)]
 pub struct Column {
     pub name: String,
@@ -282,7 +284,9 @@ pub fn DataTable(
     });
 
     let on_click_edit_handler = move |row_data: HashMap<String, TableCellData>| {
-        props.get().on_row_edit.run(row_data);
+        Callback::new(move |_| {
+            props.get().on_row_edit.run(row_data.clone());
+        })
     };
 
     let on_click_row_handler = move |row_data: HashMap<String, TableCellData>| {
@@ -290,7 +294,9 @@ pub fn DataTable(
     };
 
     let on_click_delete_handler = move |row_data: HashMap<String, TableCellData>| {
-        props.get().on_row_delete.run(row_data);
+        Callback::new(move |_| {
+            props.get().on_row_delete.run(row_data.clone());
+        })
     };
 
     view! {
@@ -391,24 +397,21 @@ pub fn DataTable(
                                                     <td class="flex flex-row items-center gap-2 h-full py-2 min-w-[150px]">
                                                         {if props.get().editable {
                                                             Some(view! {
-                                                                <button
-                                                                    class="text-primary cursor-pointer"
-                                                                    on:click=move |_| on_click_edit_handler(row_data_edit.clone())
-                                                                >
-                                                                    <Icon width="1em" height="1em" icon=IconId::BsPencil />
-                                                                </button>
+                                                                <BasicButton
+                                                                                onclick=on_click_edit_handler(row_data_edit.clone())
+                                                                                icon=Some(IconId::BsPencil)
+                                                                            />
                                                             })
                                                         } else {
                                                             None
                                                         }}
                                                         {if props.get().deletable {
                                                             Some(view! {
-                                                                <button
-                                                                    class="text-theme-red cursor-pointer"
-                                                                        on:click=move |_| on_click_delete_handler(row_data.clone())
-                                                                >
-                                                                    <Icon width="1em" height="1em" icon=IconId::BsTrash />
-                                                                </button>
+                                                                <BasicButton
+                                                                style_ext="text-danger".to_string()
+                                                                                onclick=on_click_delete_handler(row_data.clone())
+                                                                                icon=Some(IconId::BsTrash)
+                                                                            />
                                                             })
                                                         } else {
                                                             None
