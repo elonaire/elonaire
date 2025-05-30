@@ -34,9 +34,7 @@ pub fn Home() -> impl IntoView {
     });
     let (modal_open, set_modal_open) = signal(true);
     let (popover_open, set_popover_open) = signal(false);
-    let table_data = Memo::new(move |_| get_transactions());
-    let table_rows = Memo::new(move |_| table_data.get().1);
-    let table_columns = Memo::new(move |_| table_data.get().0);
+    let table_data = RwSignal::new(get_transactions());
 
     // let on_data_sorted_handler = Callback::new(
     //     move |new_data: (Vec<Column>, Vec<HashMap<String, TableCellData>>)| {
@@ -137,7 +135,7 @@ pub fn Home() -> impl IntoView {
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRij6dtiHizH96qpCOe8WeXXP3yLyQJkPdGVg&s" />
                         </div>
                     </Popover>
-                    <DataTable columns=table_columns data=table_rows />
+                    <DataTable data=table_data />
                 </div>
             </div>
         </main>

@@ -48,11 +48,6 @@ impl Column {
     }
 
     pub fn toggle_sort(&mut self) -> &mut Self {
-        leptos::logging::log!(
-            "Toggling sort order for column: {}, order: {:?}",
-            self.name,
-            self.sort_order
-        );
         self.sort_order = match self.sort_order {
             SortOrder::Default => SortOrder::Ascending,
             SortOrder::Ascending => SortOrder::Descending,
@@ -98,6 +93,27 @@ pub enum TableCellData {
     UInt128(u128),
     Bool(bool),
     DateTime(DateTime<Utc>),
+}
+
+impl std::fmt::Debug for TableCellData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TableCellData::String(s) => f.debug_tuple("String").field(s).finish(),
+            TableCellData::Int32(i) => f.debug_tuple("Int32").field(i).finish(),
+            TableCellData::Int64(i) => f.debug_tuple("Int64").field(i).finish(),
+            TableCellData::Html(_) => f.debug_tuple("Html").field(&"<Html content>").finish(),
+            TableCellData::Float32(f32) => f.debug_tuple("Float32").field(f32).finish(),
+            TableCellData::Float64(f64) => f.debug_tuple("Float64").field(f64).finish(),
+            TableCellData::UInt32(u) => f.debug_tuple("UInt32").field(u).finish(),
+            TableCellData::UInt64(u) => f.debug_tuple("UInt64").field(u).finish(),
+            TableCellData::UInt128(u) => f.debug_tuple("UInt128").field(u).finish(),
+            TableCellData::Bool(b) => f.debug_tuple("Bool").field(b).finish(),
+            TableCellData::DateTime(_) => f
+                .debug_tuple("DateTime")
+                .field(&"<DateTime content>")
+                .finish(),
+        }
+    }
 }
 
 impl PartialEq for TableCellData {
@@ -166,7 +182,6 @@ impl TableProps {
     pub fn paginate(
         &mut self,
         current_page: usize,
-        // data: Vec<HashMap<String, TableCellData>>,
     ) -> (usize, usize, Vec<HashMap<String, TableCellData>>) {
         let total_pages = (self.data.len() as f64 / self.page_size as f64).ceil() as usize;
         let current_data = self
@@ -215,8 +230,7 @@ impl TableProps {
 
 #[component]
 pub fn DataTable(
-    #[prop(into)] columns: Memo<Vec<Column>>,
-    #[prop(into)] data: Memo<Vec<HashMap<String, TableCellData>>>,
+    #[prop(into)] data: RwSignal<(Vec<Column>, Vec<HashMap<String, TableCellData>>)>,
     #[prop(optional, default = 10)] page_size: usize,
     #[prop(optional, default = Callback::new(|_| {}))] on_row_click: Callback<
         HashMap<String, TableCellData>,
@@ -231,8 +245,8 @@ pub fn DataTable(
     #[prop(default = false, optional)] deletable: bool,
 ) -> impl IntoView {
     let props = Memo::new(move |_| TableProps {
-        columns: columns.get(),
-        data: data.get(),
+        columns: data.get().0,
+        data: data.get().1,
         page_size,
         on_row_click,
         on_row_edit,
@@ -242,6 +256,7 @@ pub fn DataTable(
     });
 
     let (current_page, set_current_page) = signal(1);
+    let (sorted_column_info, set_sorted_column_info) = signal(String::new());
 
     // Derived signal for paginated data
     let pagination_state = Memo::new(move |_| props.get().paginate(current_page.get()));
@@ -256,17 +271,14 @@ pub fn DataTable(
         };
         column.toggle_sort().toggle_sort_icon();
         let sorted_data = props.get().sort(&column);
-        leptos::logging::log!("sorted_data");
         let mut updated_columns = props.get().columns;
         if let Some(c) = updated_columns.iter_mut().find(|c| c.name == column.name) {
+            set_sorted_column_info.set(format!("-{}-{:?}", column.name, column.sort_order));
             *c = column.clone();
         }
 
-        // props
-        //     .get()
-        //     .on_data_sorted
-        //     .run((updated_columns, sorted_data));
         set_current_page.set(1);
+        data.set((updated_columns, sorted_data));
     });
 
     let on_click_edit_handler = move |row_data: HashMap<String, TableCellData>| {
@@ -289,7 +301,7 @@ pub fn DataTable(
                     <tr class="p-2">
                         <For
                             each=move || props.get().columns
-                            key=|column| column.name.clone()
+                            key=|column| format!("{}-{:?}", column.name.clone(), column.sort_order)
                             let (column)
                         >
                             <th
@@ -323,9 +335,9 @@ pub fn DataTable(
                 </thead>
                 <tbody>
                     <For
-                        each=move || pagination_state.get().2
+                        each=move || props.get().data
                         key=move |row| match row.get("id").clone() {
-                            Some(TableCellData::String(s)) => s.clone(),
+                            Some(TableCellData::String(s)) => format!("{}{}", s.clone(), sorted_column_info.get()),
                             _ => String::new(),
                         }
                         let(row_data)

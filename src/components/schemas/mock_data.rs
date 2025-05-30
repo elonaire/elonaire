@@ -111,6 +111,11 @@ pub mod database {
                 let mut hash_map_data = HashMap::new();
 
                 hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(transaction.id.clone()),
+                );
+
+                hash_map_data.insert(
                     "Transaction ID".to_string(),
                     TableCellData::String(transaction.id.clone()),
                 );
