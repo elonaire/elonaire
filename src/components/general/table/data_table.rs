@@ -440,7 +440,6 @@ pub fn DataTable(
                     </For>
                     {
                         move || if offset_rows.get() > 0 {
-                            leptos::logging::log!("Offset columns: {}", offset_rows.get());
                             let blank_rows = (0..offset_rows.get()).collect::<Vec<usize>>();
 
                             Some(
