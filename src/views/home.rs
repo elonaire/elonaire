@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::components::{
     forms::{
         datepicker::DatePicker,
@@ -14,7 +12,7 @@ use crate::components::{
         badge::Badge,
         button::{BasicButton, ButtonGroup},
         popover::Popover,
-        table::data_table::{Column, DataTable, TableCellData},
+        table::data_table::DataTable,
         tag::LabelTag,
     },
     modal::modal::{BasicModal, UseCase},
@@ -113,7 +111,7 @@ pub fn Home() -> impl IntoView {
                                                                     button_text="Third".to_string()
                                                                     // style_ext="bg-blue-600 hover:bg-blue-800".to_string()
                                                                     // onclick=onclick
-                                                                    disabled=true
+                                                                    disabled=Memo::new(move |_| true)
                                                                 />
                                                             </ButtonGroup>
 

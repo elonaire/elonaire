@@ -100,8 +100,6 @@ pub fn SignIn() -> impl IntoView {
                                                     style_ext={"bg-red-500 hover:bg-red-400 transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full".to_string()}
                                                     onclick={onsocial_sign_in(OauthClientName::Google)}
                                                     icon={Some(IconId::AiGoogleOutlined)} // Assuming you have icons for Google
-                                                    disabled={false}
-                                                    button_type={"button".to_string()}
                                                     icon_before={true}
                                                 />
                                                 <BasicButton
@@ -109,8 +107,6 @@ pub fn SignIn() -> impl IntoView {
                                                     style_ext={"bg-gray-700 hover:bg-gray-600 transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full".to_string()}
                                                     onclick={onsocial_sign_in(OauthClientName::Github)}
                                                     icon={Some(IconId::AiGithubOutlined)} // Assuming you have icons for GitHub
-                                                    disabled={false}
-                                                    button_type={"button".to_string()}
                                                     icon_before={true}
                                                 />
                         </div>
@@ -162,9 +158,7 @@ pub fn SignIn() -> impl IntoView {
                         <BasicButton
                             button_text={"Sign In".to_string()}
                             style_ext={"bg-primary text-white px-4 py-2 text-sm hover:bg-secondary transition duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full".to_string()}
-                            icon={None}
                             // disabled={!*login_form_is_valid}
-                            button_type={"submit".to_string()}
                             icon_before={true} // if you have an icon before the button text, set it to true
                         />
                         <div class="flex items-center justify-center mt-6 text-sm text-blue-500 hover:text-blue-400">

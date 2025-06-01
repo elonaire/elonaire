@@ -9,6 +9,7 @@ use leptos::html::*;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
+use super::pagination::Pagination;
 use crate::components::general::button::BasicButton;
 
 #[derive(Clone)]
@@ -341,7 +342,7 @@ pub fn DataTable(
                 </thead>
                 <tbody>
                     <For
-                        each=move || props.get().data
+                        each=move || pagination_state.get().2
                         key=move |row| match row.get("id").clone() {
                             Some(TableCellData::String(s)) => format!("{}{}", s.clone(), sorted_column_info.get()),
                             _ => String::new(),
@@ -447,11 +448,10 @@ pub fn DataTable(
                     }}
                 </tbody>
                 </table>
-                // <Pagination
-                //     current_page={pagination_state.get().0}
-                //     total_pages={pagination_state.get().1}
-                //     on_page_change={on_page_change}
-                // />
+                <Pagination
+                    pagination_state={pagination_state}
+                    on_page_change={on_page_change}
+                />
             </div>
         </div>
     }

@@ -3,6 +3,14 @@ use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon; // Adjust based on your icon set (e.g., icondata::BsIcon)
 
+#[derive(Clone, Debug, Default)]
+pub enum ButtonType {
+    #[default]
+    Button,
+    Submit,
+    Reset,
+}
+
 // Define the BasicButton component
 #[component]
 pub fn BasicButton(
@@ -10,8 +18,8 @@ pub fn BasicButton(
     #[prop(default = "".to_string())] style_ext: String,
     #[prop(default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(default = None)] icon: Option<IconId>,
-    #[prop(default = false)] disabled: bool,
-    #[prop(default = "button".to_string())] button_type: String,
+    #[prop(default = Memo::new(move |_| false))] disabled: Memo<bool>,
+    #[prop(into, default = ButtonType::Button)] button_type: ButtonType,
     #[prop(default = true)] icon_before: bool,
 ) -> impl IntoView {
     let button_text_styles = button_text.clone();
@@ -27,7 +35,13 @@ pub fn BasicButton(
 
     view! {
         <button
-            type={button_type}
+            type={
+                match button_type {
+                    ButtonType::Button => "button",
+                    ButtonType::Submit => "submit",
+                    ButtonType::Reset => "reset"
+                }
+            }
             class=move || format!(
                 "font-bold py-2 px-4 cursor-pointer rounded-md disabled:opacity-50 disabled:cursor-not-allowed {}",
                 style_ext
