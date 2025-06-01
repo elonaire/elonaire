@@ -264,6 +264,16 @@ pub fn DataTable(
     // Derived signal for paginated data
     let pagination_state = Memo::new(move |_| props.get().paginate(current_page.get()));
 
+    let offset_rows = Memo::new(move |_| {
+        let no_of_rows = pagination_state.get().2.len();
+
+        if no_of_rows > 0 && no_of_rows < page_size {
+            page_size - no_of_rows
+        } else {
+            0
+        }
+    });
+
     let on_page_change = Callback::new(move |page: usize| {
         set_current_page.set(page);
     });
@@ -428,6 +438,33 @@ pub fn DataTable(
                             }
                         }
                     </For>
+                    {
+                        move || if offset_rows.get() > 0 {
+                            leptos::logging::log!("Offset columns: {}", offset_rows.get());
+                            let blank_rows = (0..offset_rows.get()).collect::<Vec<usize>>();
+
+                            Some(
+                                view!{
+                                    <For
+                                        each=move || blank_rows.clone()
+                                        key=move |row| row.to_string()
+
+                                        let(_)
+                                    >
+                                        {
+                                            view! {
+                                                <tr class="border-b border-gray-200">
+                                                    <td class="p-[24px]" colspan={props.get().columns.len()}>""</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </For>
+                                }
+                            )
+                        } else {
+                            None
+                        }
+                    }
                     {move || if pagination_state.get().2.is_empty() {
                         Some(view! {
                             <tr>
