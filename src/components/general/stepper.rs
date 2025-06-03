@@ -10,6 +10,15 @@ pub struct StepperLabel {
     pub icon: Option<IconId>,
 }
 
+impl StepperLabel {
+    pub fn new(label: &str, icon: Option<IconId>) -> Self {
+        StepperLabel {
+            label: label.to_string(),
+            icon,
+        }
+    }
+}
+
 // Stepper Component
 #[component]
 pub fn Stepper(

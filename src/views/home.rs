@@ -128,7 +128,7 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
-                    <Stepper step_labels=vec![StepperLabel{ label: "First".to_string(), icon: Some(IconId::AiFileAddOutlined) }, StepperLabel{ label: "Second".to_string(), icon: None }, StepperLabel{ label: "Third".to_string(), icon: None }] final_button_text="Finish".to_string()>
+                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined) ), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] final_button_text="Finish".to_string()>
                         <Step>
                             <p>"First step"</p>
                         </Step>
