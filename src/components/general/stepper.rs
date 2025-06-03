@@ -107,7 +107,7 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div class="mb-4 p-4 border rounded w-full">
+            <div class="mb-4 p-4 border border-gray-300 rounded w-full">
             {
                 move || children()
                 .nodes
@@ -116,7 +116,7 @@ pub fn Stepper(
                 .map(|child| child.into_view())
             }
             </div>
-            <div class="flex w-full justify-between">
+            <div class="flex w-full justify-start gap-4">
                 {
                     move || if current_step.get() == 0 {
                         None
