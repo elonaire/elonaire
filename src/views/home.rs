@@ -12,6 +12,7 @@ use crate::components::{
         badge::Badge,
         button::{BasicButton, ButtonGroup},
         popover::Popover,
+        stepper::{Step, Stepper, StepperLabel},
         table::data_table::DataTable,
         tag::LabelTag,
     },
@@ -49,7 +50,7 @@ pub fn Home() -> impl IntoView {
     view! {
         <Title text="Techie Tenka"/>
         <main>
-            <div class="font-mono flex flex-col min-h-screen">
+            <div class="min-h-screen m-2">
         <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
                 <InputField field_type={InputFieldType::Text} name={"name".to_string()} />
@@ -117,7 +118,7 @@ pub fn Home() -> impl IntoView {
 
                     <Badge text="2".to_string() ><span>"Notifications"</span></Badge>
                     <LabelTag label="Failed".to_string() color=ColorTemperature::Danger  />
-                    <Accordion title="Elonaire".to_string() icon=|| view! {<Icon icon=IconId::BsNodePlusFill />} >
+                    <Accordion title="Elonaire".to_string() icon=IconId::BsNodePlusFill >
                         <p>"Hey there, I am Mr Elonaire!"</p>
                     </Accordion>
                     <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
@@ -127,6 +128,17 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
+                    <Stepper step_labels=vec![StepperLabel{ label: "First".to_string(), icon: Some(IconId::AiFileAddOutlined) }, StepperLabel{ label: "Second".to_string(), icon: None }, StepperLabel{ label: "Third".to_string(), icon: None }] final_button_text="Finish".to_string()>
+                        <Step>
+                            <p>"First step"</p>
+                        </Step>
+                        <Step>
+                            <p>"Second step"</p>
+                        </Step>
+                        <Step>
+                            <p>"Third step"</p>
+                        </Step>
+                    </Stepper>
                 </div>
             </div>
         </main>

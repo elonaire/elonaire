@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{self, Icon as IconId};
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos_icons::Icon;
@@ -7,7 +7,7 @@ use leptos_icons::Icon;
 pub fn Accordion(
     title: String,
     #[prop(optional)] children: Option<Children>,
-    #[prop(into)] icon: ViewFn,
+    icon: IconId,
 ) -> impl IntoView {
     let (is_open, set_is_open) = signal(false);
 
@@ -20,16 +20,19 @@ pub fn Accordion(
                 class="flex flex-row items-center justify-between gap-2 mb-2 p-2 rounded cursor-pointer hover:bg-primary hover:text-white"
             >
                 <span class="flex flex-row items-center gap-2">
-                    { icon.run() }
+                    // { icon.run() }
+                    <Icon icon=icon />
                     <span>{title}</span>
                 </span>
                 {
                     move || {
-                        if is_open.get() {
-                            view!{ <Icon icon=IconId::BsDashLg /> }
+                        let icon_id = if is_open.get() {
+                            icondata::BsDashLg
                         } else {
-                            view!{ <Icon icon=IconId::BsPlusLg /> }
-                        }
+                            icondata::BsPlusLg
+                        };
+                        view!{ <Icon icon=icon_id /> }
+
                     }
                 }
             </span>

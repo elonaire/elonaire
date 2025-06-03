@@ -1,0 +1,153 @@
+use crate::components::general::button::BasicButton;
+use icondata::Icon as IconId;
+use leptos::ev;
+use leptos::prelude::*;
+use leptos_icons::Icon;
+
+#[derive(Clone, Debug, Default)]
+pub struct StepperLabel {
+    pub label: String,
+    pub icon: Option<IconId>,
+}
+
+// Stepper Component
+#[component]
+pub fn Stepper(
+    mut children: ChildrenFragmentMut, // Children passed as a function
+    final_button_text: String,
+    #[prop(optional, default = Callback::new(|_| {}))] on_click_final_button: Callback<
+        ev::MouseEvent,
+    >,
+    #[prop(into)] step_labels: Vec<StepperLabel>,
+) -> impl IntoView {
+    let (current_step, set_current_step) = signal(0); // Leptos signal for state
+    let step_count = children().nodes.collect_view().len(); // Get number of children
+
+    let onclick_next = Callback::new(move |_| {
+        if current_step.get() < step_count - 1 {
+            set_current_step.update(|step| *step += 1);
+        }
+    });
+
+    let onclick_prev = Callback::new(move |_| {
+        if current_step.get() > 0 {
+            set_current_step.update(|step| *step -= 1);
+        }
+    });
+
+    view! {
+        <div class="flex flex-col items-center max-w-full">
+            <div class="relative flex items-center w-full mb-4">
+                // Line between steps (md+ screens only)
+                <div class="hidden md:flex justify-center w-full absolute top-4">
+                    <div class="w-full border-t border-gray-300 absolute z-0" />
+                </div>
+                <div class="relative flex flex-wrap md:flex-nowrap justify-center md:justify-between w-full md:space-x-2">
+                    <For
+                        each=move || step_labels.clone().into_iter().enumerate()
+                        key=|(index, _)| *index
+                        let:((index, step_label))
+                    >
+                        {
+                            let is_current = move || index == current_step.get();
+                            view! {
+                                <div class=move || {
+                                    format!(
+                                        "relative flex items-center bg-white space-x-2 px-4 mb-2 z-9 {}",
+                                        if !is_current() { "hidden md:flex" } else { "" }
+                                    )
+                                }>
+                                    <div class=move || {
+                                        format!(
+                                            "w-8 h-8 flex items-center justify-center rounded-full text-sm {}",
+                                            if is_current() {
+                                                "bg-primary text-white"
+                                            } else {
+                                                "bg-gray-200 text-gray-800"
+                                            }
+                                        )
+                                    }>
+                                        {
+                                            if step_label.icon.is_none() {
+                                                Some(index + 1)
+                                            } else {
+                                                None
+                                            }
+                                        }
+                                        {
+                                            if step_label.icon.is_some() {
+                                                Some(view!{ <Icon icon={step_label.icon.unwrap()} /> })
+                                            } else {
+                                                None
+                                            }
+                                        }
+                                    </div>
+                                    <div class=move || {format!(
+                                        "text-sm {}",
+                                        if is_current() {
+                                            "font-bold text-primary"
+                                        } else {
+                                            "text-gray-800"
+                                        }
+                                    )}>
+                                        { step_label.label.clone() }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </For>
+                </div>
+            </div>
+            <div class="mb-4 p-4 border rounded w-full">
+            {
+                move || children()
+                .nodes
+                .into_iter()
+                .nth(current_step.get())
+                .map(|child| child.into_view())
+            }
+            </div>
+            <div class="flex w-full justify-between">
+                {
+                    move || if current_step.get() == 0 {
+                        None
+                    } else {
+                        Some(view! {
+                            <BasicButton
+                                onclick=onclick_prev
+                                button_text="Previous".to_string()
+                            />
+                        })
+                    }
+                }
+                {
+                    move || if current_step.get() == step_count - 1 {
+                        view! {
+                            <BasicButton
+                                onclick=on_click_final_button
+                                button_text=final_button_text.clone()
+                            />
+                        }
+                    } else {
+                        view! {
+                            <BasicButton
+                                onclick=onclick_next
+                                button_text="Next".to_string()
+                            />
+                        }
+                    }
+                }
+            </div>
+        </div>
+    }
+}
+
+// Step Component
+#[component]
+pub fn Step(children: ChildrenFn) -> impl IntoView {
+    view! {
+        <>
+            { children().into_view() }
+        </>
+    }
+}

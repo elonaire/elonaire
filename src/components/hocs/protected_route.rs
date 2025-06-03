@@ -5,7 +5,7 @@ use reactive_stores::Store;
 
 #[component]
 /// This component is a wrapper around the `children` prop. It checks if the user is authenticated.
-pub fn ProtectedRoute(mut children: ChildrenFnMut) -> impl IntoView {
+pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let user = move || current_state.user(); // Should return ReadSignal<UserInfo>
     let navigate = use_navigate();

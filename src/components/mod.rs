@@ -4,4 +4,4 @@ pub mod hocs;
 pub mod modal;
 pub mod schemas;
 
-// TODO: Carousel, Tabs, Stepper Form, Accordion
+// TODO: Tabs, Stepper Form, Accordion(add functionality to existing Accordion)

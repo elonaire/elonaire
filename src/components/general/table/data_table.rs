@@ -312,177 +312,179 @@ pub fn DataTable(
 
     view! {
         <div class="w-full flex flex-col justify-between">
-            <table class="border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
-                <thead>
-                    <tr class="p-2">
-                        <For
-                            each=move || props.get().columns
-                            key=|column| format!("{}-{:?}", column.name.clone(), column.sort_order)
-                            let (column)
-                        >
-                            <th
-                                class="border-b p-2 border-gray-200 text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
-                                on:click=move |_| on_click_sort.run(column.clone())
+            <div class="overflow-x-auto">
+                <table class="border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
+                    <thead>
+                        <tr class="p-2">
+                            <For
+                                each=move || props.get().columns
+                                key=|column| format!("{}-{:?}", column.name.clone(), column.sort_order)
+                                let (column)
                             >
-                                <span class="flex flex-row items-center">
-                                    <span>{column.name.clone()}</span>
-                                    {if column.sortable {
+                                <th
+                                    class="border-b p-2 border-gray-200 text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
+                                    on:click=move |_| on_click_sort.run(column.clone())
+                                >
+                                    <span class="flex flex-row items-center">
+                                        <span>{column.name.clone()}</span>
+                                        {if column.sortable {
+                                            Some(view! {
+                                                <span class="text-primary">
+                                                    { column.sort_icon.run() }
+                                                </span>
+                                            })
+                                        } else {
+                                            None
+                                        }}
+                                    </span>
+                                </th>
+                            </For>
+                            {move || if props.get().editable || props.get().deletable {
+                                Some(view! {
+                                    <th class="border-b p-2 border-gray-200 text-wrap font-bold text-gray-800 text-left min-w-[150px] max-w-[150px]">
+                                        "Actions"
+                                    </th>
+                                })
+                            } else {
+                                None
+                            }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <For
+                            each=move || pagination_state.get().2
+                            key=move |row| match row.get("id").clone() {
+                                Some(TableCellData::String(s)) => format!("{}{}", s.clone(), sorted_column_info.get()),
+                                _ => String::new(),
+                            }
+                            let(row_data)
+                        >
+                            {
+                                let row_data_row_click = row_data.clone();
+                                let row_data_cols = row_data.clone();
+
+                                view! {
+                                    <tr
+                                        class="border-b border-gray-200 p-2"
+                                        on:click=move |_| on_click_row_handler(row_data_row_click.clone())
+                                    >
+                                        // Computed row columns
+                                        {
+                                            let id = match row_data.get("id").clone() {
+                                                Some(TableCellData::String(s)) => s.clone(),
+                                                _ => String::new(),
+                                            };
+
+                                            view! {
+                                                <For
+                                                    each=move || props.get().columns.clone()
+                                                    key=move |column| {
+                                                        format!("{}-{}", column.name.clone(), id)
+                                                    }
+                                                    let(column)
+                                                >
+                                                    <td class="p-2 min-w-[150px] max-w-[150px] text-wrap">
+                                                        {match row_data_cols.get(&column.name).clone() {
+                                                            Some(TableCellData::String(s)) => s.clone().into_any().into_view(),
+                                                            Some(TableCellData::Int32(i)) => i.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Int64(i)) => i.to_string().into_any().into_view(),
+                                                            Some(TableCellData::UInt32(u)) => u.to_string().into_any().into_view(),
+                                                            Some(TableCellData::UInt64(u)) => u.to_string().into_any().into_view(),
+                                                            Some(TableCellData::UInt128(u)) => u.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Html(html)) => html.run().into_view(),
+                                                            Some(TableCellData::Float32(f)) => f.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Float64(f)) => f.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Bool(b)) => b.to_string().into_any().into_view(),
+                                                            Some(TableCellData::DateTime(dt)) => dt.to_string().into_any().into_view(),
+                                                            None => "N/A".into_any().into_view(),
+                                                        }}
+                                                    </td>
+                                                </For>
+                                                // Action columns
+                                                {if props.get().editable || props.get().deletable {
+                                                    let row_data_edit = row_data.clone();
+
+                                                    Some(view! {
+                                                        <td class="flex flex-row items-center gap-2 h-full py-2 min-w-[150px] max-w-[150px]">
+                                                            {if props.get().editable {
+                                                                Some(view! {
+                                                                    <BasicButton
+                                                                                    onclick=on_click_edit_handler(row_data_edit.clone())
+                                                                                    icon=Some(IconId::BsPencil)
+                                                                                />
+                                                                })
+                                                            } else {
+                                                                None
+                                                            }}
+                                                            {if props.get().deletable {
+                                                                Some(view! {
+                                                                    <BasicButton
+                                                                    style_ext="text-danger".to_string()
+                                                                                    onclick=on_click_delete_handler(row_data.clone())
+                                                                                    icon=Some(IconId::BsTrash)
+                                                                                />
+                                                                })
+                                                            } else {
+                                                                None
+                                                            }}
+                                                        </td>
+                                                    })
+                                                } else {
+                                                    None
+                                                }}
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </For>
+                        {
+                            move || if offset_rows.get() > 0 {
+                                let blank_rows = (0..offset_rows.get()).collect::<Vec<usize>>();
+
+                                Some(
+                                    view!{
+                                        <For
+                                            each=move || blank_rows.clone()
+                                            key=move |row| row.to_string()
+
+                                            let(_)
+                                        >
+                                            {
+                                                view! {
+                                                    <tr class="border-b border-gray-200">
+                                                        <td class="p-[24px]" colspan={props.get().columns.len()}>""</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </For>
+                                    }
+                                )
+                            } else {
+                                None
+                            }
+                        }
+                        {move || if pagination_state.get().2.is_empty() {
+                            Some(view! {
+                                <tr>
+                                    <td colspan={props.get().columns.len()}>
+                                        <div class="py-2">"No Content"</div>
+                                    </td>
+                                    {if props.get().deletable || props.get().editable {
                                         Some(view! {
-                                            <span class="text-primary">
-                                                { column.sort_icon.run() }
-                                            </span>
+                                            <td></td>
                                         })
                                     } else {
                                         None
                                     }}
-                                </span>
-                            </th>
-                        </For>
-                        {move || if props.get().editable || props.get().deletable {
-                            Some(view! {
-                                <th class="border-b p-2 border-gray-200 text-wrap font-bold text-gray-800 text-left min-w-[150px] max-w-[150px]">
-                                    "Actions"
-                                </th>
+                                </tr>
                             })
                         } else {
                             None
                         }}
-                    </tr>
-                </thead>
-                <tbody>
-                    <For
-                        each=move || pagination_state.get().2
-                        key=move |row| match row.get("id").clone() {
-                            Some(TableCellData::String(s)) => format!("{}{}", s.clone(), sorted_column_info.get()),
-                            _ => String::new(),
-                        }
-                        let(row_data)
-                    >
-                        {
-                            let row_data_row_click = row_data.clone();
-                            let row_data_cols = row_data.clone();
-
-                            view! {
-                                <tr
-                                    class="border-b border-gray-200 p-2"
-                                    on:click=move |_| on_click_row_handler(row_data_row_click.clone())
-                                >
-                                    // Computed row columns
-                                    {
-                                        let id = match row_data.get("id").clone() {
-                                            Some(TableCellData::String(s)) => s.clone(),
-                                            _ => String::new(),
-                                        };
-
-                                        view! {
-                                            <For
-                                                each=move || props.get().columns.clone()
-                                                key=move |column| {
-                                                    format!("{}-{}", column.name.clone(), id)
-                                                }
-                                                let(column)
-                                            >
-                                                <td class="p-2 min-w-[150px] max-w-[150px] text-wrap">
-                                                    {match row_data_cols.get(&column.name).clone() {
-                                                        Some(TableCellData::String(s)) => s.clone().into_any().into_view(),
-                                                        Some(TableCellData::Int32(i)) => i.to_string().into_any().into_view(),
-                                                        Some(TableCellData::Int64(i)) => i.to_string().into_any().into_view(),
-                                                        Some(TableCellData::UInt32(u)) => u.to_string().into_any().into_view(),
-                                                        Some(TableCellData::UInt64(u)) => u.to_string().into_any().into_view(),
-                                                        Some(TableCellData::UInt128(u)) => u.to_string().into_any().into_view(),
-                                                        Some(TableCellData::Html(html)) => html.run().into_view(),
-                                                        Some(TableCellData::Float32(f)) => f.to_string().into_any().into_view(),
-                                                        Some(TableCellData::Float64(f)) => f.to_string().into_any().into_view(),
-                                                        Some(TableCellData::Bool(b)) => b.to_string().into_any().into_view(),
-                                                        Some(TableCellData::DateTime(dt)) => dt.to_string().into_any().into_view(),
-                                                        None => "N/A".into_any().into_view(),
-                                                    }}
-                                                </td>
-                                            </For>
-                                            // Action columns
-                                            {if props.get().editable || props.get().deletable {
-                                                let row_data_edit = row_data.clone();
-
-                                                Some(view! {
-                                                    <td class="flex flex-row items-center gap-2 h-full py-2 min-w-[150px] max-w-[150px]">
-                                                        {if props.get().editable {
-                                                            Some(view! {
-                                                                <BasicButton
-                                                                                onclick=on_click_edit_handler(row_data_edit.clone())
-                                                                                icon=Some(IconId::BsPencil)
-                                                                            />
-                                                            })
-                                                        } else {
-                                                            None
-                                                        }}
-                                                        {if props.get().deletable {
-                                                            Some(view! {
-                                                                <BasicButton
-                                                                style_ext="text-danger".to_string()
-                                                                                onclick=on_click_delete_handler(row_data.clone())
-                                                                                icon=Some(IconId::BsTrash)
-                                                                            />
-                                                            })
-                                                        } else {
-                                                            None
-                                                        }}
-                                                    </td>
-                                                })
-                                            } else {
-                                                None
-                                            }}
-                                        }
-                                    }
-                                </tr>
-                            }
-                        }
-                    </For>
-                    {
-                        move || if offset_rows.get() > 0 {
-                            let blank_rows = (0..offset_rows.get()).collect::<Vec<usize>>();
-
-                            Some(
-                                view!{
-                                    <For
-                                        each=move || blank_rows.clone()
-                                        key=move |row| row.to_string()
-
-                                        let(_)
-                                    >
-                                        {
-                                            view! {
-                                                <tr class="border-b border-gray-200">
-                                                    <td class="p-[24px]" colspan={props.get().columns.len()}>""</td>
-                                                </tr>
-                                            }
-                                        }
-                                    </For>
-                                }
-                            )
-                        } else {
-                            None
-                        }
-                    }
-                    {move || if pagination_state.get().2.is_empty() {
-                        Some(view! {
-                            <tr>
-                                <td colspan={props.get().columns.len()}>
-                                    <div class="py-2">"No Content"</div>
-                                </td>
-                                {if props.get().deletable || props.get().editable {
-                                    Some(view! {
-                                        <td></td>
-                                    })
-                                } else {
-                                    None
-                                }}
-                            </tr>
-                        })
-                    } else {
-                        None
-                    }}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
             <Pagination
                 pagination_state={pagination_state}
                 on_page_change={on_page_change}
