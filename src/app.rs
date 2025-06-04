@@ -17,6 +17,23 @@ pub fn App() -> impl IntoView {
     view! {
         // <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
         <div id="modal-root"></div>
+        <ErrorBoundary
+                        // the fallback receives a signal containing current errors
+                        fallback=|errors| view! {
+                            <div class="error">
+                                <p>"Something went wrong: "</p>
+                                // we can render a list of errors
+                                // as strings, if we'd like
+                                <ul>
+                                    {move || errors.get()
+                                        .into_iter()
+                                        .map(|(_, e)| view! { <li>{e.to_string()}</li>})
+                                        .collect::<Vec<_>>()
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    >
         <Router>
             <Routes fallback=|| "Page not found.">
                 // <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
@@ -24,5 +41,6 @@ pub fn App() -> impl IntoView {
                 <Route path=StaticSegment("/sign-in") view=SignIn/>
             </Routes>
         </Router>
+        </ErrorBoundary>
     }
 }

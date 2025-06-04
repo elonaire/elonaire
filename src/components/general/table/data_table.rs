@@ -3,6 +3,7 @@ use std::hash::Hash;
 use std::hash::Hasher;
 
 use chrono::DateTime;
+use chrono::ParseResult;
 use chrono::Utc;
 use icondata as IconId;
 use leptos::html::*;
@@ -95,7 +96,7 @@ pub enum TableCellData {
     UInt64(u64),
     UInt128(u128),
     Bool(bool),
-    DateTime(DateTime<Utc>),
+    DateTime(String),
 }
 
 impl std::fmt::Debug for TableCellData {
@@ -111,10 +112,7 @@ impl std::fmt::Debug for TableCellData {
             TableCellData::UInt64(u) => f.debug_tuple("UInt64").field(u).finish(),
             TableCellData::UInt128(u) => f.debug_tuple("UInt128").field(u).finish(),
             TableCellData::Bool(b) => f.debug_tuple("Bool").field(b).finish(),
-            TableCellData::DateTime(_) => f
-                .debug_tuple("DateTime")
-                .field(&"<DateTime content>")
-                .finish(),
+            TableCellData::DateTime(dt) => f.debug_tuple("DateTime").field(dt).finish(),
         }
     }
 }
@@ -123,8 +121,23 @@ impl PartialEq for TableCellData {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (TableCellData::String(a), TableCellData::String(b)) => a == b,
+            (TableCellData::Int32(a), TableCellData::Int32(b)) => a == b,
             (TableCellData::Int64(a), TableCellData::Int64(b)) => a == b,
+            (TableCellData::Float32(a), TableCellData::Float32(b)) => a == b,
             (TableCellData::Float64(a), TableCellData::Float64(b)) => a == b,
+            (TableCellData::UInt32(a), TableCellData::UInt32(b)) => a == b,
+            (TableCellData::UInt64(a), TableCellData::UInt64(b)) => a == b,
+            (TableCellData::UInt128(a), TableCellData::UInt128(b)) => a == b,
+            (TableCellData::Bool(a), TableCellData::Bool(b)) => a == b,
+            (TableCellData::DateTime(a), TableCellData::DateTime(b)) => {
+                match DateTime::parse_from_rfc3339(a) {
+                    Ok(a) => match DateTime::parse_from_rfc3339(b) {
+                        Ok(b) => a.timestamp() == b.timestamp(),
+                        Err(_) => false,
+                    },
+                    Err(_) => false,
+                }
+            }
             (TableCellData::Html(_), TableCellData::Html(_)) => false, // ViewFn cannot be compared
             _ => false, // Different variants are not equal
         }
@@ -205,9 +218,26 @@ impl TableProps {
                         (Some(TableCellData::String(a)), Some(TableCellData::String(b))) => {
                             a.cmp(b)
                         }
+                        (Some(TableCellData::Int32(a)), Some(TableCellData::Int32(b))) => a.cmp(b),
                         (Some(TableCellData::Int64(a)), Some(TableCellData::Int64(b))) => a.cmp(b),
+                        (Some(TableCellData::Float32(a)), Some(TableCellData::Float32(b))) => {
+                            a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+                        }
                         (Some(TableCellData::Float64(a)), Some(TableCellData::Float64(b))) => {
                             a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+                        }
+                        (Some(TableCellData::UInt32(a)), Some(TableCellData::UInt32(b))) => {
+                            a.cmp(b)
+                        }
+                        (Some(TableCellData::UInt64(a)), Some(TableCellData::UInt64(b))) => {
+                            a.cmp(b)
+                        }
+                        (Some(TableCellData::UInt128(a)), Some(TableCellData::UInt128(b))) => {
+                            a.cmp(b)
+                        }
+                        (Some(TableCellData::Bool(a)), Some(TableCellData::Bool(b))) => a.cmp(b),
+                        (Some(TableCellData::DateTime(a)), Some(TableCellData::DateTime(b))) => {
+                            a.cmp(b)
                         }
                         _ => std::cmp::Ordering::Equal,
                     });
@@ -218,9 +248,26 @@ impl TableProps {
                         (Some(TableCellData::String(a)), Some(TableCellData::String(b))) => {
                             b.cmp(a)
                         }
+                        (Some(TableCellData::Int32(a)), Some(TableCellData::Int32(b))) => b.cmp(a),
                         (Some(TableCellData::Int64(a)), Some(TableCellData::Int64(b))) => b.cmp(a),
+                        (Some(TableCellData::UInt32(a)), Some(TableCellData::UInt32(b))) => {
+                            b.cmp(a)
+                        }
+                        (Some(TableCellData::UInt64(a)), Some(TableCellData::UInt64(b))) => {
+                            b.cmp(a)
+                        }
+                        (Some(TableCellData::UInt128(a)), Some(TableCellData::UInt128(b))) => {
+                            b.cmp(a)
+                        }
+                        (Some(TableCellData::Bool(a)), Some(TableCellData::Bool(b))) => b.cmp(a),
+                        (Some(TableCellData::Float32(a)), Some(TableCellData::Float32(b))) => {
+                            b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)
+                        }
                         (Some(TableCellData::Float64(a)), Some(TableCellData::Float64(b))) => {
                             b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)
+                        }
+                        (Some(TableCellData::DateTime(a)), Some(TableCellData::DateTime(b))) => {
+                            b.cmp(a)
                         }
                         _ => std::cmp::Ordering::Equal,
                     });
@@ -395,7 +442,12 @@ pub fn DataTable(
                                                             Some(TableCellData::Float32(f)) => f.to_string().into_any().into_view(),
                                                             Some(TableCellData::Float64(f)) => f.to_string().into_any().into_view(),
                                                             Some(TableCellData::Bool(b)) => b.to_string().into_any().into_view(),
-                                                            Some(TableCellData::DateTime(dt)) => dt.to_string().into_any().into_view(),
+                                                            Some(TableCellData::DateTime(dt)) => {
+                                                                match DateTime::parse_from_rfc3339(dt) {
+                                                                    Ok(dt) => dt.format("%d %b %Y").to_string().into_any().into_view(),
+                                                                    Err(_) => "Invalid Date".into_any().into_view(),
+                                                                }
+                                                            },
                                                             None => "N/A".into_any().into_view(),
                                                         }}
                                                     </td>
