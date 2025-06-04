@@ -34,13 +34,13 @@ pub fn App() -> impl IntoView {
                             </div>
                         }
                     >
-        <Router>
-            <Routes fallback=|| "Page not found.">
-                // <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
-                <Route path=StaticSegment("") view=Home />
-                <Route path=StaticSegment("/sign-in") view=SignIn/>
-            </Routes>
-        </Router>
+            <Router>
+                <Routes fallback=|| "Page not found.">
+                    // <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
+                    <Route path=StaticSegment("") view=Home />
+                    <Route path=StaticSegment("/sign-in") view=SignIn/>
+                </Routes>
+            </Router>
         </ErrorBoundary>
     }
 }
