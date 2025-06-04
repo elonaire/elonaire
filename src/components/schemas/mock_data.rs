@@ -206,7 +206,7 @@ pub mod database {
         let columns = vec![
             Column::new("Transaction ID", false),
             Column::new("Date", true),
-            Column::new("Duration", true),
+            Column::new("Elapsed Time", true),
             Column::new("Description", true),
             Column::new("Transaction Type", false),
             Column::new("Amount", true),
@@ -231,7 +231,7 @@ pub mod database {
                     TableCellData::DateTime(transaction.date.clone()),
                 );
                 hash_map_data.insert(
-                    "Duration".to_string(),
+                    "Elapsed Time".to_string(),
                     TableCellData::Duration(transaction.date.clone()),
                 );
                 hash_map_data.insert(
