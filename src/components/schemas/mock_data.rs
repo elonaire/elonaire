@@ -32,7 +32,7 @@ pub mod database {
         vec![
             Transaction {
                 id: "TXN0011".to_string(),
-                date: "2023-10-01T00:00:00+03:00".to_string(),
+                date: "2025-06-04T11:00:00+03:00".to_string(),
                 description: "Grocery Store".to_string(),
                 amount: 20.50,
                 transaction_type: TransactionType::Debit,
@@ -206,6 +206,7 @@ pub mod database {
         let columns = vec![
             Column::new("Transaction ID", false),
             Column::new("Date", true),
+            Column::new("Duration", true),
             Column::new("Description", true),
             Column::new("Transaction Type", false),
             Column::new("Amount", true),
@@ -228,6 +229,10 @@ pub mod database {
                 hash_map_data.insert(
                     "Date".to_string(),
                     TableCellData::DateTime(transaction.date.clone()),
+                );
+                hash_map_data.insert(
+                    "Duration".to_string(),
+                    TableCellData::Duration(transaction.date.clone()),
                 );
                 hash_map_data.insert(
                     "Description".to_string(),

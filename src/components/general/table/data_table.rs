@@ -3,7 +3,6 @@ use std::hash::Hash;
 use std::hash::Hasher;
 
 use chrono::DateTime;
-use chrono::ParseResult;
 use chrono::Utc;
 use icondata as IconId;
 use leptos::html::*;
@@ -12,6 +11,7 @@ use leptos_icons::Icon;
 
 use super::pagination::Pagination;
 use crate::components::general::button::BasicButton;
+use crate::utils::time::get_elapsed_time;
 
 #[derive(Clone)]
 pub struct Column {
@@ -97,6 +97,7 @@ pub enum TableCellData {
     UInt128(u128),
     Bool(bool),
     DateTime(String),
+    Duration(String),
 }
 
 impl std::fmt::Debug for TableCellData {
@@ -113,6 +114,7 @@ impl std::fmt::Debug for TableCellData {
             TableCellData::UInt128(u) => f.debug_tuple("UInt128").field(u).finish(),
             TableCellData::Bool(b) => f.debug_tuple("Bool").field(b).finish(),
             TableCellData::DateTime(dt) => f.debug_tuple("DateTime").field(dt).finish(),
+            TableCellData::Duration(d) => f.debug_tuple("Duration").field(d).finish(),
         }
     }
 }
@@ -130,6 +132,15 @@ impl PartialEq for TableCellData {
             (TableCellData::UInt128(a), TableCellData::UInt128(b)) => a == b,
             (TableCellData::Bool(a), TableCellData::Bool(b)) => a == b,
             (TableCellData::DateTime(a), TableCellData::DateTime(b)) => {
+                match DateTime::parse_from_rfc3339(a) {
+                    Ok(a) => match DateTime::parse_from_rfc3339(b) {
+                        Ok(b) => a.timestamp() == b.timestamp(),
+                        Err(_) => false,
+                    },
+                    Err(_) => false,
+                }
+            }
+            (TableCellData::Duration(a), TableCellData::Duration(b)) => {
                 match DateTime::parse_from_rfc3339(a) {
                     Ok(a) => match DateTime::parse_from_rfc3339(b) {
                         Ok(b) => a.timestamp() == b.timestamp(),
@@ -239,6 +250,9 @@ impl TableProps {
                         (Some(TableCellData::DateTime(a)), Some(TableCellData::DateTime(b))) => {
                             a.cmp(b)
                         }
+                        (Some(TableCellData::Duration(a)), Some(TableCellData::Duration(b))) => {
+                            a.cmp(b)
+                        }
                         _ => std::cmp::Ordering::Equal,
                     });
             }
@@ -267,6 +281,9 @@ impl TableProps {
                             b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)
                         }
                         (Some(TableCellData::DateTime(a)), Some(TableCellData::DateTime(b))) => {
+                            b.cmp(a)
+                        }
+                        (Some(TableCellData::Duration(a)), Some(TableCellData::Duration(b))) => {
                             b.cmp(a)
                         }
                         _ => std::cmp::Ordering::Equal,
@@ -447,6 +464,11 @@ pub fn DataTable(
                                                                     Ok(dt) => dt.format("%d %b %Y").to_string().into_any().into_view(),
                                                                     Err(_) => "Invalid Date".into_any().into_view(),
                                                                 }
+                                                            },
+                                                            Some(TableCellData::Duration(dt)) => {
+                                                                let utc: DateTime<Utc> = Utc::now();
+
+                                                                get_elapsed_time(dt, &utc).into_any().into_view()
                                                             },
                                                             None => "N/A".into_any().into_view(),
                                                         }}
