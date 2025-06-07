@@ -1,5 +1,6 @@
 use crate::components::forms::input::{InputField, InputFieldType};
-use chrono::{Datelike, Duration, Local, NaiveDate, Weekday};
+use chrono::Local;
+use chrono::{DateTime, Datelike, Duration, NaiveDate, TimeZone, Weekday};
 use icondata as IconId;
 use leptos::ev;
 use leptos::prelude::*;
@@ -7,23 +8,27 @@ use leptos_icons::Icon;
 
 #[component]
 pub fn DatePicker(
-    #[prop(default = "".to_string(), optional)] label: String,
+    #[prop(optional)] label: String,
     name: String,
     #[prop(default = false, optional)] required: bool,
-    #[prop(default = Local::now().date_naive())] initial_value: NaiveDate,
-    #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<NaiveDate>,
+    #[prop(into, default = Signal::derive(move || Local::now()), optional)] initial_value: Signal<
+        DateTime<Local>,
+    >,
+    #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
-    let (selected_date, set_selected_date) = signal(initial_value);
+    let (selected_date, set_selected_date) = signal(initial_value.get());
 
-    let selected_date_value =
+    let selected_date_value = Memo::new(move |_| selected_date.get().to_rfc3339());
+
+    let selected_date_display_value =
         Memo::new(move |_| selected_date.get().format("%b %0e %Y").to_string());
 
     let toggle_calendar = Callback::new(move |_| {
         set_show_calendar.update(|val| *val = !*val);
     });
 
-    let select_date = Callback::new(move |date: NaiveDate| {
+    let select_date = Callback::new(move |date: DateTime<Local>| {
         set_selected_date.set(date);
         onchange.run(date);
         set_show_calendar.set(false);
@@ -31,21 +36,29 @@ pub fn DatePicker(
 
     view! {
         <div class="mb-2">
-            <label for={name.clone()} class="block text-gray-700 text-sm font-bold mb-2">
-                {label}
-                {move || if required {
-                    Some(view! { <span class="text-red-500">"*"</span> })
-                } else {
-                    None
-                }}
-            </label>
+            // <label for={name.clone()} class="block text-gray-700 text-sm font-bold mb-2">
+            //     {label}
+            //     {move || if required {
+            //         Some(view! { <span class="text-red-500">"*"</span> })
+            //     } else {
+            //         None
+            //     }}
+            // </label>
             <div class="relative">
+                <InputField
+                    initial_value=selected_date_value
+                    name=name
+                    field_type=InputFieldType::Text
+                    required=required
+                    ext_input_styles="sr-only".into()
+                />
                 <InputField
                     readonly=true
                     onclick=Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev))
-                    initial_value=selected_date_value
-                    name={name.clone()}
-                    field_type={InputFieldType::Text}
+                    initial_value=selected_date_display_value
+                    // name={name.clone()}
+                    field_type=InputFieldType::Text
+                    id_attr="date_display".into()
                 />
                 <div
                     class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
@@ -68,8 +81,9 @@ pub fn DatePicker(
 }
 
 #[component]
-fn Calendar(#[prop(into)] select_date: Callback<NaiveDate>) -> impl IntoView {
-    let today = chrono::Local::now().naive_local();
+fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoView {
+    // let today = chrono::Local::now().naive_local();
+    let today: DateTime<Local> = Local::now();
     let default_month = today.month();
     let default_year = today.year();
     let (current_month, set_current_month) = signal(default_month);
@@ -174,7 +188,8 @@ fn Calendar(#[prop(into)] select_date: Callback<NaiveDate>) -> impl IntoView {
                     let date = if is_blank {
                         None
                     } else {
-                        Some(NaiveDate::from_ymd_opt(current_year.get(), current_month.get(), day as u32).unwrap())
+                        // Some(NaiveDate::from_ymd_opt(current_year.get(), current_month.get(), day as u32).unwrap())
+                        Some(Local.with_ymd_and_hms(current_year.get(), current_month.get(), day as u32, 0, 0, 0).unwrap())
                     };
                     let select_date = select_date.clone();
                     view! {

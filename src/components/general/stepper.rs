@@ -2,7 +2,10 @@ use crate::components::general::button::BasicButton;
 use icondata::Icon as IconId;
 use leptos::ev;
 use leptos::prelude::*;
+use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
+use web_sys::FormData;
+use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
 
 #[derive(Clone, Debug, Default)]
 pub struct StepperLabel {
@@ -28,6 +31,8 @@ pub fn Stepper(
         ev::MouseEvent,
     >,
     #[prop(into)] step_labels: Vec<StepperLabel>,
+    // #[prop(optional, default = false)] is_linear: bool,
+    // #[prop(optional, default = RwSignal::new(false))] can_proceed: RwSignal<bool>,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
     let step_count = children().nodes.collect_view().len(); // Get number of children
@@ -153,10 +158,64 @@ pub fn Stepper(
 
 // Step Component
 #[component]
-pub fn Step(children: ChildrenFn) -> impl IntoView {
+pub fn Step(
+    children: ChildrenFn,
+    #[prop(optional, default = Callback::new(|_| {}))] form_validity: Callback<bool>,
+) -> impl IntoView {
+    let form_ref = NodeRef::new();
+
     view! {
-        <>
+        <form
+        node_ref=form_ref
+        on:input=move |e| {
+            leptos::logging::log!("input event: {:?}", e.target());
+            let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            if let Some(input) = target {
+                let value = input.value();
+                leptos::logging::log!("input value: {:?}", value);
+                // on_input.run(e)
+            } else {
+                // Might be a HTMLTextAreaElement
+                let target = e.target().and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+
+                if let Some(textarea) = target {
+                    let value = textarea.value();
+                    leptos::logging::log!("textarea value: {:?}", value);
+                    // on_input.run(e)
+                }
+            }
+
+            if let Some(form) = form_ref.get() {
+                let valid = form.check_validity();
+                if valid {
+                    let form_data = FormData::new_with_form(&form).unwrap();
+                    leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
+                };
+                form_validity.run(valid);
+            }
+
+        }
+        on:change=move |e| {
+            leptos::logging::log!("change event: {:?}", e);
+            let target = e.target().and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
+
+            if let Some(select) = target {
+                let value = select.value();
+                leptos::logging::log!("change value: {:?}", value);
+                // on_input.run(e)
+            }
+
+            if let Some(form) = form_ref.get() {
+                let valid = form.check_validity();
+                if valid {
+                    let form_data = FormData::new_with_form(&form).unwrap();
+                    leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
+                };
+                form_validity.run(valid);
+            }
+        }
+        >
             { children().into_view() }
-        </>
+        </form>
     }
 }

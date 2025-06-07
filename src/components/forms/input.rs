@@ -25,20 +25,23 @@ pub enum InputFieldType {
 
 #[component]
 pub fn InputField(
-    #[prop(optional, default = Memo::new(|_| "".to_string()))] initial_value: Memo<String>,
-    #[prop(default = "".to_string())] label: String,
+    #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
+        String,
+    >,
+    #[prop(optional)] label: String,
     field_type: InputFieldType,
-    name: String,
+    #[prop(optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false)] readonly: bool,
     #[prop(default = false)] required: bool,
-    #[prop(default = "".to_string())] placeholder: String,
+    #[prop(optional)] placeholder: String,
     #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     #[prop(optional, default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
-    #[prop(default = "".to_string())] ext_wrapper_styles: String,
-    #[prop(default = "".to_string())] ext_label_styles: String,
-    #[prop(default = "".to_string())] ext_input_styles: String,
-    #[prop(default = "on".to_string())] autocomplete: String,
+    #[prop(optional)] ext_wrapper_styles: String,
+    #[prop(optional)] ext_label_styles: String,
+    #[prop(optional)] ext_input_styles: String,
+    #[prop(optional,default = "off".to_string())] autocomplete: String,
+    #[prop(optional)] id_attr: String,
 ) -> impl IntoView {
     let (display_error, _set_display_error) = signal(false);
 
@@ -65,7 +68,13 @@ pub fn InputField(
         <div class={ext_wrapper_styles}>
             <label
                 class={format!("block text-gray-700 text-sm font-bold {}", ext_label_styles)}
-                for={name.clone()}
+                for={
+                    if id_attr.is_empty() {
+                        name.clone()
+                    } else {
+                        id_attr.clone()
+                    }
+                }
             >
                 {label}
                 {move || if required {
@@ -79,16 +88,23 @@ pub fn InputField(
                     "form-input ring-0 shadow appearance-none border border-slate-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
                     ext_input_styles
                 )}
-                type={input_field_type_str}
-                value={initial_value}
-                name={name.clone()}
-                node_ref={input_node_ref}
-                readonly={readonly}
+                type=input_field_type_str
+                value=initial_value
+                name=name.clone()
+                node_ref=input_node_ref
+                readonly=readonly
                 on:input={move |ev| oninput.run(ev)}
-                placeholder={placeholder}
-                autocomplete={autocomplete}
-                id={name.clone()}
+                placeholder=placeholder
+                autocomplete=autocomplete
+                id={
+                    if id_attr.is_empty() {
+                        name.clone()
+                    } else {
+                        id_attr.clone()
+                    }
+                }
                 on:click={move |ev| onclick.run(ev)}
+                required=required
             />
             <p class="text-red-500 text-xs italic">
                 {move || {

@@ -3,6 +3,7 @@ use leptos::prelude::*;
 // Define the Leptos component
 #[component]
 pub fn ToggleSwitch(
+    name: String,
     #[prop(into)] active: Signal<bool>,
     #[prop(default = Callback::new(|_| {}), optional)] on_toggle: Callback<bool>,
     #[prop(default = "On".to_string())] label_active: String,
@@ -16,7 +17,7 @@ pub fn ToggleSwitch(
     view! {
         <div class="flex items-center cursor-pointer" on:click=onclick>
             <div class="relative">
-                <input type="checkbox" id="toggle-switch" class="sr-only"/>
+                <input type="checkbox" name=name value=active id="toggle-switch" class="sr-only"/>
                 <div
                     class=move || format!(
                         "block w-14 h-8 rounded-full {}",

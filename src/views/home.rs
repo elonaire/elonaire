@@ -53,13 +53,13 @@ pub fn Home() -> impl IntoView {
             <div class="min-h-screen m-2">
         <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
-                <InputField field_type={InputFieldType::Text} name={"name".to_string()} />
-                <DatePicker name={"dob".to_string()} />
-                <RadioInputField label={"Male".to_string()} name={"gender".to_string()} id_attr={"male".to_string()}><span>"Comeon"</span></RadioInputField>
+                <InputField field_type=InputFieldType::Text name="name".into() />
+                <DatePicker name="dob".into() />
+                <RadioInputField label="Male".into() name="gender".into() id_attr="male".into()><span>"Comeon"</span></RadioInputField>
                 <SelectInput
-                            initial_value={"option1".to_string()}
-                            label={"Time Zone".to_string()}
-                            name={"timezone".to_string()}
+                            initial_value="option1".into()
+                            label="Time Zone".into()
+                            name="timezone".into()
                             required=true
                             options=vec![
                                 SelectOption {
@@ -77,48 +77,41 @@ pub fn Home() -> impl IntoView {
                             ]
                 />
                     <Textarea
-                                        initial_value="Initial text".to_string()
-                                        label="Description".to_string()
-                                        name="description".to_string()
-                                        // input_node_ref=Some(input_ref)
+                                        initial_value="Initial text".into()
+                                        label="Description".into()
+                                        name="description".into()
                                         required=true
-                                        placeholder="Enter your description...".to_string()
-                                        // oninput=Some(oninput)
-                                        ext_input_styles="bg-gray-100".to_string()
+                                        placeholder="Enter your description...".into()
+                                        ext_input_styles="bg-gray-100".into()
                                     />
                                     <ToggleSwitch
                                                     active=active
                                                     on_toggle=on_toggle
-                                                    label_active="Enabled".to_string()
-                                                    label_inactive="Disabled".to_string()
+                                                    label_active="Enabled".into()
+                                                    label_inactive="Disabled".into()
+                                                    name="status".into()
                                                 />
 
                                                 <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
                                                     <BasicButton
-                                                                    button_text="First".to_string()
-                                                                    // style_ext="bg-blue-600 hover:bg-red-800".to_string()
-                                                                    // onclick=onclick.clone()
+                                                                    button_text="First".into()
                                                                     icon=Some(IconId::AiCheckCircleOutlined)
                                                                     icon_before=true
                                                                 />
                                                                 <BasicButton
-                                                                    button_text="Second".to_string()
-                                                                    // style_ext="bg-blue-600 hover:bg-blue-800".to_string()
-                                                                    // onclick=onclick.clone()
+                                                                    button_text="Second".into()
                                                                     icon=Some(IconId::BsXCircle)
                                                                     icon_before=false
                                                                 />
                                                                 <BasicButton
-                                                                    button_text="Third".to_string()
-                                                                    // style_ext="bg-blue-600 hover:bg-blue-800".to_string()
-                                                                    // onclick=onclick
+                                                                    button_text="Third".into()
                                                                     disabled=Memo::new(move |_| true)
                                                                 />
                                                             </ButtonGroup>
 
-                    <Badge text="2".to_string() ><span>"Notifications"</span></Badge>
-                    <LabelTag label="Failed".to_string() color=ColorTemperature::Danger  />
-                    <Accordion title="Elonaire".to_string() icon=IconId::BsNodePlusFill >
+                    <Badge text="2".into() ><span>"Notifications"</span></Badge>
+                    <LabelTag label="Failed".into() color=ColorTemperature::Danger  />
+                    <Accordion title="Elonaire".into() icon=IconId::BsNodePlusFill >
                         <p>"Hey there, I am Mr Elonaire!"</p>
                     </Accordion>
                     <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
@@ -128,12 +121,46 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
-                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined) ), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] final_button_text="Finish".to_string()>
+                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined)), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] final_button_text="Finish".into()>
                         <Step>
                             <p>"First step"</p>
+                            <InputField field_type=InputFieldType::Text name="user_name".into() label="User Name".into() required=true />
+                            <InputField field_type=InputFieldType::Email name="email".into() label="Email".into() required=true />
+
+                            <SelectInput
+                                        initial_value="".into()
+                                        label="Time Zone".into()
+                                        name="timezone".into()
+                                        required=true
+                                        options=vec![
+                                            SelectOption {
+                                                value: "".into(),
+                                                label: "--Select Timezone".into(),
+                                            },
+                                            SelectOption {
+                                                value: "utc".into(),
+                                                label: "UTC".into(),
+                                            },
+                                            SelectOption {
+                                                value: "est".into(),
+                                                label: "EST".into(),
+                                            },
+                                        ]
+                            />
+                            <RadioInputField required=true label="Male".into() name="gender".into() initial_value=Memo::new(move |_|"male".into()) id_attr="male".into() />
+                            <RadioInputField required=true label="Female".into() name="gender".into() initial_value=Memo::new(move |_|"female".into()) id_attr="female".into() />
+                            <Textarea
+                                                initial_value="Initial text".into()
+                                                label="Description".into()
+                                                name="description".into()
+                                                required=true
+                                                placeholder="Enter your description...".into()
+                                                ext_input_styles="bg-gray-100".into()
+                                            />
                         </Step>
                         <Step>
                             <p>"Second step"</p>
+                            <DatePicker name="dob".into() required=true />
                         </Step>
                         <Step>
                             <p>"Third step"</p>
