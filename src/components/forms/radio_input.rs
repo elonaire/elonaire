@@ -9,7 +9,7 @@ pub fn RadioInputField(
         String,
     >,
     label: String,
-    name: String,
+    #[prop(optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false, optional)] readonly: bool,
     #[prop(default = false, optional)] required: bool,
@@ -25,13 +25,7 @@ pub fn RadioInputField(
 
     view! {
         <div class="mb-4">
-            <label class="inline-flex items-center gap-2 text-gray-700 text-sm cursor-pointer" for={
-                if id_attr.is_empty() {
-                    name.clone()
-                } else {
-                    id_attr.clone()
-                }
-            }>
+            <label class="inline-flex items-center gap-2 text-gray-700 text-sm cursor-pointer" for=id_attr.clone()>
                 <input
                     class=move || format!(
                         "leading-tight rounded-full border-gray-300 text-blue-950 shadow-sm focus:border-blue-950 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 {}",

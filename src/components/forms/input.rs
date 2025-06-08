@@ -36,6 +36,7 @@ pub fn InputField(
     #[prop(default = false)] required: bool,
     #[prop(optional)] placeholder: String,
     #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
+    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(optional, default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(optional)] ext_wrapper_styles: String,
     #[prop(optional)] ext_label_styles: String,
@@ -68,13 +69,7 @@ pub fn InputField(
         <div class={ext_wrapper_styles}>
             <label
                 class={format!("block text-gray-700 text-sm font-bold {}", ext_label_styles)}
-                for={
-                    if id_attr.is_empty() {
-                        name.clone()
-                    } else {
-                        id_attr.clone()
-                    }
-                }
+                for=id_attr.clone()
             >
                 {label}
                 {move || if required {
@@ -96,15 +91,10 @@ pub fn InputField(
                 on:input={move |ev| oninput.run(ev)}
                 placeholder=placeholder
                 autocomplete=autocomplete
-                id={
-                    if id_attr.is_empty() {
-                        name.clone()
-                    } else {
-                        id_attr.clone()
-                    }
-                }
+                id=id_attr.clone()
                 on:click={move |ev| onclick.run(ev)}
                 required=required
+                on:change={move |ev| onchange.run(ev)}
             />
             <p class="text-red-500 text-xs italic">
                 {move || {

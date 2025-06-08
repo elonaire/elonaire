@@ -1,4 +1,5 @@
 use crate::components::forms::input::{InputField, InputFieldType};
+use crate::components::general::button::BasicButton;
 use chrono::Local;
 use chrono::{DateTime, Datelike, Duration, NaiveDate, TimeZone, Weekday};
 use icondata as IconId;
@@ -9,12 +10,13 @@ use leptos_icons::Icon;
 #[component]
 pub fn DatePicker(
     #[prop(optional)] label: String,
-    name: String,
+    #[prop(optional)] name: String,
     #[prop(default = false, optional)] required: bool,
     #[prop(into, default = Signal::derive(move || Local::now()), optional)] initial_value: Signal<
         DateTime<Local>,
     >,
     #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
+    #[prop(optional)] id_attr: String,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
     let (selected_date, set_selected_date) = signal(initial_value.get());
@@ -36,29 +38,21 @@ pub fn DatePicker(
 
     view! {
         <div class="mb-2">
-            // <label for={name.clone()} class="block text-gray-700 text-sm font-bold mb-2">
-            //     {label}
-            //     {move || if required {
-            //         Some(view! { <span class="text-red-500">"*"</span> })
-            //     } else {
-            //         None
-            //     }}
-            // </label>
             <div class="relative">
                 <InputField
                     initial_value=selected_date_value
                     name=name
+                    label=label
                     field_type=InputFieldType::Text
                     required=required
                     ext_input_styles="sr-only".into()
+                    id_attr=id_attr
                 />
                 <InputField
                     readonly=true
                     onclick=Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev))
                     initial_value=selected_date_display_value
-                    // name={name.clone()}
                     field_type=InputFieldType::Text
-                    id_attr="date_display".into()
                 />
                 <div
                     class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
@@ -82,7 +76,6 @@ pub fn DatePicker(
 
 #[component]
 fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoView {
-    // let today = chrono::Local::now().naive_local();
     let today: DateTime<Local> = Local::now();
     let default_month = today.month();
     let default_year = today.year();
@@ -117,12 +110,9 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
             .iter()
             .map(|&year| {
                 Some(view! {
-                    <button
-                        class="flex text-xs border-none rounded m-1 hover:bg-blue-200 cursor-pointer"
-                        on:click={move |_| change_year.run(year)}
-                    >
-                        {year}
-                    </button>
+                    <BasicButton onclick=Callback::new(move |_| {
+                        change_year.run(year);
+                    }) style_ext="flex text-xs border-none rounded m-1 hover:bg-blue-200 cursor-pointer".into() button_text=year.to_string() />
                 })
             })
             .collect::<Vec<_>>()
@@ -175,9 +165,6 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
             Weekday::Sat => 6,
         };
 
-        // Log calendar adjustment
-        leptos::logging::log!("Calendar adjustment: {}", calendar_adjustment);
-
         view! {
             <For
                 each=move || (0..(calendar_adjustment + days_in_month)).enumerate()
@@ -188,21 +175,15 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                     let date = if is_blank {
                         None
                     } else {
-                        // Some(NaiveDate::from_ymd_opt(current_year.get(), current_month.get(), day as u32).unwrap())
                         Some(Local.with_ymd_and_hms(current_year.get(), current_month.get(), day as u32, 0, 0, 0).unwrap())
                     };
                     let select_date = select_date.clone();
                     view! {
-                        <button
-                            class="flex text-xs items-center justify-center border-none rounded m-1 hover:bg-blue-200 cursor-pointer"
-                            on:click=move |_| {
-                                if let Some(date) = date {
-                                    select_date.run(date);
-                                }
+                        <BasicButton onclick=Callback::new(move |_| {
+                            if let Some(date) = date {
+                                select_date.run(date);
                             }
-                        >
-                            {if is_blank { "".to_string() } else { day.to_string() }}
-                        </button>
+                        }) style_ext="flex text-xs items-center justify-center border-none rounded m-1 hover:bg-blue-200 cursor-pointer".into() button_text={if is_blank { "".to_string() } else { day.to_string() }} />
                     }
                 }
             />
@@ -215,16 +196,12 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                 Some(view! {
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <button on:click={move |_| prev_year_page.run(())}>
-                                <span class="text-gray-500 cursor-pointer"><Icon icon=IconId::BiChevronLeftRegular /></span>
-                            </button>
+                            <BasicButton onclick=prev_year_page icon=Some(IconId::BiChevronLeftRegular) />
                             <span class="cursor-pointer">"Years"</span>
-                            <button on:click={move |_| next_year_page.run(())}>
-                                <span class="text-gray-500 cursor-pointer"><Icon icon=IconId::BiChevronRightRegular /></span>
-                            </button>
+                            <BasicButton onclick=next_year_page icon=Some(IconId::BiChevronRightRegular) />
                         </div>
                         <div class="grid grid-cols-4 gap-1 bg-white -none rounded p-2">
-                            {render_years()}
+                            {move || render_years()}
                         </div>
                     </div>
                 })
@@ -237,8 +214,8 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                 Some(view! {
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <button
-                                on:click={move |_| {
+                            <BasicButton onclick=Callback::new(
+                                move |_| {
                                     set_current_month.update(|m| {
                                         if *m == 1 {
                                             set_current_year.update(|y| *y -= 1);
@@ -247,18 +224,16 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                                             *m -= 1;
                                         }
                                     });
-                                }}
-                            >
-                                <span class="text-gray-500 cursor-pointer"><Icon icon=IconId::BiChevronLeftRegular /></span>
-                            </button>
+                                }
+                            ) icon=Some(IconId::BiChevronLeftRegular) />
                             <span
                                 on:click={move |_| toggle_viewing_years.run(())}
                                 class="cursor-pointer"
                             >
-                                {format!("{:?} {:?}", current_year.get(), chrono::Month::try_from(u8::try_from(current_month.get()).unwrap()).unwrap())}
+                                {move || format!("{:?} {:?}", current_year.get(), chrono::Month::try_from(u8::try_from(current_month.get()).unwrap()).unwrap())}
                             </span>
-                            <button
-                                on:click={move |_| {
+                            <BasicButton onclick=Callback::new(
+                                move |_| {
                                     set_current_month.update(|m| {
                                         if *m == 12 {
                                             set_current_year.update(|y| *y += 1);
@@ -267,10 +242,8 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                                             *m += 1;
                                         }
                                     });
-                                }}
-                            >
-                                <span class="text-gray-500 cursor-pointer"><Icon icon=IconId::BiChevronRightRegular /></span>
-                            </button>
+                                }
+                            ) icon=Some(IconId::BiChevronRightRegular) />
                         </div>
                         <div class="grid grid-cols-7 gap-1 text-gray-500 bg-white border-none rounded p-2">
                             {days_of_week.iter().map(|&day| view! { <div class="font-bold text-center text-sm">{day}</div> }).collect::<Vec<_>>()}

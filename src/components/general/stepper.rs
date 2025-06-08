@@ -187,6 +187,7 @@ pub fn Step(
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
+                leptos::logging::log!("form valid: {}", valid);
                 if valid {
                     let form_data = FormData::new_with_form(&form).unwrap();
                     leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
@@ -203,10 +204,19 @@ pub fn Step(
                 let value = select.value();
                 leptos::logging::log!("change value: {:?}", value);
                 // on_input.run(e)
+            } else {
+                let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+
+                if let Some(input) = target {
+                    let value = input.value();
+                    leptos::logging::log!("input value: {:?}", value);
+                    // on_input.run(e)
+                }
             }
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
+                leptos::logging::log!("form valid: {}", valid);
                 if valid {
                     let form_data = FormData::new_with_form(&form).unwrap();
                     leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());

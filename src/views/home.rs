@@ -54,8 +54,8 @@ pub fn Home() -> impl IntoView {
         <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
                 <InputField field_type=InputFieldType::Text name="name".into() />
-                <DatePicker name="dob".into() />
-                <RadioInputField label="Male".into() name="gender".into() id_attr="male".into()><span>"Comeon"</span></RadioInputField>
+                <DatePicker name="dob_lone".into() />
+                <RadioInputField label="Male".into() id_attr="male_lone".into()><span>"Comeon"</span></RadioInputField>
                 <SelectInput
                             initial_value="option1".into()
                             label="Time Zone".into()
@@ -125,7 +125,7 @@ pub fn Home() -> impl IntoView {
                         <Step>
                             <p>"First step"</p>
                             <InputField field_type=InputFieldType::Text name="user_name".into() label="User Name".into() required=true />
-                            <InputField field_type=InputFieldType::Email name="email".into() label="Email".into() required=true />
+                            <InputField field_type=InputFieldType::Email name="email".into() label="Email".into() autocomplete="on".into() required=true />
 
                             <SelectInput
                                         initial_value="".into()
@@ -160,7 +160,8 @@ pub fn Home() -> impl IntoView {
                         </Step>
                         <Step>
                             <p>"Second step"</p>
-                            <DatePicker name="dob".into() required=true />
+                            <InputField field_type=InputFieldType::Text name="first_name".into() label="First Name".into() required=true />
+                            <DatePicker id_attr="step2_dob".into() name="dob".into() label="Date of Birth".into() required=true />
                         </Step>
                         <Step>
                             <p>"Third step"</p>

@@ -24,13 +24,7 @@ pub fn CheckboxInputField(
         <div class="mb-4">
             <label
                 class="inline-flex items-center gap-2 text-gray-700 text-sm font-bold"
-                for={
-                    if id_attr.is_empty() {
-                        name.clone()
-                    } else {
-                        id_attr.clone()
-                    }
-                }
+                for=id_attr.clone()
             >
                 <input
                     class=format!("leading-tight rounded border-gray-300 text-blue-950 shadow-sm focus:border-blue-950 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 {}", ext_input_styles)

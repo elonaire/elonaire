@@ -8,6 +8,9 @@ pub fn ToggleSwitch(
     #[prop(default = Callback::new(|_| {}), optional)] on_toggle: Callback<bool>,
     #[prop(default = "On".to_string())] label_active: String,
     #[prop(default = "Off".to_string())] label_inactive: String,
+    #[prop(optional)] id_attr: String,
+    #[prop(optional)] label: String,
+    #[prop(default = false)] required: bool,
 ) -> impl IntoView {
     // Define the onclick handler
     let onclick = move |_| {
@@ -17,7 +20,15 @@ pub fn ToggleSwitch(
     view! {
         <div class="flex items-center cursor-pointer" on:click=onclick>
             <div class="relative">
-                <input type="checkbox" name=name value=active id="toggle-switch" class="sr-only"/>
+                <label for=id_attr.clone() class="block text-gray-700 text-sm font-bold mb-2">
+                    {label}
+                    {move || if required {
+                        Some(view! { <span class="text-red-500">"*"</span> })
+                    } else {
+                        None
+                    }}
+                </label>
+                <input type="checkbox" required=required name=name value=active id=id_attr class="sr-only"/>
                 <div
                     class=move || format!(
                         "block w-14 h-8 rounded-full {}",

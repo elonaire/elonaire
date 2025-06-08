@@ -23,11 +23,7 @@ pub fn Textarea(
 
     view! {
         <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for={if id_attr.is_empty() {
-                name.clone()
-            } else {
-                id_attr.clone()
-            }}>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for=id_attr.clone()>
                 {label}
                 {move || if required {
                     Some(view! { <span class="text-red-500">"*"</span> })

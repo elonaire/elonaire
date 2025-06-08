@@ -31,13 +31,7 @@ pub fn SelectInput(
 
     view! {
         <div class="mb-4">
-            <label for={
-                if id_attr.is_empty() {
-                    name.clone()
-                } else {
-                    id_attr.clone()
-                }
-            } class="block text-gray-700 text-sm font-bold mb-2">
+            <label for=id_attr.clone() class="block text-gray-700 text-sm font-bold mb-2">
                 {label}
                 {move || if required {
                     Some(view! { <span class="text-red-500">"*"</span> })
