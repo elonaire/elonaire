@@ -66,7 +66,7 @@ pub fn InputField(
     };
 
     view! {
-        <div class={ext_wrapper_styles}>
+        <div class=move || format!("mb-2 {}", ext_wrapper_styles)>
             <label
                 class={format!("block text-gray-700 text-sm font-bold {}", ext_label_styles)}
                 for=id_attr.clone()

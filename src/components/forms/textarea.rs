@@ -22,7 +22,7 @@ pub fn Textarea(
     let (display_error, _set_display_error) = signal(false);
 
     view! {
-        <div class="mb-4">
+        <div class="mb-2">
             <label class="block text-gray-700 text-sm font-bold mb-2" for=id_attr.clone()>
                 {label}
                 {move || if required {

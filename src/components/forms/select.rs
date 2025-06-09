@@ -39,7 +39,7 @@ pub fn SelectInput(
     let (display_error, _set_display_error) = signal(false);
 
     view! {
-        <div class="mb-4">
+        <div class="mb-2">
             <label for=id_attr.clone() class="block text-gray-700 text-sm font-bold mb-2">
                 {label}
                 {move || if required {

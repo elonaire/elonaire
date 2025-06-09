@@ -29,25 +29,29 @@ pub fn ToggleSwitch(
     });
 
     view! {
-        <div class="flex items-center cursor-pointer">
-            <div on:click=handle_toggle class="relative">
-                // <input type="checkbox" on:input=move |ev| oninput.run(ev) on:change=move |ev| onchange.run(ev) required=required name=name value={move || active.get()} checked={move || active.get()} id=id_attr class="sr-only"/>
+        <div class="flex flex-col cursor-pointer mb-2">
+            <div>
                 <CheckboxInputField oninput=oninput initial_value=current_value label=label name=name id_attr=id_attr checked=active ext_input_styles="sr-only" required=required />
-                <div
-                    class=move || format!(
-                        "block w-14 h-8 rounded-full {}",
-                        if active.get() { "bg-blue-950" } else { "bg-gray-300" }
-                    )
-                ></div>
-                <div
-                    class=move || format!(
-                        "dot absolute left-1 bottom-1 w-6 h-6 rounded-full transition transform {}",
-                        if active.get() { "translate-x-full" } else { "" }
-                    )
-                ></div>
             </div>
-            <div class="ml-3 text-gray-700 font-medium">
-                {current_value}
+            <div class="flex items-center">
+                <div on:click=handle_toggle class="relative">
+                    // <input type="checkbox" on:input=move |ev| oninput.run(ev) on:change=move |ev| onchange.run(ev) required=required name=name value={move || active.get()} checked={move || active.get()} id=id_attr class="sr-only"/>
+                    <div
+                        class=move || format!(
+                            "block w-14 h-8 rounded-full {}",
+                            if active.get() { "bg-blue-950" } else { "bg-gray-300" }
+                        )
+                    ></div>
+                    <div
+                        class=move || format!(
+                            "dot absolute left-1 bottom-1 w-6 h-6 rounded-full transition transform {}",
+                            if active.get() { "translate-x-full" } else { "" }
+                        )
+                    ></div>
+                </div>
+                <div class="flex items-center ml-3 text-gray-700 font-medium">
+                    <p>{current_value}</p>
+                </div>
             </div>
         </div>
     }
