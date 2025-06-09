@@ -26,7 +26,7 @@ impl StepperLabel {
 #[component]
 pub fn Stepper(
     mut children: ChildrenFragmentMut, // Children passed as a function
-    final_button_text: String,
+    #[prop(into, optional)] final_button_text: String,
     #[prop(optional, default = Callback::new(|_| {}))] on_click_final_button: Callback<
         ev::MouseEvent,
     >,

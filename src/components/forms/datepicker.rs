@@ -9,14 +9,14 @@ use leptos_icons::Icon;
 
 #[component]
 pub fn DatePicker(
-    #[prop(optional)] label: String,
-    #[prop(optional)] name: String,
+    #[prop(into, optional)] label: String,
+    #[prop(into, optional)] name: String,
     #[prop(default = false, optional)] required: bool,
     #[prop(into, default = Signal::derive(move || Local::now()), optional)] initial_value: Signal<
         DateTime<Local>,
     >,
     #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
-    #[prop(optional)] id_attr: String,
+    #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
     let (selected_date, set_selected_date) = signal(initial_value.get());
@@ -45,7 +45,7 @@ pub fn DatePicker(
                     label=label
                     field_type=InputFieldType::Text
                     required=required
-                    ext_input_styles="sr-only".into()
+                    ext_input_styles="sr-only"
                     id_attr=id_attr
                 />
                 <InputField
@@ -62,7 +62,7 @@ pub fn DatePicker(
                 </div>
                 {move || if show_calendar.get() {
                     Some(view! {
-                        <div class="absolute bg-slate-50 border mt-1 rounded shadow-lg z-10 max-h-[400px] overflow-auto">
+                        <div class="absolute bg-slate-50 border mt-1 rounded shadow-lg z-10 w-[300px] max-h-[400px] overflow-auto">
                             <Calendar select_date={select_date.clone()} />
                         </div>
                     })
@@ -112,7 +112,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                 Some(view! {
                     <BasicButton onclick=Callback::new(move |_| {
                         change_year.run(year);
-                    }) style_ext="flex text-xs border-none rounded m-1 hover:bg-blue-200 cursor-pointer".into() button_text=year.to_string() />
+                    }) style_ext="flex text-xs border-none rounded m-1 hover:bg-blue-200 cursor-pointer" button_text=year.to_string() />
                 })
             })
             .collect::<Vec<_>>()
@@ -183,7 +183,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                             if let Some(date) = date {
                                 select_date.run(date);
                             }
-                        }) style_ext="flex text-xs items-center justify-center border-none rounded m-1 hover:bg-blue-200 cursor-pointer".into() button_text={if is_blank { "".to_string() } else { day.to_string() }} />
+                        }) style_ext="flex text-xs items-center justify-center border-none rounded m-1 hover:bg-blue-200 cursor-pointer" button_text={if is_blank { "".to_string() } else { day.to_string() }} />
                     }
                 }
             />

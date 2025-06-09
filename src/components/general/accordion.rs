@@ -5,9 +5,9 @@ use leptos_icons::Icon;
 
 #[component]
 pub fn Accordion(
-    title: String,
+    #[prop(into)] title: String,
     #[prop(optional)] children: Option<Children>,
-    icon: IconId,
+    #[prop(optional)] icon: Option<IconId>,
 ) -> impl IntoView {
     let (is_open, set_is_open) = signal(false);
 
@@ -21,7 +21,13 @@ pub fn Accordion(
             >
                 <span class="flex flex-row items-center gap-2">
                     // { icon.run() }
-                    <Icon icon=icon />
+                    {
+                        if icon.is_some() {
+                            Some(view!{ <Icon icon=icon.unwrap() /> })
+                        } else {
+                            None
+                        }
+                    }
                     <span>{title}</span>
                 </span>
                 {

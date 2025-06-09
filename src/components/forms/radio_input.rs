@@ -8,17 +8,17 @@ pub fn RadioInputField(
     #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
         String,
     >,
-    label: String,
-    #[prop(optional)] name: String,
+    #[prop(into, optional)] label: String,
+    #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false, optional)] readonly: bool,
     #[prop(default = false, optional)] required: bool,
-    #[prop(default = "".to_string(), optional)] placeholder: String,
+    #[prop(into, optional)] placeholder: String,
     #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
-    #[prop(optional)] id_attr: String,
+    #[prop(into, optional)] id_attr: String,
     #[prop(optional)] children: Option<Children>,
-    #[prop(default = "".to_string())] input_style_ext: String,
-    #[prop(optional,default = "off".to_string())] autocomplete: String,
+    #[prop(into, optional)] input_style_ext: String,
+    #[prop(into, optional, default = "off".to_string())] autocomplete: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
     let (display_error, _set_display_error) = signal(false);
@@ -33,7 +33,7 @@ pub fn RadioInputField(
                     )
                     type="radio"
                     value=initial_value
-                    name=name.clone()
+                    name=name
                     node_ref=input_node_ref
                     readonly=readonly
                     on:input=move |ev| oninput.run(ev)

@@ -13,7 +13,7 @@ pub fn Popover(
     #[prop(optional)] children: Option<ChildrenFn>,
     #[prop(into)] display_item: ViewFn,
     #[prop(default = Position::Bottom, optional)] position: Position,
-    #[prop(default = "".to_string())] style_ext: String,
+    #[prop(into, optional)] style_ext: String,
     #[prop(default = Callback::new(|_| {}), optional)] on_click_toggle: Callback<bool>,
     #[prop(into)] showing: Signal<bool>,
 ) -> impl IntoView {

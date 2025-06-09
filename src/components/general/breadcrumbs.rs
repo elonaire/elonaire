@@ -1,3 +1,4 @@
+use crate::components::schemas::props::StringVec;
 use icondata as IconId;
 use leptos::prelude::*;
 use leptos_icons::Icon;
@@ -6,8 +7,8 @@ use leptos_router::{components::A, hooks::use_location};
 #[component]
 pub fn Breadcrumbs(
     /// These routes are named in order of appearance and if the `custom_route_names` prop is not specified, the first route is by default named "Home". If specified, you need to provide a name for each route, including the first route.
-    #[prop(default = vec!["Home".to_string()], optional)]
-    custom_route_names: Vec<String>,
+    #[prop(into, default = StringVec(vec!["Home".to_string()]), optional)]
+    custom_route_names: StringVec,
 ) -> impl IntoView {
     let location = use_location();
     let (breadcrumbs, set_breadcrumbs) = signal(vec![] as Vec<ViewFn>);
@@ -31,8 +32,12 @@ pub fn Breadcrumbs(
                 cumulative_path.push('/');
                 cumulative_path.push_str(segment.as_str());
                 let route_name_index = i + 1;
-                let segment_text = if custom_route_names.get(route_name_index).is_some() {
-                    custom_route_names.get(route_name_index).unwrap().to_owned()
+                let segment_text = if custom_route_names.0.get(route_name_index).is_some() {
+                    custom_route_names
+                        .0
+                        .get(route_name_index)
+                        .unwrap()
+                        .to_owned()
                 } else {
                     segment.clone()
                 };
@@ -49,7 +54,7 @@ pub fn Breadcrumbs(
             .collect();
 
         // Append the home link
-        let home_route_name = custom_route_names[0].clone();
+        let home_route_name = custom_route_names.0[0].clone();
         let home_link = ViewFn::from(move || {
             let home_route_name = home_route_name.clone();
             view! { <A href="/">{home_route_name}</A> }

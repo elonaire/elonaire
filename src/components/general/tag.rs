@@ -5,7 +5,7 @@ use crate::components::schemas::props::ColorTemperature;
 
 #[component]
 pub fn LabelTag(
-    label: String,
+    #[prop(into, optional)] label: String,
     #[prop(default = ColorTemperature::Primary)] color: ColorTemperature,
 ) -> impl IntoView {
     // Function to return the corresponding tailwind classes

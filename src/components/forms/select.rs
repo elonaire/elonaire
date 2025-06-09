@@ -10,21 +10,30 @@ pub struct SelectOption {
     pub label: String,
 }
 
+impl SelectOption {
+    pub fn new(value: &str, label: &str) -> Self {
+        Self {
+            value: value.into(),
+            label: label.into(),
+        }
+    }
+}
+
 // Define the Leptos component
 #[component]
 pub fn SelectInput(
-    #[prop(default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<
+    #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<
         String,
     >,
-    label: String,
-    name: String,
+    #[prop(into)] label: String,
+    #[prop(into)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Select>,
     #[prop(default = false, optional)] readonly: bool,
     options: Vec<SelectOption>,
     #[prop(default = false, optional)] required: bool,
     #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
-    #[prop(optional)] ext_input_styles: String,
-    #[prop(optional)] id_attr: String,
+    #[prop(into, optional)] ext_input_styles: String,
+    #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
     let (display_error, _set_display_error) = signal(false);
@@ -41,7 +50,7 @@ pub fn SelectInput(
             </label>
             <select
                 node_ref=input_node_ref
-                name=name.clone()
+                name=name
                 class=move || format!(
                     "form-input ring-0 shadow appearance-none border border-slate-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
                     ext_input_styles
@@ -55,7 +64,14 @@ pub fn SelectInput(
                 {options.into_iter()
                     .map(|option| {
                         view! {
-                            <option value={option.value.clone()}>{option.label.clone()}</option>
+                            <option
+                                value={option.value.clone()}
+                                selected={ move ||
+                                    !initial_value.get().is_empty() && initial_value.get() == option.value.clone()
+                                }
+                            >
+                                {option.label.clone()}
+                            </option>
                         }
                     })
                     .collect::<Vec<_>>()}

@@ -14,11 +14,11 @@ pub enum ButtonType {
 // Define the BasicButton component
 #[component]
 pub fn BasicButton(
-    #[prop(default = "".to_string())] button_text: String,
-    #[prop(default = "".to_string())] style_ext: String,
+    #[prop(into, optional)] button_text: String,
+    #[prop(into, optional)] style_ext: String,
     #[prop(default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(default = None)] icon: Option<IconId>,
-    #[prop(default = Memo::new(move |_| false))] disabled: Memo<bool>,
+    #[prop(into, default = Signal::derive(move || false))] disabled: Signal<bool>,
     #[prop(into, default = ButtonType::Button)] button_type: ButtonType,
     #[prop(default = true)] icon_before: bool,
 ) -> impl IntoView {

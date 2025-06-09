@@ -20,20 +20,16 @@ use crate::components::{
     schemas::{mock_data::database::get_transactions, props::ColorTemperature},
 };
 use icondata as IconId;
-// use leptos::ev;
 use leptos::prelude::*;
-use leptos_icons::Icon;
 use leptos_meta::*;
 
 #[island]
 pub fn Home() -> impl IntoView {
-    let (active, set_active) = signal(false);
-    let on_toggle = Callback::new(move |new_active: bool| {
-        set_active.set(new_active);
-    });
     let (modal_open, set_modal_open) = signal(true);
     let (popover_open, set_popover_open) = signal(false);
     let table_data = RwSignal::new(get_transactions());
+    let switch_active = RwSignal::new(false);
+    let kitchen_switch_active = RwSignal::new(false);
 
     let onclick_primary = Callback::new(move |_| {
         set_modal_open.set(false);
@@ -53,65 +49,55 @@ pub fn Home() -> impl IntoView {
             <div class="min-h-screen m-2">
         <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
-                <InputField field_type=InputFieldType::Text name="name".into() />
-                <DatePicker name="dob_lone".into() />
-                <RadioInputField label="Male".into() id_attr="male_lone".into()><span>"Comeon"</span></RadioInputField>
+                <InputField field_type=InputFieldType::Text name="name" />
+                <DatePicker name="dob_lone" />
+                <RadioInputField label="Male" id_attr="male_lone"><span>"Comeon"</span></RadioInputField>
                 <SelectInput
-                            initial_value="option1".into()
-                            label="Time Zone".into()
-                            name="timezone".into()
+                            initial_value="est"
+                            label="Time Zone"
+                            name="timezone"
                             required=true
                             options=vec![
-                                SelectOption {
-                                    value: "".to_string(),
-                                    label: "--Select Timezone".to_string(),
-                                },
-                                SelectOption {
-                                    value: "utc".to_string(),
-                                    label: "UTC".to_string(),
-                                },
-                                SelectOption {
-                                    value: "est".to_string(),
-                                    label: "EST".to_string(),
-                                },
+                                SelectOption::new("", "--Select Timezone"),
+                                SelectOption::new("utc", "UTC"),
+                                SelectOption::new("est", "EST"),
                             ]
                 />
                     <Textarea
-                                        initial_value="Initial text".into()
-                                        label="Description".into()
-                                        name="description".into()
+                                        initial_value="Initial text"
+                                        label="Description"
+                                        name="description"
                                         required=true
-                                        placeholder="Enter your description...".into()
-                                        ext_input_styles="bg-gray-100".into()
+                                        placeholder="Enter your description..."
+                                        ext_input_styles="bg-gray-100"
                                     />
                                     <ToggleSwitch
-                                                    active=active
-                                                    on_toggle=on_toggle
-                                                    label_active="Enabled".into()
-                                                    label_inactive="Disabled".into()
+                                                    active=switch_active
+                                                    label_active="Enabled"
+                                                    label_inactive="Disabled"
                                                     name="status".into()
                                                 />
 
                                                 <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
                                                     <BasicButton
-                                                                    button_text="First".into()
+                                                                    button_text="First"
                                                                     icon=Some(IconId::AiCheckCircleOutlined)
                                                                     icon_before=true
                                                                 />
                                                                 <BasicButton
-                                                                    button_text="Second".into()
+                                                                    button_text="Second"
                                                                     icon=Some(IconId::BsXCircle)
                                                                     icon_before=false
                                                                 />
                                                                 <BasicButton
-                                                                    button_text="Third".into()
-                                                                    disabled=Memo::new(move |_| true)
+                                                                    button_text="Third"
+                                                                    disabled=true
                                                                 />
                                                             </ButtonGroup>
 
                     <Badge text="2".into() ><span>"Notifications"</span></Badge>
-                    <LabelTag label="Failed".into() color=ColorTemperature::Danger  />
-                    <Accordion title="Elonaire".into() icon=IconId::BsNodePlusFill >
+                    <LabelTag label="Failed" color=ColorTemperature::Danger  />
+                    <Accordion title="Elonaire" icon=IconId::BsNodePlusFill >
                         <p>"Hey there, I am Mr Elonaire!"</p>
                     </Accordion>
                     <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
@@ -121,47 +107,44 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
-                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined)), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] final_button_text="Finish".into()>
+                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined)), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] final_button_text="Finish">
                         <Step>
                             <p>"First step"</p>
-                            <InputField field_type=InputFieldType::Text name="user_name".into() label="User Name".into() required=true />
-                            <InputField field_type=InputFieldType::Email name="email".into() label="Email".into() autocomplete="on".into() required=true />
+                            <InputField field_type=InputFieldType::Text name="user_name" label="User Name" required=true />
+                            <InputField field_type=InputFieldType::Email name="email" label="Email" autocomplete="on" required=true />
 
                             <SelectInput
-                                        initial_value="".into()
-                                        label="Time Zone".into()
-                                        name="timezone".into()
+                                        initial_value="utc"
+                                        label="Time Zone"
+                                        name="timezone"
                                         required=true
                                         options=vec![
-                                            SelectOption {
-                                                value: "".into(),
-                                                label: "--Select Timezone".into(),
-                                            },
-                                            SelectOption {
-                                                value: "utc".into(),
-                                                label: "UTC".into(),
-                                            },
-                                            SelectOption {
-                                                value: "est".into(),
-                                                label: "EST".into(),
-                                            },
+                                            SelectOption::new("", "--Select Timezone"),
+                                            SelectOption::new("utc", "UTC"),
+                                            SelectOption::new("est", "EST"),
                                         ]
                             />
-                            <RadioInputField required=true label="Male".into() name="gender".into() initial_value=Memo::new(move |_|"male".into()) id_attr="male".into() />
-                            <RadioInputField required=true label="Female".into() name="gender".into() initial_value=Memo::new(move |_|"female".into()) id_attr="female".into() />
+                            <RadioInputField required=true label="Male" name="gender" initial_value="male" id_attr="male" />
+                            <RadioInputField required=true label="Female" name="gender" initial_value="female" id_attr="female" />
                             <Textarea
-                                                initial_value="Initial text".into()
-                                                label="Description".into()
-                                                name="description".into()
+                                                initial_value="Initial text"
+                                                label="Description"
+                                                name="description"
                                                 required=true
-                                                placeholder="Enter your description...".into()
-                                                ext_input_styles="bg-gray-100".into()
+                                                placeholder="Enter your description..."
+                                                ext_input_styles="bg-gray-100"
                                             />
                         </Step>
                         <Step>
                             <p>"Second step"</p>
-                            <InputField field_type=InputFieldType::Text name="first_name".into() label="First Name".into() required=true />
-                            <DatePicker id_attr="step2_dob".into() name="dob".into() label="Date of Birth".into() required=true />
+                            <InputField field_type=InputFieldType::Text name="first_name" label="First Name" required=true />
+                            <ToggleSwitch
+                                            label="Toggle Kitchen Lights"
+                                            active=kitchen_switch_active
+                                            name="kitchen_lights".into()
+                                            id_attr="kitchen_lights"
+                                        />
+                            <DatePicker id_attr="step2_dob" name="dob" label="Date of Birth" required=true />
                         </Step>
                         <Step>
                             <p>"Third step"</p>

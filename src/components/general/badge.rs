@@ -7,9 +7,9 @@ use crate::components::schemas::props::ColorTemperature;
 pub fn Badge(
     text: String,
     #[prop(default = ColorTemperature::Primary)] color: ColorTemperature,
-    #[prop(default = "".to_string())] parent_class: String,
+    #[prop(into, optional)] parent_class: String,
     children: Children,
-    #[prop(default = "".to_string())] badge_position: String,
+    #[prop(into, optional)] badge_position: String,
 ) -> impl IntoView {
     let color_classes = move || match color {
         ColorTemperature::Danger => "bg-danger",

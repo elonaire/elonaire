@@ -160,21 +160,42 @@ impl Eq for TableCellData {}
 impl Hash for TableCellData {
     fn hash<H: Hasher>(&self, state: &mut H) {
         match self {
-            TableCellData::String(s) => {
+            TableCellData::String(s) | TableCellData::DateTime(s) | TableCellData::Duration(s) => {
                 0u8.hash(state); // Variant discriminator
                 s.hash(state);
             }
-            TableCellData::Int64(i) => {
+            TableCellData::Int32(i) => {
                 1u8.hash(state);
                 i.hash(state);
             }
-            TableCellData::Float64(f) => {
+            TableCellData::Int64(i) => {
                 2u8.hash(state);
+                i.hash(state);
+            }
+            TableCellData::Float32(f) => {
+                3u8.hash(state);
                 // Convert float to bits to handle NaN and other edge cases
                 f.to_bits().hash(state);
             }
+            TableCellData::Float64(f) => {
+                4u8.hash(state);
+                // Convert float to bits to handle NaN and other edge cases
+                f.to_bits().hash(state);
+            }
+            TableCellData::UInt32(u) => {
+                5u8.hash(state);
+                u.hash(state);
+            }
+            TableCellData::UInt64(u) => {
+                6u8.hash(state);
+                u.hash(state);
+            }
+            TableCellData::UInt128(u) => {
+                7u8.hash(state);
+                u.hash(state);
+            }
             _ => {
-                3u8.hash(state);
+                8u8.hash(state);
                 // Since ViewFn can't be hashed, use a constant or skip
             }
         }

@@ -28,21 +28,21 @@ pub fn InputField(
     #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
         String,
     >,
-    #[prop(optional)] label: String,
+    #[prop(into, optional)] label: String,
     field_type: InputFieldType,
-    #[prop(optional)] name: String,
+    #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false)] readonly: bool,
     #[prop(default = false)] required: bool,
-    #[prop(optional)] placeholder: String,
+    #[prop(into, optional)] placeholder: String,
     #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(optional, default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
-    #[prop(optional)] ext_wrapper_styles: String,
-    #[prop(optional)] ext_label_styles: String,
-    #[prop(optional)] ext_input_styles: String,
-    #[prop(optional,default = "off".to_string())] autocomplete: String,
-    #[prop(optional)] id_attr: String,
+    #[prop(into, optional)] ext_wrapper_styles: String,
+    #[prop(into, optional)] ext_label_styles: String,
+    #[prop(into, optional)] ext_input_styles: String,
+    #[prop(into, optional, default = "off".to_string())] autocomplete: String,
+    #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     let (display_error, _set_display_error) = signal(false);
 
@@ -85,7 +85,7 @@ pub fn InputField(
                 )}
                 type=input_field_type_str
                 value=initial_value
-                name=name.clone()
+                name=name
                 node_ref=input_node_ref
                 readonly=readonly
                 on:input={move |ev| oninput.run(ev)}
