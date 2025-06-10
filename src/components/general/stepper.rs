@@ -175,10 +175,7 @@ pub fn Stepper(
 
 // Step Component
 #[component]
-pub fn Step(
-    children: ChildrenFn,
-    // #[prop(optional, default = Callback::new(|_| {}))] form_validity: Callback<bool>,
-) -> impl IntoView {
+pub fn Step(children: ChildrenFn) -> impl IntoView {
     let form_ref = NodeRef::new();
 
     view! {
