@@ -77,6 +77,9 @@ pub fn Stepper(
                             let is_current = move || index == current_step.get();
                             view! {
                                 <div on:click=move |_| {
+                                    if next_is_disabled.get() {
+                                        return;
+                                    }
                                     set_current_step.update(|step| *step = index);
                                 } class=move || {
                                     format!(
