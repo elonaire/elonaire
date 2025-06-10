@@ -1,6 +1,8 @@
 use crate::components::forms::checkbox::CheckboxInputField;
 use leptos::ev;
 use leptos::prelude::*;
+use web_sys::Event;
+use web_sys::HtmlInputElement;
 
 // Define the Leptos component
 #[component]
@@ -12,12 +14,23 @@ pub fn ToggleSwitch(
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] label: String,
     #[prop(default = false)] required: bool,
-    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
 ) -> impl IntoView {
+    let checkbox_ref = NodeRef::new();
+
     let handle_toggle = move |ev: ev::MouseEvent| {
         ev.stop_propagation();
         active.set(!active.get());
+        // checkbox_ref.on_load(|i: HtmlInputElement| i.click());
+        checkbox_ref.on_load(|i: HtmlInputElement| {
+            let _event = match Event::new("change") {
+                Ok(ev) => {
+                    ev.init_event_with_bubbles("change", true);
+                    i.dispatch_event(&ev).unwrap();
+                }
+                Err(_e) => {}
+            };
+        });
     };
 
     let current_value = Memo::new(move |_| {
@@ -31,11 +44,10 @@ pub fn ToggleSwitch(
     view! {
         <div class="flex flex-col cursor-pointer mb-2">
             <div>
-                <CheckboxInputField oninput=oninput initial_value=current_value label=label name=name id_attr=id_attr checked=active ext_input_styles="sr-only" required=required />
+                <CheckboxInputField input_node_ref=checkbox_ref oninput=oninput initial_value=current_value label=label name=name id_attr=id_attr checked=active ext_input_styles="sr-only" required=required />
             </div>
             <div class="flex items-center">
                 <div on:click=handle_toggle class="relative">
-                    // <input type="checkbox" on:input=move |ev| oninput.run(ev) on:change=move |ev| onchange.run(ev) required=required name=name value={move || active.get()} checked={move || active.get()} id=id_attr class="sr-only"/>
                     <div
                         class=move || format!(
                             "block w-14 h-8 rounded-full {}",

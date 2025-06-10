@@ -143,6 +143,7 @@ pub fn Home() -> impl IntoView {
                                             active=kitchen_switch_active
                                             name="kitchen_lights".into()
                                             id_attr="kitchen_lights"
+                                            required=true
                                         />
                             <DatePicker id_attr="step2_dob" name="dob" label="Date of Birth" required=true />
                         </Step>

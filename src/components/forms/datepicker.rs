@@ -6,6 +6,7 @@ use icondata as IconId;
 use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
+use web_sys::{Event, HtmlInputElement};
 
 #[component]
 pub fn DatePicker(
@@ -20,6 +21,7 @@ pub fn DatePicker(
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
     let (selected_date, set_selected_date) = signal(initial_value.get());
+    let date_input_ref = NodeRef::new();
 
     let selected_date_value = Memo::new(move |_| selected_date.get().to_rfc3339());
 
@@ -34,6 +36,16 @@ pub fn DatePicker(
         set_selected_date.set(date);
         onchange.run(date);
         set_show_calendar.set(false);
+
+        date_input_ref.on_load(|i: HtmlInputElement| {
+            let _event = match Event::new("change") {
+                Ok(ev) => {
+                    ev.init_event_with_bubbles("change", true);
+                    i.dispatch_event(&ev).unwrap();
+                }
+                Err(_e) => {}
+            };
+        });
     });
 
     view! {
@@ -47,6 +59,7 @@ pub fn DatePicker(
                     required=required
                     ext_input_styles="sr-only"
                     id_attr=id_attr
+                    input_node_ref=date_input_ref
                 />
                 <InputField
                     readonly=true

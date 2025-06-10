@@ -2,10 +2,10 @@ use crate::components::general::button::BasicButton;
 use icondata::Icon as IconId;
 use leptos::ev;
 use leptos::prelude::*;
-use leptos::wasm_bindgen::JsCast;
+// use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
 use web_sys::FormData;
-use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
+// use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
 
 #[derive(Clone, Debug, Default)]
 pub struct StepperLabel {
@@ -167,23 +167,23 @@ pub fn Step(
     view! {
         <form
         node_ref=form_ref
-        on:input=move |e| {
-            leptos::logging::log!("input event: {:?}", e.target());
-            let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            if let Some(input) = target {
-                let value = input.value();
-                leptos::logging::log!("input value: {:?}", value);
-                // on_input.run(e)
-            } else {
-                // Might be a HTMLTextAreaElement
-                let target = e.target().and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+        on:input=move |_| {
+            // leptos::logging::log!("input event: {:?}", e.target());
+            // let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            // if let Some(input) = target {
+            //     let value = input.value();
+            //     leptos::logging::log!("input value: {:?}", value);
+            //     // on_input.run(e)
+            // } else {
+            //     // Might be a HTMLTextAreaElement
+            //     let target = e.target().and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
 
-                if let Some(textarea) = target {
-                    let value = textarea.value();
-                    leptos::logging::log!("textarea value: {:?}", value);
-                    // on_input.run(e)
-                }
-            }
+            //     if let Some(textarea) = target {
+            //         let value = textarea.value();
+            //         leptos::logging::log!("textarea value: {:?}", value);
+            //         // on_input.run(e)
+            //     }
+            // }
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
@@ -196,23 +196,23 @@ pub fn Step(
             }
 
         }
-        on:change=move |e| {
-            leptos::logging::log!("change event: {:?}", e);
-            let target = e.target().and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
+        on:change=move |_| {
+            // leptos::logging::log!("change event: {:?}", e);
+            // let target = e.target().and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
 
-            if let Some(select) = target {
-                let value = select.value();
-                leptos::logging::log!("change value: {:?}", value);
-                // on_input.run(e)
-            } else {
-                let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            // if let Some(select) = target {
+            //     let value = select.value();
+            //     leptos::logging::log!("change value: {:?}", value);
+            //     // on_input.run(e)
+            // } else {
+            //     let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
 
-                if let Some(input) = target {
-                    let value = input.value();
-                    leptos::logging::log!("input value: {:?}", value);
-                    // on_input.run(e)
-                }
-            }
+            //     if let Some(input) = target {
+            //         let value = input.value();
+            //         leptos::logging::log!("input value: {:?}", value);
+            //         // on_input.run(e)
+            //     }
+            // }
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
