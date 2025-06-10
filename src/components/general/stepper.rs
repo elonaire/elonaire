@@ -204,10 +204,9 @@ pub fn Step(
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
-                leptos::logging::log!("form valid: {}", valid);
                 if valid {
-                    let form_data = FormData::new_with_form(&form).unwrap();
-                    leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
+                    let _form_data = FormData::new_with_form(&form).unwrap();
+                    // leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
                 };
                 let _event = match CustomEvent::new("show_form_validity") {
                     Ok(ev) => {
@@ -216,7 +215,6 @@ pub fn Step(
                     }
                     Err(_e) => {}
                 };
-                // form_validity.run(valid);
             }
 
         }
@@ -240,10 +238,9 @@ pub fn Step(
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
-                leptos::logging::log!("form valid: {}", valid);
                 if valid {
-                    let form_data = FormData::new_with_form(&form).unwrap();
-                    leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
+                    let _form_data = FormData::new_with_form(&form).unwrap();
+                    // leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
                 };
 
                 let _event = match CustomEvent::new("show_form_validity") {
@@ -253,7 +250,6 @@ pub fn Step(
                     }
                     Err(_e) => {}
                 };
-                // form_validity.run(valid);
             }
         }
         >
