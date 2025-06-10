@@ -4,7 +4,9 @@ use leptos::ev;
 use leptos::prelude::*;
 // use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
+use web_sys::CustomEvent;
 use web_sys::FormData;
+use web_sys::wasm_bindgen::JsValue;
 // use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
 
 #[derive(Clone, Debug, Default)]
@@ -31,10 +33,11 @@ pub fn Stepper(
         ev::MouseEvent,
     >,
     #[prop(into)] step_labels: Vec<StepperLabel>,
-    // #[prop(optional, default = false)] is_linear: bool,
+    #[prop(optional, default = false)] is_linear: bool,
     // #[prop(optional, default = RwSignal::new(false))] can_proceed: RwSignal<bool>,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
+    let (step_form_is_valid, set_step_form_is_valid) = signal(false); // Leptos signal for state
     let step_count = children().nodes.collect_view().len(); // Get number of children
 
     let onclick_next = Callback::new(move |_| {
@@ -48,6 +51,14 @@ pub fn Stepper(
             set_current_step.update(|step| *step -= 1);
         }
     });
+
+    let show_form_validity = move |ev: CustomEvent| {
+        // Implement logic to show form validity
+        leptos::logging::log!("Form validity shown: {:?}", ev.detail().as_bool().unwrap());
+        set_step_form_is_valid.set(ev.detail().as_bool().unwrap());
+    };
+
+    let next_is_disabled = Memo::new(move |_| !step_form_is_valid.get() && is_linear);
 
     view! {
         <div class="flex flex-col items-center max-w-full">
@@ -114,7 +125,7 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div class="mb-4 p-4 border border-gray-300 rounded w-full">
+            <div on:show_form_validity=show_form_validity class="mb-4 p-4 border border-gray-300 rounded w-full">
             {
                 move || children()
                 .nodes
@@ -147,6 +158,7 @@ pub fn Stepper(
                     } else {
                         view! {
                             <BasicButton
+                                disabled=next_is_disabled
                                 onclick=onclick_next
                                 button_text="Next".to_string()
                             />
@@ -162,7 +174,7 @@ pub fn Stepper(
 #[component]
 pub fn Step(
     children: ChildrenFn,
-    #[prop(optional, default = Callback::new(|_| {}))] form_validity: Callback<bool>,
+    // #[prop(optional, default = Callback::new(|_| {}))] form_validity: Callback<bool>,
 ) -> impl IntoView {
     let form_ref = NodeRef::new();
 
@@ -194,7 +206,14 @@ pub fn Step(
                     let form_data = FormData::new_with_form(&form).unwrap();
                     leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
                 };
-                form_validity.run(valid);
+                let _event = match CustomEvent::new("show_form_validity") {
+                    Ok(ev) => {
+                        ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
+                        form.dispatch_event(&ev).unwrap();
+                    }
+                    Err(_e) => {}
+                };
+                // form_validity.run(valid);
             }
 
         }
@@ -223,7 +242,15 @@ pub fn Step(
                     let form_data = FormData::new_with_form(&form).unwrap();
                     leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
                 };
-                form_validity.run(valid);
+
+                let _event = match CustomEvent::new("show_form_validity") {
+                    Ok(ev) => {
+                        ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
+                        form.dispatch_event(&ev).unwrap();
+                    }
+                    Err(_e) => {}
+                };
+                // form_validity.run(valid);
             }
         }
         >

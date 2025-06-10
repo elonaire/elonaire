@@ -107,7 +107,7 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
-                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined)), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] final_button_text="Finish">
+                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined)), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] is_linear=true final_button_text="Finish">
                         <Step>
                             <p>"First step"</p>
                             <InputField field_type=InputFieldType::Text name="user_name" label="User Name" required=true />
