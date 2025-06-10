@@ -5,7 +5,6 @@ use leptos::ev;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
-use web_sys::Event;
 use web_sys::FormData;
 use web_sys::HtmlFormElement;
 use web_sys::SubmitEvent;
