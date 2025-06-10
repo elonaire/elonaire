@@ -65,9 +65,11 @@ pub fn Stepper(
                         {
                             let is_current = move || index == current_step.get();
                             view! {
-                                <div class=move || {
+                                <div on:click=move |_| {
+                                    set_current_step.update(|step| *step = index);
+                                } class=move || {
                                     format!(
-                                        "relative flex items-center bg-white space-x-2 px-4 mb-2 z-9 {}",
+                                        "relative flex items-center cursor-pointer bg-white space-x-2 px-4 mb-2 z-9 {}",
                                         if !is_current() { "hidden md:flex" } else { "" }
                                     )
                                 }>
