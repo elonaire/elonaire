@@ -204,13 +204,13 @@ pub fn Step(children: ChildrenFn) -> impl IntoView {
                 if valid {
                     let _form_data = FormData::new_with_form(&form).unwrap();
                     // leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
-                };
-                let _event = match CustomEvent::new("show_form_validity") {
-                    Ok(ev) => {
-                        ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
-                        form.dispatch_event(&ev).unwrap();
-                    }
-                    Err(_e) => {}
+                    let _event = match CustomEvent::new("show_form_validity") {
+                        Ok(ev) => {
+                            ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
+                            form.dispatch_event(&ev).unwrap();
+                        }
+                        Err(_e) => {}
+                    };
                 };
             }
 
@@ -238,14 +238,13 @@ pub fn Step(children: ChildrenFn) -> impl IntoView {
                 if valid {
                     let _form_data = FormData::new_with_form(&form).unwrap();
                     // leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
-                };
-
-                let _event = match CustomEvent::new("show_form_validity") {
-                    Ok(ev) => {
-                        ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
-                        form.dispatch_event(&ev).unwrap();
-                    }
-                    Err(_e) => {}
+                    let _event = match CustomEvent::new("show_form_validity") {
+                        Ok(ev) => {
+                            ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
+                            form.dispatch_event(&ev).unwrap();
+                        }
+                        Err(_e) => {}
+                    };
                 };
             }
         }
