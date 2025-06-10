@@ -1,12 +1,12 @@
 use crate::components::forms::input::{InputField, InputFieldType};
 use crate::components::general::button::BasicButton;
+use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use chrono::Local;
 use chrono::{DateTime, Datelike, Duration, NaiveDate, TimeZone, Weekday};
 use icondata as IconId;
 use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
-use web_sys::{Event, HtmlInputElement};
 
 #[component]
 pub fn DatePicker(
@@ -38,15 +38,9 @@ pub fn DatePicker(
         set_show_calendar.set(false);
 
         // Fire a bubbling Change event so that the form can capture changes
-        date_input_ref.on_load(|i: HtmlInputElement| {
-            let _event = match Event::new("change") {
-                Ok(ev) => {
-                    ev.init_event_with_bubbles("change", true);
-                    i.dispatch_event(&ev).unwrap();
-                }
-                Err(_e) => {}
-            };
-        });
+        if let Some(input_el) = date_input_ref.get() {
+            fire_bubbled_and_cancelable_event("change", true, true, input_el);
+        }
     });
 
     view! {

@@ -1,8 +1,7 @@
 use crate::components::forms::checkbox::CheckboxInputField;
+use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use leptos::ev;
 use leptos::prelude::*;
-use web_sys::Event;
-use web_sys::HtmlInputElement;
 
 // Define the Leptos component
 #[component]
@@ -23,15 +22,9 @@ pub fn ToggleSwitch(
         active.set(!active.get());
 
         // Fire a bubbling Change event so that the form can capture changes
-        checkbox_ref.on_load(|i: HtmlInputElement| {
-            let _event = match Event::new("change") {
-                Ok(ev) => {
-                    ev.init_event_with_bubbles("change", true);
-                    i.dispatch_event(&ev).unwrap();
-                }
-                Err(_e) => {}
-            };
-        });
+        if let Some(input_el) = checkbox_ref.get() {
+            fire_bubbled_and_cancelable_event("change", true, true, input_el);
+        }
     };
 
     let current_value = Memo::new(move |_| active.get().to_string());

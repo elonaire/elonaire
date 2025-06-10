@@ -1,12 +1,14 @@
 use crate::components::general::button::BasicButton;
+use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use icondata::Icon as IconId;
 use leptos::ev;
 use leptos::prelude::*;
-// use leptos::wasm_bindgen::JsCast;
+use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
-use web_sys::CustomEvent;
+use web_sys::Event;
 use web_sys::FormData;
-use web_sys::wasm_bindgen::JsValue;
+use web_sys::HtmlFormElement;
+use web_sys::SubmitEvent;
 // use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
 
 #[derive(Clone, Debug, Default)]
@@ -52,10 +54,18 @@ pub fn Stepper(
         }
     });
 
-    let show_form_validity = move |ev: CustomEvent| {
+    let handle_step_form_submit = move |ev: SubmitEvent| {
         // Implement logic to show form validity
-        leptos::logging::log!("Form validity shown: {:?}", ev.detail().as_bool().unwrap());
-        set_step_form_is_valid.set(ev.detail().as_bool().unwrap());
+        leptos::logging::log!("Form valid and submitted: {:?}", ev.target());
+        let target = ev
+            .target()
+            .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
+
+        if let Some(form) = target {
+            let _form_data = FormData::new_with_form(&form).unwrap();
+            let is_valid = form.check_validity();
+            set_step_form_is_valid.set(is_valid);
+        }
     };
 
     let next_is_disabled = Memo::new(move |_| !step_form_is_valid.get() && is_linear);
@@ -128,7 +138,7 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div on:show_form_validity=show_form_validity class="mb-4 p-4 border border-gray-300 rounded w-full">
+            <div on:submit=handle_step_form_submit class="mb-4 p-4 border border-gray-300 rounded w-full">
             {
                 move || children()
                 .nodes
@@ -178,73 +188,36 @@ pub fn Stepper(
 pub fn Step(children: ChildrenFn) -> impl IntoView {
     let form_ref = NodeRef::new();
 
+    // A workaround for updating the next step's form's validity state when navigating to the next step
+    // Only runs once when the component is mounted
+    Effect::new(move || {
+        if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
+            let valid = form.check_validity();
+            if !valid {
+                fire_bubbled_and_cancelable_event("submit", true, true, form);
+            }
+        }
+    });
+
     view! {
         <form
         node_ref=form_ref
         on:input=move |_| {
-            // leptos::logging::log!("input event: {:?}", e.target());
-            // let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-            // if let Some(input) = target {
-            //     let value = input.value();
-            //     leptos::logging::log!("input value: {:?}", value);
-            //     // on_input.run(e)
-            // } else {
-            //     // Might be a HTMLTextAreaElement
-            //     let target = e.target().and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
-
-            //     if let Some(textarea) = target {
-            //         let value = textarea.value();
-            //         leptos::logging::log!("textarea value: {:?}", value);
-            //         // on_input.run(e)
-            //     }
-            // }
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
                 if valid {
-                    let _form_data = FormData::new_with_form(&form).unwrap();
-                    // leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
-                    let _event = match CustomEvent::new("show_form_validity") {
-                        Ok(ev) => {
-                            ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
-                            form.dispatch_event(&ev).unwrap();
-                        }
-                        Err(_e) => {}
-                    };
+                    fire_bubbled_and_cancelable_event("submit", true, true, form);
                 };
             }
 
         }
         on:change=move |_| {
-            // leptos::logging::log!("change event: {:?}", e);
-            // let target = e.target().and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
-
-            // if let Some(select) = target {
-            //     let value = select.value();
-            //     leptos::logging::log!("change value: {:?}", value);
-            //     // on_input.run(e)
-            // } else {
-            //     let target = e.target().and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-
-            //     if let Some(input) = target {
-            //         let value = input.value();
-            //         leptos::logging::log!("input value: {:?}", value);
-            //         // on_input.run(e)
-            //     }
-            // }
 
             if let Some(form) = form_ref.get() {
                 let valid = form.check_validity();
                 if valid {
-                    let _form_data = FormData::new_with_form(&form).unwrap();
-                    // leptos::logging::log!("gender value: {:?}", form_data.get("gender").as_string());
-                    let _event = match CustomEvent::new("show_form_validity") {
-                        Ok(ev) => {
-                            ev.init_custom_event_with_can_bubble_and_cancelable_and_detail("show_form_validity", true, true, &JsValue::from_bool(valid));
-                            form.dispatch_event(&ev).unwrap();
-                        }
-                        Err(_e) => {}
-                    };
+                    fire_bubbled_and_cancelable_event("submit", true, true, form);
                 };
             }
         }
