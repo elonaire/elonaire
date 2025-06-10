@@ -37,6 +37,7 @@ pub fn DatePicker(
         onchange.run(date);
         set_show_calendar.set(false);
 
+        // Fire a bubbling Change event so that the form can capture changes
         date_input_ref.on_load(|i: HtmlInputElement| {
             let _event = match Event::new("change") {
                 Ok(ev) => {

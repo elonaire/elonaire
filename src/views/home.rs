@@ -28,7 +28,7 @@ pub fn Home() -> impl IntoView {
     let (modal_open, set_modal_open) = signal(true);
     let (popover_open, set_popover_open) = signal(false);
     let table_data = RwSignal::new(get_transactions());
-    let switch_active = RwSignal::new(false);
+    let switch_active = RwSignal::new(true);
     let kitchen_switch_active = RwSignal::new(false);
 
     let onclick_primary = Callback::new(move |_| {

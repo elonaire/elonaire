@@ -21,7 +21,8 @@ pub fn ToggleSwitch(
     let handle_toggle = move |ev: ev::MouseEvent| {
         ev.stop_propagation();
         active.set(!active.get());
-        // checkbox_ref.on_load(|i: HtmlInputElement| i.click());
+
+        // Fire a bubbling Change event so that the form can capture changes
         checkbox_ref.on_load(|i: HtmlInputElement| {
             let _event = match Event::new("change") {
                 Ok(ev) => {
@@ -33,13 +34,7 @@ pub fn ToggleSwitch(
         });
     };
 
-    let current_value = Memo::new(move |_| {
-        if active.get() {
-            label_active.clone()
-        } else {
-            label_inactive.clone()
-        }
-    });
+    let current_value = Memo::new(move |_| active.get().to_string());
 
     view! {
         <div class="flex flex-col cursor-pointer mb-2">
@@ -62,7 +57,15 @@ pub fn ToggleSwitch(
                     ></div>
                 </div>
                 <div class="flex items-center ml-3 text-gray-700 font-medium">
-                    <p>{current_value}</p>
+                    <p>{
+                        move || {
+                            if active.get() {
+                                label_active.clone()
+                            } else {
+                                label_inactive.clone()
+                            }
+                        }
+                    }</p>
                 </div>
             </div>
         </div>
