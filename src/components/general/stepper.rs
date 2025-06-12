@@ -2,23 +2,22 @@ use crate::components::general::button::BasicButton;
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use icondata::Icon as IconId;
 use leptos::ev;
+use leptos::html::Form;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
-use web_sys::FormData;
 use web_sys::HtmlFormElement;
 use web_sys::SubmitEvent;
-// use web_sys::{HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement};
 
 #[derive(Clone, Debug, Default)]
-pub struct StepperLabel {
+pub struct StepInfo {
     pub label: String,
     pub icon: Option<IconId>,
 }
 
-impl StepperLabel {
+impl StepInfo {
     pub fn new(label: &str, icon: Option<IconId>) -> Self {
-        StepperLabel {
+        StepInfo {
             label: label.to_string(),
             icon,
         }
@@ -33,13 +32,17 @@ pub fn Stepper(
     #[prop(optional, default = Callback::new(|_| {}))] on_click_final_button: Callback<
         ev::MouseEvent,
     >,
-    #[prop(into)] step_labels: Vec<StepperLabel>,
+    #[prop(into)] step_labels: RwSignal<Vec<StepInfo>>,
     #[prop(optional, default = false)] is_linear: bool,
-    // #[prop(optional, default = RwSignal::new(false))] can_proceed: RwSignal<bool>,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
     let (step_form_is_valid, set_step_form_is_valid) = signal(false); // Leptos signal for state
     let step_count = children().nodes.collect_view().len(); // Get number of children
+    let form_refs = RwSignal::new(
+        (0..step_count)
+            .map(|_| NodeRef::<Form>::new())
+            .collect::<Vec<_>>(),
+    );
 
     let onclick_next = Callback::new(move |_| {
         if current_step.get() < step_count - 1 {
@@ -55,19 +58,27 @@ pub fn Stepper(
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
         // Implement logic to show form validity
-        leptos::logging::log!("Form valid and submitted: {:?}", ev.target());
         let target = ev
             .target()
             .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
 
         if let Some(form) = target {
-            let _form_data = FormData::new_with_form(&form).unwrap();
+            // let form_data = FormData::new_with_form(&form).unwrap();
             let is_valid = form.check_validity();
             set_step_form_is_valid.set(is_valid);
         }
     };
 
     let next_is_disabled = Memo::new(move |_| !step_form_is_valid.get() && is_linear);
+
+    // A workaround for updating the next step's form's validity state when navigating to the next step or previous step
+    Effect::new(move || {
+        let form_ref = form_refs.get().get(current_step.get()).unwrap().to_owned();
+
+        if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
+            fire_bubbled_and_cancelable_event("submit", true, true, form);
+        }
+    });
 
     view! {
         <div class="flex flex-col items-center max-w-full">
@@ -78,7 +89,7 @@ pub fn Stepper(
                 </div>
                 <div class="relative flex flex-wrap md:flex-nowrap justify-center md:justify-between w-full md:space-x-2">
                     <For
-                        each=move || step_labels.clone().into_iter().enumerate()
+                        each=move || step_labels.get().into_iter().enumerate()
                         key=|(index, _)| *index
                         let:((index, step_label))
                     >
@@ -139,12 +150,40 @@ pub fn Stepper(
             </div>
             <div on:submit=handle_step_form_submit class="mb-4 p-4 border border-gray-300 rounded w-full">
             {
-                move || children()
-                .nodes
-                .into_iter()
-                .nth(current_step.get())
-                .map(|child| child.into_view())
-            }
+                    move || {
+                        let current = current_step.get();
+                        children()
+                            .nodes
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, child)| {
+                                let form_ref = form_refs.get().get(i).unwrap().to_owned();
+
+                                view! {
+                                    <form
+                                        node_ref=form_ref
+                                        class=move || if current == i { "block" } else { "hidden" }
+                                        on:input=move |_| {
+                                            if let Some(form) = form_ref.get() {
+                                                if form.check_validity() {
+                                                    fire_bubbled_and_cancelable_event("submit", true, true, form);
+                                                }
+                                            }
+                                        }
+                                        on:change=move |_| {
+                                            if let Some(form) = form_ref.get() {
+                                                if form.check_validity() {
+                                                    fire_bubbled_and_cancelable_event("submit", true, true, form);
+                                                }
+                                            }
+                                        }
+                                    >
+                                        { child.into_view() }
+                                    </form>
+                                }
+                            }).collect_view()
+                    }
+                }
             </div>
             <div class="flex w-full justify-start gap-4">
                 {
@@ -185,43 +224,9 @@ pub fn Stepper(
 // Step Component
 #[component]
 pub fn Step(children: ChildrenFn) -> impl IntoView {
-    let form_ref = NodeRef::new();
-
-    // A workaround for updating the next step's form's validity state when navigating to the next step
-    // Only runs once when the component is mounted
-    Effect::new(move || {
-        if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
-            let valid = form.check_validity();
-            if !valid {
-                fire_bubbled_and_cancelable_event("submit", true, true, form);
-            }
-        }
-    });
-
     view! {
-        <form
-        node_ref=form_ref
-        on:input=move |_| {
 
-            if let Some(form) = form_ref.get() {
-                let valid = form.check_validity();
-                if valid {
-                    fire_bubbled_and_cancelable_event("submit", true, true, form);
-                };
-            }
-
-        }
-        on:change=move |_| {
-
-            if let Some(form) = form_ref.get() {
-                let valid = form.check_validity();
-                if valid {
-                    fire_bubbled_and_cancelable_event("submit", true, true, form);
-                };
-            }
-        }
-        >
             { children().into_view() }
-        </form>
+
     }
 }

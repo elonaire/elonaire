@@ -12,7 +12,7 @@ use crate::components::{
         badge::Badge,
         button::{BasicButton, ButtonGroup},
         popover::Popover,
-        stepper::{Step, Stepper, StepperLabel},
+        stepper::{Step, StepInfo, Stepper},
         table::data_table::DataTable,
         tag::LabelTag,
     },
@@ -20,7 +20,7 @@ use crate::components::{
     schemas::{mock_data::database::get_transactions, props::ColorTemperature},
 };
 use icondata as IconId;
-use leptos::prelude::*;
+use leptos::{html::Form, prelude::*};
 use leptos_meta::*;
 
 #[island]
@@ -107,7 +107,7 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
-                    <Stepper step_labels=vec![StepperLabel::new("First", Some(IconId::AiFileAddOutlined)), StepperLabel::new("Second", None), StepperLabel::new("Third", None)] is_linear=true final_button_text="Finish">
+                    <Stepper step_labels=RwSignal::new(vec![StepInfo::new("First", Some(IconId::AiFileAddOutlined)), StepInfo::new("Second", None), StepInfo::new("Third", None)]) is_linear=true final_button_text="Finish">
                         <Step>
                             <p>"First step"</p>
                             <InputField field_type=InputFieldType::Text name="user_name" label="User Name" required=true />
