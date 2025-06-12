@@ -1,10 +1,18 @@
+use leptos::{html::Form, prelude::*};
+use serde::de::DeserializeOwned;
 use web_sys::{Event, EventTarget};
 
 use js_sys::Array;
 use serde_json::{Map, Value};
 use web_sys::FormData;
 
-pub fn form_data_to_json_string(form_data: &FormData) -> Option<String> {
+pub fn get_form_data_from_form_ref(form_ref: &NodeRef<Form>) -> Option<FormData> {
+    let form = form_ref.to_owned().get()?;
+    let form_data = FormData::new_with_form(&form).ok()?;
+    Some(form_data)
+}
+
+pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(form_data: &FormData) -> Option<T> {
     let entries = js_sys::try_iter(form_data).ok()?.unwrap();
     let mut map = Map::new();
 
@@ -18,7 +26,8 @@ pub fn form_data_to_json_string(form_data: &FormData) -> Option<String> {
         }
     }
 
-    serde_json::to_string(&Value::Object(map)).ok()
+    let value = Value::Object(map);
+    serde_json::from_value(value).ok()
 }
 
 pub fn fire_bubbled_and_cancelable_event<T>(

@@ -30,10 +30,13 @@ pub fn Stepper(
     mut children: ChildrenFragmentMut, // Children passed as a function
     #[prop(into, optional)] final_button_text: String,
     #[prop(optional, default = Callback::new(|_| {}))] on_click_final_button: Callback<
-        ev::MouseEvent,
+        Vec<NodeRef<Form>>,
     >,
     #[prop(into)] step_labels: RwSignal<Vec<StepInfo>>,
     #[prop(optional, default = false)] is_linear: bool,
+    #[prop(optional, default = Callback::new(|_| {}))] send_all_form_refs: Callback<
+        Vec<NodeRef<Form>>,
+    >,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
     let (step_form_is_valid, set_step_form_is_valid) = signal(false); // Leptos signal for state
@@ -48,12 +51,23 @@ pub fn Stepper(
         if current_step.get() < step_count - 1 {
             set_current_step.update(|step| *step += 1);
         }
+
+        // if second last, send all form_refs to parent in a callback
+        if current_step.get() == step_count - 1 {
+            let form_refs = form_refs.get();
+            send_all_form_refs.run(form_refs);
+        }
     });
 
     let onclick_prev = Callback::new(move |_| {
         if current_step.get() > 0 {
             set_current_step.update(|step| *step -= 1);
         }
+    });
+
+    let handle_final_button_click = Callback::new(move |_| {
+        let form_refs = form_refs.get();
+        on_click_final_button.run(form_refs);
     });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
@@ -193,7 +207,7 @@ pub fn Stepper(
                         Some(view! {
                             <BasicButton
                                 onclick=onclick_prev
-                                button_text="Previous".to_string()
+                                button_text="Previous"
                             />
                         })
                     }
@@ -202,7 +216,7 @@ pub fn Stepper(
                     move || if current_step.get() == step_count - 1 {
                         view! {
                             <BasicButton
-                                onclick=on_click_final_button
+                                onclick=handle_final_button_click
                                 button_text=final_button_text.clone()
                             />
                         }
@@ -211,7 +225,7 @@ pub fn Stepper(
                             <BasicButton
                                 disabled=next_is_disabled
                                 onclick=onclick_next
-                                button_text="Next".to_string()
+                                button_text="Next"
                             />
                         }
                     }

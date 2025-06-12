@@ -1,27 +1,41 @@
-use crate::components::{
-    forms::{
-        datepicker::DatePicker,
-        input::{InputField, InputFieldType},
-        radio_input::RadioInputField,
-        select::{SelectInput, SelectOption},
-        textarea::Textarea,
-        toggle_switch::ToggleSwitch,
+use crate::{
+    components::{
+        forms::{
+            datepicker::DatePicker,
+            input::{InputField, InputFieldType},
+            radio_input::RadioInputField,
+            select::{SelectInput, SelectOption},
+            textarea::Textarea,
+            toggle_switch::ToggleSwitch,
+        },
+        general::{
+            accordion::Accordion,
+            badge::Badge,
+            button::{BasicButton, ButtonGroup},
+            popover::Popover,
+            stepper::{Step, StepInfo, Stepper},
+            table::data_table::DataTable,
+            tag::LabelTag,
+        },
+        modal::modal::{BasicModal, UseCase},
+        schemas::{mock_data::database::get_transactions, props::ColorTemperature},
     },
-    general::{
-        accordion::Accordion,
-        badge::Badge,
-        button::{BasicButton, ButtonGroup},
-        popover::Popover,
-        stepper::{Step, StepInfo, Stepper},
-        table::data_table::DataTable,
-        tag::LabelTag,
-    },
-    modal::modal::{BasicModal, UseCase},
-    schemas::{mock_data::database::get_transactions, props::ColorTemperature},
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 use icondata as IconId;
 use leptos::{html::Form, prelude::*};
 use leptos_meta::*;
+use serde::Deserialize;
+use web_sys::FormData;
+
+#[derive(Debug, Clone, Deserialize)]
+struct FirstForm {
+    pub user_name: String,
+    pub email: String,
+    pub timezone: String,
+    pub gender: String,
+    pub description: String,
+}
 
 #[island]
 pub fn Home() -> impl IntoView {
@@ -30,6 +44,7 @@ pub fn Home() -> impl IntoView {
     let table_data = RwSignal::new(get_transactions());
     let switch_active = RwSignal::new(true);
     let kitchen_switch_active = RwSignal::new(false);
+    let stepper_form_refs = RwSignal::new(Vec::new());
 
     let onclick_primary = Callback::new(move |_| {
         set_modal_open.set(false);
@@ -41,6 +56,11 @@ pub fn Home() -> impl IntoView {
 
     let toggle_popover_handler = Callback::new(move |value: bool| {
         set_popover_open.set(value);
+    });
+
+    let handle_received_form_refs = Callback::new(move |form_refs: Vec<NodeRef<Form>>| {
+        leptos::logging::log!("form_refs: {:?}", form_refs);
+        stepper_form_refs.update(|prev| *prev = form_refs);
     });
 
     view! {
@@ -107,7 +127,7 @@ pub fn Home() -> impl IntoView {
                         </div>
                     </Popover>
                     <DataTable data=table_data editable=true deletable=true />
-                    <Stepper step_labels=RwSignal::new(vec![StepInfo::new("First", Some(IconId::AiFileAddOutlined)), StepInfo::new("Second", None), StepInfo::new("Third", None)]) is_linear=true final_button_text="Finish">
+                    <Stepper step_labels=RwSignal::new(vec![StepInfo::new("First", Some(IconId::AiFileAddOutlined)), StepInfo::new("Second", None), StepInfo::new("Third", None)]) send_all_form_refs=handle_received_form_refs is_linear=true final_button_text="Finish">
                         <Step>
                             <p>"First step"</p>
                             <InputField field_type=InputFieldType::Text name="user_name" label="User Name" required=true />
@@ -149,6 +169,21 @@ pub fn Home() -> impl IntoView {
                         </Step>
                         <Step>
                             <p>"Third step"</p>
+                            { move || {
+                                if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
+                                    let form_data = get_form_data_from_form_ref(first_form_ref).unwrap();
+                                    let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap();
+                                    leptos::logging::log!("First form data: {:?}", data);
+                                    Some(view! {
+                                        <p><strong>"Username: "</strong>{data.user_name}</p>
+                                    })
+                                } else {
+                                    None
+                                }
+                                // let first_form_ref = stepper_form_refs.get().get(0).unwrap().to_owned();
+
+                            }
+                            }
                         </Step>
                     </Stepper>
                 </div>
