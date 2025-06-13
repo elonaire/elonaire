@@ -175,6 +175,7 @@ pub fn Home() -> impl IntoView {
                                     let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap();
                                     leptos::logging::log!("First form data: {:?}", data);
                                     Some(view! {
+                                        <h2 class="text-lg">"First Step Verification"</h2>
                                         <p><strong>"Username: "</strong>{data.user_name}</p>
                                     })
                                 } else {

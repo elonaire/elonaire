@@ -1,7 +1,6 @@
 use crate::components::general::button::BasicButton;
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use icondata::Icon as IconId;
-use leptos::ev;
 use leptos::html::Form;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
@@ -37,6 +36,7 @@ pub fn Stepper(
     #[prop(optional, default = Callback::new(|_| {}))] send_all_form_refs: Callback<
         Vec<NodeRef<Form>>,
     >,
+    #[prop(into, optional)] ext_wrapper_styles: String,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
     let (step_form_is_valid, set_step_form_is_valid) = signal(false); // Leptos signal for state
@@ -71,6 +71,7 @@ pub fn Stepper(
     });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
+        ev.prevent_default();
         // Implement logic to show form validity
         let target = ev
             .target()
@@ -162,7 +163,7 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div on:submit=handle_step_form_submit class="mb-4 p-4 border border-gray-300 rounded w-full">
+            <div on:submit=handle_step_form_submit class=format!("mb-4 p-4 border border-gray-300 rounded w-full {}", ext_wrapper_styles)>
             {
                     move || {
                         let current = current_step.get();
