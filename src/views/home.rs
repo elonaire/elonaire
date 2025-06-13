@@ -12,12 +12,12 @@ use crate::{
             accordion::Accordion,
             badge::Badge,
             button::{BasicButton, ButtonGroup},
+            modal::modal::{BasicModal, UseCase},
             popover::Popover,
             stepper::{Step, StepInfo, Stepper},
             table::data_table::DataTable,
             tag::LabelTag,
         },
-        modal::modal::{BasicModal, UseCase},
         schemas::{mock_data::database::get_transactions, props::ColorTemperature},
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
@@ -26,7 +26,6 @@ use icondata as IconId;
 use leptos::{html::Form, prelude::*};
 use leptos_meta::*;
 use serde::Deserialize;
-use web_sys::FormData;
 
 #[derive(Debug, Clone, Deserialize)]
 struct FirstForm {

@@ -4,6 +4,7 @@ use leptos::prelude::*;
 use leptos_icons::Icon; // Adjust based on your icon set (e.g., icondata::BsIcon)
 
 #[derive(Clone, Debug, Default)]
+#[allow(dead_code)]
 pub enum ButtonType {
     #[default]
     Button,

@@ -2,6 +2,8 @@ pub mod accordion;
 pub mod badge;
 pub mod breadcrumbs;
 pub mod button;
+pub mod hocs;
+pub mod modal;
 pub mod popover;
 pub mod stepper;
 pub mod table;
