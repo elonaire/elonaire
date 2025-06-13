@@ -4,4 +4,4 @@ pub mod hocs;
 pub mod modal;
 pub mod schemas;
 
-// TODO: Tabs, Stepper Form, Accordion(add functionality to existing Accordion)
+// TODO: Tabs, Accordion(add functionality to existing Accordion)
