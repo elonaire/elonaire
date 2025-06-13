@@ -1,3 +1,4 @@
+use crate::components::forms::reactive_form::ReactiveForm;
 use crate::components::general::button::BasicButton;
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use icondata::Icon as IconId;
@@ -173,28 +174,12 @@ pub fn Stepper(
                             .enumerate()
                             .map(|(i, child)| {
                                 let form_ref = form_refs.get().get(i).unwrap().to_owned();
+                                let dynamic_class = move || if current == i { "block" } else { "hidden" };
 
                                 view! {
-                                    <form
-                                        node_ref=form_ref
-                                        class=move || if current == i { "block" } else { "hidden" }
-                                        on:input=move |_| {
-                                            if let Some(form) = form_ref.get() {
-                                                if form.check_validity() {
-                                                    fire_bubbled_and_cancelable_event("submit", true, true, form);
-                                                }
-                                            }
-                                        }
-                                        on:change=move |_| {
-                                            if let Some(form) = form_ref.get() {
-                                                if form.check_validity() {
-                                                    fire_bubbled_and_cancelable_event("submit", true, true, form);
-                                                }
-                                            }
-                                        }
-                                    >
+                                    <ReactiveForm form_ref=form_ref ext_styles=dynamic_class()>
                                         { child.into_view() }
-                                    </form>
+                                    </ReactiveForm>
                                 }
                             }).collect_view()
                     }
@@ -238,10 +223,8 @@ pub fn Stepper(
 
 // Step Component
 #[component]
-pub fn Step(children: ChildrenFn) -> impl IntoView {
+pub fn Step(children: Children) -> impl IntoView {
     view! {
-
-            { children().into_view() }
-
+        { children() }
     }
 }
