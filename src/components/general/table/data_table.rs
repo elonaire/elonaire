@@ -477,8 +477,8 @@ pub fn DataTable(
                                                             Some(TableCellData::UInt64(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt128(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::Html(html)) => html.run().into_view(),
-                                                            Some(TableCellData::Float32(f)) => f.to_string().into_any().into_view(),
-                                                            Some(TableCellData::Float64(f)) => f.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Float32(f)) => format!("{:.2}", f).into_any().into_view(),
+                                                            Some(TableCellData::Float64(f)) => format!("{:.2}", f).into_any().into_view(),
                                                             Some(TableCellData::Bool(b)) => b.to_string().into_any().into_view(),
                                                             Some(TableCellData::DateTime(dt)) => {
                                                                 match DateTime::parse_from_rfc3339(dt) {
