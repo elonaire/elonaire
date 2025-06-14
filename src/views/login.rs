@@ -44,9 +44,7 @@ pub fn SignIn() -> impl IntoView {
                         .await
                         .unwrap();
 
-                    let auth_status = response.json::<AuthDetailsRest>().await.unwrap();
-
-                    leptos::logging::log!("auth_status: {:?}", auth_status);
+                    let _auth_status = response.json::<AuthDetailsRest>().await.unwrap();
                 });
             }
             None => {}
@@ -61,7 +59,6 @@ pub fn SignIn() -> impl IntoView {
 
     let onsocial_sign_in = move |client: OauthClientName| {
         Callback::new(move |_e: ev::MouseEvent| {
-            leptos::logging::log!("client: {:?}", client);
             let operation = SignInMutation::build(UserLoginsInputFields {
                 raw_user_details: UserLoginsInput {
                     user_name: None,

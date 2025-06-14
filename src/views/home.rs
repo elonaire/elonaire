@@ -59,7 +59,6 @@ pub fn Home() -> impl IntoView {
     });
 
     let handle_received_form_refs = Callback::new(move |form_refs: Vec<NodeRef<Form>>| {
-        leptos::logging::log!("form_refs: {:?}", form_refs);
         stepper_form_refs.update(|prev| *prev = form_refs);
     });
 
@@ -173,7 +172,6 @@ pub fn Home() -> impl IntoView {
                                 if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
                                     let form_data = get_form_data_from_form_ref(first_form_ref).unwrap();
                                     let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap();
-                                    leptos::logging::log!("First form data: {:?}", data);
                                     Some(view! {
                                         <h2 class="text-lg">"First Step Verification"</h2>
                                         <p><strong>"Username: "</strong>{data.user_name}</p>
