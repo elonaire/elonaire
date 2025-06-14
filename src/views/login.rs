@@ -157,7 +157,7 @@ pub fn SignIn() -> impl IntoView {
                             </div>
                             <BasicButton
                                 button_text="Sign In"
-                                style_ext="bg-primary text-white px-4 py-2 text-sm hover:bg-secondary transition duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full"
+                                style_ext="bg-primary text-white px-4 py-2 hover:bg-secondary transition duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full"
                                 // disabled={!*login_form_is_valid}
                                 icon_before=true // if you have an icon before the button text, set it to true
                             />

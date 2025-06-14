@@ -7,4 +7,5 @@ pub mod modal;
 pub mod popover;
 pub mod stepper;
 pub mod table;
+pub mod tabs;
 pub mod tag;

@@ -16,6 +16,7 @@ use crate::{
             popover::Popover,
             stepper::{Step, StepInfo, Stepper},
             table::data_table::DataTable,
+            tabs::{Tab, TabInfo, Tabs},
             tag::LabelTag,
         },
         schemas::{mock_data::database::get_transactions, props::ColorTemperature},
@@ -186,6 +187,15 @@ pub fn Home() -> impl IntoView {
                             }
                         </Step>
                     </Stepper>
+
+                    <Tabs tab_labels=RwSignal::new(vec![TabInfo::new("First", None), TabInfo::new("Second", None)])>
+                        <Tab>
+                            <p>"First tab"</p>
+                        </Tab>
+                        <Tab>
+                            <p>"Second tab"</p>
+                        </Tab>
+                    </Tabs>
                 </div>
             </div>
         </main>
