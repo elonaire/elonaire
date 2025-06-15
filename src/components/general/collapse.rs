@@ -61,10 +61,6 @@ pub fn Panel(
         }
     };
 
-    Effect::new(move |_| {
-        leptos::logging::log!("New is_open: {:?}", is_open.get());
-    });
-
     view! {
         <div node_ref=panel_ref>
             <span

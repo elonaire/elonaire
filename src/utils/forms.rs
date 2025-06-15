@@ -2,7 +2,7 @@ use leptos::{html::Form, prelude::*};
 use serde::de::DeserializeOwned;
 use web_sys::{CustomEvent, Event, EventTarget};
 
-use js_sys::{Array, wasm_bindgen::JsValue};
+use js_sys::Array;
 use serde_json::{Map, Value};
 use web_sys::FormData;
 
