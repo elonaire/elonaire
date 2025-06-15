@@ -9,9 +9,9 @@ use crate::{
             toggle_switch::ToggleSwitch,
         },
         general::{
-            accordion::Accordion,
             badge::Badge,
             button::{BasicButton, ButtonGroup},
+            collapse::{Collapse, Panel, PanelInfo},
             modal::modal::{BasicModal, UseCase},
             popover::Popover,
             stepper::{Step, StepInfo, Stepper},
@@ -45,6 +45,7 @@ pub fn Home() -> impl IntoView {
     let switch_active = RwSignal::new(true);
     let kitchen_switch_active = RwSignal::new(false);
     let stepper_form_refs = RwSignal::new(Vec::new());
+    let panel_is_open = RwSignal::new(true);
 
     let onclick_primary = Callback::new(move |_| {
         set_modal_open.set(false);
@@ -116,9 +117,15 @@ pub fn Home() -> impl IntoView {
 
                     <Badge text="2".into() ><span>"Notifications"</span></Badge>
                     <LabelTag label="Failed" color=ColorTemperature::Danger  />
-                    <Accordion title="Elonaire" icon=IconId::BsNodePlusFill >
+                    <Panel is_open=panel_is_open title="Elonaire" icon=IconId::BsNodePlusFill >
                         <p>"Hey there, I am Mr Elonaire!"</p>
-                    </Accordion>
+                    </Panel>
+                    <Collapse is_accordion=true panel_items=RwSignal::new(vec![
+                        PanelInfo::new("title 1", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
+                        PanelInfo::new("title 2", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
+                        PanelInfo::new("title 3", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
+                        PanelInfo::new("title 4", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> }))
+                    ]) />
                     <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
                         <div class="flex flex-row">
                         <span class="text-gray-600">"Tenka"</span>

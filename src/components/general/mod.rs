@@ -1,7 +1,7 @@
-pub mod accordion;
 pub mod badge;
 pub mod breadcrumbs;
 pub mod button;
+pub mod collapse;
 pub mod hocs;
 pub mod modal;
 pub mod popover;
