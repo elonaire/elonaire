@@ -23,6 +23,14 @@ pub enum InputFieldType {
     Week,
 }
 
+/// This is a component for creating input fields with various types.
+/// It provides a flexible way to create input fields with different types, such as text, email, date, number, password, tel, url, search, color, range, file, hidden, image, month, time and week by using the `InputFieldType` enum.
+/// The component also supports various attributes such as label, name, placeholder, and event handlers.
+/// Examples:
+/// ```
+/// <InputField field_type=InputFieldType::Text name="name" />
+/// ```
+
 #[component]
 pub fn InputField(
     #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<

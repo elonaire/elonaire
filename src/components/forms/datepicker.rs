@@ -8,6 +8,19 @@ use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
+/// This is a custom date picker component that allows users to select a date from a calendar.
+///
+/// It provides a user-friendly interface for selecting dates, with features such as:
+/// - Displaying the current date and time
+/// - Navigating between months and years
+/// - Selecting a specific date by clicking on the calendar grid
+/// - Validating user input and displaying error messages if necessary
+///
+/// The component is designed to be easily integrated into existing forms and can be customized to fit specific design requirements.
+/// Example usage:
+/// ```
+/// <DatePicker label="Date of Birth" name="dob" />
+/// ```
 #[component]
 pub fn DatePicker(
     #[prop(into, optional)] label: String,

@@ -3,8 +3,13 @@ use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
 
+/// This is a higher-order component that returns a view if the user is authenticated or redirected to the sign-in page if not.
+/// The component is a wrapper around the `children` prop.
+/// Example usage:
+/// ```
+/// <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
+/// ```
 #[component]
-/// This component is a wrapper around the `children` prop. It checks if the user is authenticated.
 pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let user = move || current_state.user(); // Should return ReadSignal<UserInfo>

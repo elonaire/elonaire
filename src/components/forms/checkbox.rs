@@ -2,6 +2,15 @@ use leptos::ev;
 use leptos::html::*;
 use leptos::prelude::*;
 
+/// CheckboxInputField is a component that renders a checkbox input field.
+/// It can be used in forms to collect user input.
+/// Example usage:
+/// ```
+/// <CheckboxInputField
+///     label="Remember me"
+///     name="remember"
+/// />
+/// ```
 #[component]
 pub fn CheckboxInputField(
     #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<

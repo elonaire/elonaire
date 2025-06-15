@@ -19,7 +19,22 @@ impl SelectOption {
     }
 }
 
-// Define the Leptos component
+/// This is a custom select input component that allows you to create a dropdown menu with custom options.
+/// Example usage:
+/// ```
+/// <SelectInput
+///    initial_value="est"
+///    label="Time Zone"
+///    name="timezone"
+///    required=true
+///    options=vec![
+///       SelectOption::new("", "--Select Timezone"),
+///       SelectOption::new("utc", "UTC"),
+///       SelectOption::new("est", "EST"),
+///    ]
+/// />
+/// ```
+/// You may use the SelectOption struct to create custom options for the SelectInput component.
 #[component]
 pub fn SelectInput(
     #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<

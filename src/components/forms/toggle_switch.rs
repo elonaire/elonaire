@@ -3,7 +3,17 @@ use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use leptos::ev;
 use leptos::prelude::*;
 
-// Define the Leptos component
+/// ToggleSwitch is a component that renders a toggle switch input field.
+/// It can be used in forms to collect user input.
+/// Example usage:
+/// ```
+/// <ToggleSwitch
+///    active=RwSignal::new(true)
+///    label_active="Enabled"
+///    label_inactive="Disabled"
+///    name="status".into()
+/// />
+/// ```
 #[component]
 pub fn ToggleSwitch(
     name: String,

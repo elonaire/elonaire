@@ -73,7 +73,7 @@ pub fn Home() -> impl IntoView {
                 <DatePicker name="dob_lone" />
                 <RadioInputField label="Male" id_attr="male_lone"><span>"Comeon"</span></RadioInputField>
                 <SelectInput
-                            initial_value="est"
+                            initial_value=""
                             label="Time Zone"
                             name="timezone"
                             required=true

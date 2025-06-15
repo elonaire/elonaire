@@ -2,7 +2,18 @@ use leptos::ev;
 use leptos::html::*;
 use leptos::prelude::*;
 
-// Define the Leptos component
+/// This component represents a textarea input field.
+/// Example usage:
+/// ```
+/// <Textarea
+///    initial_value="Initial text"
+///    label="Description"
+///    name="description"
+///    required=true
+///    placeholder="Enter your description..."
+///    ext_input_styles="bg-gray-100"
+/// />
+/// ```
 #[component]
 pub fn Textarea(
     #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<

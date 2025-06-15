@@ -2,7 +2,20 @@ use leptos::ev;
 use leptos::html::Input;
 use leptos::prelude::*;
 
-// Define the Leptos component
+/// This component represents a radio input field.
+/// Example usage:
+/// ```
+/// <RadioInputField label="Male" id_attr="male_lone" />
+/// ```
+/// It also allows the use of children properties to customize the appearance and behavior of the radio input field. You may use the children property to add custom content to the radio input field. e.g images
+/// Example usage:
+/// ```
+/// <RadioInputField id_attr="male">
+///     <div class="flex items-center gap-2">
+///         <span class="text-gray-700 text-sm">Male</span>
+///     </div>
+/// </RadioInputField>
+/// ```
 #[component]
 pub fn RadioInputField(
     #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<

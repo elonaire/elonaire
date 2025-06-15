@@ -15,6 +15,17 @@ pub enum UseCase {
     General,
 }
 
+/// This is a basic modal component that can be used to display information to the user.
+/// It can be used for various use cases such as error, success, confirmation, info, and general use cases.
+/// It can be customized with different icons and colors based on the use case.
+/// Example usage:
+/// ```
+/// <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false >
+///     <div>
+///         <p>"Hey, please confirm this."</p>
+///     </div>
+/// </BasicModal>
+/// ```
 #[component]
 pub fn BasicModal(
     title: String,

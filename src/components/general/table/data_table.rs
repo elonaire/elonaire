@@ -316,6 +316,45 @@ impl TableProps {
     }
 }
 
+/// This component is a data table that can be used to display data in a table format.
+/// It provides sorting, pagination, and row actions such as editing and deleting.
+/// Example usage:
+/// ```
+/// // Data preparation:
+/// let columns = vec![
+///    Column::new("Transaction ID", false),
+///    Column::new("Date", true),
+///  ];
+///
+/// // Assume that transactions variable is a vector of Transaction structs probably deserialized from a backend API JSON response
+/// let transactions = transactions
+///    .iter()
+///    .map(|transaction| {
+///        let mut hash_map_data = HashMap::new();
+///
+///        // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+///        // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+///        hash_map_data.insert(
+///            "id".to_string(),
+///            TableCellData::String(transaction.id.clone()),
+///        );
+///
+///        hash_map_data.insert(
+///            "Transaction ID".to_string(),
+///            TableCellData::String(transaction.id.clone()),
+///        );
+///        hash_map_data.insert(
+///            "Date".to_string(),
+///            TableCellData::DateTime(transaction.date.clone()),
+///        );
+///        hash_map_data
+///    })
+///    .collect();
+///
+/// let table_data = (columns, transactions);
+///
+/// <DataTable data=table_data editable=true deletable=true />
+/// ```
 #[component]
 pub fn DataTable(
     #[prop(into)] data: RwSignal<(Vec<Column>, Vec<HashMap<String, TableCellData>>)>,
