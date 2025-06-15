@@ -73,6 +73,7 @@ pub fn Stepper(
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
+        ev.stop_propagation();
         // Implement logic to show form validity
         let target = ev
             .target()

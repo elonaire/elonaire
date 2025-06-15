@@ -132,7 +132,10 @@ pub fn Collapse(
             >
                 {
                     view! {
-                        <Panel on:togglepanel=move |_ev: CustomEvent| handle_panel_toggle(index) title=panel_item.title.clone() is_open=panel_item.is_open is_accordion=is_accordion>
+                        <Panel on:togglepanel=move |ev: CustomEvent| {
+                            ev.stop_propagation();
+                            handle_panel_toggle(index)
+                        } title=panel_item.title.clone() is_open=panel_item.is_open is_accordion=is_accordion>
                             {panel_item.children.run()}
                         </Panel>
                     }
