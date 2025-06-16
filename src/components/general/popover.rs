@@ -23,13 +23,13 @@ pub fn Popover(
     #[prop(into)] display_item: ViewFn,
     #[prop(default = Position::Bottom, optional)] position: Position,
     #[prop(into, optional)] style_ext: String,
-    #[prop(default = Callback::new(|_| {}), optional)] on_click_toggle: Callback<bool>,
-    #[prop(into)] showing: Signal<bool>,
+    // #[prop(default = Callback::new(|_| {}), optional)] on_click_toggle: Callback<bool>,
+    #[prop(into)] showing: RwSignal<bool>,
 ) -> impl IntoView {
     let (children, _set_children) = signal(children);
 
     let onclick_toggle_handler = move |_| {
-        on_click_toggle.run(!showing.get());
+        showing.update(|val| *val = !*val);
     };
 
     // Determine the classes for the position and arrow

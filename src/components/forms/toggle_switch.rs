@@ -16,7 +16,7 @@ use leptos::prelude::*;
 /// ```
 #[component]
 pub fn ToggleSwitch(
-    name: String,
+    #[prop(into)] name: String,
     #[prop(into)] active: RwSignal<bool>,
     #[prop(into, default = "On".into())] label_active: String,
     #[prop(into, default = "Off".into())] label_inactive: String,

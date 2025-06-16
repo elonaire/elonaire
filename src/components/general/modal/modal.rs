@@ -28,12 +28,12 @@ pub enum UseCase {
 /// ```
 #[component]
 pub fn BasicModal(
-    title: String,
+    #[prop(into)] title: String,
     #[prop(optional)] children: Option<ChildrenFn>,
     #[prop(default = UseCase::General, optional)] use_case: UseCase,
     #[prop(default = Callback::new(|_| {}), optional)] on_click_primary: Callback<()>,
-    #[prop(default = Callback::new(|_| {}), optional)] on_cancel: Callback<bool>,
-    #[prop(default = Signal::derive(move || false), into, optional)] is_open: Signal<bool>,
+    #[prop(default = Callback::new(|_| {}), optional)] on_cancel: Callback<()>,
+    #[prop(default = RwSignal::new(false), into, optional)] is_open: RwSignal<bool>,
     #[prop(default = "OK".to_string())] primary_button_text: String,
     #[prop(default = true, optional)] disable_auto_close: bool,
 ) -> impl IntoView {
@@ -41,16 +41,18 @@ pub fn BasicModal(
     let (primary_button_text, _set_primary_button_text) = signal(primary_button_text);
     let (children, _set_children) = signal(children);
 
-    let oncancel_handler = move |value: bool| {
+    let oncancel_handler = move |_| {
         Callback::new(move |e: ev::MouseEvent| {
             e.stop_propagation();
-            on_cancel.run(value);
+            is_open.update(|val| *val = false);
+            on_cancel.run(());
         })
     };
 
     let onclick_primary_handler = move || {
         Callback::new(move |e: ev::MouseEvent| {
             e.stop_propagation();
+            is_open.update(|val| *val = false);
             on_click_primary.run(());
         })
     };
@@ -58,7 +60,8 @@ pub fn BasicModal(
     let handle_backdrop_click = move |e: ev::MouseEvent| {
         e.stop_propagation();
         if !disable_auto_close {
-            on_cancel.run(false);
+            is_open.update(|val| *val = false);
+            on_cancel.run(());
         };
     };
 

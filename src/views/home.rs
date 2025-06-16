@@ -39,25 +39,13 @@ struct FirstForm {
 
 #[island]
 pub fn Home() -> impl IntoView {
-    let (modal_open, set_modal_open) = signal(true);
-    let (popover_open, set_popover_open) = signal(false);
+    let modal_open = RwSignal::new(true);
+    let popover_open = RwSignal::new(false);
     let table_data = RwSignal::new(get_transactions());
     let switch_active = RwSignal::new(true);
     let kitchen_switch_active = RwSignal::new(false);
     let stepper_form_refs = RwSignal::new(Vec::new());
     let panel_is_open = RwSignal::new(true);
-
-    let onclick_primary = Callback::new(move |_| {
-        set_modal_open.set(false);
-    });
-
-    let on_cancel = Callback::new(move |value: bool| {
-        set_modal_open.set(value);
-    });
-
-    let toggle_popover_handler = Callback::new(move |value: bool| {
-        set_popover_open.set(value);
-    });
 
     let handle_received_form_refs = Callback::new(move |form_refs: Vec<NodeRef<Form>>| {
         stepper_form_refs.update(|prev| *prev = form_refs);
@@ -67,7 +55,7 @@ pub fn Home() -> impl IntoView {
         <Title text="Techie Tenka"/>
         <main>
             <div class="min-h-screen m-2">
-        <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
+        <BasicModal title="Can I confirm this?" is_open=modal_open use_case=UseCase::Confirmation disable_auto_close=false ><div><p>"Hey I am just a Nerd tryna make it. Have pity on me Rust."</p></div></BasicModal>
                 <div class="flex flex-col m-auto">
                 <InputField field_type=InputFieldType::Text name="name" />
                 <DatePicker name="dob_lone" />
@@ -95,7 +83,7 @@ pub fn Home() -> impl IntoView {
                                                     active=switch_active
                                                     label_active="Enabled"
                                                     label_inactive="Disabled"
-                                                    name="status".into()
+                                                    name="status"
                                                 />
 
                                                 <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
@@ -126,7 +114,7 @@ pub fn Home() -> impl IntoView {
                         PanelInfo::new("title 3", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
                         PanelInfo::new("title 4", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> }))
                     ]) />
-                    <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
+                    <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open>
                         <div class="flex flex-row">
                         <span class="text-gray-600">"Tenka"</span>
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRij6dtiHizH96qpCOe8WeXXP3yLyQJkPdGVg&s" />
@@ -167,7 +155,7 @@ pub fn Home() -> impl IntoView {
                             <ToggleSwitch
                                             label="Toggle Kitchen Lights"
                                             active=kitchen_switch_active
-                                            name="kitchen_lights".into()
+                                            name="kitchen_lights"
                                             id_attr="kitchen_lights"
                                             required=true
                                         />
@@ -186,8 +174,6 @@ pub fn Home() -> impl IntoView {
                                 } else {
                                     None
                                 }
-                                // let first_form_ref = stepper_form_refs.get().get(0).unwrap().to_owned();
-
                             }
                             }
                         </Step>
