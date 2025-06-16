@@ -8,6 +8,15 @@ pub enum Position {
     Bottom,
 }
 
+/// The Popover component is a reusable UI element that displays a popover with customizable content and positioning.
+/// ```
+/// <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open on_click_toggle=toggle_popover_handler >
+///    <div class="flex flex-row">
+///    <span class="text-gray-600">"Tenka"</span>
+///        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRij6dtiHizH96qpCOe8WeXXP3yLyQJkPdGVg&s" />
+///    </div>
+/// </Popover>
+/// ```
 #[component]
 pub fn Popover(
     #[prop(optional)] children: Option<ChildrenFn>,

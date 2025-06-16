@@ -3,9 +3,15 @@ use leptos::prelude::*;
 
 use crate::components::schemas::props::ColorTemperature;
 
+/// This is a badge component that can be used to display a small piece of information.
+/// It can be customized with different colors and positions.
+/// Example usage:
+/// ```
+/// <Badge text="2" ><span>"Notifications"</span></Badge>
+/// ```
 #[component]
 pub fn Badge(
-    text: String,
+    #[prop(into)] text: String,
     #[prop(default = ColorTemperature::Primary)] color: ColorTemperature,
     #[prop(into, optional)] parent_class: String,
     children: Children,

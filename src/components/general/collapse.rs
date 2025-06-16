@@ -41,6 +41,23 @@ impl std::fmt::Debug for PanelInfo {
     }
 }
 
+/// This is a component for displaying a panel with a title and content.
+/// Example usage:
+/// ```
+/// // This example uses a single panel
+/// <Panel is_open=panel_is_open title="Elonaire" icon=IconId::BsNodePlusFill >
+///     <p>"Hey there, I am Mr Elonaire!"</p>
+/// </Panel>
+///
+/// // You can also group multiple panels by using the Collapse component
+/// // is_accordion prop enables only one panel to be open at a time. It's optional and the default is false.
+/// <Collapse is_accordion=true panel_items=RwSignal::new(vec![
+///    PanelInfo::new("title 1", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
+///    PanelInfo::new("title 2", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
+///    PanelInfo::new("title 3", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
+///    PanelInfo::new("title 4", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> }))
+/// ]) />
+/// ```
 #[component]
 pub fn Panel(
     #[prop(into)] title: String,

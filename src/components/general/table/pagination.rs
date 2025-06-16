@@ -7,6 +7,7 @@ use crate::components::general::{
     table::data_table::TableCellData,
 };
 
+/// This is a pagination component which emits an `on_page_change` event using a callback
 #[component]
 pub fn Pagination(
     /// pagination_state: (current_page, total_pages, current_data)

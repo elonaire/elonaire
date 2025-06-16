@@ -115,7 +115,7 @@ pub fn Home() -> impl IntoView {
                                                                 />
                                                             </ButtonGroup>
 
-                    <Badge text="2".into() ><span>"Notifications"</span></Badge>
+                    <Badge text="2" ><span>"Notifications"</span></Badge>
                     <LabelTag label="Failed" color=ColorTemperature::Danger  />
                     <Panel is_open=panel_is_open title="Elonaire" icon=IconId::BsNodePlusFill >
                         <p>"Hey there, I am Mr Elonaire!"</p>

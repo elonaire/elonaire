@@ -327,6 +327,7 @@ impl TableProps {
 ///  ];
 ///
 /// // Assume that transactions variable is a vector of Transaction structs probably deserialized from a backend API JSON response
+/// // Use the TableCellData enum to format table cell values to the variants you want.
 /// let transactions = transactions
 ///    .iter()
 ///    .map(|transaction| {

@@ -3,6 +3,11 @@ use leptos::prelude::*;
 
 use crate::components::schemas::props::ColorTemperature;
 
+/// This is a component for displaying a label tag with a color temperature.
+/// Example usage:
+/// ```
+/// <LabelTag label="Success" color=ColorTemperature::Success />
+/// ```
 #[component]
 pub fn LabelTag(
     #[prop(into, optional)] label: String,

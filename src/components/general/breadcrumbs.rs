@@ -4,6 +4,12 @@ use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::{components::A, hooks::use_location};
 
+/// This component renders a breadcrumb navigation based on the current route.
+/// Example usage:
+/// ```
+/// // The custom_route_names prop is optional and defaults to ["Home"].
+/// <Breadcrumbs custom_route_names=["Home", "Sign In"] />
+/// ```
 #[component]
 pub fn Breadcrumbs(
     /// These routes are named in order of appearance and if the `custom_route_names` prop is not specified, the first route is by default named "Home". If specified, you need to provide a name for each route, including the first route.

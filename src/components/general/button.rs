@@ -12,7 +12,26 @@ pub enum ButtonType {
     Reset,
 }
 
-// Define the BasicButton component
+/// This is a reusable button component which also includes a button group component for creating grouped buttons
+/// Example usage:
+/// ```
+/// <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
+///    <BasicButton
+///        button_text="First"
+///        con=Some(IconId::AiCheckCircleOutlined)
+///        icon_before=true
+///     />
+///     <BasicButton
+///        button_text="Second"
+///        icon=Some(IconId::BsXCircle)
+///        icon_before=false
+///      />
+///      <BasicButton
+///        button_text="Third"
+///        disabled=true
+///      />
+///   </ButtonGroup>
+/// ```
 #[component]
 pub fn BasicButton(
     #[prop(into, optional)] button_text: String,

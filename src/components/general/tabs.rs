@@ -17,6 +17,18 @@ impl TabInfo {
     }
 }
 
+/// This component renders a set of tabs that can be used to switch between different views.
+/// Example usage:
+/// ```
+/// <Tabs tab_labels=RwSignal::new(vec![TabInfo::new("First", None), TabInfo::new("Second", None)])>
+///     <Tab>
+///         <p>"First tab"</p>
+///     </Tab>
+///     <Tab>
+///         <p>"Second tab"</p>
+///     </Tab>
+/// </Tabs>
+/// ```
 #[component]
 pub fn Tabs(
     mut children: ChildrenFragmentMut,

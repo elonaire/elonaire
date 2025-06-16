@@ -24,7 +24,70 @@ impl StepInfo {
     }
 }
 
-// Stepper Component
+/// This component is used to create a stepper UI.
+/// It allows users to navigate through a series of steps, each containing a form.
+/// The stepper provides navigation buttons to move between steps and a final button to submit the entire form.
+/// Form are validated as long as fields use the required attribute.
+/// Example usage:
+/// ```
+/// <Stepper step_labels=RwSignal::new(vec![StepInfo::new("First", Some(IconId::AiFileAddOutlined)), StepInfo::new("Second", None), StepInfo::new("Third", None)]) send_all_form_refs=handle_received_form_refs is_linear=true final_button_text="Finish">
+///    <Step>
+///        <p>"First step"</p>
+///        <InputField field_type=InputFieldType::Text name="user_name" label="Username" required=true />
+///        <InputField field_type=InputFieldType::Email name="email" label="Email" autocomplete="on" required=true />
+///
+///        <SelectInput
+///           initial_value=""
+///           label="Time Zone"
+///           name="timezone"
+///           required=true
+///           options=vec![
+///               SelectOption::new("", "--Select Timezone"),
+///               SelectOption::new("utc", "UTC"),
+///               SelectOption::new("est", "EST"),
+///           ]
+///        />
+///        <RadioInputField required=true label="Male" name="gender" initial_value="male" id_attr="male" />
+///        <RadioInputField required=true label="Female" name="gender" initial_value="female" id_attr="female" />
+///        <Textarea
+///            initial_value="Initial text"
+///            label="Description"
+///            name="description"
+///            required=true
+///            placeholder="Enter your description..."
+///            ext_input_styles="bg-gray-100"
+///        />
+///    </Step>
+///    <Step>
+///        <p>"Second step"</p>
+///        <InputField field_type=InputFieldType::Text name="first_name" label="First Name" required=true />
+///        <ToggleSwitch
+///            label="Accept Terms of Service"
+///            active=accepted
+///            name="tos"
+///            id_attr="tos-step2"
+///            required=true
+///        />
+///        <DatePicker id_attr="step2_dob" name="dob" label="Date of Birth" required=true />
+///    </Step>
+///    <Step>
+///        <p>"Third step"</p>
+///        { move || {
+///            if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
+///                let form_data = get_form_data_from_form_ref(first_form_ref).unwrap();
+///                let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap();
+///                Some(view! {
+///                    <h2 class="text-lg">"First Step Verification"</h2>
+///                    <p><strong>"Username: "</strong>{data.user_name}</p>
+///                })
+///            } else {
+///                None
+///            }
+///        }
+///        }
+///    </Step>
+/// </Stepper>
+/// ```
 #[component]
 pub fn Stepper(
     mut children: ChildrenFragmentMut, // Children passed as a function
