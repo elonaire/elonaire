@@ -30,6 +30,12 @@ impl StepInfo {
 /// Form are validated as long as fields use the required attribute.
 /// Example usage:
 /// ```
+/// // Use this to track form references changes in order to handle form submission
+/// let stepper_form_refs = RwSignal::new(Vec::new());
+///
+/// let handle_received_form_refs = Callback::new(move |form_refs: Vec<NodeRef<Form>>| {
+///     stepper_form_refs.update(|prev| *prev = form_refs);
+/// });
 /// <Stepper step_labels=RwSignal::new(vec![StepInfo::new("First", Some(IconId::AiFileAddOutlined)), StepInfo::new("Second", None), StepInfo::new("Third", None)]) send_all_form_refs=handle_received_form_refs is_linear=true final_button_text="Finish">
 ///    <Step>
 ///        <p>"First step"</p>
