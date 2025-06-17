@@ -352,7 +352,7 @@ impl TableProps {
 ///    })
 ///    .collect();
 ///
-/// let table_data = (columns, transactions);
+/// let table_data = RwSignal::new((columns, transactions));
 ///
 /// <DataTable data=table_data editable=true deletable=true />
 /// ```
@@ -438,7 +438,7 @@ pub fn DataTable(
     view! {
         <div class="w-full flex flex-col justify-between">
             <div class="overflow-x-auto">
-                <table class="border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
+                <table class="table-fixed border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
                     <thead>
                         <tr class="p-2">
                             <For
@@ -466,7 +466,7 @@ pub fn DataTable(
                             </For>
                             {move || if props.get().editable || props.get().deletable {
                                 Some(view! {
-                                    <th class="border-b p-2 border-gray-200 text-wrap font-bold text-gray-800 text-left min-w-[150px] max-w-[150px]">
+                                    <th class="border-b p-2 border-gray-200 text-wrap font-bold text-gray-800 text-left">
                                         "Actions"
                                     </th>
                                 })
@@ -508,7 +508,7 @@ pub fn DataTable(
                                                     }
                                                     let(column)
                                                 >
-                                                    <td class="p-2 min-w-[150px] max-w-[150px] text-wrap">
+                                                    <td class="p-2 text-wrap">
                                                         {match row_data_cols.get(&column.name).clone() {
                                                             Some(TableCellData::String(s)) => s.clone().into_any().into_view(),
                                                             Some(TableCellData::Int32(i)) => i.to_string().into_any().into_view(),
@@ -540,7 +540,7 @@ pub fn DataTable(
                                                     let row_data_edit = row_data.clone();
 
                                                     Some(view! {
-                                                        <td class="flex flex-row items-center gap-2 h-full py-2 min-w-[150px] max-w-[150px]">
+                                                        <td class="flex flex-row items-center gap-2 h-full py-2">
                                                             {if props.get().editable {
                                                                 Some(view! {
                                                                     <BasicButton
