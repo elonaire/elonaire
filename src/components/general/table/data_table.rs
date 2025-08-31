@@ -51,6 +51,7 @@ impl Column {
         }
     }
 
+    /// This method toggles the sort order of the column.
     pub fn toggle_sort(&mut self) -> &mut Self {
         self.sort_order = match self.sort_order {
             SortOrder::Default => SortOrder::Ascending,
@@ -60,6 +61,7 @@ impl Column {
         self
     }
 
+    /// This method toggles the sort icon of the column.
     pub fn toggle_sort_icon(&mut self) -> &mut Self {
         self.sort_icon = match self.sort_order {
             SortOrder::Default => {
@@ -86,17 +88,29 @@ impl PartialEq for Column {
 #[derive(Clone)]
 #[allow(dead_code)]
 pub enum TableCellData {
+    /// This handles String data type
     String(String),
+    /// This handles i32 data type
     Int32(i32),
+    /// This handles i64 data type
     Int64(i64),
+    /// This handles RSX which is a ViewFn that returns HTML content
     Html(ViewFn), // Simplified for Leptos; assumes HTML as ViewFn
+    /// This handles f32 data type
     Float32(f32),
+    /// This handles f64 data type
     Float64(f64),
+    /// This handles u32 data type
     UInt32(u32),
+    /// This handles u64 data type
     UInt64(u64),
+    /// This handles u128 data type
     UInt128(u128),
+    /// This handles bool data type
     Bool(bool),
+    /// This handles DateTime data and takes an RFC3339 formatted string
     DateTime(String),
+    /// This handles time duration and takes an RFC3339 formatted string which is the start date. End date is assumed to be the current date.
     Duration(String),
 }
 
@@ -227,6 +241,7 @@ impl PartialEq for TableProps {
 }
 
 impl TableProps {
+    /// This method paginates the table data based on the current page and page size.
     pub fn paginate(
         &mut self,
         current_page: usize,
@@ -242,6 +257,7 @@ impl TableProps {
         (current_page, total_pages, current_data)
     }
 
+    /// This method sorts the table data based on the specified column. This is triggered when the user clicks on a column header.
     pub fn sort(&mut self, column: &Column) -> Vec<HashMap<String, TableCellData>> {
         match column.sort_order {
             SortOrder::Ascending => {
@@ -326,7 +342,7 @@ impl TableProps {
 ///    Column::new("Date", true),
 ///  ];
 ///
-/// // Assume that transactions variable is a vector of Transaction structs probably deserialized from a backend API JSON response
+/// // Assuming that transactions variable is a vector of Transaction structs probably deserialized from a backend API JSON response
 /// // Use the TableCellData enum to format table cell values to the variants you want.
 /// let transactions = transactions
 ///    .iter()
