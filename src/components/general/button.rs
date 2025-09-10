@@ -18,7 +18,7 @@ pub enum ButtonType {
 /// <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
 ///    <BasicButton
 ///        button_text="First"
-///        con=Some(IconId::AiCheckCircleOutlined)
+///        icon=Some(IconId::AiCheckCircleOutlined)
 ///        icon_before=true
 ///     />
 ///     <BasicButton

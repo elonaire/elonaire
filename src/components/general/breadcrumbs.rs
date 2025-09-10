@@ -71,7 +71,7 @@ pub fn Breadcrumbs(
     });
 
     view! {
-        <nav class="p-3 rounded">
+        <nav class="rounded">
             <ul class="flex items-center space-x-2">
                 {move || {
                     breadcrumbs

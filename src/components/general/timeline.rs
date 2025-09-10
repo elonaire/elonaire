@@ -5,10 +5,10 @@ use leptos_icons::Icon;
 #[derive(Clone, Debug)]
 #[allow(dead_code)]
 pub enum TimelineStatus {
-    Pending,
-    InProgress,
-    Completed,
-    Failed,
+    Warning,
+    Info,
+    Danger,
+    Success,
 }
 
 #[derive(Clone)]
@@ -52,7 +52,7 @@ impl TimelineItem {
 ///        Some("Initialize project"),
 ///        None,
 ///        Some("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiZ17_7VUm-SR8l9Z7ksl7n7SfjUTTNK5NWA&s"),
-///        TimelineStatus::Completed,
+///        TimelineStatus::Success,
 ///        ViewFn::from(|| view! { <p>"Project created with Leptos!"</p> }),
 ///    ),
 ///    TimelineItem::new(
@@ -62,7 +62,7 @@ impl TimelineItem {
 ///        Some(
 ///            "https://img.icons8.com/?size=100&id=4PiNHtUJVbLs&format=png&color=000000",
 ///        ),
-///        TimelineStatus::InProgress,
+///        TimelineStatus::Info,
 ///        ViewFn::from(|| view! { <p>"Using Tailwind and component slots."</p> }),
 ///    ),
 ///    TimelineItem::new(
@@ -70,7 +70,7 @@ impl TimelineItem {
 ///        Some("Deploy to production"),
 ///        None,
 ///        Some("https://img.icons8.com/color/512/amazon-web-services.png"),
-///        TimelineStatus::Pending,
+///        TimelineStatus::Info,
 ///        ViewFn::from(|| view! { <p>"Vercel, Deno or your own server."</p> }),
 ///    ),
 ///
@@ -89,10 +89,10 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
             >
                 {
                     let bg_status_classes = match item.status {
-                        TimelineStatus::Pending => "bg-gray-400 text-slate-900",
-                        TimelineStatus::InProgress => "bg-info text-white",
-                        TimelineStatus::Completed => "bg-success text-white",
-                        TimelineStatus::Failed => "bg-danger text-white",
+                        TimelineStatus::Warning => "bg-warning/20 text-warning",
+                        TimelineStatus::Info => "bg-info/20 text-info",
+                        TimelineStatus::Success => "bg-success/20 text-success",
+                        TimelineStatus::Danger => "bg-danger/20 text-danger",
                     };
 
                     view! {
@@ -102,7 +102,7 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                     if let Some(icon_head) = &item.icon_head {
                                         Some(view!{
                                             <span class="relative flex size-8 cursor-pointer -ml-[16px]">
-                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 {} {}", match &item.status { TimelineStatus::InProgress => "animate-ping", _ => "" }, bg_status_classes)></span>
+                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 z-10 {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
                                                 <span class=format!("relative inline-flex items-center justify-center size-8 rounded-full {}", bg_status_classes)>
                                                     <Icon width="50%" height="50%" icon=icon_head.to_owned() />
                                                 </span>
@@ -116,7 +116,7 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                     if let Some(image_head) = &item.image_head {
                                         Some(view!{
                                             <span class="relative flex size-8 cursor-pointer -ml-[16px]">
-                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 {} {}", match &item.status { TimelineStatus::InProgress => "animate-ping", _ => "" }, bg_status_classes)></span>
+                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 z-10 {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
                                                 <span class=format!("relative inline-flex items-center justify-center size-8 rounded-full {}", bg_status_classes)>
                                                     <img alt="timeline-head" src=image_head.to_owned() class="w-full h-full rounded-full object-contain saturate-200" />
                                                 </span>
@@ -130,7 +130,7 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                     if item.image_head.is_none() && item.icon_head.is_none() {
                                         Some(view!{
                                             <span class="relative flex size-3 cursor-pointer -ml-[6px]">
-                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 {} {}", match &item.status { TimelineStatus::InProgress => "animate-ping", _ => "" }, bg_status_classes)></span>
+                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 z-10 {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
                                                 <span class=format!("relative inline-flex size-3 rounded-full {}", bg_status_classes)></span>
                                             </span>
                                         })
@@ -141,7 +141,7 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                             </span>
                             <div class="ml-4 mb-4">
                                 <div class="flex items-center gap-2">
-                                    <h3 class="text-lg">{item.title}</h3>
+                                    <h4>{item.title}</h4>
                                 </div>
                                 {
                                     item.description.as_ref().map(|desc| view! {

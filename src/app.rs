@@ -2,11 +2,17 @@ use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{
     StaticSegment,
-    components::{Route, Router, Routes},
+    components::{ParentRoute, Route, Router, Routes},
+    path,
 };
 use reactive_stores::Store;
 
-use crate::views::home::Home;
+use crate::{
+    components::general::hocs::protected_route::ProtectedRoute,
+    views::{
+        dashboard::Dashboard, dashboard_home::DashboardHome, home::Home, portfolio::Portfolio,
+    },
+};
 use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
 
 #[component]
@@ -36,8 +42,13 @@ pub fn App() -> impl IntoView {
                     >
             <Router>
                 <Routes fallback=|| "Page not found.">
-                    // <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
                     <Route path=StaticSegment("") view=Home />
+                    // <Route path=StaticSegment("/dashboard") view=|| view! { <ProtectedRoute><Dashboard /></ProtectedRoute> } />
+                    // <Route path=StaticSegment("/dashboard") view=Dashboard />
+                    <ParentRoute path=path!("/dashboard") view=Dashboard>
+                        <Route path=path!("portfolio") view=Portfolio />
+                        <Route path=path!("") view=DashboardHome />
+                    </ParentRoute>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>
                 </Routes>
             </Router>
