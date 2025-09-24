@@ -4,4 +4,8 @@ fn main() {
         .unwrap()
         .as_default()
         .unwrap();
+
+    cynic_codegen::register_schema("shared")
+        .from_sdl_file("schemas/shared.graphql")
+        .unwrap();
 }

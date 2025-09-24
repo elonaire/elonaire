@@ -19,10 +19,10 @@ use crate::utils::forms::fire_bubbled_and_cancelable_event;
 ///
 ///    if let Some(form) = target {
 ///        set_form_is_valid.set(form.check_validity());
-///        if let Some(form_data) = FormData::new_with_form(&form) {
+///        if let Ok(form_data) = FormData::new_with_form(&form) {
 ///            // Implement logic to handle form data
 ///            // e.g. you can deserialize the form data into a struct
-///            let deserialized_form_data = deserialize_form_data_to_struct::<MyFormStruct>();
+///            let deserialized_form_data = deserialize_form_data_to_struct::<MyFormStruct>(&form_data);
 ///            // Do something with the data e.g. serialize to JSON and send to the server
 ///        };
 ///    }

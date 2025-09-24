@@ -10,7 +10,10 @@ use reactive_stores::Store;
 use crate::{
     components::general::hocs::protected_route::ProtectedRoute,
     views::{
-        dashboard::Dashboard, dashboard_home::DashboardHome, home::Home, portfolio::Portfolio,
+        dashboard::Dashboard,
+        dashboard_home::DashboardHome,
+        home::Home,
+        portfolio::{CreatePortfolio, Portfolio, PortfolioList},
     },
 };
 use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
@@ -44,9 +47,11 @@ pub fn App() -> impl IntoView {
                 <Routes fallback=|| "Page not found.">
                     <Route path=StaticSegment("") view=Home />
                     // <Route path=StaticSegment("/dashboard") view=|| view! { <ProtectedRoute><Dashboard /></ProtectedRoute> } />
-                    // <Route path=StaticSegment("/dashboard") view=Dashboard />
-                    <ParentRoute path=path!("/dashboard") view=Dashboard>
-                        <Route path=path!("portfolio") view=Portfolio />
+                    <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><Dashboard /></ProtectedRoute> }>
+                        <ParentRoute path=path!("/portfolio") view=Portfolio>
+                            <Route path=path!("") view=PortfolioList />
+                            <Route path=path!("create") view=CreatePortfolio />
+                        </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>

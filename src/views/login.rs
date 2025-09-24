@@ -4,7 +4,10 @@ use leptos::html::Form;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos_meta::*;
+use leptos_router::components::A;
+use leptos_router::hooks::use_navigate;
 use leptos_router::hooks::use_query;
+use reactive_stores::Store;
 use web_sys::window;
 
 use crate::components::forms::input::InputField;
@@ -12,8 +15,11 @@ use crate::components::forms::input::InputFieldType;
 use crate::components::forms::reactive_form::ReactiveForm;
 // use crate::components::general::breadcrumbs::Breadcrumbs;
 use crate::components::general::button::BasicButton;
+use crate::schemas::general::acl::AppStateContext;
+use crate::schemas::general::acl::AppStateContextStoreFields;
 use crate::schemas::general::acl::AuthCode;
 use crate::schemas::general::acl::AuthDetailsRest;
+use crate::schemas::general::acl::{AuthInfoStoreFields, UserInfoStoreFields};
 use crate::schemas::graphql::acl::{
     OauthClientName, SignInMutation, UserLoginsInput, UserLoginsInputFields,
 };
@@ -22,9 +28,12 @@ use cynic::{MutationBuilder, http::ReqwestExt};
 #[island]
 pub fn SignIn() -> impl IntoView {
     let login_form_ref = NodeRef::<Form>::new();
+    let current_state = expect_context::<Store<AppStateContext>>();
 
     let query = use_query::<AuthCode>();
     Effect::new(move || {
+        let navigate = use_navigate();
+
         match query
             .read()
             .as_ref()
@@ -44,7 +53,12 @@ pub fn SignIn() -> impl IntoView {
                         .await
                         .unwrap();
 
-                    let _auth_status = response.json::<AuthDetailsRest>().await.unwrap();
+                    if let Ok(auth_status) = response.json::<AuthDetailsRest>().await {
+                        *current_state.user().auth_info().token().write() =
+                            auth_status.token.unwrap();
+
+                        navigate("/dashboard", Default::default());
+                    };
                 });
             }
             None => {}
@@ -53,7 +67,7 @@ pub fn SignIn() -> impl IntoView {
 
     let navigate = |url: &str| {
         if let Some(window) = window() {
-            let _ = window.open_with_url_and_target(url, "_blank");
+            let _ = window.open_with_url_and_target(url, "_self");
         }
     };
 
@@ -159,9 +173,7 @@ pub fn SignIn() -> impl IntoView {
                                 icon_before=true // if you have an icon before the button text, set it to true
                             />
                             <div class="flex items-center justify-center mt-6 text-sm text-blue-500 hover:text-blue-400">
-                            <a href="/signup">
-                                    "Don't have an account? Sign up"
-                                </a>
+                                <A href="/signup">"Don't have an account? Sign up"</A>
                             </div>
                         </ReactiveForm>
         </div>

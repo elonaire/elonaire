@@ -2605,6 +2605,7 @@ dependencies = [
  "chrono",
  "cynic",
  "cynic-codegen",
+ "gloo-net",
  "icondata",
  "js-sys",
  "leptos",

@@ -57,23 +57,25 @@ pub fn DatePicker(
     });
 
     view! {
-        <div class="mb-2">
+        <div class="relative">
+            // This is hidden because it serves the purpose of form validation behind the scenes. The form gets an ISO date string.
+            <InputField
+                initial_value=selected_date_value
+                name=name
+                label=label
+                field_type=InputFieldType::Text
+                required=required
+                ext_input_styles="sr-only"
+                id_attr=id_attr.clone()
+                input_node_ref=date_input_ref
+            />
             <div class="relative">
-                <InputField
-                    initial_value=selected_date_value
-                    name=name
-                    label=label
-                    field_type=InputFieldType::Text
-                    required=required
-                    ext_input_styles="sr-only"
-                    id_attr=id_attr
-                    input_node_ref=date_input_ref
-                />
                 <InputField
                     readonly=true
                     onclick=Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev))
                     initial_value=selected_date_display_value
                     field_type=InputFieldType::Text
+                    id_attr=format!("{id_attr}-no-sr")
                 />
                 <div
                     class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
@@ -81,16 +83,16 @@ pub fn DatePicker(
                 >
                     <span class="text-gray-500"><Icon icon=IconId::BsCalendar2Date /></span>
                 </div>
-                {move || if show_calendar.get() {
-                    Some(view! {
-                        <div class="absolute bg-slate-50 border mt-1 rounded shadow-lg z-10 w-[300px] max-h-[400px] overflow-auto">
-                            <Calendar select_date={select_date.clone()} />
-                        </div>
-                    })
-                } else {
-                    None
-                }}
             </div>
+            {move || if show_calendar.get() {
+                Some(view! {
+                    <div class="absolute bg-slate-50 rounded shadow-lg z-10 w-[300px] max-h-[400px] overflow-auto">
+                        <Calendar select_date={select_date.clone()} />
+                    </div>
+                })
+            } else {
+                None
+            }}
         </div>
     }
 }

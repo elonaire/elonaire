@@ -1,6 +1,9 @@
+use icondata as IconData;
 use leptos::ev;
 use leptos::html::*;
 use leptos::prelude::*;
+
+use crate::components::general::button::BasicButton;
 
 #[derive(Clone, PartialEq)]
 #[allow(dead_code)]
@@ -74,7 +77,7 @@ pub fn InputField(
     };
 
     view! {
-        <div class=move || format!("mb-2 {}", ext_wrapper_styles)>
+        <div class=move || format!("{}", ext_wrapper_styles)>
             <label
                 class={format!("block text-gray-700 text-sm font-bold {}", ext_label_styles)}
                 for=id_attr.clone()
@@ -113,6 +116,49 @@ pub fn InputField(
                     }
                 }}
             </p>
+        </div>
+    }
+}
+
+#[component]
+pub fn CustomFileInput(
+    #[prop(into, optional)] label: String,
+    #[prop(into, optional)] name: String,
+    #[prop(default = false, optional)] required: bool,
+    #[prop(into, optional)] id_attr: String,
+    #[prop(into, optional)] ext_label_styles: String,
+    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
+    #[prop(optional)] input_node_ref: NodeRef<Input>,
+) -> impl IntoView {
+    view! {
+        <div class="relative">
+            // <label
+            //     class={format!("block text-gray-700 text-sm font-bold {}", ext_label_styles)}
+            //     for=id_attr.clone()
+            // >
+            //     {label}
+            //     {move || if required {
+            //         Some(view! { <span class="text-red-500">"*"</span> })
+            //     } else {
+            //         None
+            //     }}
+            // </label>
+            <InputField
+                name=name
+                label=label
+                required=required
+                field_type=InputFieldType::File
+                ext_input_styles="absolute inset-y-0 left-0 w-full opacity-0"
+                id_attr=id_attr.clone()
+                onchange=onchange
+                input_node_ref=input_node_ref
+            />
+               <BasicButton
+                   button_text="Choose File"
+                   icon=Some(IconData::AiUploadOutlined)
+                   icon_before=true
+                   style_ext="w-full bg-primary text-white"
+                />
         </div>
     }
 }

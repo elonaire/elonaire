@@ -6,11 +6,11 @@ mod schema {}
 #[cynic(
     schema = "acl",
     graphql_type = "Mutation",
-    variables = "UserLoginsInputFields"
+    variables = "UserLoginsInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
 pub struct SignInMutation {
     #[arguments(rawUserDetails: $raw_user_details)]
-    pub sign_in: Option<AuthDetails>,
+    pub sign_in: Option<AuthDetails>, // this is the return type expected from the API on success
 }
 
 #[derive(cynic::QueryFragment, Debug)]

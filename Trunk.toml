@@ -1,3 +1,7 @@
 [[proxy]]
 rewrite = "/api/acl"
 backend = "http://localhost:3007"
+
+[[proxy]]
+rewrite = "/api/files"
+backend = "http://localhost:3001"
