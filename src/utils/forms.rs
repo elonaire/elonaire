@@ -7,7 +7,7 @@ use serde_json::{Map, Value};
 use web_sys::FormData;
 
 pub fn get_form_data_from_form_ref(form_ref: &NodeRef<Form>) -> Option<FormData> {
-    let form = form_ref.to_owned().get()?;
+    let form = form_ref.to_owned().get_untracked()?;
     let form_data = FormData::new_with_form(&form).ok()?;
     Some(form_data)
 }

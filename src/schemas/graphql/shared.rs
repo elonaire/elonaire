@@ -12,7 +12,7 @@ mod schema {}
 )]
 pub struct AddPortfolioItem {
     #[arguments(portfolioItem: $portfolio_item)]
-    pub add_portfolio_item: Vec<UserPortfolio>, // this is the return type expected from the API on success
+    pub add_portfolio_item: UserPortfolio, // this is the return type expected from the API on success
 }
 
 #[derive(cynic::QueryFragment, Debug)]

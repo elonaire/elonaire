@@ -1,5 +1,5 @@
 use icondata as IconData;
-use leptos::ev::SubmitEvent;
+use leptos::ev::{Event, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -17,6 +17,8 @@ use crate::components::forms::reactive_form::ReactiveForm;
 use crate::components::forms::select::SelectInput;
 use crate::components::forms::select::SelectOption;
 use crate::components::general::button::ButtonType;
+use crate::components::general::modal::modal::BasicModal;
+use crate::components::general::modal::modal::UseCase;
 use crate::components::general::{
     breadcrumbs::Breadcrumbs,
     button::BasicButton,
@@ -26,8 +28,11 @@ use crate::schemas::general::acl::AuthInfoStoreFields;
 use crate::schemas::general::acl::UserInfoStoreFields;
 use crate::schemas::general::acl::{AppStateContext, AppStateContextStoreFields};
 use crate::schemas::general::files::UploadedFileResponse;
+use crate::schemas::graphql::shared::AddPortfolioItem;
 use crate::schemas::graphql::shared::UserPortfolioInput;
-use crate::utils::forms::deserialize_form_data_to_struct;
+use crate::schemas::graphql::shared::UserPortfolioInputFields;
+use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
+use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
 pub fn Portfolio() -> impl IntoView {
@@ -84,6 +89,149 @@ pub fn CreatePortfolio() -> impl IntoView {
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
     let current_state = expect_context::<Store<AppStateContext>>();
+    let success_modal_is_open = RwSignal::new(false);
+    let confirm_modal_is_open = RwSignal::new(false);
+    let (submission_confirmed, set_submission_confirmed) = signal(false);
+
+    let onprimary_handler = Callback::new(move |_| {
+        set_submission_confirmed.set(true);
+    });
+
+    Effect::new(move || {
+        if submission_confirmed.get() {
+            if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
+                leptos::logging::log!("{:?}", file_input.files());
+                if let Ok(files_form_data) = FormData::new() {
+                    if let Some(filelist) = file_input.files() {
+                        for i in 0..filelist.length() {
+                            if let Some(file) = filelist.item(i) {
+                                leptos::logging::log!("{:?}", file.name());
+                                if let Err(e) = files_form_data.append_with_blob("file", &file) {
+                                    leptos::logging::error!("Failed to append Blob: {:?}", e);
+                                };
+                            }
+                        }
+                    }
+
+                    spawn_local(async move {
+                        match gloo_net::http::Request::post(
+                            "http://localhost:8080/api/files/upload",
+                        )
+                        .header(
+                            "Authorization",
+                            format!(
+                                "Bearer {}",
+                                current_state.user().auth_info().token().get_untracked()
+                            )
+                            .as_str(),
+                        )
+                        .body(files_form_data)
+                        .unwrap()
+                        .send()
+                        .await
+                        {
+                            Ok(response) => {
+                                leptos::logging::log!("{:?}", response);
+                                match response.json::<UploadedFileResponse>().await {
+                                    Ok(uploaded_file) => {
+                                        if let Some(form_data) =
+                                            get_form_data_from_form_ref(&form_ref)
+                                        {
+                                            // Implement logic to handle form data
+                                            if let Ok(_) = form_data.append_with_str(
+                                                "thumbnail",
+                                                format!(
+                                                    "http://localhost:3001/view/{}",
+                                                    uploaded_file.file_name
+                                                )
+                                                .as_str(),
+                                            ) {
+                                                let deserialized_form_data =
+                                                    deserialize_form_data_to_struct::<
+                                                        UserPortfolioInput,
+                                                    >(
+                                                        &form_data
+                                                    );
+
+                                                // leptos::logging::log!(
+                                                //     "deserialized_form_data: {:?}",
+                                                //     deserialized_form_data
+                                                // );
+
+                                                let operation = AddPortfolioItem::build(
+                                                    UserPortfolioInputFields {
+                                                        portfolio_item: deserialized_form_data
+                                                            .unwrap(),
+                                                    },
+                                                );
+
+                                                let response = reqwest::Client::new()
+                                                    .post("http://localhost:8080/api/shared")
+                                                    .header(
+                                                        "Authorization",
+                                                        format!(
+                                                            "Bearer {}",
+                                                            current_state
+                                                                .user()
+                                                                .auth_info()
+                                                                .token()
+                                                                .get_untracked()
+                                                        )
+                                                        .as_str(),
+                                                    )
+                                                    .run_graphql(operation)
+                                                    .await
+                                                    .unwrap();
+
+                                                match response.data {
+                                                    Some(data) => {
+                                                        leptos::logging::log!(
+                                                            "Portfolio item added successfully: {:?}",
+                                                            data.add_portfolio_item
+                                                        );
+
+                                                        if let Some(form) = form_ref
+                                                            .get_untracked()
+                                                            .and_then(|el| {
+                                                                el.dyn_into::<HtmlFormElement>()
+                                                                    .ok()
+                                                            })
+                                                        {
+                                                            form.reset();
+                                                            set_form_is_valid
+                                                                .set(form.check_validity());
+                                                        }
+
+                                                        success_modal_is_open
+                                                            .update(|status| *status = true);
+                                                    }
+                                                    None => {
+                                                        leptos::logging::error!(
+                                                            "Failed to add portfolio item: {:?}",
+                                                            response.errors
+                                                        );
+                                                    }
+                                                };
+                                            };
+                                        };
+                                    }
+                                    Err(err) => {
+                                        leptos::logging::error!(
+                                            "Failed to parse uploaded file response: {:?}",
+                                            err
+                                        );
+                                    }
+                                };
+                            }
+                            Err(err) => {
+                                leptos::logging::error!("Failed to upload files: {:?}", err);
+                            }
+                        };
+                    });
+                };
+            };
+        }
+    });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
@@ -98,84 +246,7 @@ pub fn CreatePortfolio() -> impl IntoView {
             set_form_is_valid.set(form.check_validity());
 
             if let Some(_submitter) = ev.submitter() {
-                if let Some(file_input) =
-                    file_input_ref.to_owned().get() as Option<HtmlInputElement>
-                {
-                    leptos::logging::log!("{:?}", file_input.files());
-                    if let Ok(files_form_data) = FormData::new() {
-                        if let Some(filelist) = file_input.files() {
-                            for i in 0..filelist.length() {
-                                if let Some(file) = filelist.item(i) {
-                                    leptos::logging::log!("{:?}", file.name());
-                                    if let Err(e) =
-                                        files_form_data.append_with_blob("file[]", &file)
-                                    {
-                                        leptos::logging::error!("Failed to append Blob: {:?}", e);
-                                    };
-                                }
-                            }
-                        }
-
-                        spawn_local(async move {
-                            match gloo_net::http::Request::post(
-                                "http://localhost:8080/api/files/upload",
-                            )
-                            .header(
-                                "Authorization",
-                                format!(
-                                    "Bearer {}",
-                                    current_state.user().auth_info().token().get_untracked()
-                                )
-                                .as_str(),
-                            )
-                            .body(files_form_data)
-                            .unwrap()
-                            .send()
-                            .await
-                            {
-                                Ok(response) => {
-                                    leptos::logging::log!("{:?}", response);
-                                    match response.json::<UploadedFileResponse>().await {
-                                        Ok(uploaded_file) => {
-                                            leptos::logging::log!("{:?}", uploaded_file);
-                                            if let Ok(form_data) = FormData::new_with_form(&form) {
-                                                // Implement logic to handle form data
-                                                // e.g. you can deserialize the form data into a struct
-                                                // let deserialized_form_data = deserialize_form_data_to_struct::<MyFormStruct>(&form_data);
-                                                // Do something with the data e.g. serialize to JSON and send to the server
-                                                if let Ok(_) = form_data.append_with_str(
-                                                    "thumbnail",
-                                                    uploaded_file.file_id.as_str(),
-                                                ) {
-                                                    let deserialized_form_data =
-                                                        deserialize_form_data_to_struct::<
-                                                            UserPortfolioInput,
-                                                        >(
-                                                            &form_data
-                                                        );
-
-                                                    leptos::logging::log!(
-                                                        "deserialized_form_data: {:?}",
-                                                        deserialized_form_data
-                                                    );
-                                                };
-                                            };
-                                        }
-                                        Err(err) => {
-                                            leptos::logging::error!(
-                                                "Failed to parse uploaded file response: {:?}",
-                                                err
-                                            );
-                                        }
-                                    };
-                                }
-                                Err(err) => {
-                                    leptos::logging::error!("Failed to upload files: {:?}", err);
-                                }
-                            };
-                        });
-                    };
-                };
+                confirm_modal_is_open.update(|status| *status = true);
             }
         }
     };
@@ -183,6 +254,16 @@ pub fn CreatePortfolio() -> impl IntoView {
     view! {
         <>
             <Title text="Create Portfolio"/>
+            <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
+                <div>
+                    <p>"Portfolio Project created successfully!"</p>
+                </div>
+            </BasicModal>
+            <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
+                <div>
+                    <p>"Are you sure that you want to submit?"</p>
+                </div>
+            </BasicModal>
 
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio", "Create"] />
@@ -203,7 +284,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                     required=true
                     id_attr="category"
                     options=vec![
-                        SelectOption::new("", "--Select Category"),
+                        SelectOption::new("", "Select Category"),
                         SelectOption::new("JavaScript", "JavaScript")
                     ]
                     />

@@ -5,3 +5,7 @@ backend = "http://localhost:3007"
 [[proxy]]
 rewrite = "/api/files"
 backend = "http://localhost:3001"
+
+[[proxy]]
+rewrite = "/api/shared"
+backend = "http://localhost:3002"

@@ -4,7 +4,7 @@ use leptos_icons::Icon;
 
 use crate::components::general::button::BasicButton;
 
-#[derive(Clone, PartialEq, Copy, Debug, Default)]
+#[derive(Clone, PartialEq, Copy, Debug, Default, Eq)]
 #[allow(dead_code)]
 pub enum UseCase {
     Error,
@@ -20,7 +20,7 @@ pub enum UseCase {
 /// It can be customized with different icons and colors based on the use case.
 /// Example usage:
 /// ```
-/// <BasicModal title="Can I confirm this?".to_string() is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false >
+/// <BasicModal title="Can I confirm this?" is_open=modal_open use_case=UseCase::Confirmation on_click_primary=onclick_primary on_cancel=on_cancel disable_auto_close=false>
 ///     <div>
 ///         <p>"Hey, please confirm this."</p>
 ///     </div>
@@ -34,7 +34,7 @@ pub fn BasicModal(
     #[prop(default = Callback::new(|_| {}), optional)] on_click_primary: Callback<()>,
     #[prop(default = Callback::new(|_| {}), optional)] on_cancel: Callback<()>,
     #[prop(default = RwSignal::new(false), into, optional)] is_open: RwSignal<bool>,
-    #[prop(default = "OK".to_string())] primary_button_text: String,
+    #[prop(into, default = "OK".to_string())] primary_button_text: String,
     #[prop(default = true, optional)] disable_auto_close: bool,
 ) -> impl IntoView {
     let (title, _set_title) = signal(title);
