@@ -1,5 +1,5 @@
 use icondata as IconData;
-use leptos::ev::{Event, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -98,14 +98,12 @@ pub fn CreatePortfolio() -> impl IntoView {
     });
 
     Effect::new(move || {
-        if submission_confirmed.get() {
+        if submission_confirmed.get() && form_is_valid.get() {
             if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
-                leptos::logging::log!("{:?}", file_input.files());
                 if let Ok(files_form_data) = FormData::new() {
                     if let Some(filelist) = file_input.files() {
                         for i in 0..filelist.length() {
                             if let Some(file) = filelist.item(i) {
-                                leptos::logging::log!("{:?}", file.name());
                                 if let Err(e) = files_form_data.append_with_blob("file", &file) {
                                     leptos::logging::error!("Failed to append Blob: {:?}", e);
                                 };
@@ -131,7 +129,6 @@ pub fn CreatePortfolio() -> impl IntoView {
                         .await
                         {
                             Ok(response) => {
-                                leptos::logging::log!("{:?}", response);
                                 match response.json::<UploadedFileResponse>().await {
                                     Ok(uploaded_file) => {
                                         if let Some(form_data) =
@@ -152,11 +149,6 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                     >(
                                                         &form_data
                                                     );
-
-                                                // leptos::logging::log!(
-                                                //     "deserialized_form_data: {:?}",
-                                                //     deserialized_form_data
-                                                // );
 
                                                 let operation = AddPortfolioItem::build(
                                                     UserPortfolioInputFields {
@@ -184,12 +176,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                     .unwrap();
 
                                                 match response.data {
-                                                    Some(data) => {
-                                                        leptos::logging::log!(
-                                                            "Portfolio item added successfully: {:?}",
-                                                            data.add_portfolio_item
-                                                        );
-
+                                                    Some(_data) => {
                                                         if let Some(form) = form_ref
                                                             .get_untracked()
                                                             .and_then(|el| {

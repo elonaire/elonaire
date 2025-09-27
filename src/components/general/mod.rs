@@ -5,6 +5,7 @@ pub mod collapse;
 pub mod hocs;
 pub mod modal;
 pub mod popover;
+pub mod progress;
 pub mod stepper;
 pub mod table;
 pub mod tabs;
