@@ -4,6 +4,7 @@ use serde::Deserialize;
 #[cynic::schema("shared")]
 mod schema {}
 
+/* This is the beginning of UserPortfolio GraphQL schema */
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(
     schema = "shared",
@@ -83,4 +84,41 @@ pub enum UserSkillLevel {
 pub enum UserSkillType {
     Technical,
     Soft,
+}
+
+/* This is the beginning of UserProfessionalInfo GraphQL schema */
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(
+    schema = "shared",
+    graphql_type = "Mutation",
+    variables = "ProfessionalDetailsInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+)]
+pub struct AddProfessionalDetails {
+    #[arguments(professionalDetails: $professional_details)]
+    pub add_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success
+}
+
+#[derive(cynic::QueryVariables, Debug)]
+pub struct ProfessionalDetailsInputFields {
+    pub professional_details: UserProfessionalInfoInput,
+}
+
+#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
+#[cynic(schema = "shared")]
+pub struct UserProfessionalInfoInput {
+    pub occupation: String,
+    pub description: String,
+    pub active: bool,
+    pub start_date: String,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct UserProfessionalInfo {
+    pub id: String,
+    pub occupation: String,
+    pub description: String,
+    pub start_date: String,
+    pub years_of_experience: Option<i32>,
+    pub active: bool,
 }

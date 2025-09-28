@@ -1,7 +1,7 @@
 use crate::components::forms::input::{InputField, InputFieldType};
 use crate::components::general::button::BasicButton;
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
-use chrono::Local;
+use chrono::Local; // Local::now()
 use chrono::{DateTime, Datelike, Duration, NaiveDate, TimeZone, Weekday};
 use icondata as IconId;
 use leptos::ev;
@@ -26,34 +26,51 @@ pub fn DatePicker(
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] name: String,
     #[prop(default = false, optional)] required: bool,
-    #[prop(into, default = Signal::derive(move || Local::now()), optional)] initial_value: Signal<
-        DateTime<Local>,
+    #[prop(into, default = Signal::derive(|| None), optional)] initial_value: Signal<
+        Option<DateTime<Local>>,
     >,
     #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
     #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
-    let (selected_date, set_selected_date) = signal(initial_value.get());
+    let (selected_date, set_selected_date) = signal(None);
     let date_input_ref = NodeRef::new();
 
-    let selected_date_value = Memo::new(move |_| selected_date.get().to_rfc3339());
+    let selected_date_value = Memo::new(move |_| {
+        selected_date
+            .get()
+            .map(|dt: DateTime<Local>| dt.to_rfc3339())
+            .unwrap_or(String::new())
+    });
 
-    let selected_date_display_value =
-        Memo::new(move |_| selected_date.get().format("%b %0e %Y").to_string());
+    let selected_date_display_value = Memo::new(move |_| {
+        selected_date
+            .get()
+            .map(|dt| dt.format("%b %0e %Y").to_string())
+            .unwrap_or(String::from("Select Date"))
+    });
+
+    Effect::new(move |_| {
+        set_selected_date.set(initial_value.get());
+    });
+
+    Effect::new(move |_| {
+        let _select_hack = selected_date.get();
+
+        // Fire a bubbling Change event so that the form can capture changes
+        if let Some(input_el) = date_input_ref.get() {
+            fire_bubbled_and_cancelable_event("change", true, true, input_el);
+        }
+    });
 
     let toggle_calendar = Callback::new(move |_| {
         set_show_calendar.update(|val| *val = !*val);
     });
 
     let select_date = Callback::new(move |date: DateTime<Local>| {
-        set_selected_date.set(date);
+        set_selected_date.set(Some(date));
         onchange.run(date);
         set_show_calendar.set(false);
-
-        // Fire a bubbling Change event so that the form can capture changes
-        if let Some(input_el) = date_input_ref.get() {
-            fire_bubbled_and_cancelable_event("change", true, true, input_el);
-        }
     });
 
     view! {
@@ -65,7 +82,7 @@ pub fn DatePicker(
                 label=label
                 field_type=InputFieldType::Text
                 required=required
-                ext_input_styles="sr-only"
+                ext_input_styles="absolute opacity-0"
                 id_attr=id_attr.clone()
                 input_node_ref=date_input_ref
             />

@@ -32,6 +32,11 @@ pub fn Dashboard() -> impl IntoView {
         vec![
             MenuItem::new("Dashboard", IconData::MdiMonitorDashboard, "/dashboard"),
             MenuItem::new(
+                "Professional Details",
+                IconData::BiUserBadgeSolid,
+                "/dashboard/professional-details",
+            ),
+            MenuItem::new(
                 "Portfolio",
                 IconData::AiProfileOutlined,
                 "/dashboard/portfolio",

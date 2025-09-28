@@ -1,4 +1,4 @@
-use leptos::{html::Form, prelude::*};
+use leptos::{html::Form, prelude::*, tachys::reactive_graph::bind::GetValue};
 
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 

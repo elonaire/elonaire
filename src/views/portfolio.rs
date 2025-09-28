@@ -4,34 +4,37 @@ use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
 use leptos_meta::*;
-use leptos_router::components::A;
-use leptos_router::components::Outlet;
+use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::datepicker::DatePicker;
-use crate::components::forms::input::CustomFileInput;
-use crate::components::forms::input::InputField;
-use crate::components::forms::input::InputFieldType;
-use crate::components::forms::reactive_form::ReactiveForm;
-use crate::components::forms::select::SelectInput;
-use crate::components::forms::select::SelectOption;
-use crate::components::general::button::ButtonType;
-use crate::components::general::modal::modal::BasicModal;
-use crate::components::general::modal::modal::UseCase;
-use crate::components::general::{
-    breadcrumbs::Breadcrumbs,
-    button::BasicButton,
-    table::data_table::{Column, DataTable},
+use crate::{
+    components::{
+        forms::{
+            datepicker::DatePicker,
+            input::{CustomFileInput, InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+        },
+        general::{
+            breadcrumbs::Breadcrumbs,
+            button::{BasicButton, ButtonType},
+            modal::modal::{BasicModal, UseCase},
+            table::data_table::{Column, DataTable},
+        },
+    },
+    schemas::{
+        general::{
+            acl::{
+                AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields,
+                UserInfoStoreFields,
+            },
+            files::UploadedFileResponse,
+        },
+        graphql::shared::{AddPortfolioItem, UserPortfolioInput, UserPortfolioInputFields},
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
-use crate::schemas::general::acl::AuthInfoStoreFields;
-use crate::schemas::general::acl::UserInfoStoreFields;
-use crate::schemas::general::acl::{AppStateContext, AppStateContextStoreFields};
-use crate::schemas::general::files::UploadedFileResponse;
-use crate::schemas::graphql::shared::AddPortfolioItem;
-use crate::schemas::graphql::shared::UserPortfolioInput;
-use crate::schemas::graphql::shared::UserPortfolioInputFields;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
@@ -150,6 +153,11 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                         &form_data
                                                     );
 
+                                                leptos::logging::log!(
+                                                    "deserialized_form_data: {:?}",
+                                                    deserialized_form_data
+                                                );
+
                                                 let operation = AddPortfolioItem::build(
                                                     UserPortfolioInputFields {
                                                         portfolio_item: deserialized_form_data
@@ -187,6 +195,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                             form.reset();
                                                             set_form_is_valid
                                                                 .set(form.check_validity());
+                                                            set_submission_confirmed.set(false);
                                                         }
 
                                                         success_modal_is_open

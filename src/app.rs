@@ -14,6 +14,9 @@ use crate::{
         dashboard_home::DashboardHome,
         home::Home,
         portfolio::{CreatePortfolio, Portfolio, PortfolioList},
+        professional_details::{
+            CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
+        },
     },
 };
 use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
@@ -51,6 +54,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />
                             <Route path=path!("create") view=CreatePortfolio />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/professional-details") view=ProfessionalDetails>
+                            <Route path=path!("") view=ProfessionalDetailsList />
+                            <Route path=path!("create") view=CreateProfessionalDetail />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>
