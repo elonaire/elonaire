@@ -37,7 +37,7 @@ pub fn RadioInputField(
     let (display_error, _set_display_error) = signal(false);
 
     view! {
-        <div class="mb-2">
+        <div>
             <label class="inline-flex items-center gap-2 text-gray-700 text-sm cursor-pointer" for=id_attr.clone()>
                 <input
                     class=move || format!(

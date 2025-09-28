@@ -13,6 +13,7 @@ use crate::{
         forms::{
             datepicker::DatePicker,
             input::{InputField, InputFieldType},
+            radio_input::RadioInputField,
             reactive_form::ReactiveForm,
         },
         general::{
@@ -100,8 +101,11 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
         if submission_confirmed.get() && form_is_valid.get() {
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data =
-                        deserialize_form_data_to_struct::<UserProfessionalInfoInput>(&form_data);
+                    let deserialized_form_data = deserialize_form_data_to_struct::<
+                        UserProfessionalInfoInput,
+                    >(&form_data, true);
+
+                    leptos::logging::log!("deserialized_form_data: {:?}", deserialized_form_data);
 
                     let operation = AddProfessionalDetails::build(ProfessionalDetailsInputFields {
                         professional_details: deserialized_form_data.unwrap(),
@@ -128,7 +132,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                                 .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
                             {
                                 form.reset();
-                                set_form_is_valid.set(form.check_validity());
+                                set_form_is_valid.set(false);
+                                set_submission_confirmed.set(false);
+                            } else {
+                                set_submission_confirmed.set(false);
                             }
 
                             success_modal_is_open.update(|status| *status = true);
@@ -189,6 +196,8 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
 
                     <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                    <RadioInputField label="Active" required=true id_attr="active_lone" name="active" initial_value=Signal::derive(|| "true") />
+                    <RadioInputField label="Inactive" required=true id_attr="inactive_lone" name="active" initial_value=Signal::derive(|| "false") />
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"

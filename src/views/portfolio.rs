@@ -150,7 +150,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                     deserialize_form_data_to_struct::<
                                                         UserPortfolioInput,
                                                     >(
-                                                        &form_data
+                                                        &form_data, false
                                                     );
 
                                                 leptos::logging::log!(
@@ -193,8 +193,9 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                             })
                                                         {
                                                             form.reset();
-                                                            set_form_is_valid
-                                                                .set(form.check_validity());
+                                                            set_form_is_valid.set(false);
+                                                            set_submission_confirmed.set(false);
+                                                        } else {
                                                             set_submission_confirmed.set(false);
                                                         }
 

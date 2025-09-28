@@ -12,7 +12,10 @@ pub fn get_form_data_from_form_ref(form_ref: &NodeRef<Form>) -> Option<FormData>
     Some(form_data)
 }
 
-pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(form_data: &FormData) -> Option<T> {
+pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
+    form_data: &FormData,
+    deserialize_bool: bool,
+) -> Option<T> {
     let entries = js_sys::try_iter(form_data).ok()?.unwrap();
     let mut map = Map::new();
 
@@ -22,7 +25,13 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(form_data: &FormData
         let key = arr.get(0).as_string()?;
         let value = arr.get(1);
         if let Some(s) = value.as_string() {
-            map.insert(key, Value::String(s));
+            if deserialize_bool && (s == "true" || s == "false") {
+                let parsed_s: bool = s.parse().unwrap();
+
+                map.insert(key, Value::Bool(parsed_s));
+            } else {
+                map.insert(key, Value::String(s));
+            }
         }
     }
 
