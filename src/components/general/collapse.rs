@@ -32,7 +32,7 @@ impl PanelInfo {
 
 impl std::fmt::Debug for PanelInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Column")
+        f.debug_struct("PanelInfo")
             .field("title", &self.title)
             .field("icon", &self.icon)
             .field("is_open", &self.is_open)

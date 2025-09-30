@@ -8,6 +8,7 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
+use crate::components::general::spinner::Spinner;
 use crate::{
     components::{
         forms::{
@@ -96,6 +97,7 @@ pub fn CreatePortfolio() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
+    let (is_loading, set_is_loading) = signal(false);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -107,6 +109,7 @@ pub fn CreatePortfolio() -> impl IntoView {
 
     Effect::new(move || {
         if submission_confirmed.get() && form_is_valid.get() {
+            set_is_loading.set(true);
             if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
                 if let Ok(files_form_data) = FormData::new() {
                     if let Some(filelist) = file_input.files() {
@@ -158,11 +161,6 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                         &form_data, false
                                                     );
 
-                                                leptos::logging::log!(
-                                                    "deserialized_form_data: {:?}",
-                                                    deserialized_form_data
-                                                );
-
                                                 let operation = AddPortfolioItem::build(
                                                     UserPortfolioInputFields {
                                                         portfolio_item: deserialized_form_data
@@ -203,6 +201,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                         } else {
                                                             set_submission_confirmed.set(false);
                                                         }
+                                                        set_is_loading.set(false);
 
                                                         success_modal_is_open
                                                             .update(|status| *status = true);
@@ -266,6 +265,9 @@ pub fn CreatePortfolio() -> impl IntoView {
                     <p>"Are you sure that you want to submit?"</p>
                 </div>
             </BasicModal>
+            <Show when=move || is_loading.get()>
+                <Spinner />
+            </Show>
 
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio", "Create"] />

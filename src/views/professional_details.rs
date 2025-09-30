@@ -8,6 +8,8 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
+use crate::components::forms::radio_input::RadioOption;
+use crate::components::general::spinner::Spinner;
 use crate::{
     components::{
         forms::{
@@ -93,6 +95,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
+    let (is_loading, set_is_loading) = signal(false);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -104,6 +107,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
 
     Effect::new(move || {
         if submission_confirmed.get() && form_is_valid.get() {
+            set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
                     let deserialized_form_data = deserialize_form_data_to_struct::<
@@ -142,6 +146,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                             } else {
                                 set_submission_confirmed.set(false);
                             }
+                            set_is_loading.set(false);
 
                             success_modal_is_open.update(|status| *status = true);
                         }
@@ -188,6 +193,9 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     <p>"Are you sure that you want to submit?"</p>
                 </div>
             </BasicModal>
+            <Show when=move || is_loading.get()>
+                <Spinner />
+            </Show>
 
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Professions", "New Profession"] />
@@ -201,8 +209,25 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
 
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <RadioInputField label="Active" required=true id_attr="active_lone" name="active" initial_value=Signal::derive(|| "true") />
-                    <RadioInputField label="Inactive" required=true id_attr="inactive_lone" name="active" initial_value=Signal::derive(|| "false") />
+                    // <RadioInputField label="Active" required=true id_attr="active_lone" name="active" initial_value=Signal::derive(|| "true") />
+                    // <RadioInputField label="Inactive" required=true id_attr="inactive_lone" name="active" initial_value=Signal::derive(|| "false") />
+                    <RadioInputField
+                        legend="Select Status"
+                        name="active"
+                        required=true
+                        options=vec![
+                            RadioOption {
+                                value: "true".to_string(),
+                                label: "Active".to_string(),
+                                children: None,
+                            },
+                            RadioOption {
+                                value: "false".to_string(),
+                                label: "InActive".to_string(),
+                                children: None,
+                            },
+                        ]
+                    />
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"
