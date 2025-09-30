@@ -33,7 +33,7 @@ pub fn ToggleSwitch(
 
         // Fire a bubbling Change event so that the form can capture changes
         if let Some(input_el) = checkbox_ref.get() {
-            fire_bubbled_and_cancelable_event("change", true, true, input_el);
+            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
         }
     };
 

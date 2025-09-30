@@ -1,5 +1,5 @@
 use icondata as IconData;
-use leptos::ev::SubmitEvent;
+use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -92,9 +92,14 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
+    let init_date = RwSignal::new(None);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
+    });
+
+    let onreset_handler = Callback::new(move |_ev: ev::Event| {
+        init_date.set(None);
     });
 
     Effect::new(move || {
@@ -190,12 +195,12 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
 
             <h1 class="mx-[20px]">New Profession</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Occupation" required=true id_attr="occupation" name="occupation" />
                     <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
 
-                    <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
                     <RadioInputField label="Active" required=true id_attr="active_lone" name="active" initial_value=Signal::derive(|| "true") />
                     <RadioInputField label="Inactive" required=true id_attr="inactive_lone" name="active" initial_value=Signal::derive(|| "false") />
                     <BasicButton

@@ -70,7 +70,7 @@ pub fn Panel(
     let panel_ref = NodeRef::new();
     let toggle_content = move |_| {
         if let Some(panel_element) = panel_ref.get() {
-            fire_custom_bubbled_and_cancelable_event("togglepanel", true, true, panel_element);
+            fire_custom_bubbled_and_cancelable_event("togglepanel", true, true, &panel_element);
         }
 
         if !is_accordion {

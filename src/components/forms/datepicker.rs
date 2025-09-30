@@ -26,7 +26,7 @@ pub fn DatePicker(
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] name: String,
     #[prop(default = false, optional)] required: bool,
-    #[prop(into, default = Signal::derive(|| None), optional)] initial_value: Signal<
+    #[prop(into, default = RwSignal::new(None), optional)] initial_value: RwSignal<
         Option<DateTime<Local>>,
     >,
     #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
@@ -55,11 +55,12 @@ pub fn DatePicker(
     });
 
     Effect::new(move |_| {
+        // This is a hack to ensure that reactivity works well for this component during select
         let _select_hack = selected_date.get();
 
         // Fire a bubbling Change event so that the form can capture changes
         if let Some(input_el) = date_input_ref.get() {
-            fire_bubbled_and_cancelable_event("change", true, true, input_el);
+            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
         }
     });
 

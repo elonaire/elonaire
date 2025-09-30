@@ -1,4 +1,4 @@
-use leptos::{html::Form, prelude::*, tachys::reactive_graph::bind::GetValue};
+use leptos::{ev, html::Form, prelude::*};
 
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 
@@ -37,6 +37,7 @@ use crate::utils::forms::fire_bubbled_and_cancelable_event;
 pub fn ReactiveForm(
     form_ref: NodeRef<Form>,
     #[prop(into, optional)] ext_styles: String,
+    #[prop(default = Callback::new(|_| {}))] onreset: Callback<ev::Event>,
     children: Children,
 ) -> impl IntoView {
     view! {
@@ -46,17 +47,18 @@ pub fn ReactiveForm(
             on:input=move |_| {
                 if let Some(form) = form_ref.get() {
                     if form.check_validity() {
-                        fire_bubbled_and_cancelable_event("submit", true, true, form);
+                        fire_bubbled_and_cancelable_event("submit", true, true, &form);
                     }
                 }
             }
             on:change=move |_| {
                 if let Some(form) = form_ref.get() {
                     if form.check_validity() {
-                        fire_bubbled_and_cancelable_event("submit", true, true, form);
+                        fire_bubbled_and_cancelable_event("submit", true, true, &form);
                     }
                 }
             }
+            on:reset=move |ev| onreset.run(ev)
         >
             {children()}
         </form>

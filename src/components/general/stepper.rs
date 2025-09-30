@@ -162,7 +162,7 @@ pub fn Stepper(
         let form_ref = form_refs.get().get(current_step.get()).unwrap().to_owned();
 
         if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
-            fire_bubbled_and_cancelable_event("submit", true, true, form);
+            fire_bubbled_and_cancelable_event("submit", true, true, &form);
         }
     });
 
