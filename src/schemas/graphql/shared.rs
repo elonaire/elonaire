@@ -13,7 +13,7 @@ mod schema {}
 )]
 pub struct AddPortfolioItem {
     #[arguments(portfolioItem: $portfolio_item)]
-    pub add_portfolio_item: UserPortfolio, // this is the return type expected from the API on success
+    pub create_portfolio_item: UserPortfolio, // this is the return type expected from the API on success
 }
 
 #[derive(cynic::QueryFragment, Debug)]
@@ -93,9 +93,9 @@ pub enum UserSkillType {
     graphql_type = "Mutation",
     variables = "ProfessionalDetailsInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
-pub struct AddProfessionalDetails {
+pub struct CreateProfessionalDetails {
     #[arguments(professionalDetails: $professional_details)]
-    pub add_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success
+    pub create_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success
 }
 
 #[derive(cynic::QueryVariables, Debug)]

@@ -30,7 +30,7 @@ use crate::{
             AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
         },
         graphql::shared::{
-            AddProfessionalDetails, ProfessionalDetailsInputFields, UserProfessionalInfoInput,
+            CreateProfessionalDetails, ProfessionalDetailsInputFields, UserProfessionalInfoInput,
         },
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
@@ -116,9 +116,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
 
                     leptos::logging::log!("deserialized_form_data: {:?}", deserialized_form_data);
 
-                    let operation = AddProfessionalDetails::build(ProfessionalDetailsInputFields {
-                        professional_details: deserialized_form_data.unwrap(),
-                    });
+                    let operation =
+                        CreateProfessionalDetails::build(ProfessionalDetailsInputFields {
+                            professional_details: deserialized_form_data.unwrap(),
+                        });
 
                     let response = reqwest::Client::new()
                         .post("http://localhost:8080/api/shared")
