@@ -20,6 +20,16 @@ impl std::fmt::Debug for RadioOption {
     }
 }
 
+impl RadioOption {
+    pub fn new(value: &str, label: &str, children: Option<ViewFn>) -> Self {
+        Self {
+            value: value.to_string(),
+            label: label.to_string(),
+            children,
+        }
+    }
+}
+
 /// This component represents a radio input field.
 /// Example usage:
 /// ```

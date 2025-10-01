@@ -70,7 +70,7 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
             <div class="mx-[20px] flex items-center justify-end">
                 <A href="/dashboard/professional-details/create">
                     <BasicButton
-                        button_text="Create Project"
+                        button_text="Create Profession"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-white"
@@ -114,7 +114,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                         UserProfessionalInfoInput,
                     >(&form_data, true);
 
-                    leptos::logging::log!("deserialized_form_data: {:?}", deserialized_form_data);
+                    if deserialized_form_data.is_none() {
+                        set_is_loading.set(false);
+                        return;
+                    }
 
                     let operation =
                         CreateProfessionalDetails::build(ProfessionalDetailsInputFields {
@@ -210,8 +213,6 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
 
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    // <RadioInputField label="Active" required=true id_attr="active_lone" name="active" initial_value=Signal::derive(|| "true") />
-                    // <RadioInputField label="Inactive" required=true id_attr="inactive_lone" name="active" initial_value=Signal::derive(|| "false") />
                     <RadioInputField
                         legend="Select Status"
                         name="active"

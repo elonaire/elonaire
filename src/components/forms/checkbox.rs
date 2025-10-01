@@ -22,6 +22,16 @@ impl std::fmt::Debug for CheckboxOption {
     }
 }
 
+impl CheckboxOption {
+    pub fn new(value: &str, label: &str, children: Option<ViewFn>) -> Self {
+        Self {
+            value: value.to_string(),
+            label: label.to_string(),
+            children,
+        }
+    }
+}
+
 /// CheckboxInputField is a component that renders a checkbox input field.
 /// It can be used in forms to collect user input.
 /// Example usage:

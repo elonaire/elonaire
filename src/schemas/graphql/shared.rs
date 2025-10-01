@@ -11,9 +11,9 @@ mod schema {}
     graphql_type = "Mutation",
     variables = "UserPortfolioInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
-pub struct AddPortfolioItem {
+pub struct CreatePortfolioItem {
     #[arguments(portfolioItem: $portfolio_item)]
-    pub create_portfolio_item: UserPortfolio, // this is the return type expected from the API on success
+    pub create_portfolio_item: UserPortfolio, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 #[derive(cynic::QueryFragment, Debug)]
@@ -95,7 +95,7 @@ pub enum UserSkillType {
 )]
 pub struct CreateProfessionalDetails {
     #[arguments(professionalDetails: $professional_details)]
-    pub create_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success
+    pub create_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 #[derive(cynic::QueryVariables, Debug)]
@@ -121,4 +121,39 @@ pub struct UserProfessionalInfo {
     pub start_date: String,
     pub years_of_experience: Option<i32>,
     pub active: bool,
+}
+
+/* This is the beginning of UserService GraphQL schema */
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(
+    schema = "shared",
+    graphql_type = "Mutation",
+    variables = "UserServiceInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+)]
+pub struct CreateUserService {
+    #[arguments(userService: $user_service)]
+    pub create_user_service: UserService, // this is the return type expected from the API on success, the key is the resolver name
+}
+
+// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
+#[derive(cynic::QueryVariables, Debug)]
+pub struct UserServiceInputFields {
+    pub user_service: UserServiceInput, // The key should match the value provided in the corresponding query fragment
+}
+
+#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
+#[cynic(schema = "shared")]
+pub struct UserServiceInput {
+    pub title: String,
+    pub description: String,
+    pub thumbnail: String,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct UserService {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub thumbnail: String,
 }

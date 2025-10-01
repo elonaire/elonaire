@@ -17,6 +17,7 @@ use crate::{
         professional_details::{
             CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
         },
+        user_services::{CreateUserService, UserService, UserServicesList},
     },
 };
 use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
@@ -58,6 +59,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/professional-details") view=ProfessionalDetails>
                             <Route path=path!("") view=ProfessionalDetailsList />
                             <Route path=path!("create") view=CreateProfessionalDetail />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/services") view=UserService>
+                            <Route path=path!("") view=UserServicesList />
+                            <Route path=path!("create") view=CreateUserService />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>
