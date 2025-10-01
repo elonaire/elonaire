@@ -1,5 +1,4 @@
 use leptos::ev;
-use leptos::html::Input;
 use leptos::prelude::*;
 
 /// Represents a single radio option with a value and display text.
@@ -90,7 +89,7 @@ pub fn RadioInputField(
                                 let is_selected = move || initial_value.get() == option_value_selected;
 
                                 view! {
-                                    <label class="inline-flex items-center gap-2 text-gray-700 text-sm cursor-pointer hover:bg-gray-50 px-2 py-1 rounded">
+                                    <label class="inline-flex items-center gap-2 text-gray-700 text-sm cursor-pointer px-2 py-1 rounded">
                                         <input
                                             class="leading-tight rounded-full border-gray-300 text-blue-600 shadow-sm focus:border-blue-600 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
                                             type="radio"

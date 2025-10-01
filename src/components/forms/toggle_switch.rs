@@ -11,7 +11,7 @@ use leptos::prelude::*;
 ///    active=RwSignal::new(true)
 ///    label_active="Enabled"
 ///    label_inactive="Disabled"
-///    name="status".into()
+///    name="status"
 /// />
 /// ```
 #[component]
@@ -37,7 +37,11 @@ pub fn ToggleSwitch(
         }
     };
 
-    let current_value = Memo::new(move |_| active.get().to_string());
+    let current_value = RwSignal::new("".to_string());
+
+    Effect::new(move |_| {
+        current_value.set(active.get().to_string());
+    });
 
     view! {
         <div class="flex flex-col cursor-pointer mb-2">
