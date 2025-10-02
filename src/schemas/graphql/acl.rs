@@ -1,3 +1,5 @@
+use serde::Deserialize;
+
 // Pull in the ACL schema we registered in build.rs
 #[cynic::schema("acl")]
 mod schema {}
@@ -24,7 +26,7 @@ pub struct UserLoginsInputFields {
     pub raw_user_details: UserLoginsInput,
 }
 
-#[derive(cynic::InputObject, Debug)]
+#[derive(cynic::InputObject, Debug, Deserialize)]
 pub struct UserLoginsInput {
     pub user_name: Option<String>,
     pub password: Option<String>,

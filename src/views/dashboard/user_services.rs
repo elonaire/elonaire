@@ -8,14 +8,17 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
+use crate::components::forms::input::CustomFileInput;
 use crate::components::general::spinner::Spinner;
+use crate::schemas::general::files::UploadedFileResponse;
+use crate::schemas::graphql::shared::{
+    CreateUserService, UserServiceInput, UserServiceInputFields,
+};
 use crate::{
     components::{
         forms::{
-            datepicker::DatePicker,
-            input::{CustomFileInput, InputField, InputFieldType},
+            input::{InputField, InputFieldType},
             reactive_form::ReactiveForm,
-            select::{SelectInput, SelectOption},
         },
         general::{
             breadcrumbs::Breadcrumbs,
@@ -24,22 +27,15 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::{
-        general::{
-            acl::{
-                AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields,
-                UserInfoStoreFields,
-            },
-            files::UploadedFileResponse,
-        },
-        graphql::shared::{CreatePortfolioItem, UserPortfolioInput, UserPortfolioInputFields},
+    schemas::general::acl::{
+        AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
-pub fn Portfolio() -> impl IntoView {
+pub fn UserService() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -48,30 +44,28 @@ pub fn Portfolio() -> impl IntoView {
 }
 
 #[island]
-pub fn PortfolioList() -> impl IntoView {
+pub fn UserServicesList() -> impl IntoView {
     let table_data = RwSignal::new((
         vec![
             Column::new("Title", false),
             Column::new("Description", true),
-            Column::new("Start Date", true),
-            Column::new("End Date", true),
         ],
         vec![],
     ));
 
     view! {
         <>
-            <Title text="My Portfolio"/>
+            <Title text="User Services"/>
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Services"] />
             </div>
 
-            <h1 class="mx-[20px]">Portfolio</h1>
+            <h1 class="mx-[20px]">User Services</h1>
 
             <div class="mx-[20px] flex items-center justify-end">
-                <A href="/dashboard/portfolio/create">
+                <A href="/dashboard/services/create">
                     <BasicButton
-                        button_text="Create"
+                        button_text="Create Service"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-white"
@@ -87,7 +81,7 @@ pub fn PortfolioList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreatePortfolio() -> impl IntoView {
+pub fn CreateUserService() -> impl IntoView {
     let form_ref = NodeRef::new();
     let file_input_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
@@ -96,15 +90,10 @@ pub fn CreatePortfolio() -> impl IntoView {
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
-    let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
-    });
-
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
     });
 
     Effect::new(move || {
@@ -156,7 +145,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                             ) {
                                                 let deserialized_form_data =
                                                     deserialize_form_data_to_struct::<
-                                                        UserPortfolioInput,
+                                                        UserServiceInput,
                                                     >(
                                                         &form_data, false
                                                     );
@@ -166,9 +155,9 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                     return;
                                                 }
 
-                                                let operation = CreatePortfolioItem::build(
-                                                    UserPortfolioInputFields {
-                                                        portfolio_item: deserialized_form_data
+                                                let operation = CreateUserService::build(
+                                                    UserServiceInputFields {
+                                                        user_service: deserialized_form_data
                                                             .unwrap(),
                                                     },
                                                 );
@@ -216,6 +205,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                             "Failed to add portfolio item: {:?}",
                                                             response.errors
                                                         );
+                                                        set_is_loading.set(false);
                                                     }
                                                 };
                                             };
@@ -226,11 +216,13 @@ pub fn CreatePortfolio() -> impl IntoView {
                                             "Failed to parse uploaded file response: {:?}",
                                             err
                                         );
+                                        set_is_loading.set(false);
                                     }
                                 };
                             }
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
+                                set_is_loading.set(false);
                             }
                         };
                     });
@@ -259,10 +251,10 @@ pub fn CreatePortfolio() -> impl IntoView {
 
     view! {
         <>
-            <Title text="Create Portfolio"/>
+            <Title text="New Service"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div>
-                    <p>"Portfolio Project created successfully!"</p>
+                    <p>"Service created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -275,29 +267,18 @@ pub fn CreatePortfolio() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Services", "New Service"] />
             </div>
 
-            <h1 class="mx-[20px]">Create New Portfolio Project</h1>
+            <h1 class="mx-[20px]">New Service</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
-                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <DatePicker label="End Date" required=true id_attr="end_date" initial_value=init_date name="end_date" />
-                    <InputField field_type=InputFieldType::Text label="Link" required=true id_attr="link" name="link" />
-                    <SelectInput
-                    label="Category"
-                    name="category"
-                    required=true
-                    id_attr="category"
-                    options=vec![
-                        SelectOption::new("", "Select Category"),
-                        SelectOption::new("JavaScript", "JavaScript")
-                    ]
-                    />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" required=true />
+
+
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"

@@ -212,6 +212,7 @@ pub fn CreateSkill() -> impl IntoView {
                                                             "Failed to add portfolio item: {:?}",
                                                             response.errors
                                                         );
+                                                        set_is_loading.set(false);
                                                     }
                                                 };
                                             };
@@ -222,11 +223,13 @@ pub fn CreateSkill() -> impl IntoView {
                                             "Failed to parse uploaded file response: {:?}",
                                             err
                                         );
+                                        set_is_loading.set(false);
                                     }
                                 };
                             }
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
+                                set_is_loading.set(false);
                             }
                         };
                     });

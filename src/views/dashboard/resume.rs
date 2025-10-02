@@ -8,14 +8,14 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::forms::radio_input::RadioOption;
+use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
+use crate::schemas::graphql::shared::{CreateResumeItem, ResumeItemInputFields, UserResumeInput};
 use crate::{
     components::{
         forms::{
             datepicker::DatePicker,
             input::{InputField, InputFieldType},
-            radio_input::RadioInputField,
             reactive_form::ReactiveForm,
         },
         general::{
@@ -25,20 +25,15 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::{
-        general::acl::{
-            AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
-        },
-        graphql::shared::{
-            CreateProfessionalDetails, ProfessionalDetailsInputFields, UserProfessionalInfoInput,
-        },
+    schemas::general::acl::{
+        AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
-pub fn ProfessionalDetails() -> impl IntoView {
+pub fn Resume() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -47,28 +42,28 @@ pub fn ProfessionalDetails() -> impl IntoView {
 }
 
 #[island]
-pub fn ProfessionalDetailsList() -> impl IntoView {
+pub fn ResumeItemsList() -> impl IntoView {
     let table_data = RwSignal::new((
         vec![
-            Column::new("Occupation", false),
-            Column::new("Description", true),
-            Column::new("Status", true),
+            Column::new("Title", false),
             Column::new("Start Date", true),
+            Column::new("End Date", true),
+            Column::new("Section", true),
         ],
         vec![],
     ));
 
     view! {
         <>
-            <Title text="My Portfolio"/>
+            <Title text="Resume Items"/>
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Professions"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resume Items"] />
             </div>
 
-            <h1 class="mx-[20px]">Professional Details</h1>
+            <h1 class="mx-[20px]">Resume Items</h1>
 
             <div class="mx-[20px] flex items-center justify-end">
-                <A href="/dashboard/professional-details/create">
+                <A href="/dashboard/resume/create">
                     <BasicButton
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
@@ -86,7 +81,7 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreateProfessionalDetail() -> impl IntoView {
+pub fn CreateResumeItem() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
@@ -110,19 +105,17 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data = deserialize_form_data_to_struct::<
-                        UserProfessionalInfoInput,
-                    >(&form_data, true);
+                    let deserialized_form_data =
+                        deserialize_form_data_to_struct::<UserResumeInput>(&form_data, true);
 
                     if deserialized_form_data.is_none() {
                         set_is_loading.set(false);
                         return;
                     }
 
-                    let operation =
-                        CreateProfessionalDetails::build(ProfessionalDetailsInputFields {
-                            professional_details: deserialized_form_data.unwrap(),
-                        });
+                    let operation = CreateResumeItem::build(ResumeItemInputFields {
+                        resume_item: deserialized_form_data.unwrap(),
+                    });
 
                     let response = reqwest::Client::new()
                         .post("http://localhost:8080/api/shared")
@@ -159,6 +152,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                                 "Failed to add portfolio item: {:?}",
                                 response.errors
                             );
+                            set_is_loading.set(false);
                         }
                     };
                 };
@@ -186,10 +180,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
 
     view! {
         <>
-            <Title text="New Profession"/>
+            <Title text="New Resume Item"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div>
-                    <p>"Profession created successfully!"</p>
+                    <p>"Resume Item created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -202,33 +196,28 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Professions", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resume Items", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New Profession</h1>
+            <h1 class="mx-[20px]">New Resume Item</h1>
 
             <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
-                    <InputField field_type=InputFieldType::Text label="Occupation" required=true id_attr="occupation" name="occupation" />
-                    <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
+                    <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
+                    <InputField field_type=InputFieldType::Text label="More Info" id_attr="more_info" name="more_info" />
 
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <RadioInputField
-                        legend="Select Status"
-                        name="active"
-                        required=true
-                        options=vec![
-                            RadioOption {
-                                value: "true".to_string(),
-                                label: "Active".to_string(),
-                                children: None,
-                            },
-                            RadioOption {
-                                value: "false".to_string(),
-                                label: "InActive".to_string(),
-                                children: None,
-                            },
-                        ]
+                    <DatePicker label="End Date" id_attr="end_date" initial_value=init_date name="end_date" />
+                    <InputField field_type=InputFieldType::Text label="Link" id_attr="link" name="link" />
+                    <SelectInput
+                    label="Section"
+                    name="section"
+                    required=true
+                    id_attr="section"
+                    options=vec![
+                        SelectOption::new("", "Select Section"),
+                        SelectOption::new("Education", "Education")
+                    ]
                     />
                     <BasicButton
                         button_text="Submit"

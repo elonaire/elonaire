@@ -21,7 +21,7 @@ impl<'a> MenuItem<'a> {
 }
 
 #[island]
-pub fn Dashboard() -> impl IntoView {
+pub fn DashboardLayout() -> impl IntoView {
     // track collapsed state
     let (collapsed, set_collapsed) = signal(false);
 
@@ -33,12 +33,12 @@ pub fn Dashboard() -> impl IntoView {
             MenuItem::new("Dashboard", IconData::MdiMonitorDashboard, "/dashboard"),
             MenuItem::new(
                 "Professional Details",
-                IconData::BiUserBadgeSolid,
+                IconData::MdiBadgeAccountHorizontalOutline,
                 "/dashboard/professional-details",
             ),
             MenuItem::new(
                 "Portfolio",
-                IconData::AiProfileOutlined,
+                IconData::MdiTrophyAward,
                 "/dashboard/portfolio",
             ),
             MenuItem::new("Services", IconData::BiWrenchRegular, "/dashboard/services"),
@@ -73,7 +73,7 @@ pub fn Dashboard() -> impl IntoView {
                         Some(view! {
                             <div class="overflow-hidden mx-[20px]">
                                 <div class="flex items-center justify-between h-[45px] border-y border-gray-200">
-                                    <p class="text-gray-700 font-medium">NAVIGATION</p>
+                                    <p class="text-gray-300 font-medium">NAVIGATION</p>
                                     <button
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)

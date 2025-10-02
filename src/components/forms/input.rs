@@ -144,7 +144,7 @@ pub fn CustomFileInput(
             />
                <BasicButton
                    button_text="Choose File"
-                   icon=Some(IconData::AiUploadOutlined)
+                   icon=Some(IconData::FiUpload)
                    icon_before=true
                    style_ext="w-full bg-primary text-white"
                 />

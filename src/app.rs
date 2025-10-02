@@ -10,16 +10,18 @@ use reactive_stores::Store;
 use crate::{
     components::general::hocs::protected_route::ProtectedRoute,
     views::{
-        dashboard::Dashboard,
-        dashboard_home::DashboardHome,
-        home::Home,
-        portfolio::{CreatePortfolio, Portfolio, PortfolioList},
-        professional_details::{
-            CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
+        dashboard::{
+            home::DashboardHome,
+            layout::DashboardLayout,
+            portfolio::{CreatePortfolio, Portfolio, PortfolioList},
+            professional_details::{
+                CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
+            },
+            resume::{CreateResumeItem, Resume, ResumeItemsList},
+            skills::{CreateSkill, Skills, SkillsList},
+            user_services::{CreateUserService, UserService, UserServicesList},
         },
-        resume::{CreateResumeItem, Resume, ResumeItemsList},
-        skills::{CreateSkill, Skills, SkillsList},
-        user_services::{CreateUserService, UserService, UserServicesList},
+        home::Home,
     },
 };
 use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
@@ -53,7 +55,7 @@ pub fn App() -> impl IntoView {
                 <Routes fallback=|| "Page not found.">
                     <Route path=StaticSegment("") view=Home />
                     // <Route path=StaticSegment("/dashboard") view=|| view! { <ProtectedRoute><Dashboard /></ProtectedRoute> } />
-                    <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><Dashboard /></ProtectedRoute> }>
+                    <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />
                             <Route path=path!("create") view=CreatePortfolio />
