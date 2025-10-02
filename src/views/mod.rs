@@ -4,4 +4,5 @@ pub mod home;
 pub mod login;
 pub mod portfolio;
 pub mod professional_details;
+pub mod resume;
 pub mod user_services;

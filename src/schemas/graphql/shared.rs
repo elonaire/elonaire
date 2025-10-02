@@ -157,3 +157,67 @@ pub struct UserService {
     pub description: String,
     pub thumbnail: String,
 }
+
+/* This is the beginning of UserService GraphQL schema */
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(
+    schema = "shared",
+    graphql_type = "Mutation",
+    variables = "ResumeItemInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+)]
+pub struct CreateResumeItem {
+    #[arguments(resumeItem: $resume_item)]
+    pub create_resume_item: UserResume, // this is the return type expected from the API on success, the key is the resolver name
+}
+
+// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
+#[derive(cynic::QueryVariables, Debug)]
+pub struct ResumeItemInputFields {
+    pub resume_item: UserResumeInput, // The key should match the value provided in the corresponding query fragment
+}
+
+#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
+#[cynic(schema = "shared")]
+pub struct UserResumeInput {
+    pub title: String,
+    pub more_info: String,
+    pub start_date: String,
+    pub end_date: String,
+    pub link: String,
+    pub section: UserResumeSection,
+}
+
+#[derive(cynic::Enum, Clone, Debug, Copy, Eq, PartialEq)]
+#[cynic(rename_all = "None", schema = "shared")]
+pub enum UserResumeSection {
+    Education,
+    Experience,
+    Achievements,
+    Projects,
+    Certifications,
+    Volunteer,
+    Publications,
+    Languages,
+    Interests,
+    References,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct UserResume {
+    pub id: String,
+    pub title: String,
+    pub more_info: Option<String>,
+    pub start_date: String,
+    pub end_date: Option<String>,
+    pub link: Option<String>,
+    pub section: UserResumeSection,
+    pub achievements: Vec<ResumeAchievement>,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct ResumeAchievement {
+    pub id: String,
+    pub description: String,
+}

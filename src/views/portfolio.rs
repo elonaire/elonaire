@@ -71,7 +71,7 @@ pub fn PortfolioList() -> impl IntoView {
             <div class="mx-[20px] flex items-center justify-end">
                 <A href="/dashboard/portfolio/create">
                     <BasicButton
-                        button_text="Create Project"
+                        button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-white"
@@ -275,7 +275,7 @@ pub fn CreatePortfolio() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio", "Create"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio", "New"] />
             </div>
 
             <h1 class="mx-[20px]">Create New Portfolio Project</h1>
