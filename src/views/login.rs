@@ -48,6 +48,7 @@ pub fn SignIn() -> impl IntoView {
             .and_then(|params| params.auth_code.clone())
         {
             Some(auth_code) => {
+                set_is_loading.set(true);
                 spawn_local(async move {
                     let auth_code_body = AuthCode {
                         auth_code: Some(auth_code),
@@ -63,6 +64,7 @@ pub fn SignIn() -> impl IntoView {
                     if let Ok(auth_status) = response.json::<AuthDetailsRest>().await {
                         *current_state.user().auth_info().token().write() =
                             auth_status.token.unwrap();
+                        set_is_loading.set(false);
                     };
                 });
             }
@@ -95,6 +97,7 @@ pub fn SignIn() -> impl IntoView {
                 },
             });
 
+            set_is_loading.set(true);
             spawn_local(async move {
                 let response = reqwest::Client::new()
                     .post("http://localhost:8080/api/acl")
@@ -106,6 +109,7 @@ pub fn SignIn() -> impl IntoView {
                     Some(data) => {
                         match data.sign_in {
                             Some(auth_details) => {
+                                set_is_loading.set(false);
                                 navigate(auth_details.url.unwrap().as_str());
                             }
                             None => {}
