@@ -18,6 +18,7 @@ use crate::{
             CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
         },
         resume::{CreateResumeItem, Resume, ResumeItemsList},
+        skills::{CreateSkill, Skills, SkillsList},
         user_services::{CreateUserService, UserService, UserServicesList},
     },
 };
@@ -68,6 +69,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/resume") view=Resume>
                             <Route path=path!("") view=ResumeItemsList />
                             <Route path=path!("create") view=CreateResumeItem />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/skills") view=Skills>
+                            <Route path=path!("") view=SkillsList />
+                            <Route path=path!("create") view=CreateSkill />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>

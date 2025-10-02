@@ -47,6 +47,11 @@ pub fn Dashboard() -> impl IntoView {
                 IconData::MdiCertificateOutline,
                 "/dashboard/resume",
             ),
+            MenuItem::new(
+                "Skills",
+                IconData::BiCertificationRegular,
+                "/dashboard/skills",
+            ),
             MenuItem::new("Blog", IconData::RiArticleDocumentLine, "/dashboard/blog"),
             MenuItem::new("Media", IconData::AiFileImageOutlined, "/dashboard/media"),
         ]

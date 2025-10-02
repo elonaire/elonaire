@@ -58,34 +58,6 @@ pub enum UserPortfolioCategory {
     Mobile,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
-pub struct UserSkill {
-    pub id: String,
-    pub thumbnail: String,
-    pub name: String,
-    pub level: Option<UserSkillLevel>,
-    #[cynic(rename = "type")]
-    pub r#type: UserSkillType,
-    pub start_date: String,
-}
-
-#[derive(cynic::Enum, Clone, Copy, Debug)]
-#[cynic(rename_all = "None", schema = "shared")]
-pub enum UserSkillLevel {
-    Beginner,
-    Intermediate,
-    Advanced,
-    Expert,
-}
-
-#[derive(cynic::Enum, Clone, Copy, Debug)]
-#[cynic(rename_all = "None", schema = "shared")]
-pub enum UserSkillType {
-    Technical,
-    Soft,
-}
-
 /* This is the beginning of UserProfessionalInfo GraphQL schema */
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(
@@ -220,4 +192,61 @@ pub struct UserResume {
 pub struct ResumeAchievement {
     pub id: String,
     pub description: String,
+}
+
+/* This is the beginning of UserSkill GraphQL schema */
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(
+    schema = "shared",
+    graphql_type = "Mutation",
+    variables = "UserSkillInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+)]
+pub struct CreateSkill {
+    #[arguments(skill: $skill)]
+    pub create_skill: UserSkill, // this is the return type expected from the API on success, the key is the resolver name
+}
+
+// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
+#[derive(cynic::QueryVariables, Debug)]
+pub struct UserSkillInputFields {
+    pub skill: UserSkillInput, // The key should match the value provided in the corresponding query fragment
+}
+
+#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
+#[cynic(schema = "shared")]
+pub struct UserSkillInput {
+    pub name: String,
+    #[cynic(rename = "type")]
+    pub r#type: UserSkillType,
+    pub level: UserSkillLevel,
+    pub start_date: String,
+    pub thumbnail: String,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct UserSkill {
+    pub id: String,
+    pub thumbnail: String,
+    pub name: String,
+    pub level: Option<UserSkillLevel>,
+    #[cynic(rename = "type")]
+    pub r#type: UserSkillType,
+    pub start_date: String,
+}
+
+#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
+#[cynic(rename_all = "None", schema = "shared")]
+pub enum UserSkillLevel {
+    Beginner,
+    Intermediate,
+    Advanced,
+    Expert,
+}
+
+#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
+#[cynic(rename_all = "None", schema = "shared")]
+pub enum UserSkillType {
+    Technical,
+    Soft,
 }
