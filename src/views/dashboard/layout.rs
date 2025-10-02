@@ -88,10 +88,10 @@ pub fn DashboardLayout() -> impl IntoView {
                                         let(child)
                                     >
                                         <div class="block rounded-md hover:bg-gray-100 h-[45px]" on:click=move |_| set_collapsed.set(false)>
-                                            <div class="flex items-center gap-[10px] h-full">
+                                            <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
                                                 <Icon width="24" height="24" icon=child.icon />
-                                                <A href=child.path>{child.label}</A>
-                                            </div>
+                                                <span class="flex-1">{child.label}</span>
+                                            </A>
                                         </div>
                                     </For>
                                 </nav>
