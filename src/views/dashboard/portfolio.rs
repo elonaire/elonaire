@@ -217,6 +217,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                             response.errors
                                                         );
                                                         set_is_loading.set(false);
+                                                        set_submission_confirmed.set(false);
                                                     }
                                                 };
                                             };
@@ -228,12 +229,14 @@ pub fn CreatePortfolio() -> impl IntoView {
                                             err
                                         );
                                         set_is_loading.set(false);
+                                        set_submission_confirmed.set(false);
                                     }
                                 };
                             }
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
                                 set_is_loading.set(false);
+                                set_submission_confirmed.set(false);
                             }
                         };
                     });

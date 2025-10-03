@@ -153,6 +153,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                                 response.errors
                             );
                             set_is_loading.set(false);
+                            set_submission_confirmed.set(false);
                         }
                     };
                 };
