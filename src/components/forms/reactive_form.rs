@@ -52,6 +52,7 @@ pub fn ReactiveForm(
                 }
             }
             on:change=move |_| {
+                leptos::logging::log!("Form changed");
                 if let Some(form) = form_ref.get() {
                     if form.check_validity() {
                         fire_bubbled_and_cancelable_event("submit", true, true, &form);

@@ -11,6 +11,7 @@ use crate::{
     components::general::hocs::protected_route::ProtectedRoute,
     views::{
         dashboard::{
+            blog::{Blog, BlogList, CreateBlog},
             home::DashboardHome,
             layout::DashboardLayout,
             portfolio::{CreatePortfolio, Portfolio, PortfolioList},
@@ -75,6 +76,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/skills") view=Skills>
                             <Route path=path!("") view=SkillsList />
                             <Route path=path!("create") view=CreateSkill />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/blog") view=Blog>
+                            <Route path=path!("") view=BlogList />
+                            <Route path=path!("create") view=CreateBlog />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>

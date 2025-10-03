@@ -250,3 +250,79 @@ pub enum UserSkillType {
     Technical,
     Soft,
 }
+
+/* This is the beginning of Blog GraphQL schema */
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(
+    schema = "shared",
+    graphql_type = "Mutation",
+    variables = "BlogPostInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+)]
+pub struct CreateBlogPost {
+    #[arguments(blogPost: $blog_post)]
+    pub create_blog_post: BlogPost, // this is the return type expected from the API on success, the key is the resolver name
+}
+
+// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
+#[derive(cynic::QueryVariables, Debug)]
+pub struct BlogPostInputFields {
+    pub blog_post: BlogPostInput, // The key should match the value provided in the corresponding query fragment
+}
+
+#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
+#[cynic(schema = "shared")]
+pub struct BlogPostInput {
+    pub title: String,
+    pub short_description: String,
+    pub status: BlogStatus,
+    pub thumbnail: String,
+    pub content_file: String,
+    pub category: BlogCategory,
+    pub is_featured: Option<bool>,
+    pub is_premium: Option<bool>,
+}
+
+#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
+#[cynic(rename_all = "None", schema = "shared")]
+pub enum BlogStatus {
+    Draft,
+    Published,
+    Archived,
+}
+
+#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
+#[cynic(rename_all = "None", schema = "shared")]
+pub enum BlogCategory {
+    WebDevelopment,
+    MobileDevelopment,
+    ArtificialIntelligence,
+    Technology,
+    Lifestyle,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct BlogPost {
+    pub id: String,
+    pub title: String,
+    pub short_description: String,
+    pub status: Option<BlogStatus>,
+    pub thumbnail: String,
+    pub content: Option<String>,
+    pub category: BlogCategory,
+    pub link: String,
+    pub published_date: Option<String>,
+    pub is_featured: Option<bool>,
+    pub is_premium: Option<bool>,
+    pub comments: Option<Vec<BlogComment>>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
+    pub content_file: String,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+pub struct BlogComment {
+    pub content: String,
+    pub id: String,
+}

@@ -24,6 +24,7 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
         let arr = Array::from(&pair);
         let key = arr.get(0).as_string()?;
         let value = arr.get(1);
+
         if let Some(s) = value.as_string() {
             if deserialize_bool && (s == "true" || s == "false") {
                 let parsed_s: bool = s.parse().unwrap();

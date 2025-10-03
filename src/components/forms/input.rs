@@ -54,6 +54,8 @@ pub fn InputField(
     #[prop(into, optional)] ext_input_styles: String,
     #[prop(into, optional, default = "off".to_string())] autocomplete: String,
     #[prop(into, optional)] id_attr: String,
+    #[prop(into, optional)] accept: String,
+    #[prop(into, optional)] multiple: bool,
 ) -> impl IntoView {
     let (display_error, _set_display_error) = signal(false);
 
@@ -106,6 +108,8 @@ pub fn InputField(
                 on:click={move |ev| onclick.run(ev)}
                 required=required
                 on:change={move |ev| onchange.run(ev)}
+                accept=accept
+                multiple=multiple
             />
             <p class="text-red-500 text-xs italic">
                 {move || {
@@ -129,6 +133,8 @@ pub fn CustomFileInput(
     #[prop(into, optional)] ext_label_styles: String,
     #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
+    #[prop(into, optional)] multiple: bool,
+    #[prop(into, optional)] accept: String,
 ) -> impl IntoView {
     view! {
         <div class="relative">
@@ -141,6 +147,8 @@ pub fn CustomFileInput(
                 id_attr=id_attr.clone()
                 onchange=onchange
                 input_node_ref=input_node_ref
+                multiple=multiple
+                accept=accept
             />
                <BasicButton
                    button_text="Choose File"

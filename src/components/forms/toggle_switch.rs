@@ -17,7 +17,7 @@ use leptos::prelude::*;
 #[component]
 pub fn ToggleSwitch(
     #[prop(into)] name: String,
-    #[prop(into)] active: RwSignal<bool>,
+    #[prop(into, optional, default = RwSignal::new(false))] active: RwSignal<bool>,
     #[prop(into, default = "On".into())] label_active: String,
     #[prop(into, default = "Off".into())] label_inactive: String,
     #[prop(into, optional)] id_attr: String,
@@ -26,28 +26,28 @@ pub fn ToggleSwitch(
     #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
 ) -> impl IntoView {
     let checkbox_ref = NodeRef::new();
+    let initial_value = RwSignal::new(String::from("false"));
 
     let handle_toggle = move |ev: ev::MouseEvent| {
         ev.stop_propagation();
         active.set(!active.get());
-
-        // Fire a bubbling Change event so that the form can capture changes
-        if let Some(input_el) = checkbox_ref.get() {
-            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
-        }
     };
 
-    let current_value = RwSignal::new("".to_string());
+    Effect::new(move |_| {
+        let _value_hack = initial_value.get();
+        // Fire a bubbling Change event so that the form can capture changes
+        if let Some(input_el) = checkbox_ref.get() {
+            fire_bubbled_and_cancelable_event("input", true, true, &input_el);
+        }
+    });
 
     Effect::new(move |_| {
-        current_value.set(active.get().to_string());
+        initial_value.set(active.get().to_string());
     });
 
     view! {
-        <div class="flex flex-col cursor-pointer mb-2">
-            <div>
-                <CheckboxInputField input_node_ref=checkbox_ref oninput=oninput initial_value=current_value label=label name=name id_attr=id_attr checked=active ext_input_styles="sr-only" required=required />
-            </div>
+        <div class="flex flex-col cursor-pointer relative">
+            <CheckboxInputField input_node_ref=checkbox_ref oninput=oninput initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required />
             <div class="flex items-center">
                 <div on:click=handle_toggle class="relative">
                     <div

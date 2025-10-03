@@ -140,8 +140,8 @@ pub fn CreatePortfolio() -> impl IntoView {
                         .await
                         {
                             Ok(response) => {
-                                match response.json::<UploadedFileResponse>().await {
-                                    Ok(uploaded_file) => {
+                                match response.json::<Vec<UploadedFileResponse>>().await {
+                                    Ok(uploaded_files) => {
                                         if let Some(form_data) =
                                             get_form_data_from_form_ref(&form_ref)
                                         {
@@ -150,7 +150,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                 "thumbnail",
                                                 format!(
                                                     "http://localhost:3001/view/{}",
-                                                    uploaded_file.file_name
+                                                    uploaded_files[0].file_name
                                                 )
                                                 .as_str(),
                                             ) {
@@ -300,7 +300,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                         SelectOption::new("JavaScript", "JavaScript")
                     ]
                     />
-                    <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" required=true />
+                    <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"
