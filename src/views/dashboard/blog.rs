@@ -1,5 +1,5 @@
 use icondata as IconData;
-use leptos::ev::{self, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -8,7 +8,6 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::radio_input::RadioInputField;
 use crate::components::forms::toggle_switch::ToggleSwitch;
 use crate::components::general::spinner::Spinner;
 use crate::{
