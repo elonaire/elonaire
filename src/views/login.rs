@@ -11,24 +11,28 @@ use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 use web_sys::window;
 
-use crate::components::forms::input::InputField;
-use crate::components::forms::input::InputFieldType;
-use crate::components::forms::reactive_form::ReactiveForm;
-// use crate::components::general::breadcrumbs::Breadcrumbs;
-use crate::components::general::button::BasicButton;
-use crate::components::general::button::ButtonType;
-use crate::components::general::spinner::Spinner;
-use crate::schemas::general::acl::AppStateContext;
-use crate::schemas::general::acl::AppStateContextStoreFields;
-use crate::schemas::general::acl::AuthCode;
-use crate::schemas::general::acl::AuthDetailsRest;
-use crate::schemas::general::acl::{AuthInfoStoreFields, UserInfoStoreFields};
-use crate::schemas::graphql::acl::{
-    OauthClientName, SignInMutation, UserLoginsInput, UserLoginsInputFields,
+use crate::components::{
+    forms::{
+        input::{InputField, InputFieldType},
+        reactive_form::ReactiveForm,
+    },
+    general::{
+        button::{BasicButton, ButtonType},
+        spinner::Spinner,
+    },
 };
-use crate::utils::forms::deserialize_form_data_to_struct;
-use crate::utils::forms::get_form_data_from_form_ref;
-use cynic::{MutationBuilder, http::ReqwestExt};
+use crate::data::models::graphql::acl::SignInResponse;
+use crate::data::models::graphql::acl::SignInVars;
+use crate::data::models::graphql::acl::UserLoginsForm;
+use crate::data::models::{
+    general::acl::{
+        AppStateContext, AppStateContextStoreFields, AuthCode, AuthDetailsRest,
+        AuthInfoStoreFields, UserInfoStoreFields,
+    },
+    graphql::acl::{OauthClientName, UserLoginsInput},
+};
+use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 #[island]
 pub fn SignIn() -> impl IntoView {
@@ -36,7 +40,6 @@ pub fn SignIn() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
-    let success_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
 
     let query = use_query::<AuthCode>();
@@ -89,33 +92,49 @@ pub fn SignIn() -> impl IntoView {
 
     let onsocial_sign_in = move |client: OauthClientName| {
         Callback::new(move |_e: ev::MouseEvent| {
-            let operation = SignInMutation::build(UserLoginsInputFields {
+            let user_logins = SignInVars {
                 raw_user_details: UserLoginsInput {
                     user_name: None,
                     password: None,
                     oauth_client: Some(client),
                 },
-            });
+            };
+
+            let query = r#"
+                   mutation SignIn($rawUserDetails: UserLoginsInput!) {
+                       signIn(rawUserDetails: $rawUserDetails) {
+                           url
+                       }
+                   }
+               "#;
 
             set_is_loading.set(true);
             spawn_local(async move {
-                let response = reqwest::Client::new()
-                    .post("http://localhost:8080/api/acl")
-                    .run_graphql(operation)
-                    .await
-                    .unwrap();
+                let login_res = perform_mutation_or_query_with_vars::<SignInResponse, SignInVars>(
+                    None,
+                    "http://localhost:8080/api/acl",
+                    query,
+                    user_logins,
+                )
+                .await;
 
-                match response.data {
+                leptos::logging::log!("login_res: {:?}", login_res);
+
+                match login_res.get_data() {
                     Some(data) => {
-                        match data.sign_in {
+                        match &data.sign_in {
                             Some(auth_details) => {
-                                set_is_loading.set(false);
-                                navigate(auth_details.url.unwrap().as_str());
+                                navigate(auth_details.url.as_ref().unwrap().as_str());
                             }
-                            None => {}
+                            None => {
+                                set_is_loading.set(false);
+                            }
                         };
                     }
-                    None => {}
+                    None => {
+                        set_is_loading.set(false);
+                        // login_res.get_error()
+                    }
                 };
             });
         })
@@ -139,28 +158,50 @@ pub fn SignIn() -> impl IntoView {
                     spawn_local(async move {
                         if let Some(form_data) = get_form_data_from_form_ref(&login_form_ref) {
                             let deserialized_form_data =
-                                deserialize_form_data_to_struct::<UserLoginsInput>(
-                                    &form_data, true,
-                                );
+                                deserialize_form_data_to_struct::<UserLoginsForm>(&form_data, true);
 
                             if deserialized_form_data.is_none() {
                                 set_is_loading.set(false);
                                 return;
                             }
 
-                            let operation = SignInMutation::build(UserLoginsInputFields {
-                                raw_user_details: deserialized_form_data.unwrap(),
-                            });
+                            leptos::logging::log!(
+                                "deserialized_form_data: {:?}",
+                                deserialized_form_data
+                            );
 
-                            let response = reqwest::Client::new()
-                                .post("http://localhost:8080/api/acl")
-                                .run_graphql(operation)
-                                .await
-                                .unwrap();
+                            let deserialized_form_data = deserialized_form_data.unwrap();
 
-                            match response.data {
+                            let user_logins = SignInVars {
+                                raw_user_details: UserLoginsInput {
+                                    user_name: deserialized_form_data.user_name,
+                                    password: deserialized_form_data.password,
+                                    oauth_client: None,
+                                },
+                            };
+
+                            let query = r#"
+                                   mutation SignIn($rawUserDetails: UserLoginsInput!) {
+                                       signIn(rawUserDetails: $rawUserDetails) {
+                                            token
+                                       }
+                                   }
+                               "#;
+
+                            let login_res =
+                                perform_mutation_or_query_with_vars::<SignInResponse, SignInVars>(
+                                    None,
+                                    "http://localhost:8080/api/acl",
+                                    query,
+                                    user_logins,
+                                )
+                                .await;
+
+                            leptos::logging::log!("login_res: {:?}", login_res);
+
+                            match login_res.get_data() {
                                 Some(data) => {
-                                    match data.sign_in {
+                                    match &data.sign_in {
                                         Some(auth_details) => {
                                             if let Some(form) =
                                                 login_form_ref.get_untracked().and_then(|el| {
@@ -173,10 +214,8 @@ pub fn SignIn() -> impl IntoView {
                                             }
                                             set_is_loading.set(false);
 
-                                            success_modal_is_open.update(|status| *status = true);
-
                                             *current_state.user().auth_info().token().write() =
-                                                auth_details.token.unwrap();
+                                                auth_details.token.as_ref().unwrap().to_owned();
                                         }
                                         None => {
                                             set_is_loading.set(false);
@@ -185,6 +224,7 @@ pub fn SignIn() -> impl IntoView {
                                 }
                                 None => {
                                     set_is_loading.set(false);
+                                    // login_res.get_error()
                                 }
                             };
                         };
@@ -234,7 +274,7 @@ pub fn SignIn() -> impl IntoView {
                                     name="user_name"
                                     required=true
                                     placeholder="Enter your email or username"
-                                    id_attr="username"
+                                    id_attr="user_name"
                                     ext_input_styles="focus:ring-secondary"
                                     autocomplete="on"
                                 />

@@ -57,8 +57,6 @@ pub fn InputField(
     #[prop(into, optional)] accept: String,
     #[prop(into, optional)] multiple: bool,
 ) -> impl IntoView {
-    let (display_error, _set_display_error) = signal(false);
-
     let input_field_type_str = match field_type {
         InputFieldType::Text => "text",
         InputFieldType::Email => "email",
@@ -111,15 +109,6 @@ pub fn InputField(
                 accept=accept
                 multiple=multiple
             />
-            <p class="text-red-500 text-xs italic">
-                {move || {
-                    if display_error.get() {
-                        "This field is required"
-                    } else {
-                        ""
-                    }
-                }}
-            </p>
         </div>
     }
 }

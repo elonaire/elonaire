@@ -24,7 +24,7 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::{
+    data::models::{
         general::{
             acl::{
                 AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields,
@@ -32,7 +32,7 @@ use crate::{
             },
             files::UploadedFileResponse,
         },
-        graphql::shared::{CreatePortfolioItem, UserPortfolioInput, UserPortfolioInputFields},
+        graphql::shared::{CreatePortfolioItem, UserPortfolioInput, UserPortfolioInputArguments},
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
@@ -167,7 +167,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                 }
 
                                                 let operation = CreatePortfolioItem::build(
-                                                    UserPortfolioInputFields {
+                                                    UserPortfolioInputArguments {
                                                         portfolio_item: deserialized_form_data
                                                             .unwrap(),
                                                     },

@@ -21,6 +21,7 @@ impl std::fmt::Debug for RadioOption {
 }
 
 impl RadioOption {
+    #[allow(dead_code)]
     pub fn new(value: &str, label: &str, children: Option<ViewFn>) -> Self {
         Self {
             value: value.to_string(),
@@ -65,8 +66,6 @@ pub fn RadioInputField(
     legend_class: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
-    let (display_error, _set_display_error) = signal(false);
-
     let base_fieldset_class = "border border-gray-300 rounded p-4";
     let base_legend_class = "text-gray-700 text-sm font-bold px-2";
 

@@ -1,4 +1,4 @@
-use crate::schemas::general::acl::{AppStateContext, AppStateContextStoreFields};
+use crate::data::models::general::acl::{AppStateContext, AppStateContextStoreFields};
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;

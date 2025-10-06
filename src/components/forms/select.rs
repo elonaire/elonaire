@@ -11,6 +11,7 @@ pub struct SelectOption {
 }
 
 impl SelectOption {
+    #[allow(dead_code)]
     pub fn new(value: &str, label: &str) -> Self {
         Self {
             value: value.into(),

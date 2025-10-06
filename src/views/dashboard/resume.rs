@@ -10,7 +10,9 @@ use web_sys::HtmlFormElement;
 
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
-use crate::schemas::graphql::shared::{CreateResumeItem, ResumeItemInputFields, UserResumeInput};
+use crate::data::models::graphql::shared::{
+    CreateResumeItem, ResumeItemInputArguments, UserResumeInput,
+};
 use crate::{
     components::{
         forms::{
@@ -25,7 +27,7 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::general::acl::{
+    data::models::general::acl::{
         AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
@@ -113,7 +115,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                         return;
                     }
 
-                    let operation = CreateResumeItem::build(ResumeItemInputFields {
+                    let operation = CreateResumeItem::build(ResumeItemInputArguments {
                         resume_item: deserialized_form_data.unwrap(),
                     });
 

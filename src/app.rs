@@ -9,6 +9,7 @@ use reactive_stores::Store;
 
 use crate::{
     components::general::hocs::protected_route::ProtectedRoute,
+    data::models::general::acl::AppStateContext,
     views::{
         dashboard::{
             blog::{Blog, BlogList, CreateBlog},
@@ -23,9 +24,9 @@ use crate::{
             user_services::{CreateUserService, UserService, UserServicesList},
         },
         home::Home,
+        login::SignIn,
     },
 };
-use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
 
 #[component]
 pub fn App() -> impl IntoView {

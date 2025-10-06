@@ -28,12 +28,14 @@ pub struct AppStateContext {
 }
 
 #[derive(Clone, Debug, Default, Store)]
+#[allow(dead_code)]
 pub struct UserInfo {
     pub user_profile: UserProfile,
     pub auth_info: AuthInfo,
 }
 
 #[derive(Clone, Debug, Default, Store)]
+#[allow(dead_code)]
 pub struct UserProfile {
     pub id: Option<String>,
     pub user_name: Option<String>,

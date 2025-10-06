@@ -30,7 +30,6 @@ pub fn Textarea(
     #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
-    let (display_error, _set_display_error) = signal(false);
 
     view! {
         <div class="mb-2">
@@ -57,13 +56,6 @@ pub fn Textarea(
             >
                 {move || initial_value.get()}
             </textarea>
-            <p class="text-red-500 text-xs italic">
-                {move || if display_error.get() {
-                    "This field is required"
-                } else {
-                    ""
-                }}
-            </p>
         </div>
     }
 }

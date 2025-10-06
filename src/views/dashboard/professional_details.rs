@@ -25,12 +25,12 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::{
+    data::models::{
         general::acl::{
             AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
         },
         graphql::shared::{
-            CreateProfessionalDetails, ProfessionalDetailsInputFields, UserProfessionalInfoInput,
+            CreateProfessionalDetails, ProfessionalDetailsInputArguments, UserProfessionalInfoInput,
         },
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
@@ -120,7 +120,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     }
 
                     let operation =
-                        CreateProfessionalDetails::build(ProfessionalDetailsInputFields {
+                        CreateProfessionalDetails::build(ProfessionalDetailsInputArguments {
                             professional_details: deserialized_form_data.unwrap(),
                         });
 

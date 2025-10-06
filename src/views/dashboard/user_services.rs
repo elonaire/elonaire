@@ -1,5 +1,5 @@
 use icondata as IconData;
-use leptos::ev::{self, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -10,10 +10,11 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::input::CustomFileInput;
 use crate::components::general::spinner::Spinner;
-use crate::schemas::general::files::UploadedFileResponse;
-use crate::schemas::graphql::shared::{
-    CreateUserService, UserServiceInput, UserServiceInputFields,
+use crate::data::models::{
+    general::files::UploadedFileResponse,
+    graphql::shared::{CreateUserService, UserServiceInput, UserServiceInputArguments},
 };
+
 use crate::{
     components::{
         forms::{
@@ -27,7 +28,7 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::general::acl::{
+    data::models::general::acl::{
         AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
@@ -156,7 +157,7 @@ pub fn CreateUserService() -> impl IntoView {
                                                 }
 
                                                 let operation = CreateUserService::build(
-                                                    UserServiceInputFields {
+                                                    UserServiceInputArguments {
                                                         user_service: deserialized_form_data
                                                             .unwrap(),
                                                     },

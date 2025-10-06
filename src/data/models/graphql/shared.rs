@@ -9,8 +9,9 @@ mod schema {}
 #[cynic(
     schema = "shared",
     graphql_type = "Mutation",
-    variables = "UserPortfolioInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+    variables = "UserPortfolioInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
+#[allow(dead_code)]
 pub struct CreatePortfolioItem {
     #[arguments(portfolioItem: $portfolio_item)]
     pub create_portfolio_item: UserPortfolio, // this is the return type expected from the API on success, the key is the resolver name
@@ -18,6 +19,7 @@ pub struct CreatePortfolioItem {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct UserPortfolio {
     pub id: String,
     pub title: String,
@@ -31,7 +33,7 @@ pub struct UserPortfolio {
 }
 
 #[derive(cynic::QueryVariables, Debug)]
-pub struct UserPortfolioInputFields {
+pub struct UserPortfolioInputArguments {
     pub portfolio_item: UserPortfolioInput,
 }
 
@@ -63,15 +65,16 @@ pub enum UserPortfolioCategory {
 #[cynic(
     schema = "shared",
     graphql_type = "Mutation",
-    variables = "ProfessionalDetailsInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+    variables = "ProfessionalDetailsInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
+#[allow(dead_code)]
 pub struct CreateProfessionalDetails {
     #[arguments(professionalDetails: $professional_details)]
     pub create_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 #[derive(cynic::QueryVariables, Debug)]
-pub struct ProfessionalDetailsInputFields {
+pub struct ProfessionalDetailsInputArguments {
     pub professional_details: UserProfessionalInfoInput,
 }
 
@@ -86,6 +89,7 @@ pub struct UserProfessionalInfoInput {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct UserProfessionalInfo {
     pub id: String,
     pub occupation: String,
@@ -100,8 +104,9 @@ pub struct UserProfessionalInfo {
 #[cynic(
     schema = "shared",
     graphql_type = "Mutation",
-    variables = "UserServiceInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+    variables = "UserServiceInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
+#[allow(dead_code)]
 pub struct CreateUserService {
     #[arguments(userService: $user_service)]
     pub create_user_service: UserService, // this is the return type expected from the API on success, the key is the resolver name
@@ -109,7 +114,7 @@ pub struct CreateUserService {
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
 #[derive(cynic::QueryVariables, Debug)]
-pub struct UserServiceInputFields {
+pub struct UserServiceInputArguments {
     pub user_service: UserServiceInput, // The key should match the value provided in the corresponding query fragment
 }
 
@@ -123,6 +128,7 @@ pub struct UserServiceInput {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct UserService {
     pub id: String,
     pub title: String,
@@ -135,8 +141,9 @@ pub struct UserService {
 #[cynic(
     schema = "shared",
     graphql_type = "Mutation",
-    variables = "ResumeItemInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+    variables = "ResumeItemInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
+#[allow(dead_code)]
 pub struct CreateResumeItem {
     #[arguments(resumeItem: $resume_item)]
     pub create_resume_item: UserResume, // this is the return type expected from the API on success, the key is the resolver name
@@ -144,7 +151,7 @@ pub struct CreateResumeItem {
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
 #[derive(cynic::QueryVariables, Debug)]
-pub struct ResumeItemInputFields {
+pub struct ResumeItemInputArguments {
     pub resume_item: UserResumeInput, // The key should match the value provided in the corresponding query fragment
 }
 
@@ -176,6 +183,7 @@ pub enum UserResumeSection {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct UserResume {
     pub id: String,
     pub title: String,
@@ -189,6 +197,7 @@ pub struct UserResume {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct ResumeAchievement {
     pub id: String,
     pub description: String,
@@ -199,8 +208,9 @@ pub struct ResumeAchievement {
 #[cynic(
     schema = "shared",
     graphql_type = "Mutation",
-    variables = "UserSkillInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+    variables = "UserSkillInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
+#[allow(dead_code)]
 pub struct CreateSkill {
     #[arguments(skill: $skill)]
     pub create_skill: UserSkill, // this is the return type expected from the API on success, the key is the resolver name
@@ -208,7 +218,7 @@ pub struct CreateSkill {
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
 #[derive(cynic::QueryVariables, Debug)]
-pub struct UserSkillInputFields {
+pub struct UserSkillInputArguments {
     pub skill: UserSkillInput, // The key should match the value provided in the corresponding query fragment
 }
 
@@ -225,6 +235,7 @@ pub struct UserSkillInput {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct UserSkill {
     pub id: String,
     pub thumbnail: String,
@@ -256,8 +267,9 @@ pub enum UserSkillType {
 #[cynic(
     schema = "shared",
     graphql_type = "Mutation",
-    variables = "BlogPostInputFields" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
+    variables = "BlogPostInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
 )]
+#[allow(dead_code)]
 pub struct CreateBlogPost {
     #[arguments(blogPost: $blog_post)]
     pub create_blog_post: BlogPost, // this is the return type expected from the API on success, the key is the resolver name
@@ -265,7 +277,7 @@ pub struct CreateBlogPost {
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
 #[derive(cynic::QueryVariables, Debug)]
-pub struct BlogPostInputFields {
+pub struct BlogPostInputArguments {
     pub blog_post: BlogPostInput, // The key should match the value provided in the corresponding query fragment
 }
 
@@ -302,6 +314,7 @@ pub enum BlogCategory {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct BlogPost {
     pub id: String,
     pub title: String,
@@ -322,7 +335,45 @@ pub struct BlogPost {
 
 #[derive(cynic::QueryFragment, Debug)]
 #[cynic(schema = "shared")]
+#[allow(dead_code)]
 pub struct BlogComment {
     pub content: String,
     pub id: String,
+}
+
+/* This is a Query for UserResources */
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(
+    graphql_type = "Query",
+    schema = "shared",
+    variables = "UserResourcesArguments"
+)]
+#[allow(dead_code)]
+pub struct FetchUserResources {
+    #[arguments(userId: $user_id)]
+    pub fetch_user_resources: UserResources,
+}
+
+#[derive(cynic::QueryFragment, Debug)]
+#[cynic(schema = "shared")]
+#[allow(dead_code)]
+pub struct UserResources {
+    blog_posts: Vec<BlogPost>,
+    professional_info: Vec<UserProfessionalInfo>,
+    portfolio: Vec<UserPortfolio>,
+    resume: Vec<UserResume>,
+    skills: Vec<UserSkill>,
+    services: Vec<UserService>,
+}
+
+#[derive(cynic::QueryVariables)]
+pub struct UserResourcesVars {
+    should_include: bool,
+}
+
+// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
+#[derive(cynic::QueryVariables, Debug)]
+#[allow(dead_code)]
+pub struct UserResourcesArguments {
+    pub user_id: String, // The key should match the value provided in the corresponding query fragment
 }

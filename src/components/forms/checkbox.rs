@@ -6,6 +6,7 @@ use std::collections::HashSet;
 /// Represents a single checkbox option with a value and display text.
 /// You can also provide custom children for complex rendering (e.g., with icons).
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct CheckboxOption {
     pub value: String,
     pub label: String,
@@ -23,6 +24,7 @@ impl std::fmt::Debug for CheckboxOption {
 }
 
 impl CheckboxOption {
+    #[allow(dead_code)]
     pub fn new(value: &str, label: &str, children: Option<ViewFn>) -> Self {
         Self {
             value: value.to_string(),

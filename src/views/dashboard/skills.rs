@@ -24,7 +24,7 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    schemas::{
+    data::models::{
         general::{
             acl::{
                 AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields,
@@ -32,7 +32,7 @@ use crate::{
             },
             files::UploadedFileResponse,
         },
-        graphql::shared::{CreateSkill, UserSkillInput, UserSkillInputFields},
+        graphql::shared::{CreateSkill, UserSkillInput, UserSkillInputArguments},
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
@@ -165,7 +165,7 @@ pub fn CreateSkill() -> impl IntoView {
                                                 }
 
                                                 let operation =
-                                                    CreateSkill::build(UserSkillInputFields {
+                                                    CreateSkill::build(UserSkillInputArguments {
                                                         skill: deserialized_form_data.unwrap(),
                                                     });
 
