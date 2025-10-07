@@ -23,7 +23,6 @@ use crate::components::{
 };
 use crate::data::models::graphql::acl::SignInResponse;
 use crate::data::models::graphql::acl::SignInVars;
-use crate::data::models::graphql::acl::UserLoginsForm;
 use crate::data::models::{
     general::acl::{
         AppStateContext, AppStateContextStoreFields, AuthCode, AuthDetailsRest,
@@ -158,26 +157,19 @@ pub fn SignIn() -> impl IntoView {
                     spawn_local(async move {
                         if let Some(form_data) = get_form_data_from_form_ref(&login_form_ref) {
                             let deserialized_form_data =
-                                deserialize_form_data_to_struct::<UserLoginsForm>(&form_data, true);
+                                deserialize_form_data_to_struct::<UserLoginsInput>(
+                                    &form_data, true,
+                                );
 
                             if deserialized_form_data.is_none() {
                                 set_is_loading.set(false);
                                 return;
                             }
 
-                            leptos::logging::log!(
-                                "deserialized_form_data: {:?}",
-                                deserialized_form_data
-                            );
-
                             let deserialized_form_data = deserialized_form_data.unwrap();
 
                             let user_logins = SignInVars {
-                                raw_user_details: UserLoginsInput {
-                                    user_name: deserialized_form_data.user_name,
-                                    password: deserialized_form_data.password,
-                                    oauth_client: None,
-                                },
+                                raw_user_details: deserialized_form_data,
                             };
 
                             let query = r#"
@@ -196,8 +188,6 @@ pub fn SignIn() -> impl IntoView {
                                     user_logins,
                                 )
                                 .await;
-
-                            leptos::logging::log!("login_res: {:?}", login_res);
 
                             match login_res.get_data() {
                                 Some(data) => {

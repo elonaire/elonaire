@@ -10,17 +10,11 @@ pub struct AuthDetails {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserLoginsInput {
-    #[serde(rename = "userName")]
+    #[serde(rename = "userName", alias = "user_name")]
     pub user_name: Option<String>,
     pub password: Option<String>,
-    #[serde(rename = "oauthClient")]
+    #[serde(rename = "oauthClient", alias = "oauth_client")]
     pub oauth_client: Option<OauthClientName>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UserLoginsForm {
-    pub user_name: Option<String>,
-    pub password: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]

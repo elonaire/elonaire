@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 // Pull in the SHARED schema we registered in build.rs
 #[cynic::schema("shared")]
@@ -263,47 +263,30 @@ pub enum UserSkillType {
 }
 
 /* This is the beginning of Blog GraphQL schema */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    schema = "shared",
-    graphql_type = "Mutation",
-    variables = "BlogPostInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
-)]
-#[allow(dead_code)]
-pub struct CreateBlogPost {
-    #[arguments(blogPost: $blog_post)]
-    pub create_blog_post: BlogPost, // this is the return type expected from the API on success, the key is the resolver name
-}
-
-// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
-#[derive(cynic::QueryVariables, Debug)]
-pub struct BlogPostInputArguments {
-    pub blog_post: BlogPostInput, // The key should match the value provided in the corresponding query fragment
-}
-
-#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct BlogPostInput {
     pub title: String,
+    #[serde(rename = "shortDescription", alias = "short_description")]
     pub short_description: String,
     pub status: BlogStatus,
     pub thumbnail: String,
+    #[serde(rename = "contentFile", alias = "content_file")]
     pub content_file: String,
     pub category: BlogCategory,
+    #[serde(rename = "isFeatured", alias = "is_featured")]
     pub is_featured: Option<bool>,
+    #[serde(rename = "isPremium", alias = "is_premium")]
     pub is_premium: Option<bool>,
 }
 
-#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
-#[cynic(rename_all = "None", schema = "shared")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum BlogStatus {
     Draft,
     Published,
     Archived,
 }
 
-#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
-#[cynic(rename_all = "None", schema = "shared")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum BlogCategory {
     WebDevelopment,
     MobileDevelopment,
@@ -312,68 +295,85 @@ pub enum BlogCategory {
     Lifestyle,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct BlogPost {
     pub id: String,
     pub title: String,
+    #[serde(rename = "shortDescription")]
     pub short_description: String,
     pub status: Option<BlogStatus>,
     pub thumbnail: String,
     pub content: Option<String>,
     pub category: BlogCategory,
     pub link: String,
+    #[serde(rename = "publishedDate")]
     pub published_date: Option<String>,
+    #[serde(rename = "isFeatured")]
     pub is_featured: Option<bool>,
+    #[serde(rename = "isPremium")]
     pub is_premium: Option<bool>,
     pub comments: Option<Vec<BlogComment>>,
+    #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
+    #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
-    pub content_file: String,
+    #[serde(rename = "contentFile")]
+    pub content_file: Option<String>,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct BlogComment {
     pub content: String,
     pub id: String,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateBlogPostResponse {
+    #[serde(rename = "createBlogPost")]
+    pub create_blog_post: BlogPost, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateBlogPostVars {
+    #[serde(rename = "blogPost")]
+    pub blog_post: BlogPostInput,
+}
+
 /* This is a Query for UserResources */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    graphql_type = "Query",
-    schema = "shared",
-    variables = "UserResourcesArguments"
-)]
-#[allow(dead_code)]
-pub struct FetchUserResources {
-    #[arguments(userId: $user_id)]
-    pub fetch_user_resources: UserResources,
-}
+// #[derive(cynic::QueryFragment, Debug)]
+// #[cynic(
+//     graphql_type = "Query",
+//     schema = "shared",
+//     variables = "UserResourcesArguments"
+// )]
+// #[allow(dead_code)]
+// pub struct FetchUserResources {
+//     #[arguments(userId: $user_id)]
+//     pub fetch_user_resources: UserResources,
+// }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
-#[allow(dead_code)]
-pub struct UserResources {
-    blog_posts: Vec<BlogPost>,
-    professional_info: Vec<UserProfessionalInfo>,
-    portfolio: Vec<UserPortfolio>,
-    resume: Vec<UserResume>,
-    skills: Vec<UserSkill>,
-    services: Vec<UserService>,
-}
+// #[derive(cynic::QueryFragment, Debug)]
+// #[cynic(schema = "shared")]
+// #[allow(dead_code)]
+// pub struct UserResources {
+//     blog_posts: Vec<BlogPost>,
+//     professional_info: Vec<UserProfessionalInfo>,
+//     portfolio: Vec<UserPortfolio>,
+//     resume: Vec<UserResume>,
+//     skills: Vec<UserSkill>,
+//     services: Vec<UserService>,
+// }
 
-#[derive(cynic::QueryVariables)]
-pub struct UserResourcesVars {
-    should_include: bool,
-}
+// #[derive(cynic::QueryVariables)]
+// pub struct UserResourcesVars {
+//     should_include: bool,
+// }
 
-// This struct name should match the variables arg in the cynic macro of the corresponding query fragment
-#[derive(cynic::QueryVariables, Debug)]
-#[allow(dead_code)]
-pub struct UserResourcesArguments {
-    pub user_id: String, // The key should match the value provided in the corresponding query fragment
-}
+// // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
+// #[derive(cynic::QueryVariables, Debug)]
+// #[allow(dead_code)]
+// pub struct UserResourcesArguments {
+//     pub user_id: String, // The key should match the value provided in the corresponding query fragment
+// }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use icondata as IconData;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
@@ -10,6 +12,8 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::toggle_switch::ToggleSwitch;
 use crate::components::general::spinner::Spinner;
+use crate::data::models::graphql::shared::{CreateBlogPostResponse, CreateBlogPostVars};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -32,11 +36,10 @@ use crate::{
             },
             files::UploadedFileResponse,
         },
-        graphql::shared::{BlogPostInput, BlogPostInputArguments, CreateBlogPost},
+        graphql::shared::BlogPostInput,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
-use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
 pub fn Blog() -> impl IntoView {
@@ -213,30 +216,78 @@ pub fn CreateBlog() -> impl IntoView {
                                                     return;
                                                 }
 
-                                                let operation =
-                                                    CreateBlogPost::build(BlogPostInputArguments {
-                                                        blog_post: deserialized_form_data.unwrap(),
-                                                    });
+                                                let deserialized_form_data =
+                                                    deserialized_form_data.unwrap();
 
-                                                let response = reqwest::Client::new()
-                                                    .post("http://localhost:8080/api/shared")
-                                                    .header(
-                                                        "Authorization",
-                                                        format!(
-                                                            "Bearer {}",
-                                                            current_state
-                                                                .user()
-                                                                .auth_info()
-                                                                .token()
-                                                                .get_untracked()
-                                                        )
-                                                        .as_str(),
+                                                let blog_post = CreateBlogPostVars {
+                                                    blog_post: deserialized_form_data,
+                                                };
+
+                                                let query = r#"
+                                                       mutation CreateBlogPost($blogPost: BlogPostInput!) {
+                                                            createBlogPost(blogPost: $blogPost) {
+                                                                id
+                                                                shortDescription
+                                                                title
+                                                                status
+                                                                category
+                                                                link
+                                                                thumbnail
+                                                                publishedDate
+                                                            }
+                                                       }
+                                                   "#;
+
+                                                let mut headers =
+                                                    HashMap::new() as HashMap<String, String>;
+                                                headers.insert(
+                                                    "Authorization".into(),
+                                                    format!(
+                                                        "Bearer {}",
+                                                        current_state
+                                                            .user()
+                                                            .auth_info()
+                                                            .token()
+                                                            .get_untracked()
+                                                    ),
+                                                );
+
+                                                let response =
+                                                    perform_mutation_or_query_with_vars::<
+                                                        CreateBlogPostResponse,
+                                                        CreateBlogPostVars,
+                                                    >(
+                                                        Some(headers),
+                                                        "http://localhost:8080/api/shared",
+                                                        query,
+                                                        blog_post,
                                                     )
-                                                    .run_graphql(operation)
-                                                    .await
-                                                    .unwrap();
+                                                    .await;
 
-                                                match response.data {
+                                                // let operation =
+                                                //     CreateBlogPost::build(BlogPostInputArguments {
+                                                //         blog_post: deserialized_form_data.unwrap(),
+                                                //     });
+
+                                                // let response = reqwest::Client::new()
+                                                //     .post("http://localhost:8080/api/shared")
+                                                //     .header(
+                                                //         "Authorization",
+                                                //         format!(
+                                                //             "Bearer {}",
+                                                //             current_state
+                                                //                 .user()
+                                                //                 .auth_info()
+                                                //                 .token()
+                                                //                 .get_untracked()
+                                                //         )
+                                                //         .as_str(),
+                                                //     )
+                                                //     .run_graphql(operation)
+                                                //     .await
+                                                //     .unwrap();
+
+                                                match response.get_data() {
                                                     Some(_data) => {
                                                         if let Some(form) = form_ref
                                                             .get_untracked()
@@ -257,10 +308,6 @@ pub fn CreateBlog() -> impl IntoView {
                                                             .update(|status| *status = true);
                                                     }
                                                     None => {
-                                                        leptos::logging::error!(
-                                                            "Failed to add portfolio item: {:?}",
-                                                            response.errors
-                                                        );
                                                         set_is_loading.set(false);
                                                         set_submission_confirmed.set(false);
                                                     }
