@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use icondata as IconData;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
@@ -9,6 +11,8 @@ use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::general::spinner::Spinner;
+use crate::data::models::graphql::shared::{CreateUserSkillResponse, CreateUserSkillVars};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -32,11 +36,10 @@ use crate::{
             },
             files::UploadedFileResponse,
         },
-        graphql::shared::{CreateSkill, UserSkillInput, UserSkillInputArguments},
+        graphql::shared::UserSkillInput,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
-use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
 pub fn Skills() -> impl IntoView {
@@ -164,30 +167,53 @@ pub fn CreateSkill() -> impl IntoView {
                                                     return;
                                                 }
 
-                                                let operation =
-                                                    CreateSkill::build(UserSkillInputArguments {
-                                                        skill: deserialized_form_data.unwrap(),
-                                                    });
+                                                let deserialized_form_data =
+                                                    deserialized_form_data.unwrap();
 
-                                                let response = reqwest::Client::new()
-                                                    .post("http://localhost:8080/api/shared")
-                                                    .header(
-                                                        "Authorization",
-                                                        format!(
-                                                            "Bearer {}",
-                                                            current_state
-                                                                .user()
-                                                                .auth_info()
-                                                                .token()
-                                                                .get_untracked()
-                                                        )
-                                                        .as_str(),
+                                                let input_vars = CreateUserSkillVars {
+                                                    skill: deserialized_form_data,
+                                                };
+
+                                                let query = r#"
+                                                       mutation CreateSkill($skill: UserSkillInput!) {
+                                                            createSkill(skill: $skill) {
+                                                                thumbnail
+                                                                name
+                                                                level
+                                                                type
+                                                                startDate
+                                                                id
+                                                            }
+                                                       }
+                                                   "#;
+
+                                                let mut headers =
+                                                    HashMap::new() as HashMap<String, String>;
+                                                headers.insert(
+                                                    "Authorization".into(),
+                                                    format!(
+                                                        "Bearer {}",
+                                                        current_state
+                                                            .user()
+                                                            .auth_info()
+                                                            .token()
+                                                            .get_untracked()
+                                                    ),
+                                                );
+
+                                                let response =
+                                                    perform_mutation_or_query_with_vars::<
+                                                        CreateUserSkillResponse,
+                                                        CreateUserSkillVars,
+                                                    >(
+                                                        Some(headers),
+                                                        "http://localhost:8080/api/shared",
+                                                        query,
+                                                        input_vars,
                                                     )
-                                                    .run_graphql(operation)
-                                                    .await
-                                                    .unwrap();
+                                                    .await;
 
-                                                match response.data {
+                                                match response.get_data() {
                                                     Some(_data) => {
                                                         if let Some(form) = form_ref
                                                             .get_untracked()
@@ -208,10 +234,6 @@ pub fn CreateSkill() -> impl IntoView {
                                                             .update(|status| *status = true);
                                                     }
                                                     None => {
-                                                        leptos::logging::error!(
-                                                            "Failed to add portfolio item: {:?}",
-                                                            response.errors
-                                                        );
                                                         set_is_loading.set(false);
                                                         set_submission_confirmed.set(false);
                                                     }

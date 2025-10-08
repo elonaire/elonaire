@@ -1,56 +1,51 @@
 use serde::{Deserialize, Serialize};
 
-// Pull in the SHARED schema we registered in build.rs
-#[cynic::schema("shared")]
-mod schema {}
-
 /* This is the beginning of UserPortfolio GraphQL schema */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    schema = "shared",
-    graphql_type = "Mutation",
-    variables = "UserPortfolioInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
-)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
-pub struct CreatePortfolioItem {
-    #[arguments(portfolioItem: $portfolio_item)]
+pub struct CreatePortfolioItemResponse {
+    #[serde(rename = "createPortfolioItem")]
     pub create_portfolio_item: UserPortfolio, // this is the return type expected from the API on success, the key is the resolver name
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserPortfolio {
     pub id: String,
     pub title: String,
     pub description: String,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
+    #[serde(rename = "endDate", alias = "end_date")]
     pub end_date: Option<String>,
-    pub link: String,
+    #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
+    pub years_of_experience: Option<usize>,
+    pub link: Option<String>,
     pub category: UserPortfolioCategory,
-    pub thumbnail: String,
-    pub skills: Vec<UserSkill>,
+    pub thumbnail: Option<String>,
+    pub skills: Option<Vec<UserSkill>>,
 }
 
-#[derive(cynic::QueryVariables, Debug)]
-pub struct UserPortfolioInputArguments {
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UserPortfolioInputVars {
+    #[serde(rename = "portfolioItem")]
     pub portfolio_item: UserPortfolioInput,
 }
 
-#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserPortfolioInput {
     pub title: String,
     pub description: String,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
+    #[serde(rename = "endDate", alias = "end_date")]
     pub end_date: Option<String>,
     pub link: String,
     pub category: UserPortfolioCategory,
     pub thumbnail: String,
 }
 
-#[derive(cynic::Enum, Clone, Debug, Copy, Eq, PartialEq)]
-#[cynic(rename_all = "None", schema = "shared")]
+#[derive(Clone, Debug, Copy, Eq, PartialEq, Serialize, Deserialize)]
 pub enum UserPortfolioCategory {
     JavaScript,
     Rust,
@@ -61,73 +56,64 @@ pub enum UserPortfolioCategory {
 }
 
 /* This is the beginning of UserProfessionalInfo GraphQL schema */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    schema = "shared",
-    graphql_type = "Mutation",
-    variables = "ProfessionalDetailsInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
-)]
+#[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
-pub struct CreateProfessionalDetails {
-    #[arguments(professionalDetails: $professional_details)]
+pub struct CreateProfessionalDetailsResponse {
+    #[serde(rename = "createProfessionalDetails")]
     pub create_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success, the key is the resolver name
 }
 
-#[derive(cynic::QueryVariables, Debug)]
-pub struct ProfessionalDetailsInputArguments {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProfessionalDetailsInputVars {
+    #[serde(rename = "professionalDetails")]
     pub professional_details: UserProfessionalInfoInput,
 }
 
-#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserProfessionalInfoInput {
     pub occupation: String,
     pub description: String,
     pub active: bool,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserProfessionalInfo {
     pub id: String,
     pub occupation: String,
     pub description: String,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
-    pub years_of_experience: Option<i32>,
+    #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
+    pub years_of_experience: Option<usize>,
     pub active: bool,
 }
 
 /* This is the beginning of UserService GraphQL schema */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    schema = "shared",
-    graphql_type = "Mutation",
-    variables = "UserServiceInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
-)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
-pub struct CreateUserService {
-    #[arguments(userService: $user_service)]
+pub struct CreateUserServiceResponse {
+    #[serde(rename = "createUserService")]
     pub create_user_service: UserService, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
-#[derive(cynic::QueryVariables, Debug)]
-pub struct UserServiceInputArguments {
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct UserServiceInputVars {
+    #[serde(rename = "userService")]
     pub user_service: UserServiceInput, // The key should match the value provided in the corresponding query fragment
 }
 
-#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserServiceInput {
     pub title: String,
     pub description: String,
     pub thumbnail: String,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserService {
     pub id: String,
@@ -136,38 +122,35 @@ pub struct UserService {
     pub thumbnail: String,
 }
 
-/* This is the beginning of UserService GraphQL schema */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    schema = "shared",
-    graphql_type = "Mutation",
-    variables = "ResumeItemInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
-)]
+/* This is the beginning of Resume GraphQL schema */
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
-pub struct CreateResumeItem {
-    #[arguments(resumeItem: $resume_item)]
+pub struct CreateResumeItemResponse {
+    #[serde(rename = "createResumeItem")]
     pub create_resume_item: UserResume, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
-#[derive(cynic::QueryVariables, Debug)]
-pub struct ResumeItemInputArguments {
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ResumeItemInputVars {
+    #[serde(rename = "resumeItem")]
     pub resume_item: UserResumeInput, // The key should match the value provided in the corresponding query fragment
 }
 
-#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserResumeInput {
     pub title: String,
+    #[serde(rename = "moreInfo", alias = "more_info")]
     pub more_info: String,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
+    #[serde(rename = "endDate", alias = "end_date")]
     pub end_date: String,
     pub link: String,
     pub section: UserResumeSection,
 }
 
-#[derive(cynic::Enum, Clone, Debug, Copy, Eq, PartialEq)]
-#[cynic(rename_all = "None", schema = "shared")]
+#[derive(Clone, Debug, Copy, Eq, PartialEq, Deserialize, Serialize)]
 pub enum UserResumeSection {
     Education,
     Experience,
@@ -181,22 +164,25 @@ pub enum UserResumeSection {
     References,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserResume {
     pub id: String,
     pub title: String,
+    #[serde(rename = "moreinfo", alias = "more_info")]
     pub more_info: Option<String>,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
+    #[serde(rename = "endDate", alias = "end_date")]
     pub end_date: Option<String>,
+    #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
+    pub years_of_experience: Option<usize>,
     pub link: Option<String>,
     pub section: UserResumeSection,
-    pub achievements: Vec<ResumeAchievement>,
+    pub achievements: Option<Vec<ResumeAchievement>>,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct ResumeAchievement {
     pub id: String,
@@ -204,50 +190,44 @@ pub struct ResumeAchievement {
 }
 
 /* This is the beginning of UserSkill GraphQL schema */
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(
-    schema = "shared",
-    graphql_type = "Mutation",
-    variables = "UserSkillInputArguments" // these are the query variables for the mutation, and a corresponding struct with the same needs to be defined
-)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
-pub struct CreateSkill {
-    #[arguments(skill: $skill)]
+pub struct CreateUserSkillResponse {
+    #[serde(rename = "createSkill")]
     pub create_skill: UserSkill, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
-#[derive(cynic::QueryVariables, Debug)]
-pub struct UserSkillInputArguments {
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CreateUserSkillVars {
     pub skill: UserSkillInput, // The key should match the value provided in the corresponding query fragment
 }
 
-#[derive(cynic::InputObject, Debug, Clone, PartialEq, Eq, Deserialize)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserSkillInput {
     pub name: String,
-    #[cynic(rename = "type")]
+    #[serde(rename = "type")]
     pub r#type: UserSkillType,
     pub level: UserSkillLevel,
+    #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
     pub thumbnail: String,
 }
 
-#[derive(cynic::QueryFragment, Debug)]
-#[cynic(schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserSkill {
     pub id: String,
     pub thumbnail: String,
     pub name: String,
     pub level: Option<UserSkillLevel>,
-    #[cynic(rename = "type")]
+    #[serde(rename = "type")]
     pub r#type: UserSkillType,
+    #[serde(rename = "startDate")]
     pub start_date: String,
 }
 
-#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
-#[cynic(rename_all = "None", schema = "shared")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub enum UserSkillLevel {
     Beginner,
     Intermediate,
@@ -255,14 +235,25 @@ pub enum UserSkillLevel {
     Expert,
 }
 
-#[derive(cynic::Enum, Clone, Copy, Debug, PartialEq, Eq)]
-#[cynic(rename_all = "None", schema = "shared")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum UserSkillType {
     Technical,
     Soft,
 }
 
 /* This is the beginning of Blog GraphQL schema */
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateBlogPostResponse {
+    #[serde(rename = "createBlogPost")]
+    pub create_blog_post: BlogPost, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateBlogPostVars {
+    #[serde(rename = "blogPost")]
+    pub blog_post: BlogPostInput,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct BlogPostInput {
     pub title: String,
@@ -327,18 +318,6 @@ pub struct BlogPost {
 pub struct BlogComment {
     pub content: String,
     pub id: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct CreateBlogPostResponse {
-    #[serde(rename = "createBlogPost")]
-    pub create_blog_post: BlogPost, // this is the return type expected from the API on success
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CreateBlogPostVars {
-    #[serde(rename = "blogPost")]
-    pub blog_post: BlogPostInput,
 }
 
 /* This is a Query for UserResources */

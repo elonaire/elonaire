@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use icondata as IconData;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
@@ -11,8 +13,9 @@ use web_sys::HtmlFormElement;
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::data::models::graphql::shared::{
-    CreateResumeItem, ResumeItemInputArguments, UserResumeInput,
+    CreateResumeItemResponse, ResumeItemInputVars, UserResumeInput,
 };
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -115,25 +118,48 @@ pub fn CreateResumeItem() -> impl IntoView {
                         return;
                     }
 
-                    let operation = CreateResumeItem::build(ResumeItemInputArguments {
-                        resume_item: deserialized_form_data.unwrap(),
-                    });
+                    let deserialized_form_data = deserialized_form_data.unwrap();
 
-                    let response = reqwest::Client::new()
-                        .post("http://localhost:8080/api/shared")
-                        .header(
-                            "Authorization",
-                            format!(
-                                "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
-                            )
-                            .as_str(),
-                        )
-                        .run_graphql(operation)
-                        .await
-                        .unwrap();
+                    let input_vars = ResumeItemInputVars {
+                        resume_item: deserialized_form_data,
+                    };
 
-                    match response.data {
+                    let query = r#"
+                           mutation CreateResumeItem($resumeItem: UserResumeInput!) {
+                                createResumeItem(resumeItem: $resumeItem) {
+                                    title
+                                    moreInfo
+                                    startDate
+                                    endDate
+                                    link
+                                    section
+                                    id
+                                    yearsOfExperience
+                                }
+                           }
+                       "#;
+
+                    let mut headers = HashMap::new() as HashMap<String, String>;
+                    headers.insert(
+                        "Authorization".into(),
+                        format!(
+                            "Bearer {}",
+                            current_state.user().auth_info().token().get_untracked()
+                        ),
+                    );
+
+                    let response = perform_mutation_or_query_with_vars::<
+                        CreateResumeItemResponse,
+                        ResumeItemInputVars,
+                    >(
+                        Some(headers),
+                        "http://localhost:8080/api/shared",
+                        query,
+                        input_vars,
+                    )
+                    .await;
+
+                    match response.get_data() {
                         Some(_data) => {
                             if let Some(form) = form_ref
                                 .get_untracked()
@@ -150,10 +176,6 @@ pub fn CreateResumeItem() -> impl IntoView {
                             success_modal_is_open.update(|status| *status = true);
                         }
                         None => {
-                            leptos::logging::error!(
-                                "Failed to add portfolio item: {:?}",
-                                response.errors
-                            );
                             set_is_loading.set(false);
                             set_submission_confirmed.set(false);
                         }

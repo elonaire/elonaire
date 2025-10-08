@@ -320,21 +320,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
-name = "cynic"
-version = "3.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c99c59968c8aa7f90d84240ab6ded4d3864125ce36b5b044554542cebc974946"
-dependencies = [
- "cynic-proc-macros",
- "ref-cast",
- "reqwest",
- "serde",
- "serde_json",
- "static_assertions",
- "thiserror 1.0.69",
-]
-
-[[package]]
 name = "cynic-codegen"
 version = "3.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -360,18 +345,6 @@ dependencies = [
  "indexmap",
  "lalrpop-util",
  "logos",
-]
-
-[[package]]
-name = "cynic-proc-macros"
-version = "3.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7880789c425a73aff3ba286b2a9c794f330d4770769a42a1493d6175e4606c1"
-dependencies = [
- "cynic-codegen",
- "darling",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -2050,26 +2023,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ref-cast"
-version = "1.0.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a0ae411dbe946a674d89546582cea4ba2bb8defac896622d6496f14c23ba5cf"
-dependencies = [
- "ref-cast-impl",
-]
-
-[[package]]
-name = "ref-cast-impl"
-version = "1.0.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1165225c21bff1f3bbce98f5a1f889949bc902d3575308cc7b0de30b4f6d27c7"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "regex"
 version = "1.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2615,7 +2568,6 @@ name = "techie-tenka"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "cynic",
  "cynic-codegen",
  "gloo-net",
  "gql_client",

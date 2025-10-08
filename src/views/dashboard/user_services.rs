@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use icondata as IconData;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
@@ -10,11 +12,12 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::input::CustomFileInput;
 use crate::components::general::spinner::Spinner;
+use crate::data::models::graphql::shared::{CreateUserServiceResponse, UserServiceInputVars};
 use crate::data::models::{
-    general::files::UploadedFileResponse,
-    graphql::shared::{CreateUserService, UserServiceInput, UserServiceInputArguments},
+    general::files::UploadedFileResponse, graphql::shared::UserServiceInput,
 };
 
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -156,32 +159,51 @@ pub fn CreateUserService() -> impl IntoView {
                                                     return;
                                                 }
 
-                                                let operation = CreateUserService::build(
-                                                    UserServiceInputArguments {
-                                                        user_service: deserialized_form_data
-                                                            .unwrap(),
-                                                    },
+                                                let deserialized_form_data =
+                                                    deserialized_form_data.unwrap();
+
+                                                let input_vars = UserServiceInputVars {
+                                                    user_service: deserialized_form_data,
+                                                };
+
+                                                let query = r#"
+                                                       mutation CreateUserService($userService: UserServiceInput!) {
+                                                            createUserService(userService: $userService) {
+                                                                title
+                                                                description
+                                                                thumbnail
+                                                                id
+                                                            }
+                                                       }
+                                                   "#;
+
+                                                let mut headers =
+                                                    HashMap::new() as HashMap<String, String>;
+                                                headers.insert(
+                                                    "Authorization".into(),
+                                                    format!(
+                                                        "Bearer {}",
+                                                        current_state
+                                                            .user()
+                                                            .auth_info()
+                                                            .token()
+                                                            .get_untracked()
+                                                    ),
                                                 );
 
-                                                let response = reqwest::Client::new()
-                                                    .post("http://localhost:8080/api/shared")
-                                                    .header(
-                                                        "Authorization",
-                                                        format!(
-                                                            "Bearer {}",
-                                                            current_state
-                                                                .user()
-                                                                .auth_info()
-                                                                .token()
-                                                                .get_untracked()
-                                                        )
-                                                        .as_str(),
+                                                let response =
+                                                    perform_mutation_or_query_with_vars::<
+                                                        CreateUserServiceResponse,
+                                                        UserServiceInputVars,
+                                                    >(
+                                                        Some(headers),
+                                                        "http://localhost:8080/api/shared",
+                                                        query,
+                                                        input_vars,
                                                     )
-                                                    .run_graphql(operation)
-                                                    .await
-                                                    .unwrap();
+                                                    .await;
 
-                                                match response.data {
+                                                match response.get_data() {
                                                     Some(_data) => {
                                                         if let Some(form) = form_ref
                                                             .get_untracked()
@@ -202,10 +224,6 @@ pub fn CreateUserService() -> impl IntoView {
                                                             .update(|status| *status = true);
                                                     }
                                                     None => {
-                                                        leptos::logging::error!(
-                                                            "Failed to add portfolio item: {:?}",
-                                                            response.errors
-                                                        );
                                                         set_is_loading.set(false);
                                                         set_submission_confirmed.set(false);
                                                     }

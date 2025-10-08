@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use icondata as IconData;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
@@ -10,6 +12,10 @@ use web_sys::HtmlFormElement;
 
 use crate::components::forms::radio_input::RadioOption;
 use crate::components::general::spinner::Spinner;
+use crate::data::models::graphql::shared::{
+    CreateProfessionalDetailsResponse, ProfessionalDetailsInputVars,
+};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -29,13 +35,10 @@ use crate::{
         general::acl::{
             AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
         },
-        graphql::shared::{
-            CreateProfessionalDetails, ProfessionalDetailsInputArguments, UserProfessionalInfoInput,
-        },
+        graphql::shared::UserProfessionalInfoInput,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
-use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
 pub fn ProfessionalDetails() -> impl IntoView {
@@ -119,26 +122,45 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                         return;
                     }
 
-                    let operation =
-                        CreateProfessionalDetails::build(ProfessionalDetailsInputArguments {
-                            professional_details: deserialized_form_data.unwrap(),
-                        });
+                    let deserialized_form_data = deserialized_form_data.unwrap();
 
-                    let response = reqwest::Client::new()
-                        .post("http://localhost:8080/api/shared")
-                        .header(
-                            "Authorization",
-                            format!(
-                                "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
-                            )
-                            .as_str(),
-                        )
-                        .run_graphql(operation)
-                        .await
-                        .unwrap();
+                    let input_vars = ProfessionalDetailsInputVars {
+                        professional_details: deserialized_form_data,
+                    };
 
-                    match response.data {
+                    let query = r#"
+                           mutation CreateProfessionalDetails($professionalDetails: UserProfessionalInfoInput!) {
+                                createProfessionalDetails(professionalDetails: $professionalDetails) {
+                                    description
+                                    active
+                                    occupation
+                                    startDate
+                                    id
+                                }
+                           }
+                       "#;
+
+                    let mut headers = HashMap::new() as HashMap<String, String>;
+                    headers.insert(
+                        "Authorization".into(),
+                        format!(
+                            "Bearer {}",
+                            current_state.user().auth_info().token().get_untracked()
+                        ),
+                    );
+
+                    let response = perform_mutation_or_query_with_vars::<
+                        CreateProfessionalDetailsResponse,
+                        ProfessionalDetailsInputVars,
+                    >(
+                        Some(headers),
+                        "http://localhost:8080/api/shared",
+                        query,
+                        input_vars,
+                    )
+                    .await;
+
+                    match response.get_data() {
                         Some(_data) => {
                             if let Some(form) = form_ref
                                 .get_untracked()
@@ -155,10 +177,6 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                             success_modal_is_open.update(|status| *status = true);
                         }
                         None => {
-                            leptos::logging::error!(
-                                "Failed to add portfolio item: {:?}",
-                                response.errors
-                            );
                             set_is_loading.set(false);
                             set_submission_confirmed.set(false);
                         }

@@ -219,7 +219,7 @@ pub fn CreateBlog() -> impl IntoView {
                                                 let deserialized_form_data =
                                                     deserialized_form_data.unwrap();
 
-                                                let blog_post = CreateBlogPostVars {
+                                                let input_vars = CreateBlogPostVars {
                                                     blog_post: deserialized_form_data,
                                                 };
 
@@ -260,32 +260,9 @@ pub fn CreateBlog() -> impl IntoView {
                                                         Some(headers),
                                                         "http://localhost:8080/api/shared",
                                                         query,
-                                                        blog_post,
+                                                        input_vars,
                                                     )
                                                     .await;
-
-                                                // let operation =
-                                                //     CreateBlogPost::build(BlogPostInputArguments {
-                                                //         blog_post: deserialized_form_data.unwrap(),
-                                                //     });
-
-                                                // let response = reqwest::Client::new()
-                                                //     .post("http://localhost:8080/api/shared")
-                                                //     .header(
-                                                //         "Authorization",
-                                                //         format!(
-                                                //             "Bearer {}",
-                                                //             current_state
-                                                //                 .user()
-                                                //                 .auth_info()
-                                                //                 .token()
-                                                //                 .get_untracked()
-                                                //         )
-                                                //         .as_str(),
-                                                //     )
-                                                //     .run_graphql(operation)
-                                                //     .await
-                                                //     .unwrap();
 
                                                 match response.get_data() {
                                                     Some(_data) => {
