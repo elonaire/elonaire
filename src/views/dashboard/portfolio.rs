@@ -11,7 +11,10 @@ use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::general::spinner::Spinner;
-use crate::data::models::graphql::shared::{CreatePortfolioItemResponse, UserPortfolioInputVars};
+use crate::data::models::graphql::shared::{
+    CreatePortfolioItemResponse, UserPortfolioCategory, UserPortfolioInputVars,
+};
+use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -101,6 +104,18 @@ pub fn CreatePortfolio() -> impl IntoView {
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
+    let portfolio_categories = Memo::new(move |_| {
+        UserPortfolioCategory::variants_slice()
+            .iter()
+            .map(|category| {
+                let mut label = format!("{}", category);
+                if label.is_empty() {
+                    label = "Select Category".to_string();
+                }
+                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+            })
+            .collect::<Vec<SelectOption>>()
+    });
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -317,10 +332,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                     name="category"
                     required=true
                     id_attr="category"
-                    options=vec![
-                        SelectOption::new("", "Select Category"),
-                        SelectOption::new("JavaScript", "JavaScript")
-                    ]
+                    options=portfolio_categories.get_untracked()
                     />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <BasicButton

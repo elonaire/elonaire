@@ -11,7 +11,10 @@ use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::general::spinner::Spinner;
-use crate::data::models::graphql::shared::{CreateUserSkillResponse, CreateUserSkillVars};
+use crate::data::models::graphql::shared::{
+    CreateUserSkillResponse, CreateUserSkillVars, UserSkillLevel, UserSkillType,
+};
+use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -101,6 +104,30 @@ pub fn CreateSkill() -> impl IntoView {
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
+    let user_skill_levels = Memo::new(move |_| {
+        UserSkillLevel::variants_slice()
+            .iter()
+            .map(|category| {
+                let mut label = format!("{}", category);
+                if label.is_empty() {
+                    label = "Select Skill Level".to_string();
+                }
+                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+            })
+            .collect::<Vec<SelectOption>>()
+    });
+    let user_skill_types = Memo::new(move |_| {
+        UserSkillType::variants_slice()
+            .iter()
+            .map(|category| {
+                let mut label = format!("{}", category);
+                if label.is_empty() {
+                    label = "Select Skill Type".to_string();
+                }
+                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+            })
+            .collect::<Vec<SelectOption>>()
+    });
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -312,20 +339,14 @@ pub fn CreateSkill() -> impl IntoView {
                     name="type"
                     required=true
                     id_attr="type"
-                    options=vec![
-                        SelectOption::new("", "Select Type"),
-                        SelectOption::new("Technical", "Technical")
-                    ]
+                    options=user_skill_types.get_untracked()
                     />
                     <SelectInput
                     label="Level"
                     name="level"
                     required=true
                     id_attr="level"
-                    options=vec![
-                        SelectOption::new("", "Select Level"),
-                        SelectOption::new("Beginner", "Beginner")
-                    ]
+                    options=user_skill_levels.get_untracked()
                     />
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />

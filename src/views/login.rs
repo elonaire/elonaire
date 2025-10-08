@@ -21,14 +21,15 @@ use crate::components::{
         spinner::Spinner,
     },
 };
+use crate::data::models::general::acl::OauthClientName;
 use crate::data::models::graphql::acl::SignInResponse;
 use crate::data::models::graphql::acl::SignInVars;
 use crate::data::models::{
     general::acl::{
-        AppStateContext, AppStateContextStoreFields, AuthCode, AuthDetailsRest,
-        AuthInfoStoreFields, UserInfoStoreFields,
+        AppStateContext, AppStateContextStoreFields, AuthCode, AuthDetails, AuthInfoStoreFields,
+        UserInfoStoreFields,
     },
-    graphql::acl::{OauthClientName, UserLoginsInput},
+    graphql::acl::UserLoginsInput,
 };
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
@@ -63,7 +64,7 @@ pub fn SignIn() -> impl IntoView {
                         .await
                         .unwrap();
 
-                    if let Ok(auth_status) = response.json::<AuthDetailsRest>().await {
+                    if let Ok(auth_status) = response.json::<AuthDetails>().await {
                         *current_state.user().auth_info().token().write() =
                             auth_status.token.unwrap();
                         set_is_loading.set(false);

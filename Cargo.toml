@@ -24,6 +24,3 @@ web-sys = { version = "0.3.77", features = [
     "CustomEventInit",
     "EventInit",
 ] }
-
-[build-dependencies]
-cynic-codegen = { version = "3" }

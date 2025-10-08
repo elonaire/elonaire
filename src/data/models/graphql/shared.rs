@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::utils::custom_traits::EnumerableEnum;
+
 /* This is the beginning of UserPortfolio GraphQL schema */
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
@@ -53,6 +55,20 @@ pub enum UserPortfolioCategory {
     DevOps,
     Cloud,
     Mobile,
+}
+
+impl EnumerableEnum for UserPortfolioCategory {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            String::new(),
+            format!("{:?}", Self::JavaScript),
+            format!("{:?}", Self::Rust),
+            format!("{:?}", Self::Database),
+            format!("{:?}", Self::DevOps),
+            format!("{:?}", Self::Cloud),
+            format!("{:?}", Self::Mobile),
+        ]
+    }
 }
 
 /* This is the beginning of UserProfessionalInfo GraphQL schema */
@@ -164,6 +180,24 @@ pub enum UserResumeSection {
     References,
 }
 
+impl EnumerableEnum for UserResumeSection {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            String::new(),
+            format!("{:?}", Self::Education),
+            format!("{:?}", Self::Experience),
+            format!("{:?}", Self::Achievements),
+            format!("{:?}", Self::Projects),
+            format!("{:?}", Self::Certifications),
+            format!("{:?}", Self::Volunteer),
+            format!("{:?}", Self::Publications),
+            format!("{:?}", Self::Languages),
+            format!("{:?}", Self::Interests),
+            format!("{:?}", Self::References),
+        ]
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserResume {
@@ -235,10 +269,32 @@ pub enum UserSkillLevel {
     Expert,
 }
 
+impl EnumerableEnum for UserSkillLevel {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            String::new(),
+            format!("{:?}", Self::Beginner),
+            format!("{:?}", Self::Intermediate),
+            format!("{:?}", Self::Advanced),
+            format!("{:?}", Self::Expert),
+        ]
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum UserSkillType {
     Technical,
     Soft,
+}
+
+impl EnumerableEnum for UserSkillType {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            String::new(),
+            format!("{:?}", Self::Technical),
+            format!("{:?}", Self::Soft),
+        ]
+    }
 }
 
 /* This is the beginning of Blog GraphQL schema */
@@ -277,6 +333,17 @@ pub enum BlogStatus {
     Archived,
 }
 
+impl EnumerableEnum for BlogStatus {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            String::new(),
+            format!("{:?}", Self::Draft),
+            format!("{:?}", Self::Published),
+            format!("{:?}", Self::Archived),
+        ]
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum BlogCategory {
     WebDevelopment,
@@ -284,6 +351,19 @@ pub enum BlogCategory {
     ArtificialIntelligence,
     Technology,
     Lifestyle,
+}
+
+impl EnumerableEnum for BlogCategory {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            String::new(),
+            format!("{:?}", Self::WebDevelopment),
+            format!("{:?}", Self::MobileDevelopment),
+            format!("{:?}", Self::ArtificialIntelligence),
+            format!("{:?}", Self::Technology),
+            format!("{:?}", Self::Lifestyle),
+        ]
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

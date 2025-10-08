@@ -13,8 +13,9 @@ use web_sys::HtmlFormElement;
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::data::models::graphql::shared::{
-    CreateResumeItemResponse, ResumeItemInputVars, UserResumeInput,
+    CreateResumeItemResponse, ResumeItemInputVars, UserResumeInput, UserResumeSection,
 };
+use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -35,7 +36,6 @@ use crate::{
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
-use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
 pub fn Resume() -> impl IntoView {
@@ -96,6 +96,18 @@ pub fn CreateResumeItem() -> impl IntoView {
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
+    let resume_sections = Memo::new(move |_| {
+        UserResumeSection::variants_slice()
+            .iter()
+            .map(|category| {
+                let mut label = format!("{}", category);
+                if label.is_empty() {
+                    label = "Select Section".to_string();
+                }
+                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+            })
+            .collect::<Vec<SelectOption>>()
+    });
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -239,10 +251,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                     name="section"
                     required=true
                     id_attr="section"
-                    options=vec![
-                        SelectOption::new("", "Select Section"),
-                        SelectOption::new("Education", "Education")
-                    ]
+                    options=resume_sections.get_untracked()
                     />
                     <BasicButton
                         button_text="Submit"

@@ -36,7 +36,6 @@ use crate::{
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
-use cynic::{MutationBuilder, http::ReqwestExt};
 
 #[island]
 pub fn UserService() -> impl IntoView {

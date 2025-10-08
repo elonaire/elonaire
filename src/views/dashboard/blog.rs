@@ -12,7 +12,10 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::toggle_switch::ToggleSwitch;
 use crate::components::general::spinner::Spinner;
-use crate::data::models::graphql::shared::{CreateBlogPostResponse, CreateBlogPostVars};
+use crate::data::models::graphql::shared::{
+    BlogCategory, BlogStatus, CreateBlogPostResponse, CreateBlogPostVars,
+};
+use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -105,6 +108,41 @@ pub fn CreateBlog() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
+    let blog_statuses = Memo::new(move |_| {
+        BlogStatus::variants_slice()
+            .iter()
+            .map(|category| {
+                let mut label = format!("{}", category);
+                if label.is_empty() {
+                    label = "Select Status".to_string();
+                }
+
+                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+            })
+            .collect::<Vec<SelectOption>>()
+    });
+
+    let blog_categories = Memo::new(move |_| {
+        BlogCategory::variants_slice()
+            .iter()
+            .map(|category| {
+                let mut label = format!("{}", category);
+                if label.is_empty() {
+                    label = "Select Category".to_string();
+                }
+
+                if category == "WebDevelopment" {
+                    label = "Web Development".to_string();
+                } else if category == "MobileDevelopment" {
+                    label = "Mobile Development".to_string();
+                } else if category == "ArtificialIntelligence" {
+                    label = "Artificial Intelligence".to_string();
+                }
+
+                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+            })
+            .collect::<Vec<SelectOption>>()
+    });
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -364,20 +402,14 @@ pub fn CreateBlog() -> impl IntoView {
                     name="status"
                     required=true
                     id_attr="status"
-                    options=vec![
-                        SelectOption::new("", "Select Status"),
-                        SelectOption::new("Draft", "Draft")
-                    ]
+                    options=blog_statuses.get_untracked()
                     />
                     <SelectInput
                     label="Category"
                     name="category"
                     required=true
                     id_attr="category"
-                    options=vec![
-                        SelectOption::new("", "Select Category"),
-                        SelectOption::new("Technology", "Technology")
-                    ]
+                    options=blog_categories.get_untracked()
                     />
                     <ToggleSwitch
                        label_active="Premium"
