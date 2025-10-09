@@ -60,9 +60,21 @@ pub fn Pagination(
     view! {
         <div class="flex flex-col">
             <div class="flex items-center justify-end">
-                <span class="text-xs mr-2">
-                    {move || format!("Page {} of {}", current_page.get(), pagination_state.get().1)}
-                </span>
+                {
+                    move || {
+                        if pagination_state.get().1 > 0 {
+                            Some(
+                                view!{
+                                    <span class="text-xs mr-2">
+                                        {move || format!("Page {} of {}", current_page.get(), pagination_state.get().1)}
+                                    </span>
+                                }
+                            )
+                        } else {
+                            None
+                        }
+                    }
+                }
                 <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
                     <BasicButton onclick=on_first_click disabled=is_first_page icon=Some(IconId::BsChevronBarLeft) />
                     <BasicButton onclick=on_prev_click disabled=can_go_to_prev icon=Some(IconId::BsChevronLeft) />

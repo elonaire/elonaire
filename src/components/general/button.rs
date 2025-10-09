@@ -63,7 +63,7 @@ pub fn BasicButton(
                 }
             }
             class=move || format!(
-                "font-bold py-2 px-4 cursor-pointer rounded-md disabled:opacity-50 disabled:cursor-not-allowed {}",
+                "font-bold py-2 px-4 cursor-pointer rounded-[5px] disabled:opacity-50 disabled:cursor-not-allowed {}",
                 style_ext
             )
             on:click=move |ev| onclick.run(ev)
@@ -107,11 +107,11 @@ pub fn ButtonGroup(
                             style_ext_view
                         );
                         if index == 0 {
-                            base.push_str(" rounded-l-md");
+                            base.push_str(" rounded-l-[5px]");
                         }
 
                         if index == children_len - 1 {
-                            base.push_str(" rounded-r-md");
+                            base.push_str(" rounded-r-[5px]");
                         }
                         base
                     };

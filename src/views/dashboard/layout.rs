@@ -87,7 +87,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                         key=|menu_item| menu_item.path.to_owned()
                                         let(child)
                                     >
-                                        <div class="block rounded-md hover:bg-gray-100 h-[45px]" on:click=move |_| set_collapsed.set(false)>
+                                        <div class="block rounded-[5px] hover:bg-gray-100 h-[45px]" on:click=move |_| set_collapsed.set(false)>
                                             <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
                                                 <Icon width="24" height="24" icon=child.icon />
                                                 <span class="flex-1">{child.label}</span>

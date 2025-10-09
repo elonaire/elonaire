@@ -128,7 +128,7 @@ pub fn CheckboxGroup(
     #[prop(default = false, optional)]
     horizontal: bool,
 ) -> impl IntoView {
-    let base_fieldset_class = "border border-gray-300 rounded-lg p-4 bg-white relative";
+    let base_fieldset_class = "border border-gray-300 rounded-[5px] p-4 bg-white relative";
     let base_legend_class =
         "text-sm font-medium text-gray-700 bg-white px-1 absolute -top-2 left-3";
 

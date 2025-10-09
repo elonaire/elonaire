@@ -454,7 +454,7 @@ pub fn DataTable(
     view! {
         <div class="w-full flex flex-col justify-between">
             <div class="overflow-x-auto">
-                <table class="table-fixed border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
+                <table class="table-fixed border-separate border border-light-gray rounded-[5px] table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
                     <thead>
                         <tr class="p-2">
                             <For
@@ -463,7 +463,7 @@ pub fn DataTable(
                                 let (column)
                             >
                                 <th
-                                    class="border-b p-2 border-gray-200 text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
+                                    class="border-b p-2 border-light-gray text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
                                     on:click=move |_| on_click_sort.run(column.clone())
                                 >
                                     <span class="flex flex-row items-center">
@@ -482,7 +482,7 @@ pub fn DataTable(
                             </For>
                             {move || if props.get().editable || props.get().deletable {
                                 Some(view! {
-                                    <th class="border-b p-2 border-gray-200 text-wrap font-bold text-gray-800 text-left">
+                                    <th class="border-b p-2 border-light-gray text-wrap font-bold text-gray-800 text-left">
                                         "Actions"
                                     </th>
                                 })
@@ -506,7 +506,7 @@ pub fn DataTable(
 
                                 view! {
                                     <tr
-                                        class="border-b border-gray-200 p-2"
+                                        class="border-b border-light-gray p-2"
                                         on:click=move |_| on_click_row_handler(row_data_row_click.clone())
                                     >
                                         // Computed row columns
@@ -603,7 +603,7 @@ pub fn DataTable(
                                         >
                                             {
                                                 view! {
-                                                    <tr class="border-b border-gray-200">
+                                                    <tr class="border-b border-light-gray">
                                                         <td class="p-[24px]" colspan={props.get().columns.len()}>""</td>
                                                     </tr>
                                                 }
@@ -619,7 +619,12 @@ pub fn DataTable(
                             Some(view! {
                                 <tr>
                                     <td colspan={props.get().columns.len()}>
-                                        <div class="py-2">"No Content"</div>
+                                        <div class="py-2 flex items-center justify-center">
+                                            <div class="flex flex-col text-light-gray items-center justify-center">
+                                                <Icon width="2em" height="2em" icon=IconId::ImDrawer2 />
+                                                <p>"No Content"</p>
+                                            </div>
+                                        </div>
                                     </td>
                                     {if props.get().deletable || props.get().editable {
                                         Some(view! {
