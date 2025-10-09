@@ -111,13 +111,13 @@ pub fn CreateBlog() -> impl IntoView {
     let blog_statuses = Memo::new(move |_| {
         BlogStatus::variants_slice()
             .iter()
-            .map(|category| {
-                let mut label = format!("{}", category);
+            .map(|status| {
+                let mut label = format!("{}", status);
                 if label.is_empty() {
                     label = "Select Status".to_string();
                 }
 
-                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+                SelectOption::new(format!("{}", status).as_str(), label.as_str())
             })
             .collect::<Vec<SelectOption>>()
     });

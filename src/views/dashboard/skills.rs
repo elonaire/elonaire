@@ -107,24 +107,24 @@ pub fn CreateSkill() -> impl IntoView {
     let user_skill_levels = Memo::new(move |_| {
         UserSkillLevel::variants_slice()
             .iter()
-            .map(|category| {
-                let mut label = format!("{}", category);
+            .map(|level| {
+                let mut label = format!("{}", level);
                 if label.is_empty() {
                     label = "Select Skill Level".to_string();
                 }
-                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+                SelectOption::new(format!("{}", level).as_str(), label.as_str())
             })
             .collect::<Vec<SelectOption>>()
     });
     let user_skill_types = Memo::new(move |_| {
         UserSkillType::variants_slice()
             .iter()
-            .map(|category| {
-                let mut label = format!("{}", category);
+            .map(|skill_type| {
+                let mut label = format!("{}", skill_type);
                 if label.is_empty() {
                     label = "Select Skill Type".to_string();
                 }
-                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+                SelectOption::new(format!("{}", skill_type).as_str(), label.as_str())
             })
             .collect::<Vec<SelectOption>>()
     });

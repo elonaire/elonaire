@@ -99,12 +99,12 @@ pub fn CreateResumeItem() -> impl IntoView {
     let resume_sections = Memo::new(move |_| {
         UserResumeSection::variants_slice()
             .iter()
-            .map(|category| {
-                let mut label = format!("{}", category);
+            .map(|section| {
+                let mut label = format!("{}", section);
                 if label.is_empty() {
                     label = "Select Section".to_string();
                 }
-                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+                SelectOption::new(format!("{}", section).as_str(), label.as_str())
             })
             .collect::<Vec<SelectOption>>()
     });
