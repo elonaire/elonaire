@@ -3,7 +3,7 @@ use leptos_router::params::Params;
 use reactive_stores::Store;
 use serde::{Deserialize, Serialize};
 
-use crate::data::models::graphql::acl::UserProfile;
+use crate::data::models::graphql::acl::User;
 
 #[derive(Params, PartialEq, Serialize)]
 pub struct AuthCode {
@@ -26,7 +26,7 @@ pub struct AppStateContext {
 #[derive(Clone, Debug, Default, Store)]
 #[allow(dead_code)]
 pub struct UserInfo {
-    pub user_profile: UserProfile,
+    pub user_profile: User,
     pub auth_info: AuthInfo,
 }
 

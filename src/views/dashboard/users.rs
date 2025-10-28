@@ -10,18 +10,13 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::forms::radio_input::RadioOption;
 use crate::components::general::spinner::Spinner;
-use crate::data::models::graphql::shared::{
-    CreateProfessionalDetailsResponse, ProfessionalDetailsInputVars,
-};
+use crate::data::models::graphql::acl::{SignUpResponse, SignUpVars, UserInput};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
-            datepicker::DatePicker,
             input::{InputField, InputFieldType},
-            radio_input::RadioInputField,
             reactive_form::ReactiveForm,
         },
         general::{
@@ -31,17 +26,14 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    data::models::{
-        general::acl::{
-            AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
-        },
-        graphql::shared::UserProfessionalInfoInput,
+    data::models::general::acl::{
+        AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
 #[island]
-pub fn ProfessionalDetails() -> impl IntoView {
+pub fn Users() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -50,13 +42,13 @@ pub fn ProfessionalDetails() -> impl IntoView {
 }
 
 #[island]
-pub fn ProfessionalDetailsList() -> impl IntoView {
+pub fn UsersList() -> impl IntoView {
     let table_data = RwSignal::new((
         vec![
-            Column::new("Occupation", false),
-            Column::new("Description", true),
+            Column::new("Full Name", false),
+            Column::new("Email", true),
+            Column::new("OAuth Client", true),
             Column::new("Status", true),
-            Column::new("Start Date", true),
         ],
         vec![],
     ));
@@ -67,15 +59,15 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
 
     view! {
         <>
-            <Title text="My Portfolio"/>
+            <Title text="Users"/>
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Professions"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users"] />
             </div>
 
-            <h1 class="mx-[20px]">Professional Details</h1>
+            <h1 class="mx-[20px]">Users</h1>
 
             <div class="mx-[20px] flex items-center justify-end">
-                <A href="/dashboard/professional-details/create">
+                <A href="/dashboard/users/create">
                     <BasicButton
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
@@ -93,7 +85,7 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreateProfessionalDetail() -> impl IntoView {
+pub fn CreateUser() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
@@ -101,15 +93,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
-    let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
-    });
-
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
     });
 
     Effect::new(move || {
@@ -117,9 +104,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data = deserialize_form_data_to_struct::<
-                        UserProfessionalInfoInput,
-                    >(&form_data, true);
+                    let deserialized_form_data =
+                        deserialize_form_data_to_struct::<UserInput>(&form_data, true);
+
+                    leptos::logging::log!("deserialized_form_data: {:?}", deserialized_form_data);
 
                     if deserialized_form_data.is_none() {
                         set_is_loading.set(false);
@@ -128,18 +116,18 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
 
                     let deserialized_form_data = deserialized_form_data.unwrap();
 
-                    let input_vars = ProfessionalDetailsInputVars {
-                        professional_details: deserialized_form_data,
+                    let input_vars = SignUpVars {
+                        user: deserialized_form_data,
                     };
 
                     let query = r#"
-                           mutation CreateProfessionalDetails($professionalDetails: UserProfessionalInfoInput!) {
-                                createProfessionalDetails(professionalDetails: $professionalDetails) {
-                                    description
-                                    active
-                                    occupation
-                                    startDate
+                           mutation SignUp($user: UserInput!) {
+                                signUp(user: $user) {
                                     id
+                                    fullName
+                                    email
+                                    status
+                                    oauthClient
                                 }
                            }
                        "#;
@@ -153,16 +141,14 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                         ),
                     );
 
-                    let response = perform_mutation_or_query_with_vars::<
-                        CreateProfessionalDetailsResponse,
-                        ProfessionalDetailsInputVars,
-                    >(
-                        Some(&headers),
-                        "http://localhost:8080/api/shared",
-                        query,
-                        input_vars,
-                    )
-                    .await;
+                    let response =
+                        perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
+                            Some(&headers),
+                            "http://localhost:8080/api/acl",
+                            query,
+                            input_vars,
+                        )
+                        .await;
 
                     match response.get_data() {
                         Some(_data) => {
@@ -210,10 +196,10 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
 
     view! {
         <>
-            <Title text="New Profession"/>
+            <Title text="New User"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div>
-                    <p>"Profession created successfully!"</p>
+                    <p>"User created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -226,26 +212,16 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Professions", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New Profession</h1>
+            <h1 class="mx-[20px]">New User</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
-                    <InputField field_type=InputFieldType::Text label="Occupation" required=true id_attr="occupation" name="occupation" />
-                    <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
+                    <InputField field_type=InputFieldType::Email label="Email" required=true id_attr="email" name="email" />
+                    <InputField field_type=InputFieldType::Password label="Password" required=true id_attr="password" name="password" />
 
-                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <RadioInputField
-                        legend="Select Status"
-                        name="active"
-                        required=true
-                        options=vec![
-                            RadioOption::new("true", "Active", None),
-                            RadioOption::new("false", "InActive", None),
-                        ]
-                    />
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"

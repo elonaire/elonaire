@@ -56,6 +56,10 @@ pub fn UserServicesList() -> impl IntoView {
         vec![],
     ));
 
+    Effect::new(move || {
+        spawn_local(async move {});
+    });
+
     view! {
         <>
             <Title text="User Services"/>
@@ -195,7 +199,7 @@ pub fn CreateUserService() -> impl IntoView {
                                                         CreateUserServiceResponse,
                                                         UserServiceInputVars,
                                                     >(
-                                                        Some(headers),
+                                                        Some(&headers),
                                                         "http://localhost:8080/api/shared",
                                                         query,
                                                         input_vars,

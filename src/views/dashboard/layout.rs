@@ -52,6 +52,8 @@ pub fn DashboardLayout() -> impl IntoView {
                 IconData::BiCertificationRegular,
                 "/dashboard/skills",
             ),
+            MenuItem::new("Users", IconData::FaUserGroupSolid, "/dashboard/users"),
+            MenuItem::new("Roles", IconData::FaUserLockSolid, "/dashboard/roles"),
             MenuItem::new("Blog", IconData::RiArticleDocumentLine, "/dashboard/blog"),
             MenuItem::new("Media", IconData::AiFileImageOutlined, "/dashboard/media"),
         ]
@@ -89,7 +91,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                     >
                                         <div class="block rounded-[5px] hover:bg-gray-100 h-[45px]" on:click=move |_| set_collapsed.set(false)>
                                             <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
-                                                <Icon width="24" height="24" icon=child.icon />
+                                                <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
                                                 <span class="flex-1">{child.label}</span>
                                             </A>
                                         </div>

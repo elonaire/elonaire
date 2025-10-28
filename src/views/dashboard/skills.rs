@@ -65,6 +65,10 @@ pub fn SkillsList() -> impl IntoView {
         vec![],
     ));
 
+    Effect::new(move || {
+        spawn_local(async move {});
+    });
+
     view! {
         <>
             <Title text="My Skills"/>
@@ -104,7 +108,7 @@ pub fn CreateSkill() -> impl IntoView {
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
-    let user_skill_levels = Memo::new(move |_| {
+    let user_skill_levels = RwSignal::new(
         UserSkillLevel::variants_slice()
             .iter()
             .map(|level| {
@@ -114,9 +118,9 @@ pub fn CreateSkill() -> impl IntoView {
                 }
                 SelectOption::new(format!("{}", level).as_str(), label.as_str())
             })
-            .collect::<Vec<SelectOption>>()
-    });
-    let user_skill_types = Memo::new(move |_| {
+            .collect::<Vec<SelectOption>>(),
+    );
+    let user_skill_types = RwSignal::new(
         UserSkillType::variants_slice()
             .iter()
             .map(|skill_type| {
@@ -126,8 +130,8 @@ pub fn CreateSkill() -> impl IntoView {
                 }
                 SelectOption::new(format!("{}", skill_type).as_str(), label.as_str())
             })
-            .collect::<Vec<SelectOption>>()
-    });
+            .collect::<Vec<SelectOption>>(),
+    );
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -233,7 +237,7 @@ pub fn CreateSkill() -> impl IntoView {
                                                         CreateUserSkillResponse,
                                                         CreateUserSkillVars,
                                                     >(
-                                                        Some(headers),
+                                                        Some(&headers),
                                                         "http://localhost:8080/api/shared",
                                                         query,
                                                         input_vars,
@@ -339,14 +343,14 @@ pub fn CreateSkill() -> impl IntoView {
                     name="type"
                     required=true
                     id_attr="type"
-                    options=user_skill_types.get_untracked()
+                    options=user_skill_types
                     />
                     <SelectInput
                     label="Level"
                     name="level"
                     required=true
                     id_attr="level"
-                    options=user_skill_levels.get_untracked()
+                    options=user_skill_levels
                     />
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />

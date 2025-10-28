@@ -108,7 +108,7 @@ pub fn CreateBlog() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let blog_statuses = Memo::new(move |_| {
+    let blog_statuses = RwSignal::new(
         BlogStatus::variants_slice()
             .iter()
             .map(|status| {
@@ -119,10 +119,10 @@ pub fn CreateBlog() -> impl IntoView {
 
                 SelectOption::new(format!("{}", status).as_str(), label.as_str())
             })
-            .collect::<Vec<SelectOption>>()
-    });
+            .collect::<Vec<SelectOption>>(),
+    );
 
-    let blog_categories = Memo::new(move |_| {
+    let blog_categories = RwSignal::new(
         BlogCategory::variants_slice()
             .iter()
             .map(|category| {
@@ -141,8 +141,8 @@ pub fn CreateBlog() -> impl IntoView {
 
                 SelectOption::new(format!("{}", category).as_str(), label.as_str())
             })
-            .collect::<Vec<SelectOption>>()
-    });
+            .collect::<Vec<SelectOption>>(),
+    );
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -295,7 +295,7 @@ pub fn CreateBlog() -> impl IntoView {
                                                         CreateBlogPostResponse,
                                                         CreateBlogPostVars,
                                                     >(
-                                                        Some(headers),
+                                                        Some(&headers),
                                                         "http://localhost:8080/api/shared",
                                                         query,
                                                         input_vars,
@@ -402,14 +402,14 @@ pub fn CreateBlog() -> impl IntoView {
                     name="status"
                     required=true
                     id_attr="status"
-                    options=blog_statuses.get_untracked()
+                    options=blog_statuses
                     />
                     <SelectInput
                     label="Category"
                     name="category"
                     required=true
                     id_attr="category"
-                    options=blog_categories.get_untracked()
+                    options=blog_categories
                     />
                     <ToggleSwitch
                        label_active="Premium"

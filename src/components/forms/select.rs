@@ -45,7 +45,7 @@ pub fn SelectInput(
     #[prop(into)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Select>,
     #[prop(default = false, optional)] readonly: bool,
-    options: Vec<SelectOption>,
+    #[prop(into)] options: RwSignal<Vec<SelectOption>>,
     #[prop(default = false, optional)] required: bool,
     #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(into, optional)] ext_input_styles: String,
@@ -77,7 +77,7 @@ pub fn SelectInput(
                 id=id_attr.clone()
                 required=required
             >
-                {options.into_iter()
+                {move || options.get().into_iter()
                     .map(|option| {
                         view! {
                             <option

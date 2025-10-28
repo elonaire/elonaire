@@ -87,11 +87,11 @@ pub fn CheckboxInputField(
 /// It can be used in forms to collect user input.
 /// Example usage:
 /// ```
-/// let selected_options = create_rw_signal(HashSet::new());
+/// let selected_options = RwSignal::new(HashSet::new());
 /// <CheckboxGroup
 ///     legend="Choose your interests"
 ///     name="interests"
-///     options=vec![
+///     options=RwSignal::new(vec![
 ///         CheckboxOption {
 ///             value: "sports".to_string(),
 ///             label: "Sports".to_string(),
@@ -102,7 +102,7 @@ pub fn CheckboxInputField(
 ///             label: "Music".to_string(),
 ///             children: None,
 ///         },
-///     ]
+///     ])
 ///     selected_values=selected_options
 ///     required=true
 /// />
@@ -114,9 +114,9 @@ pub fn CheckboxGroup(
     legend: String,
     /// Options for multiple checkboxes
     #[prop(into)]
-    options: Vec<CheckboxOption>,
+    options: RwSignal<Vec<CheckboxOption>>,
     /// Selected values for multiple checkboxes
-    #[prop(into)]
+    #[prop(into, optional)]
     selected_values: RwSignal<HashSet<String>>,
     #[prop(into)] name: String,
     #[prop(default = false, optional)] readonly: bool,
@@ -128,9 +128,8 @@ pub fn CheckboxGroup(
     #[prop(default = false, optional)]
     horizontal: bool,
 ) -> impl IntoView {
-    let base_fieldset_class = "border border-gray-300 rounded-[5px] p-4 bg-white relative";
-    let base_legend_class =
-        "text-sm font-medium text-gray-700 bg-white px-1 absolute -top-2 left-3";
+    let base_fieldset_class = "border border-gray-300 rounded p-4";
+    let base_legend_class = "text-gray-700 text-sm font-bold px-2";
 
     let container_class = if horizontal {
         "flex flex-wrap gap-4"
@@ -152,7 +151,7 @@ pub fn CheckboxGroup(
                 }}
             </legend>
             <div class=container_class>
-                {options
+                {move || options.get()
                     .into_iter()
                     .map(|option| {
                         let option_value = option.value.clone();

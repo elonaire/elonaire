@@ -118,8 +118,6 @@ pub fn SignIn() -> impl IntoView {
                 )
                 .await;
 
-                leptos::logging::log!("login_res: {:?}", login_res);
-
                 match login_res.get_data() {
                     Some(data) => {
                         match &data.sign_in {

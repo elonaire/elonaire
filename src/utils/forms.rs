@@ -26,12 +26,30 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
         let value = arr.get(1);
 
         if let Some(s) = value.as_string() {
-            if deserialize_bool && (s == "true" || s == "false") {
-                let parsed_s: bool = s.parse().unwrap();
-
-                map.insert(key, Value::Bool(parsed_s));
+            // Convert to bool, null, or string
+            let val = if s.is_empty() {
+                Value::Null
+            } else if deserialize_bool && (s == "true" || s == "false") {
+                Value::Bool(s.parse::<bool>().unwrap())
             } else {
-                map.insert(key, Value::String(s));
+                Value::String(s)
+            };
+
+            // Merge into existing entry if present
+            match map.get_mut(&key) {
+                Some(existing) => match existing {
+                    Value::Array(arr) => {
+                        arr.push(val);
+                    }
+                    prev => {
+                        // Convert single previous value into array
+                        let new_arr = vec![prev.clone(), val];
+                        *prev = Value::Array(new_arr);
+                    }
+                },
+                None => {
+                    map.insert(key, val);
+                }
             }
         }
     }

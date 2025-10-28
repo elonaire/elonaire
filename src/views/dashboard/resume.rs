@@ -58,6 +58,10 @@ pub fn ResumeItemsList() -> impl IntoView {
         vec![],
     ));
 
+    Effect::new(move || {
+        spawn_local(async move {});
+    });
+
     view! {
         <>
             <Title text="Resume Items"/>
@@ -96,7 +100,7 @@ pub fn CreateResumeItem() -> impl IntoView {
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
-    let resume_sections = Memo::new(move |_| {
+    let resume_sections = RwSignal::new(
         UserResumeSection::variants_slice()
             .iter()
             .map(|section| {
@@ -106,8 +110,8 @@ pub fn CreateResumeItem() -> impl IntoView {
                 }
                 SelectOption::new(format!("{}", section).as_str(), label.as_str())
             })
-            .collect::<Vec<SelectOption>>()
-    });
+            .collect::<Vec<SelectOption>>(),
+    );
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -164,7 +168,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                         CreateResumeItemResponse,
                         ResumeItemInputVars,
                     >(
-                        Some(headers),
+                        Some(&headers),
                         "http://localhost:8080/api/shared",
                         query,
                         input_vars,
@@ -251,7 +255,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                     name="section"
                     required=true
                     id_attr="section"
-                    options=resume_sections.get_untracked()
+                    options=resume_sections
                     />
                     <BasicButton
                         button_text="Submit"

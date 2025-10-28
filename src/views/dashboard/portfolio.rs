@@ -65,6 +65,10 @@ pub fn PortfolioList() -> impl IntoView {
         vec![],
     ));
 
+    Effect::new(move || {
+        spawn_local(async move {});
+    });
+
     view! {
         <>
             <Title text="My Portfolio"/>
@@ -104,7 +108,7 @@ pub fn CreatePortfolio() -> impl IntoView {
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
-    let portfolio_categories = Memo::new(move |_| {
+    let portfolio_categories = RwSignal::new(
         UserPortfolioCategory::variants_slice()
             .iter()
             .map(|category| {
@@ -114,8 +118,8 @@ pub fn CreatePortfolio() -> impl IntoView {
                 }
                 SelectOption::new(format!("{}", category).as_str(), label.as_str())
             })
-            .collect::<Vec<SelectOption>>()
-    });
+            .collect::<Vec<SelectOption>>(),
+    );
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -222,7 +226,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                         CreatePortfolioItemResponse,
                                                         UserPortfolioInputVars,
                                                     >(
-                                                        Some(headers),
+                                                        Some(&headers),
                                                         "http://localhost:8080/api/shared",
                                                         query,
                                                         input_vars,
@@ -332,7 +336,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                     name="category"
                     required=true
                     id_attr="category"
-                    options=portfolio_categories.get_untracked()
+                    options=portfolio_categories
                     />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <BasicButton

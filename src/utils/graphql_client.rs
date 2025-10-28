@@ -43,12 +43,12 @@ impl<T> GraphQLResponse<T> {
 ///    "#;
 /// ```
 pub async fn perform_query_without_vars<Res: for<'de> Deserialize<'de>>(
-    headers: Option<HashMap<String, String>>,
+    headers: Option<&HashMap<String, String>>,
     endpoint: &str,
     query: &str,
 ) -> GraphQLResponse<Res> {
     let client = match headers {
-        Some(headers) => Client::new_with_headers(endpoint, headers),
+        Some(headers) => Client::new_with_headers(endpoint, headers.to_owned()),
         None => Client::new(endpoint),
     };
 
@@ -88,13 +88,13 @@ pub async fn perform_mutation_or_query_with_vars<
     Res: for<'de> Deserialize<'de> + Serialize,
     Var: for<'de> Deserialize<'de> + Serialize,
 >(
-    headers: Option<HashMap<String, String>>,
+    headers: Option<&HashMap<String, String>>,
     endpoint: &str,
     query: &str,
     vars: Var,
 ) -> GraphQLResponse<Res> {
     let client = match headers {
-        Some(headers) => Client::new_with_headers(endpoint, headers),
+        Some(headers) => Client::new_with_headers(endpoint, headers.to_owned()),
         None => Client::new(endpoint),
     };
 
