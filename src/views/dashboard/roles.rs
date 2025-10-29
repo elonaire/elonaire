@@ -13,9 +13,13 @@ use web_sys::HtmlFormElement;
 use crate::components::forms::checkbox::{CheckboxGroup, CheckboxOption};
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
+use crate::components::general::table::data_table::TableCellData;
+use crate::components::general::tag::LabelTag;
+use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::acl::{
     AdminPermission, CreateSystemRoleResponse, CreateSystemRoleVars, FetchDepartmentsResponse,
-    FetchOrganizationsResponse, RoleInput, RoleMetadata, RoleType,
+    FetchOrganizationsResponse, FetchSystemRolesResponse, RoleInput, RoleMetadata, RoleType,
+    SystemRole,
 };
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::{
@@ -51,6 +55,9 @@ pub fn Roles() -> impl IntoView {
 
 #[island]
 pub fn RolesList() -> impl IntoView {
+    let current_state = expect_context::<Store<AppStateContext>>();
+    let (is_loading, set_is_loading) = signal(false);
+
     let table_data = RwSignal::new((
         vec![
             Column::new("Role Name", false),
@@ -60,7 +67,89 @@ pub fn RolesList() -> impl IntoView {
     ));
 
     Effect::new(move || {
-        spawn_local(async move {});
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let fetch_roles_query = r#"
+                   query FetchSystemRoles {
+                        fetchSystemRoles {
+                            roleName
+                            isAdmin
+                            isDefault
+                            isSuperAdmin
+                            id
+                        }
+                   }
+               "#;
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let fetch_roles_response = perform_query_without_vars::<FetchSystemRolesResponse>(
+                Some(&headers),
+                "http://localhost:8080/api/acl",
+                fetch_roles_query,
+            )
+            .await;
+
+            match fetch_roles_response.get_data() {
+                Some(data) => {
+                    let roles: Vec<HashMap<String, TableCellData>> = data
+                        .fetch_system_roles
+                        .as_ref()
+                        .unwrap()
+                        .to_vec()
+                        .iter()
+                        .map(|role| {
+                            let mut hash_map_data = HashMap::new();
+
+                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                            hash_map_data.insert(
+                                "id".to_string(),
+                                TableCellData::String(role.id.as_ref().unwrap().to_owned()),
+                            );
+
+                            hash_map_data.insert(
+                                "Role Name".to_string(),
+                                TableCellData::String(role.role_name.as_ref().unwrap().to_owned()),
+                            );
+                            let privilege = if role.is_admin.is_some() && role.is_admin.unwrap() {
+                                ViewFn::from(move || view! {
+                                    <LabelTag label="Admin" color=ColorTemperature::Warning />
+                                })
+                            } else if role.is_super_admin.is_some() && role.is_super_admin.unwrap() {
+                                ViewFn::from(move || view! {
+                                    <LabelTag label="Super Admin" color=ColorTemperature::Danger />
+                                })
+                            } else {
+                                ViewFn::from(move || view! {
+                                    <LabelTag label="None" />
+                                })
+                            };
+                            hash_map_data.insert(
+                                "Privilege".to_string(),
+                                TableCellData::Html(privilege),
+                            );
+                            hash_map_data
+                        })
+                        .collect();
+
+                    table_data.update(move |prev| {
+                        prev.1 = roles;
+                    });
+
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
     });
 
     view! {
@@ -69,6 +158,9 @@ pub fn RolesList() -> impl IntoView {
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Roles"] />
             </div>
+            <Show when=move || is_loading.get()>
+                <Spinner />
+            </Show>
 
             <h1 class="mx-[20px]">Roles</h1>
 
@@ -97,7 +189,7 @@ pub fn CreateRole() -> impl IntoView {
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
     let (metadata_form_is_valid, set_metadata_form_is_valid) = signal(false);
     let submit_is_disabled =
-        Memo::new(move |_| (!main_form_is_valid.get() && !metadata_form_is_valid.get()));
+        Memo::new(move |_| (!main_form_is_valid.get() || !metadata_form_is_valid.get()));
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);

@@ -110,6 +110,12 @@ pub struct UserInput {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct FetchUsersResponse {
+    #[serde(rename = "fetchUsers")]
+    pub fetch_users: Option<Vec<User>>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SignUpResponse {
     #[serde(rename = "signUp")]
     pub sign_up: Option<User>, // this is the return type expected from the API on success
@@ -145,6 +151,12 @@ pub struct SystemRole {
     pub is_super_admin: Option<bool>,
     #[serde(rename = "updatedAt", alias = "updated_at")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchSystemRolesResponse {
+    #[serde(rename = "fetchSystemRoles")]
+    pub fetch_system_roles: Option<Vec<SystemRole>>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Deserialize, Serialize)]

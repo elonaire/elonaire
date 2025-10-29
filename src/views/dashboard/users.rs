@@ -11,8 +11,16 @@ use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
 use crate::components::general::spinner::Spinner;
-use crate::data::models::graphql::acl::{SignUpResponse, SignUpVars, UserInput};
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
+use crate::components::general::table::data_table::TableCellData;
+use crate::components::general::tag::LabelTag;
+use crate::components::schemas::props::ColorTemperature;
+use crate::data::models::general::acl::OauthClientName;
+use crate::data::models::graphql::acl::{
+    AccountStatus, FetchUsersResponse, SignUpResponse, SignUpVars, UserInput,
+};
+use crate::utils::graphql_client::{
+    perform_mutation_or_query_with_vars, perform_query_without_vars,
+};
 use crate::{
     components::{
         forms::{
@@ -43,6 +51,9 @@ pub fn Users() -> impl IntoView {
 
 #[island]
 pub fn UsersList() -> impl IntoView {
+    let current_state = expect_context::<Store<AppStateContext>>();
+    let (is_loading, set_is_loading) = signal(false);
+
     let table_data = RwSignal::new((
         vec![
             Column::new("Full Name", false),
@@ -54,7 +65,117 @@ pub fn UsersList() -> impl IntoView {
     ));
 
     Effect::new(move || {
-        spawn_local(async move {});
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let fetch_users_query = r#"
+                   query FetchUsers {
+                        fetchUsers {
+                            id
+                            email
+                            status
+                            oauthClient
+                            fullName
+                        }
+                   }
+               "#;
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let fetch_users_response = perform_query_without_vars::<FetchUsersResponse>(
+                Some(&headers),
+                "http://localhost:8080/api/acl",
+                fetch_users_query,
+            )
+            .await;
+
+            match fetch_users_response.get_data() {
+                Some(data) => {
+                    let users: Vec<HashMap<String, TableCellData>> = data
+                        .fetch_users
+                        .as_ref()
+                        .unwrap()
+                        .to_vec()
+                        .iter()
+                        .map(|user| {
+                            let mut hash_map_data = HashMap::new();
+
+                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                            hash_map_data.insert(
+                                "id".to_string(),
+                                TableCellData::String(user.id.as_ref().unwrap().to_owned()),
+                            );
+
+                            hash_map_data.insert(
+                                "Full Name".to_string(),
+                                TableCellData::String(
+                                    user.full_name.as_ref().unwrap_or(&String::new()).to_owned(),
+                                ),
+                            );
+                            hash_map_data.insert(
+                                "Email".to_string(),
+                                TableCellData::String(user.email.to_owned()),
+                            );
+                            let oauth_client = match user.oauth_client {
+                                Some(client) => {
+                                    match client {
+                                        OauthClientName::Github => ViewFn::from(move || view! {
+                                            <LabelTag label="GitHub" color=ColorTemperature::Info />
+                                        }),
+                                        OauthClientName::Google => ViewFn::from(move || view! {
+                                            <LabelTag label="Google" color=ColorTemperature::Danger />
+                                        })
+                                    }
+                                }
+                                None => ViewFn::from(move || view! {
+                                    <LabelTag label="None" />
+                                })
+                            };
+                            hash_map_data.insert(
+                                "OAuth Client".to_string(),
+                                TableCellData::Html(
+                                    oauth_client,
+                                ),
+                            );
+                            let status = match user.status.as_ref().unwrap() {
+                                AccountStatus::Active => ViewFn::from(move || view! {
+                                    <LabelTag label="Active" color=ColorTemperature::Success />
+                                }),
+                                AccountStatus::Inactive => ViewFn::from(move || view! {
+                                    <LabelTag label="InActive" color=ColorTemperature::Info />
+                                }),
+                                AccountStatus::Suspended => ViewFn::from(move || view! {
+                                    <LabelTag label="Suspended" color=ColorTemperature::Warning />
+                                }),
+                                AccountStatus::Deleted => ViewFn::from(move || view! {
+                                    <LabelTag label="Deleted" color=ColorTemperature::Danger />
+                                }),
+                            };
+                            hash_map_data.insert(
+                                "Status".to_string(),
+                                TableCellData::Html(status),
+                            );
+                            hash_map_data
+                        })
+                        .collect();
+
+                    table_data.update(move |prev| {
+                        prev.1 = users;
+                    });
+
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
     });
 
     view! {
@@ -63,6 +184,9 @@ pub fn UsersList() -> impl IntoView {
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users"] />
             </div>
+            <Show when=move || is_loading.get()>
+                <Spinner />
+            </Show>
 
             <h1 class="mx-[20px]">Users</h1>
 
