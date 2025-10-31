@@ -7,23 +7,23 @@ use crate::utils::custom_traits::EnumerableEnum;
 #[allow(dead_code)]
 pub struct CreatePortfolioItemResponse {
     #[serde(rename = "createPortfolioItem")]
-    pub create_portfolio_item: UserPortfolio, // this is the return type expected from the API on success, the key is the resolver name
+    pub create_portfolio_item: Option<UserPortfolio>, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserPortfolio {
-    pub id: String,
-    pub title: String,
-    pub description: String,
+    pub id: Option<String>,
+    pub title: Option<String>,
+    pub description: Option<String>,
     #[serde(rename = "startDate", alias = "start_date")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     #[serde(rename = "endDate", alias = "end_date")]
     pub end_date: Option<String>,
     #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
     pub years_of_experience: Option<usize>,
     pub link: Option<String>,
-    pub category: UserPortfolioCategory,
+    pub category: Option<UserPortfolioCategory>,
     pub thumbnail: Option<String>,
     pub skills: Option<Vec<UserSkill>>,
 }
@@ -76,7 +76,7 @@ impl EnumerableEnum for UserPortfolioCategory {
 #[allow(dead_code)]
 pub struct CreateProfessionalDetailsResponse {
     #[serde(rename = "createProfessionalDetails")]
-    pub create_professional_details: UserProfessionalInfo, // this is the return type expected from the API on success, the key is the resolver name
+    pub create_professional_details: Option<UserProfessionalInfo>, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -97,14 +97,14 @@ pub struct UserProfessionalInfoInput {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserProfessionalInfo {
-    pub id: String,
-    pub occupation: String,
-    pub description: String,
+    pub id: Option<String>,
+    pub occupation: Option<String>,
+    pub description: Option<String>,
     #[serde(rename = "startDate", alias = "start_date")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
     pub years_of_experience: Option<usize>,
-    pub active: bool,
+    pub active: Option<bool>,
 }
 
 /* This is the beginning of UserService GraphQL schema */
@@ -112,7 +112,7 @@ pub struct UserProfessionalInfo {
 #[allow(dead_code)]
 pub struct CreateUserServiceResponse {
     #[serde(rename = "createUserService")]
-    pub create_user_service: UserService, // this is the return type expected from the API on success, the key is the resolver name
+    pub create_user_service: Option<UserService>, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
@@ -132,10 +132,10 @@ pub struct UserServiceInput {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserService {
-    pub id: String,
-    pub title: String,
-    pub description: String,
-    pub thumbnail: String,
+    pub id: Option<String>,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub thumbnail: Option<String>,
 }
 
 /* This is the beginning of Resume GraphQL schema */
@@ -143,7 +143,7 @@ pub struct UserService {
 #[allow(dead_code)]
 pub struct CreateResumeItemResponse {
     #[serde(rename = "createResumeItem")]
-    pub create_resume_item: UserResume, // this is the return type expected from the API on success, the key is the resolver name
+    pub create_resume_item: Option<UserResume>, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
@@ -201,26 +201,26 @@ impl EnumerableEnum for UserResumeSection {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserResume {
-    pub id: String,
-    pub title: String,
+    pub id: Option<String>,
+    pub title: Option<String>,
     #[serde(rename = "moreinfo", alias = "more_info")]
     pub more_info: Option<String>,
     #[serde(rename = "startDate", alias = "start_date")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     #[serde(rename = "endDate", alias = "end_date")]
     pub end_date: Option<String>,
     #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
     pub years_of_experience: Option<usize>,
     pub link: Option<String>,
-    pub section: UserResumeSection,
+    pub section: Option<UserResumeSection>,
     pub achievements: Option<Vec<ResumeAchievement>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct ResumeAchievement {
-    pub id: String,
-    pub description: String,
+    pub id: Option<String>,
+    pub description: Option<String>,
 }
 
 /* This is the beginning of UserSkill GraphQL schema */
@@ -228,7 +228,7 @@ pub struct ResumeAchievement {
 #[allow(dead_code)]
 pub struct CreateUserSkillResponse {
     #[serde(rename = "createSkill")]
-    pub create_skill: UserSkill, // this is the return type expected from the API on success, the key is the resolver name
+    pub create_skill: Option<UserSkill>, // this is the return type expected from the API on success, the key is the resolver name
 }
 
 // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
@@ -251,14 +251,14 @@ pub struct UserSkillInput {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct UserSkill {
-    pub id: String,
-    pub thumbnail: String,
-    pub name: String,
+    pub id: Option<String>,
+    pub thumbnail: Option<String>,
+    pub name: Option<String>,
     pub level: Option<UserSkillLevel>,
     #[serde(rename = "type")]
-    pub r#type: UserSkillType,
+    pub r#type: Option<UserSkillType>,
     #[serde(rename = "startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
@@ -301,7 +301,7 @@ impl EnumerableEnum for UserSkillType {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateBlogPostResponse {
     #[serde(rename = "createBlogPost")]
-    pub create_blog_post: BlogPost, // this is the return type expected from the API on success
+    pub create_blog_post: Option<BlogPost>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -369,15 +369,15 @@ impl EnumerableEnum for BlogCategory {
 #[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct BlogPost {
-    pub id: String,
-    pub title: String,
+    pub id: Option<String>,
+    pub title: Option<String>,
     #[serde(rename = "shortDescription")]
-    pub short_description: String,
+    pub short_description: Option<String>,
     pub status: Option<BlogStatus>,
-    pub thumbnail: String,
+    pub thumbnail: Option<String>,
     pub content: Option<String>,
-    pub category: BlogCategory,
-    pub link: String,
+    pub category: Option<BlogCategory>,
+    pub link: Option<String>,
     #[serde(rename = "publishedDate")]
     pub published_date: Option<String>,
     #[serde(rename = "isFeatured")]
@@ -396,43 +396,31 @@ pub struct BlogPost {
 #[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub struct BlogComment {
-    pub content: String,
-    pub id: String,
+    pub content: Option<String>,
+    pub id: Option<String>,
 }
 
 /* This is a Query for UserResources */
-// #[derive(cynic::QueryFragment, Debug)]
-// #[cynic(
-//     graphql_type = "Query",
-//     schema = "shared",
-//     variables = "UserResourcesArguments"
-// )]
-// #[allow(dead_code)]
-// pub struct FetchUserResources {
-//     #[arguments(userId: $user_id)]
-//     pub fetch_user_resources: UserResources,
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FetchSiteResourcesResponse {
+    #[serde(rename = "fetchSiteResources")]
+    pub fetch_site_resources: Option<PublicSiteResources>,
+}
 
-// #[derive(cynic::QueryFragment, Debug)]
-// #[cynic(schema = "shared")]
-// #[allow(dead_code)]
-// pub struct UserResources {
-//     blog_posts: Vec<BlogPost>,
-//     professional_info: Vec<UserProfessionalInfo>,
-//     portfolio: Vec<UserPortfolio>,
-//     resume: Vec<UserResume>,
-//     skills: Vec<UserSkill>,
-//     services: Vec<UserService>,
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PublicSiteResources {
+    #[serde(rename = "blogPosts")]
+    pub blog_posts: Option<Vec<BlogPost>>,
+    #[serde(rename = "professionalInfo")]
+    pub professional_info: Option<Vec<UserProfessionalInfo>>,
+    pub portfolio: Option<Vec<UserPortfolio>>,
+    pub resume: Option<Vec<UserResume>>,
+    pub skills: Option<Vec<UserSkill>>,
+    pub services: Option<Vec<UserService>>,
+}
 
-// #[derive(cynic::QueryVariables)]
-// pub struct UserResourcesVars {
-//     should_include: bool,
-// }
-
-// // This struct name should match the variables arg in the cynic macro of the corresponding query fragment
-// #[derive(cynic::QueryVariables, Debug)]
-// #[allow(dead_code)]
-// pub struct UserResourcesArguments {
-//     pub user_id: String, // The key should match the value provided in the corresponding query fragment
-// }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserResourcesVars {
+    #[serde(rename = "userId")]
+    user_id: String,
+}
