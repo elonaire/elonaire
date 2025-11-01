@@ -123,23 +123,12 @@ pub fn UsersList() -> impl IntoView {
                                 TableCellData::String(user.email.to_owned()),
                             );
                             let oauth_client = match user.oauth_client {
-                                Some(client) => {
-                                    match client {
-                                        OauthClientName::Github => ViewFn::from(move || view! {
-                                            <LabelTag label="GitHub" color=ColorTemperature::Info />
-                                        }),
-                                        OauthClientName::Google => ViewFn::from(move || view! {
-                                            <LabelTag label="Google" color=ColorTemperature::Danger />
-                                        })
-                                    }
-                                }
-                                None => ViewFn::from(move || view! {
-                                    <LabelTag label="None" />
-                                })
+                                Some(client) => format!("{:?}", client),
+                                None => String::from("None")
                             };
                             hash_map_data.insert(
                                 "OAuth Client".to_string(),
-                                TableCellData::Html(
+                                TableCellData::String(
                                     oauth_client,
                                 ),
                             );

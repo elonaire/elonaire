@@ -259,6 +259,8 @@ pub struct UserSkill {
     pub r#type: Option<UserSkillType>,
     #[serde(rename = "startDate")]
     pub start_date: Option<String>,
+    #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
+    pub years_of_experience: Option<usize>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]

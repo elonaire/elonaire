@@ -157,6 +157,9 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Professions"] />
             </div>
+            <Show when=move || is_loading.get()>
+                <Spinner />
+            </Show>
 
             <h1 class="mx-[20px]">Professional Details</h1>
 

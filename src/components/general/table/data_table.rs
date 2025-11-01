@@ -100,6 +100,8 @@ pub enum TableCellData {
     Float32(f32),
     /// This handles f64 data type
     Float64(f64),
+    /// This handles usize data type
+    Usize(usize),
     /// This handles u32 data type
     UInt32(u32),
     /// This handles u64 data type
@@ -123,6 +125,7 @@ impl std::fmt::Debug for TableCellData {
             TableCellData::Html(_) => f.debug_tuple("Html").field(&"<Html content>").finish(),
             TableCellData::Float32(f32) => f.debug_tuple("Float32").field(f32).finish(),
             TableCellData::Float64(f64) => f.debug_tuple("Float64").field(f64).finish(),
+            TableCellData::Usize(u) => f.debug_tuple("Usize").field(u).finish(),
             TableCellData::UInt32(u) => f.debug_tuple("UInt32").field(u).finish(),
             TableCellData::UInt64(u) => f.debug_tuple("UInt64").field(u).finish(),
             TableCellData::UInt128(u) => f.debug_tuple("UInt128").field(u).finish(),
@@ -529,6 +532,7 @@ pub fn DataTable(
                                                             Some(TableCellData::String(s)) => s.clone().into_any().into_view(),
                                                             Some(TableCellData::Int32(i)) => i.to_string().into_any().into_view(),
                                                             Some(TableCellData::Int64(i)) => i.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Usize(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt32(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt64(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt128(u)) => u.to_string().into_any().into_view(),

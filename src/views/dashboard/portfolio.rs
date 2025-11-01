@@ -11,11 +11,15 @@ use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::general::spinner::Spinner;
+use crate::components::general::table::data_table::TableCellData;
 use crate::data::models::graphql::shared::{
-    CreatePortfolioItemResponse, UserPortfolioCategory, UserPortfolioInputVars,
+    CreatePortfolioItemResponse, FetchSiteResourcesResponse, UserPortfolioCategory,
+    UserPortfolioInputVars,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
+use crate::utils::graphql_client::{
+    perform_mutation_or_query_with_vars, perform_query_without_vars,
+};
 use crate::{
     components::{
         forms::{
@@ -55,18 +59,117 @@ pub fn Portfolio() -> impl IntoView {
 
 #[island]
 pub fn PortfolioList() -> impl IntoView {
+    let current_state = expect_context::<Store<AppStateContext>>();
+    let (is_loading, set_is_loading) = signal(false);
+
     let table_data = RwSignal::new((
         vec![
             Column::new("Title", false),
-            Column::new("Description", true),
             Column::new("Start Date", true),
+            Column::new("YOE", true),
             Column::new("Category", true),
         ],
         vec![],
     ));
 
     Effect::new(move || {
-        spawn_local(async move {});
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let fetch_roles_query = r#"
+                   query FetchSiteResources {
+                        fetchSiteResources {
+                            portfolio {
+                                title
+                                description
+                                startDate
+                                endDate
+                                link
+                                category
+                                thumbnail
+                                id
+                                yearsOfExperience
+                            }
+                        }
+                   }
+               "#;
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let fetch_roles_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
+                Some(&headers),
+                "http://localhost:8080/api/shared",
+                fetch_roles_query,
+            )
+            .await;
+
+            match fetch_roles_response.get_data() {
+                Some(data) => {
+                    let roles: Vec<HashMap<String, TableCellData>> = data
+                        .fetch_site_resources
+                        .as_ref()
+                        .unwrap()
+                        .portfolio
+                        .as_ref()
+                        .unwrap()
+                        .to_vec()
+                        .iter()
+                        .map(|portfolio| {
+                            let mut hash_map_data = HashMap::new();
+
+                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                            hash_map_data.insert(
+                                "id".to_string(),
+                                TableCellData::String(portfolio.id.as_ref().unwrap().to_owned()),
+                            );
+
+                            hash_map_data.insert(
+                                "Title".to_string(),
+                                TableCellData::String(portfolio.title.as_ref().unwrap().to_owned()),
+                            );
+
+                            hash_map_data.insert(
+                                "YOE".to_string(),
+                                TableCellData::Usize(
+                                    portfolio.years_of_experience.as_ref().unwrap().to_owned(),
+                                ),
+                            );
+
+                            hash_map_data.insert(
+                                "Start Date".to_string(),
+                                TableCellData::DateTime(
+                                    portfolio.start_date.as_ref().unwrap().to_owned(),
+                                ),
+                            );
+
+                            hash_map_data.insert(
+                                "Category".to_string(),
+                                TableCellData::String(format!(
+                                    "{:?}",
+                                    portfolio.category.as_ref().unwrap().to_owned()
+                                )),
+                            );
+                            hash_map_data
+                        })
+                        .collect();
+
+                    table_data.update(move |prev| {
+                        prev.1 = roles;
+                    });
+
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
     });
 
     view! {
@@ -75,6 +178,9 @@ pub fn PortfolioList() -> impl IntoView {
             <div class="mx-[20px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio"] />
             </div>
+            <Show when=move || is_loading.get()>
+                <Spinner />
+            </Show>
 
             <h1 class="mx-[20px]">Portfolio</h1>
 
