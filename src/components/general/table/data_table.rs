@@ -466,7 +466,7 @@ pub fn DataTable(
                                 let (column)
                             >
                                 <th
-                                    class="border-b p-2 border-light-gray text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
+                                    class="border-b p-2 border-light-gray text-nowrap font-bold text-gray-500 text-left cursor-pointer min-w-[150px]"
                                     on:click=move |_| on_click_sort.run(column.clone())
                                 >
                                     <span class="flex flex-row items-center">
@@ -485,7 +485,7 @@ pub fn DataTable(
                             </For>
                             {move || if props.get().editable || props.get().deletable {
                                 Some(view! {
-                                    <th class="border-b p-2 border-light-gray text-wrap font-bold text-gray-800 text-left">
+                                    <th class="border-b p-2 border-light-gray text-wrap font-bold text-gray-500 text-left">
                                         "Actions"
                                     </th>
                                 })

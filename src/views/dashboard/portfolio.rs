@@ -286,7 +286,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                     deserialize_form_data_to_struct::<
                                                         UserPortfolioInput,
                                                     >(
-                                                        &form_data, false
+                                                        &form_data, false, None
                                                     );
 
                                                 if deserialized_form_data.is_none() {

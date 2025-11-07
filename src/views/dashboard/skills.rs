@@ -301,7 +301,7 @@ pub fn CreateSkill() -> impl IntoView {
                                             ) {
                                                 let deserialized_form_data =
                                                     deserialize_form_data_to_struct::<UserSkillInput>(
-                                                        &form_data, false,
+                                                        &form_data, false, None,
                                                     );
 
                                                 if deserialized_form_data.is_none() {

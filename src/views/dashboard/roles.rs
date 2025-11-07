@@ -17,9 +17,9 @@ use crate::components::general::table::data_table::TableCellData;
 use crate::components::general::tag::LabelTag;
 use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::acl::{
-    AdminPermission, CreateSystemRoleResponse, CreateSystemRoleVars, FetchDepartmentsResponse,
-    FetchOrganizationsResponse, FetchSystemRolesResponse, RoleInput, RoleMetadata, RoleType,
-    SystemRole,
+    CreateSystemRoleResponse, CreateSystemRoleVars, FetchDepartmentsResponse,
+    FetchOrganizationsResponse, FetchPermissionsResponse, FetchSystemRolesResponse, RoleInput,
+    RoleMetadata, RoleType,
 };
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::{
@@ -199,6 +199,7 @@ pub fn CreateRole() -> impl IntoView {
         RwSignal::new(vec![SelectOption::new("", "Select Department")] as Vec<SelectOption>);
     let organizations =
         RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
+    let permissions = RwSignal::new(vec![] as Vec<CheckboxOption>);
 
     let role_types = RwSignal::new(
         RoleType::variants_slice()
@@ -213,23 +214,6 @@ pub fn CreateRole() -> impl IntoView {
             .collect::<Vec<SelectOption>>(),
     );
 
-    let admin_permissions = RwSignal::new(
-        AdminPermission::variants_slice()
-            .iter()
-            .map(|admin_permission| {
-                let mut label = format!("{}", admin_permission);
-                if label.is_empty() {
-                    label = "Select Admin Permission".to_string();
-                }
-                CheckboxOption::new(
-                    format!("{}", admin_permission).as_str(),
-                    label.as_str(),
-                    None,
-                )
-            })
-            .collect::<Vec<CheckboxOption>>(),
-    );
-
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
     });
@@ -240,22 +224,17 @@ pub fn CreateRole() -> impl IntoView {
             spawn_local(async move {
                 if let Some(metadata_form_data) = get_form_data_from_form_ref(&metadata_form_ref) {
                     if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
-                        let deserialized_main_form_data =
-                            deserialize_form_data_to_struct::<RoleInput>(&main_form_data, false);
-                        let deserialized_metadata_form_data = deserialize_form_data_to_struct::<
-                            RoleMetadata,
+                        let deserialized_main_form_data = deserialize_form_data_to_struct::<
+                            RoleInput,
                         >(
-                            &metadata_form_data, false
+                            &main_form_data, false, None
                         );
-
-                        leptos::logging::log!(
-                            "deserialized_main_form_data: {:?}",
-                            deserialized_main_form_data
-                        );
-                        leptos::logging::log!(
-                            "deserialized_metadata_form_data: {:?}",
-                            deserialized_metadata_form_data
-                        );
+                        let deserialized_metadata_form_data =
+                            deserialize_form_data_to_struct::<RoleMetadata>(
+                                &metadata_form_data,
+                                false,
+                                Some(&["permission_ids"]),
+                            );
 
                         if deserialized_main_form_data.is_none()
                             || deserialized_metadata_form_data.is_none()
@@ -367,6 +346,19 @@ pub fn CreateRole() -> impl IntoView {
                    }
                "#;
 
+            let fetch_permissions_query = r#"
+                   query FetchCurrentRolePermissions {
+                        fetchCurrentRolePermissions {
+                           name
+                           isAdmin
+                           isSuperAdmin
+                           id
+                           createdBy
+                           resource
+                       }
+                   }
+               "#;
+
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -439,14 +431,46 @@ pub fn CreateRole() -> impl IntoView {
                     set_is_loading.set(false);
                 }
             };
+
+            let fetch_permissions_response =
+                perform_query_without_vars::<FetchPermissionsResponse>(
+                    Some(&headers),
+                    "http://localhost:8080/api/acl",
+                    fetch_permissions_query,
+                )
+                .await;
+
+            match fetch_permissions_response.get_data() {
+                Some(data) => {
+                    permissions.update(move |prev| {
+                        let mut orgs = data
+                            .fetch_current_role_permissions
+                            .as_ref()
+                            .unwrap()
+                            .iter()
+                            .map(|permission| {
+                                CheckboxOption::new(
+                                    permission.id.as_ref().unwrap().as_str(),
+                                    permission.name.as_ref().unwrap().as_str(),
+                                    None,
+                                )
+                            })
+                            .collect();
+
+                        prev.append(&mut orgs);
+                    });
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
         });
     });
 
     let handle_metadata_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
-
-        leptos::logging::log!("SubmitEvent triggered: handle_metadata_form_submit");
 
         // Implement logic to show form validity
         let target = ev
@@ -461,8 +485,6 @@ pub fn CreateRole() -> impl IntoView {
     let handle_main_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
-
-        leptos::logging::log!("SubmitEvent triggered: handle_main_form_submit");
 
         // Implement logic to show form validity
         let target = ev
@@ -523,6 +545,11 @@ pub fn CreateRole() -> impl IntoView {
                 id_attr="department_id"
                 options=departments
                 />
+                <CheckboxGroup
+                    legend="Permissions"
+                    name="permission_ids"
+                    options=permissions
+                />
                 </div>
             </ReactiveForm>
 
@@ -530,11 +557,6 @@ pub fn CreateRole() -> impl IntoView {
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Role Name" required=true id_attr="role_name" name="role_name" />
-                    <CheckboxGroup
-                        legend="Admin Permissions"
-                        name="admin_permissions"
-                        options=admin_permissions
-                    />
 
                     <BasicButton
                         button_text="Submit"

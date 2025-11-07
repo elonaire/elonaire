@@ -208,7 +208,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
                     let deserialized_form_data = deserialize_form_data_to_struct::<
                         UserProfessionalInfoInput,
-                    >(&form_data, true);
+                    >(&form_data, true, None);
 
                     if deserialized_form_data.is_none() {
                         set_is_loading.set(false);

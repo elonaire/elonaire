@@ -130,8 +130,6 @@ pub struct SignUpVars {
 pub struct RoleInput {
     #[serde(rename = "roleName", alias = "role_name")]
     pub role_name: String,
-    #[serde(rename = "adminPermissions", alias = "admin_permissions")]
-    pub admin_permissions: Option<Vec<AdminPermission>>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Store)]
@@ -181,25 +179,8 @@ pub struct RoleMetadata {
     pub organization_id: Option<String>,
     #[serde(rename = "departmentId", alias = "department_id")]
     pub department_id: Option<String>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]
-pub enum AdminPermission {
-    CreateOrganization,
-    CreateDepartment,
-    CreateRole,
-    AssignRole,
-}
-
-impl EnumerableEnum for AdminPermission {
-    fn variants_slice() -> Vec<String> {
-        vec![
-            format!("{:?}", Self::CreateOrganization),
-            format!("{:?}", Self::CreateDepartment),
-            format!("{:?}", Self::CreateRole),
-            format!("{:?}", Self::AssignRole),
-        ]
-    }
+    #[serde(rename = "permissionIds", alias = "permission_ids")]
+    pub permission_ids: Option<Vec<String>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq, Default)]
@@ -275,4 +256,25 @@ pub struct Department {
 pub struct FetchDepartmentsResponse {
     #[serde(rename = "fetchDepartments")]
     pub fetch_departments: Option<Vec<Department>>, // this is the return type expected from the API on success
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Permission {
+    pub id: Option<String>,
+    pub name: Option<String>,
+    pub resource: Option<String>,
+    pub is_admin: Option<bool>,
+    pub is_super_admin: Option<bool>,
+    #[serde(rename = "createdBy")]
+    pub created_by: Option<String>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<String>,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchPermissionsResponse {
+    #[serde(rename = "fetchCurrentRolePermissions")]
+    pub fetch_current_role_permissions: Option<Vec<Permission>>, // this is the return type expected from the API on success
 }

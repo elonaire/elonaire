@@ -240,7 +240,7 @@ pub fn CreateBlog() -> impl IntoView {
 
                                                 let deserialized_form_data =
                                                     deserialize_form_data_to_struct::<BlogPostInput>(
-                                                        &form_data, true,
+                                                        &form_data, true, None,
                                                     );
 
                                                 leptos::logging::log!(

@@ -218,9 +218,7 @@ pub fn CreateUser() -> impl IntoView {
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
                     let deserialized_form_data =
-                        deserialize_form_data_to_struct::<UserInput>(&form_data, true);
-
-                    leptos::logging::log!("deserialized_form_data: {:?}", deserialized_form_data);
+                        deserialize_form_data_to_struct::<UserInput>(&form_data, true, None);
 
                     if deserialized_form_data.is_none() {
                         set_is_loading.set(false);

@@ -62,7 +62,7 @@ pub fn CheckboxInputField(
     view! {
         <div class=format!("{}", ext_wrapper_styles)>
             <label
-                class="inline-flex items-center gap-2 text-gray-700 text-sm font-bold"
+                class="inline-flex items-center gap-2 text-gray-500 text-sm font-bold"
                 for=id_attr.clone()
             >
                 <input
@@ -129,7 +129,7 @@ pub fn CheckboxGroup(
     horizontal: bool,
 ) -> impl IntoView {
     let base_fieldset_class = "border border-gray-300 rounded p-4";
-    let base_legend_class = "text-gray-700 text-sm font-bold px-2";
+    let base_legend_class = "text-gray-500 text-sm font-bold px-2";
 
     let container_class = if horizontal {
         "flex flex-wrap gap-4"
