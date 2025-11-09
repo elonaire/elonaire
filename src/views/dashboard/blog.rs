@@ -243,11 +243,6 @@ pub fn CreateBlog() -> impl IntoView {
                                                         &form_data, true, None,
                                                     );
 
-                                                leptos::logging::log!(
-                                                    "Deserialized form data: {:?}",
-                                                    deserialized_form_data
-                                                );
-
                                                 if deserialized_form_data.is_none() {
                                                     set_submission_confirmed.set(false);
                                                     set_is_loading.set(false);

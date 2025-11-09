@@ -15,6 +15,7 @@ use crate::{
             blog::{Blog, BlogList, CreateBlog},
             home::DashboardHome,
             layout::DashboardLayout,
+            permissions::{CreatePermission, Permissions, PermissionsList},
             portfolio::{CreatePortfolio, Portfolio, PortfolioList},
             professional_details::{
                 CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
@@ -91,6 +92,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/roles") view=Roles>
                             <Route path=path!("") view=RolesList />
                             <Route path=path!("create") view=CreateRole />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/permissions") view=Permissions>
+                            <Route path=path!("") view=PermissionsList />
+                            <Route path=path!("create") view=CreatePermission />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>

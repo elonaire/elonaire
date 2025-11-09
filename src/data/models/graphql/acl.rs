@@ -173,8 +173,8 @@ pub struct CreateSystemRoleVars {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct RoleMetadata {
-    #[serde(rename = "roleType", alias = "role_type")]
-    pub role_type: RoleType,
+    #[serde(rename = "adminPrivilege", alias = "admin_privilege")]
+    pub admin_privilege: AdminPrivilege,
     #[serde(rename = "organizationId", alias = "organization_id")]
     pub organization_id: Option<String>,
     #[serde(rename = "departmentId", alias = "department_id")]
@@ -184,18 +184,20 @@ pub struct RoleMetadata {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq, Default)]
-pub enum RoleType {
+pub enum AdminPrivilege {
     Admin,
+    SuperAdmin,
     #[default]
-    Other,
+    None,
 }
 
-impl EnumerableEnum for RoleType {
+impl EnumerableEnum for AdminPrivilege {
     fn variants_slice() -> Vec<String> {
         vec![
             String::new(),
             format!("{:?}", Self::Admin),
-            format!("{:?}", Self::Other),
+            format!("{:?}", Self::SuperAdmin),
+            format!("{:?}", Self::None),
         ]
     }
 }
@@ -259,11 +261,44 @@ pub struct FetchDepartmentsResponse {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceInput {
+    pub name: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Resource {
+    pub id: Option<String>,
+    pub name: Option<String>,
+    #[serde(rename = "createdBy", alias = "created_by")]
+    pub created_by: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PermissionInput {
+    pub name: String,
+    #[serde(rename = "createdBy", alias = "created_by")]
+    pub created_by: String,
+    #[serde(rename = "isAdmin", alias = "is_admin")]
+    pub is_admin: Option<bool>,
+    #[serde(rename = "isSuperAdmin", alias = "is_super_admin")]
+    pub is_super_admin: Option<bool>,
+    pub resource: String,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct PermissionMetadata {
+    #[serde(rename = "adminPrivilege", alias = "admin_privilege")]
+    pub admin_privilege: AdminPrivilege,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
     pub id: Option<String>,
     pub name: Option<String>,
-    pub resource: Option<String>,
+    pub resource: Option<Resource>,
+    #[serde(rename = "isAdmin")]
     pub is_admin: Option<bool>,
+    #[serde(rename = "isSuperAdmin")]
     pub is_super_admin: Option<bool>,
     #[serde(rename = "createdBy")]
     pub created_by: Option<String>,
@@ -277,4 +312,10 @@ pub struct Permission {
 pub struct FetchPermissionsResponse {
     #[serde(rename = "fetchCurrentRolePermissions")]
     pub fetch_current_role_permissions: Option<Vec<Permission>>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchGrantedPermissionsResourcesResponse {
+    #[serde(rename = "fetchGrantedPermissionsResources")]
+    pub fetch_granted_permissions_resources: Option<Vec<Resource>>, // this is the return type expected from the API on success
 }

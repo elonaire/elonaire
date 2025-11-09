@@ -54,6 +54,11 @@ pub fn DashboardLayout() -> impl IntoView {
             ),
             MenuItem::new("Users", IconData::FaUserGroupSolid, "/dashboard/users"),
             MenuItem::new("Roles", IconData::FaUserLockSolid, "/dashboard/roles"),
+            MenuItem::new(
+                "Permissions",
+                IconData::FaUserShieldSolid,
+                "/dashboard/permissions",
+            ),
             MenuItem::new("Blog", IconData::RiArticleDocumentLine, "/dashboard/blog"),
             MenuItem::new("Media", IconData::AiFileImageOutlined, "/dashboard/media"),
         ]
