@@ -94,33 +94,33 @@ pub fn DepartmentsList() -> impl IntoView {
 
             match fetch_departments_response.get_data() {
                 Some(data) => {
-                    let resources: Vec<HashMap<String, TableCellData>> = data
+                    let departments: Vec<HashMap<String, TableCellData>> = data
                         .fetch_departments
                         .as_ref()
                         .unwrap()
                         .to_vec()
                         .iter()
-                        .map(|resource| {
+                        .map(|department| {
                             let mut hash_map_data = HashMap::new();
 
                             // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
                             // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                             hash_map_data.insert(
                                 "id".to_string(),
-                                TableCellData::String(resource.id.as_ref().unwrap().to_owned()),
+                                TableCellData::String(department.id.as_ref().unwrap().to_owned()),
                             );
 
                             hash_map_data.insert(
                                 "Name".to_string(),
                                 TableCellData::String(
-                                    resource.dep_name.as_ref().unwrap().to_owned(),
+                                    department.dep_name.as_ref().unwrap().to_owned(),
                                 ),
                             );
 
                             hash_map_data.insert(
                                 "Date of Creation".to_string(),
                                 TableCellData::DateTime(
-                                    resource.created_at.as_ref().unwrap().to_owned(),
+                                    department.created_at.as_ref().unwrap().to_owned(),
                                 ),
                             );
                             hash_map_data
@@ -128,7 +128,7 @@ pub fn DepartmentsList() -> impl IntoView {
                         .collect();
 
                     table_data.update(move |prev| {
-                        prev.1 = resources;
+                        prev.1 = departments;
                     });
 
                     set_is_loading.set(false);
