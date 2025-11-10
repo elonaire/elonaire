@@ -81,7 +81,7 @@ impl TimelineItem {
 #[component]
 pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoView {
     view! {
-        <div class="relative border-s border-gray-200 ml-4">
+        <div class="relative">
             <For
                 each=move || steps.get().into_iter().enumerate()
                 key=|(i, _)| *i
@@ -97,12 +97,12 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
 
                     view! {
                         <div class="relative flex">
-                            <span>
+                            <div class="flex flex-col">
                                 {
                                     if let Some(icon_head) = &item.icon_head {
                                         Some(view!{
-                                            <span class="relative flex size-8 cursor-pointer -ml-[16px]">
-                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 z-10 {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
+                                            <span class="relative flex size-8 cursor-pointer">
+                                                <span class=format!("absolute inline-flex h-full w-full rounded-full {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
                                                 <span class=format!("relative inline-flex items-center justify-center size-8 rounded-full {}", bg_status_classes)>
                                                     <Icon width="50%" height="50%" icon=icon_head.to_owned() />
                                                 </span>
@@ -115,8 +115,8 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                 {
                                     if let Some(image_head) = &item.image_head {
                                         Some(view!{
-                                            <span class="relative flex size-8 cursor-pointer -ml-[16px]">
-                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 z-10 {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
+                                            <span class="relative flex size-8 cursor-pointer">
+                                                <span class=format!("absolute inline-flex h-full w-full rounded-full {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
                                                 <span class=format!("relative inline-flex items-center justify-center size-8 rounded-full {}", bg_status_classes)>
                                                     <img alt="timeline-head" src=image_head.to_owned() class="w-full h-full rounded-full object-contain saturate-200" />
                                                 </span>
@@ -129,8 +129,8 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                 {
                                     if item.image_head.is_none() && item.icon_head.is_none() {
                                         Some(view!{
-                                            <span class="relative flex size-3 cursor-pointer -ml-[6px]">
-                                                <span class=format!("absolute inline-flex h-full w-full rounded-full opacity-75 z-10 {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
+                                            <span class="relative flex size-3 cursor-pointer">
+                                                <span class=format!("absolute inline-flex h-full w-full rounded-full {} {}", match &item.status { TimelineStatus::Info => "animate-ping", _ => "" }, bg_status_classes)></span>
                                                 <span class=format!("relative inline-flex size-3 rounded-full {}", bg_status_classes)></span>
                                             </span>
                                         })
@@ -138,7 +138,10 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                         None
                                     }
                                 }
-                            </span>
+                                <div class="flex justify-center flex-1">
+                                    <div class="border border-gray-300"></div>
+                                </div>
+                            </div>
                             <div class="ml-4 mb-4">
                                 <div class="flex items-center gap-2">
                                     <h4>{item.title}</h4>
