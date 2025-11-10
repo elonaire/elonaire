@@ -41,7 +41,11 @@ pub fn DashboardLayout() -> impl IntoView {
                 IconData::MdiTrophyAward,
                 "/dashboard/portfolio",
             ),
-            MenuItem::new("Services", IconData::BiWrenchRegular, "/dashboard/services"),
+            MenuItem::new(
+                "Services",
+                IconData::BsWrenchAdjustable,
+                "/dashboard/services",
+            ),
             MenuItem::new(
                 "Resume",
                 IconData::MdiCertificateOutline,
@@ -59,6 +63,7 @@ pub fn DashboardLayout() -> impl IntoView {
                 IconData::FaUserShieldSolid,
                 "/dashboard/permissions",
             ),
+            MenuItem::new("Resources", IconData::BsTools, "/dashboard/resources"),
             MenuItem::new("Blog", IconData::RiArticleDocumentLine, "/dashboard/blog"),
             MenuItem::new("Media", IconData::AiFileImageOutlined, "/dashboard/media"),
         ]

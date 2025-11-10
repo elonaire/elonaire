@@ -266,22 +266,42 @@ pub struct ResourceInput {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceMetadata {
+    #[serde(rename = "organizationId", alias = "organization_id")]
+    pub organization_id: Option<String>,
+    #[serde(rename = "departmentId", alias = "department_id")]
+    pub department_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateResourceVars {
+    #[serde(rename = "resourceInput")]
+    pub resource_input: ResourceInput,
+    #[serde(rename = "resourceMetadata")]
+    pub resource_metadata: ResourceMetadata,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateResourceResponse {
+    #[serde(rename = "createResource")]
+    pub create_resource: Option<Resource>, // this is the return type expected from the API on success
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Resource {
     pub id: Option<String>,
     pub name: Option<String>,
     #[serde(rename = "createdBy", alias = "created_by")]
     pub created_by: Option<String>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<String>,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionInput {
     pub name: String,
-    #[serde(rename = "createdBy", alias = "created_by")]
-    pub created_by: String,
-    #[serde(rename = "isAdmin", alias = "is_admin")]
-    pub is_admin: Option<bool>,
-    #[serde(rename = "isSuperAdmin", alias = "is_super_admin")]
-    pub is_super_admin: Option<bool>,
     pub resource: String,
 }
 
@@ -289,6 +309,20 @@ pub struct PermissionInput {
 pub struct PermissionMetadata {
     #[serde(rename = "adminPrivilege", alias = "admin_privilege")]
     pub admin_privilege: AdminPrivilege,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreatePermissionVars {
+    #[serde(rename = "permissionInput")]
+    pub permission_input: PermissionInput,
+    #[serde(rename = "permissionMetadata")]
+    pub permission_metadata: PermissionMetadata,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreatePermissionResponse {
+    #[serde(rename = "createPermission")]
+    pub create_permission: Option<Permission>, // this is the return type expected from the API on success
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -315,7 +349,7 @@ pub struct FetchPermissionsResponse {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct FetchGrantedPermissionsResourcesResponse {
-    #[serde(rename = "fetchGrantedPermissionsResources")]
-    pub fetch_granted_permissions_resources: Option<Vec<Resource>>, // this is the return type expected from the API on success
+pub struct FetchResourcesResponse {
+    #[serde(rename = "fetchResources")]
+    pub fetch_resources: Option<Vec<Resource>>, // this is the return type expected from the API on success
 }

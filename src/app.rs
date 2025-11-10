@@ -20,6 +20,7 @@ use crate::{
             professional_details::{
                 CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
             },
+            resources::{CreateResource, Resources, ResourcesList},
             resume::{CreateResumeItem, Resume, ResumeItemsList},
             roles::{CreateRole, Roles, RolesList},
             skills::{CreateSkill, Skills, SkillsList},
@@ -96,6 +97,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/permissions") view=Permissions>
                             <Route path=path!("") view=PermissionsList />
                             <Route path=path!("create") view=CreatePermission />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/resources") view=Resources>
+                            <Route path=path!("") view=ResourcesList />
+                            <Route path=path!("create") view=CreateResource />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>

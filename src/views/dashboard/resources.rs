@@ -17,10 +17,9 @@ use crate::components::general::table::data_table::TableCellData;
 use crate::components::general::tag::LabelTag;
 use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::acl::{
-    AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, CreateSystemRoleResponse,
+    AdminPrivilege, CreateResourceResponse, CreateResourceVars, CreateSystemRoleResponse,
     CreateSystemRoleVars, FetchDepartmentsResponse, FetchOrganizationsResponse,
-    FetchPermissionsResponse, FetchResourcesResponse, FetchSystemRolesResponse, PermissionInput,
-    PermissionMetadata, RoleInput, RoleMetadata,
+    FetchResourcesResponse, FetchSystemRolesResponse, ResourceInput, ResourceMetadata,
 };
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::{
@@ -46,7 +45,7 @@ use crate::{
 };
 
 #[island]
-pub fn Permissions() -> impl IntoView {
+pub fn Resources() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -55,15 +54,14 @@ pub fn Permissions() -> impl IntoView {
 }
 
 #[island]
-pub fn PermissionsList() -> impl IntoView {
+pub fn ResourcesList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
         vec![
-            Column::new("Name", false),
-            Column::new("Privilege", true),
-            Column::new("Resource", true),
+            Column::new("Resource Name", false),
+            Column::new("Date of Creation", true),
         ],
         vec![],
     ));
@@ -71,18 +69,14 @@ pub fn PermissionsList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_permissions_query = r#"
-                   query FetchCurrentRolePermissions {
-                        fetchCurrentRolePermissions {
+            let fetch_resources_query = r#"
+                   query FetchResources {
+                        fetchResources {
                            name
-                           isAdmin
-                           isSuperAdmin
                            id
                            createdBy
-                           resource {
-                               name
-                           }
-                       }
+                           createdAt
+                        }
                    }
                "#;
             let mut headers = HashMap::new() as HashMap<String, String>;
@@ -94,63 +88,48 @@ pub fn PermissionsList() -> impl IntoView {
                 ),
             );
 
-            let fetch_permissions_response =
-                perform_query_without_vars::<FetchPermissionsResponse>(
-                    Some(&headers),
-                    "http://localhost:8080/api/acl",
-                    fetch_permissions_query,
-                )
-                .await;
+            let fetch_resources_response = perform_query_without_vars::<FetchResourcesResponse>(
+                Some(&headers),
+                "http://localhost:8080/api/acl",
+                fetch_resources_query,
+            )
+            .await;
 
-            match fetch_permissions_response.get_data() {
+            match fetch_resources_response.get_data() {
                 Some(data) => {
-                    let permissions: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_current_role_permissions
+                    let resources: Vec<HashMap<String, TableCellData>> = data
+                        .fetch_resources
                         .as_ref()
                         .unwrap()
                         .to_vec()
                         .iter()
-                        .map(|permission| {
+                        .map(|resource| {
                             let mut hash_map_data = HashMap::new();
 
                             // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
                             // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                             hash_map_data.insert(
                                 "id".to_string(),
-                                TableCellData::String(permission.id.as_ref().unwrap().to_owned()),
+                                TableCellData::String(resource.id.as_ref().unwrap().to_owned()),
                             );
 
                             hash_map_data.insert(
-                                "Name".to_string(),
-                                TableCellData::String(permission.name.as_ref().unwrap().to_owned()),
+                                "Resource Name".to_string(),
+                                TableCellData::String(resource.name.as_ref().unwrap().to_owned()),
                             );
+
                             hash_map_data.insert(
-                                "Resource".to_string(),
-                                TableCellData::String(permission.resource.as_ref().unwrap().name.as_ref().unwrap().to_owned()),
-                            );
-                            let privilege = if permission.is_admin.is_some() && permission.is_admin.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Admin" color=ColorTemperature::Warning />
-                                })
-                            } else if permission.is_super_admin.is_some() && permission.is_super_admin.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Super Admin" color=ColorTemperature::Danger />
-                                })
-                            } else {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="None" />
-                                })
-                            };
-                            hash_map_data.insert(
-                                "Privilege".to_string(),
-                                TableCellData::Html(privilege),
+                                "Date of Creation".to_string(),
+                                TableCellData::DateTime(
+                                    resource.created_at.as_ref().unwrap().to_owned(),
+                                ),
                             );
                             hash_map_data
                         })
                         .collect();
 
                     table_data.update(move |prev| {
-                        prev.1 = permissions;
+                        prev.1 = resources;
                     });
 
                     set_is_loading.set(false);
@@ -164,18 +143,18 @@ pub fn PermissionsList() -> impl IntoView {
 
     view! {
         <>
-            <Title text="Permissions"/>
+            <Title text="Resources"/>
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Permissions"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Roles"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px]">Permissions</h1>
+            <h1 class="mx-[20px]">Resources</h1>
 
             <div class="mx-[20px] flex items-center justify-end">
-                <A href="/dashboard/permissions/create">
+                <A href="/dashboard/resources/create">
                     <BasicButton
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
@@ -193,7 +172,7 @@ pub fn PermissionsList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreatePermission() -> impl IntoView {
+pub fn CreateResource() -> impl IntoView {
     let form_ref = NodeRef::new();
     let metadata_form_ref = NodeRef::new();
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
@@ -205,21 +184,10 @@ pub fn CreatePermission() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let resources =
-        RwSignal::new(vec![SelectOption::new("", "Select Resource")] as Vec<SelectOption>);
-
-    let admin_privileges = RwSignal::new(
-        AdminPrivilege::variants_slice()
-            .iter()
-            .map(|admin_privilege| {
-                let mut label = format!("{}", admin_privilege);
-                if label.is_empty() {
-                    label = "Select Admin Privilege".to_string();
-                }
-                SelectOption::new(format!("{}", admin_privilege).as_str(), label.as_str())
-            })
-            .collect::<Vec<SelectOption>>(),
-    );
+    let departments =
+        RwSignal::new(vec![SelectOption::new("", "Select Department")] as Vec<SelectOption>);
+    let organizations =
+        RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -232,15 +200,16 @@ pub fn CreatePermission() -> impl IntoView {
                 if let Some(metadata_form_data) = get_form_data_from_form_ref(&metadata_form_ref) {
                     if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
                         let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                            PermissionInput,
+                            ResourceInput,
                         >(
                             &main_form_data, false, None
                         );
-                        let deserialized_metadata_form_data = deserialize_form_data_to_struct::<
-                            PermissionMetadata,
-                        >(
-                            &metadata_form_data, false, None
-                        );
+                        let deserialized_metadata_form_data =
+                            deserialize_form_data_to_struct::<ResourceMetadata>(
+                                &metadata_form_data,
+                                false,
+                                Some(&["permission_ids"]),
+                            );
 
                         if deserialized_main_form_data.is_none()
                             || deserialized_metadata_form_data.is_none()
@@ -253,19 +222,15 @@ pub fn CreatePermission() -> impl IntoView {
                         let deserialized_metadata_form_data =
                             deserialized_metadata_form_data.unwrap();
 
-                        let input_vars = CreatePermissionVars {
-                            permission_input: deserialized_main_form_data,
-                            permission_metadata: deserialized_metadata_form_data,
+                        let input_vars = CreateResourceVars {
+                            resource_input: deserialized_main_form_data,
+                            resource_metadata: deserialized_metadata_form_data,
                         };
 
                         let query = r#"
-                               mutation CreatePermission($permissionInput: PermissionInput!, $permissionMetadata: PermissionMetadata!) {
-                                    createPermission(permissionInput: $permissionInput, permissionMetadata: $permissionMetadata) {
+                               mutation CreateResource($resourceInput: ResourceInput!, $resourceMetadata: ResourceMetadata!) {
+                                    createResource(resourceInput: $resourceInput, resourceMetadata: $resourceMetadata) {
                                         name
-                                        isAdmin
-                                        isSuperAdmin
-                                        createdAt
-                                        updatedAt
                                         id
                                         createdBy
                                     }
@@ -282,8 +247,8 @@ pub fn CreatePermission() -> impl IntoView {
                         );
 
                         let response = perform_mutation_or_query_with_vars::<
-                            CreatePermissionResponse,
-                            CreatePermissionVars,
+                            CreateResourceResponse,
+                            CreateResourceVars,
                         >(
                             Some(&headers),
                             "http://localhost:8080/api/acl",
@@ -333,12 +298,20 @@ pub fn CreatePermission() -> impl IntoView {
 
     Effect::new(move || {
         spawn_local(async move {
-            let fetch_resources_query = r#"
-                   query FetchResources {
-                        fetchResources {
-                            name
+            let fetch_orgs_query = r#"
+                   query FetchOrganizations {
+                        fetchOrganizations {
+                            orgName
                             id
-                            createdBy
+                        }
+                   }
+               "#;
+
+            let fetch_deps_query = r#"
+                   query FetchDepartments {
+                        fetchDepartments {
+                            depName
+                            id
                         }
                    }
                "#;
@@ -352,30 +325,62 @@ pub fn CreatePermission() -> impl IntoView {
                 ),
             );
 
-            let fetch_resources_response = perform_query_without_vars::<FetchResourcesResponse>(
+            let fetch_orgs_response = perform_query_without_vars::<FetchOrganizationsResponse>(
                 Some(&headers),
                 "http://localhost:8080/api/acl",
-                fetch_resources_query,
+                fetch_orgs_query,
             )
             .await;
 
-            match fetch_resources_response.get_data() {
+            match fetch_orgs_response.get_data() {
                 Some(data) => {
-                    resources.update(move |prev| {
-                        let mut resources = data
-                            .fetch_resources
+                    organizations.update(move |prev| {
+                        let mut orgs = data
+                            .fetch_organizations
                             .as_ref()
                             .unwrap()
                             .iter()
-                            .map(|resources| {
+                            .map(|org| {
                                 SelectOption::new(
-                                    resources.id.as_ref().unwrap().as_str(),
-                                    resources.name.as_ref().unwrap().as_str(),
+                                    org.id.as_ref().unwrap().as_str(),
+                                    org.org_name.as_ref().unwrap().as_str(),
                                 )
                             })
                             .collect();
 
-                        prev.append(&mut resources);
+                        prev.append(&mut orgs);
+                    });
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+
+            let fetch_deps_response = perform_query_without_vars::<FetchDepartmentsResponse>(
+                Some(&headers),
+                "http://localhost:8080/api/acl",
+                fetch_deps_query,
+            )
+            .await;
+
+            match fetch_deps_response.get_data() {
+                Some(data) => {
+                    departments.update(move |prev| {
+                        let mut deps = data
+                            .fetch_departments
+                            .as_ref()
+                            .unwrap()
+                            .to_vec()
+                            .iter()
+                            .map(|dep| {
+                                SelectOption::new(
+                                    dep.id.as_ref().unwrap().as_str(),
+                                    dep.dep_name.as_ref().unwrap().as_str(),
+                                )
+                            })
+                            .collect();
+                        prev.append(&mut deps);
                     });
                     set_is_loading.set(false);
                 }
@@ -420,10 +425,10 @@ pub fn CreatePermission() -> impl IntoView {
 
     view! {
         <>
-            <Title text="New Permission"/>
+            <Title text="New Resource"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div>
-                    <p>"Permission created successfully!"</p>
+                    <p>"Resource created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -436,36 +441,33 @@ pub fn CreatePermission() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Permissions", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resources", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New Permission</h1>
+            <h1 class="mx-[20px]">New Resource</h1>
 
-            <h2 class="mx-[20px]">Permission Metadata</h2>
+            <h2 class="mx-[20px]">Resource Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
                 <SelectInput
-                label="Admin Privilege"
-                name="admin_privilege"
-                required=true
-                id_attr="admin_privilege"
-                options=admin_privileges
+                label="Organization"
+                name="organization_id"
+                id_attr="organization_id"
+                options=organizations
+                />
+                <SelectInput
+                label="Department"
+                name="department_id"
+                id_attr="department_id"
+                options=departments
                 />
                 </div>
             </ReactiveForm>
 
-            <h2 class="mx-[20px]">Permission Info</h2>
+            <h2 class="mx-[20px]">Resource Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
-                    <SelectInput
-                    label="Resource"
-                    name="resource"
-                    required=true
-                    id_attr="resource"
-                    options=resources
-                    />
-                    <InputField field_type=InputFieldType::Text label="Permission Name" required=true id_attr="name" name="name" />
-
+                    <InputField field_type=InputFieldType::Text label="Resource Name" required=true id_attr="name" name="name" />
 
                     <BasicButton
                         button_text="Submit"

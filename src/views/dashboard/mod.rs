@@ -4,6 +4,7 @@ pub mod layout;
 pub mod permissions;
 pub mod portfolio;
 pub mod professional_details;
+pub mod resources;
 pub mod resume;
 pub mod roles;
 pub mod skills;

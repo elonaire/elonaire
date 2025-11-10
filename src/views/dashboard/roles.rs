@@ -201,15 +201,15 @@ pub fn CreateRole() -> impl IntoView {
         RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
     let permissions = RwSignal::new(vec![] as Vec<CheckboxOption>);
 
-    let role_types = RwSignal::new(
+    let admin_privileges = RwSignal::new(
         AdminPrivilege::variants_slice()
             .iter()
-            .map(|role_type| {
-                let mut label = format!("{}", role_type);
+            .map(|admin_privilege| {
+                let mut label = format!("{}", admin_privilege);
                 if label.is_empty() {
-                    label = "Select Role Type".to_string();
+                    label = "Select Admin Privilege".to_string();
                 }
-                SelectOption::new(format!("{}", role_type).as_str(), label.as_str())
+                SelectOption::new(format!("{}", admin_privilege).as_str(), label.as_str())
             })
             .collect::<Vec<SelectOption>>(),
     );
@@ -527,11 +527,11 @@ pub fn CreateRole() -> impl IntoView {
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
                 <SelectInput
-                label="Role Type"
-                name="role_type"
+                label="Admin Privilege"
+                name="admin_privilege"
                 required=true
-                id_attr="role_type"
-                options=role_types
+                id_attr="admin_privilege"
+                options=admin_privileges
                 />
                 <SelectInput
                 label="Organization"
