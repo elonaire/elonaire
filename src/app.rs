@@ -13,6 +13,7 @@ use crate::{
     views::{
         dashboard::{
             blog::{Blog, BlogList, CreateBlog},
+            departments::{CreateDepartment, Departments, DepartmentsList},
             home::DashboardHome,
             layout::DashboardLayout,
             organizations::{CreateOrganization, Organizations, OrganizationsList},
@@ -106,6 +107,10 @@ pub fn App() -> impl IntoView {
                         <ParentRoute path=path!("/organizations") view=Organizations>
                             <Route path=path!("") view=OrganizationsList />
                             <Route path=path!("create") view=CreateOrganization />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/departments") view=Departments>
+                            <Route path=path!("") view=DepartmentsList />
+                            <Route path=path!("create") view=CreateDepartment />
                         </ParentRoute>
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>

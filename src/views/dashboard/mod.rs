@@ -1,4 +1,5 @@
 pub mod blog;
+pub mod departments;
 pub mod home;
 pub mod layout;
 pub mod organizations;

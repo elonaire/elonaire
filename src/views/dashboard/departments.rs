@@ -14,8 +14,8 @@ use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::models::graphql::acl::{
-    CreateResourceResponse, CreateResourceVars, FetchDepartmentsResponse,
-    FetchOrganizationsResponse, FetchResourcesResponse, ResourceInput, ResourceMetadata,
+    CreateDepartmentResponse, CreateDepartmentVars, DepartmentInput, DepartmentMetadata,
+    FetchDepartmentsResponse, FetchOrganizationsResponse,
 };
 use crate::utils::graphql_client::{
     perform_mutation_or_query_with_vars, perform_query_without_vars,
@@ -40,7 +40,7 @@ use crate::{
 };
 
 #[island]
-pub fn Resources() -> impl IntoView {
+pub fn Departments() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -49,13 +49,13 @@ pub fn Resources() -> impl IntoView {
 }
 
 #[island]
-pub fn ResourcesList() -> impl IntoView {
+pub fn DepartmentsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
         vec![
-            Column::new("Resource Name", false),
+            Column::new("Name", false),
             Column::new("Date of Creation", true),
         ],
         vec![],
@@ -64,13 +64,14 @@ pub fn ResourcesList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_resources_query = r#"
-                   query FetchResources {
-                        fetchResources {
-                           name
-                           id
-                           createdBy
-                           createdAt
+            let fetch_departments_query = r#"
+                   query FetchDepartments {
+                        fetchDepartments {
+                            depName
+                            createdAt
+                            updatedAt
+                            id
+                            createdBy
                         }
                    }
                "#;
@@ -83,17 +84,18 @@ pub fn ResourcesList() -> impl IntoView {
                 ),
             );
 
-            let fetch_resources_response = perform_query_without_vars::<FetchResourcesResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_resources_query,
-            )
-            .await;
+            let fetch_departments_response =
+                perform_query_without_vars::<FetchDepartmentsResponse>(
+                    Some(&headers),
+                    "http://localhost:8080/api/acl",
+                    fetch_departments_query,
+                )
+                .await;
 
-            match fetch_resources_response.get_data() {
+            match fetch_departments_response.get_data() {
                 Some(data) => {
                     let resources: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_resources
+                        .fetch_departments
                         .as_ref()
                         .unwrap()
                         .to_vec()
@@ -109,8 +111,10 @@ pub fn ResourcesList() -> impl IntoView {
                             );
 
                             hash_map_data.insert(
-                                "Resource Name".to_string(),
-                                TableCellData::String(resource.name.as_ref().unwrap().to_owned()),
+                                "Name".to_string(),
+                                TableCellData::String(
+                                    resource.dep_name.as_ref().unwrap().to_owned(),
+                                ),
                             );
 
                             hash_map_data.insert(
@@ -138,18 +142,18 @@ pub fn ResourcesList() -> impl IntoView {
 
     view! {
         <>
-            <Title text="Resources"/>
+            <Title text="Departments"/>
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resources"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Departments"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px]">Resources</h1>
+            <h1 class="mx-[20px]">Departments</h1>
 
             <div class="mx-[20px] flex items-center justify-end">
-                <A href="/dashboard/resources/create">
+                <A href="/dashboard/departments/create">
                     <BasicButton
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
@@ -167,7 +171,7 @@ pub fn ResourcesList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreateResource() -> impl IntoView {
+pub fn CreateDepartment() -> impl IntoView {
     let form_ref = NodeRef::new();
     let metadata_form_ref = NodeRef::new();
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
@@ -195,16 +199,15 @@ pub fn CreateResource() -> impl IntoView {
                 if let Some(metadata_form_data) = get_form_data_from_form_ref(&metadata_form_ref) {
                     if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
                         let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                            ResourceInput,
+                            DepartmentInput,
                         >(
                             &main_form_data, false, None
                         );
-                        let deserialized_metadata_form_data =
-                            deserialize_form_data_to_struct::<ResourceMetadata>(
-                                &metadata_form_data,
-                                false,
-                                Some(&["permission_ids"]),
-                            );
+                        let deserialized_metadata_form_data = deserialize_form_data_to_struct::<
+                            DepartmentMetadata,
+                        >(
+                            &metadata_form_data, false, None
+                        );
 
                         if deserialized_main_form_data.is_none()
                             || deserialized_metadata_form_data.is_none()
@@ -217,15 +220,17 @@ pub fn CreateResource() -> impl IntoView {
                         let deserialized_metadata_form_data =
                             deserialized_metadata_form_data.unwrap();
 
-                        let input_vars = CreateResourceVars {
-                            resource_input: deserialized_main_form_data,
-                            resource_metadata: deserialized_metadata_form_data,
+                        let input_vars = CreateDepartmentVars {
+                            department_input: deserialized_main_form_data,
+                            department_metadata: deserialized_metadata_form_data,
                         };
 
                         let query = r#"
-                               mutation CreateResource($resourceInput: ResourceInput!, $resourceMetadata: ResourceMetadata!) {
-                                    createResource(resourceInput: $resourceInput, resourceMetadata: $resourceMetadata) {
-                                        name
+                               mutation CreateDepartment($departmentInput: DepartmentInput!, $departmentMetadata: DepartmentMetadata!) {
+                                    createDepartment(departmentInput: $departmentInput, departmentMetadata: $departmentMetadata) {
+                                        depName
+                                        createdAt
+                                        updatedAt
                                         id
                                         createdBy
                                     }
@@ -242,8 +247,8 @@ pub fn CreateResource() -> impl IntoView {
                         );
 
                         let response = perform_mutation_or_query_with_vars::<
-                            CreateResourceResponse,
-                            CreateResourceVars,
+                            CreateDepartmentResponse,
+                            CreateDepartmentVars,
                         >(
                             Some(&headers),
                             "http://localhost:8080/api/acl",
@@ -420,10 +425,10 @@ pub fn CreateResource() -> impl IntoView {
 
     view! {
         <>
-            <Title text="New Resource"/>
+            <Title text="New Department"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div>
-                    <p>"Resource created successfully!"</p>
+                    <p>"Department created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -436,12 +441,12 @@ pub fn CreateResource() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resources", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Departments", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New Resource</h1>
+            <h1 class="mx-[20px]">New Department</h1>
 
-            <h2 class="mx-[20px]">Resource Metadata</h2>
+            <h2 class="mx-[20px]">Department Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
                 <SelectInput
@@ -459,10 +464,10 @@ pub fn CreateResource() -> impl IntoView {
                 </div>
             </ReactiveForm>
 
-            <h2 class="mx-[20px]">Resource Info</h2>
+            <h2 class="mx-[20px]">Department Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
-                    <InputField field_type=InputFieldType::Text label="Resource Name" required=true id_attr="name" name="name" />
+                    <InputField field_type=InputFieldType::Text label="Department Name" required=true id_attr="dep_name" name="dep_name" />
 
                     <BasicButton
                         button_text="Submit"

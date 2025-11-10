@@ -246,7 +246,7 @@ pub struct DepartmentInput {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct DepartmentInputMetadata {
+pub struct DepartmentMetadata {
     #[serde(rename = "organizationId", alias = "organization_id")]
     pub organization_id: Option<String>,
     #[serde(rename = "departmentId", alias = "department_id")]
@@ -264,6 +264,20 @@ pub struct Department {
     pub created_at: Option<String>,
     #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateDepartmentVars {
+    #[serde(rename = "departmentInput", alias = "department_input")]
+    pub department_input: DepartmentInput,
+    #[serde(rename = "departmentMetadata", alias = "department_metadata")]
+    pub department_metadata: DepartmentMetadata,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateDepartmentResponse {
+    #[serde(rename = "createDepartment")]
+    pub create_department: Option<Department>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Deserialize, Serialize)]
