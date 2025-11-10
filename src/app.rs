@@ -29,8 +29,8 @@ use crate::{
             user_services::{CreateUserService, UserService, UserServicesList},
             users::{CreateUser, Users, UsersList},
         },
-        home::Home,
         login::SignIn,
+        public::home::Home,
     },
 };
 
