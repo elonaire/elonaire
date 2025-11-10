@@ -4,11 +4,13 @@ use gql_client::{Client, GraphQLErrorMessage};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub enum GraphQLResponse<T> {
     Data(T),
     Error(Vec<GraphQLErrorMessage>),
 }
 
+#[allow(dead_code)]
 impl<T> GraphQLResponse<T> {
     pub fn get_data(&self) -> Option<&T> {
         match self {

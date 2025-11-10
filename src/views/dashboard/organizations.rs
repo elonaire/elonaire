@@ -12,10 +12,9 @@ use web_sys::HtmlFormElement;
 
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
-use crate::components::general::tag::LabelTag;
-use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::acl::{
-    AccountStatus, FetchUsersResponse, SignUpResponse, SignUpVars, UserInput,
+    CreateOrganizationResponse, CreateOrganizationVars, FetchOrganizationsResponse,
+    OrganizationInput,
 };
 use crate::utils::graphql_client::{
     perform_mutation_or_query_with_vars, perform_query_without_vars,
@@ -40,7 +39,7 @@ use crate::{
 };
 
 #[island]
-pub fn Users() -> impl IntoView {
+pub fn Organizations() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -49,16 +48,14 @@ pub fn Users() -> impl IntoView {
 }
 
 #[island]
-pub fn UsersList() -> impl IntoView {
+pub fn OrganizationsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
         vec![
-            Column::new("Full Name", false),
-            Column::new("Email", true),
-            Column::new("OAuth Client", true),
-            Column::new("Status", true),
+            Column::new("Name", false),
+            Column::new("Date of Creation", true),
         ],
         vec![],
     ));
@@ -66,14 +63,14 @@ pub fn UsersList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_users_query = r#"
-                   query FetchUsers {
-                        fetchUsers {
+            let fetch_resources_query = r#"
+                   query FetchOrganizations {
+                        fetchOrganizations {
+                            orgName
+                            createdAt
+                            updatedAt
                             id
-                            email
-                            status
-                            oauthClient
-                            fullName
+                            createdBy
                         }
                    }
                "#;
@@ -86,75 +83,51 @@ pub fn UsersList() -> impl IntoView {
                 ),
             );
 
-            let fetch_users_response = perform_query_without_vars::<FetchUsersResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_users_query,
-            )
-            .await;
+            let fetch_resources_response =
+                perform_query_without_vars::<FetchOrganizationsResponse>(
+                    Some(&headers),
+                    "http://localhost:8080/api/acl",
+                    fetch_resources_query,
+                )
+                .await;
 
-            match fetch_users_response.get_data() {
+            match fetch_resources_response.get_data() {
                 Some(data) => {
-                    let users: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_users
+                    let resources: Vec<HashMap<String, TableCellData>> = data
+                        .fetch_organizations
                         .as_ref()
                         .unwrap()
                         .to_vec()
                         .iter()
-                        .map(|user| {
+                        .map(|organization| {
                             let mut hash_map_data = HashMap::new();
 
                             // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
                             // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                             hash_map_data.insert(
                                 "id".to_string(),
-                                TableCellData::String(user.id.as_ref().unwrap().to_owned()),
+                                TableCellData::String(organization.id.as_ref().unwrap().to_owned()),
                             );
 
                             hash_map_data.insert(
-                                "Full Name".to_string(),
+                                "Name".to_string(),
                                 TableCellData::String(
-                                    user.full_name.as_ref().unwrap_or(&String::new()).to_owned(),
+                                    organization.org_name.as_ref().unwrap().to_owned(),
                                 ),
                             );
+
                             hash_map_data.insert(
-                                "Email".to_string(),
-                                TableCellData::String(user.email.to_owned()),
-                            );
-                            let oauth_client = match user.oauth_client {
-                                Some(client) => format!("{:?}", client),
-                                None => String::from("None")
-                            };
-                            hash_map_data.insert(
-                                "OAuth Client".to_string(),
-                                TableCellData::String(
-                                    oauth_client,
+                                "Date of Creation".to_string(),
+                                TableCellData::DateTime(
+                                    organization.created_at.as_ref().unwrap().to_owned(),
                                 ),
-                            );
-                            let status = match user.status.as_ref().unwrap() {
-                                AccountStatus::Active => ViewFn::from(move || view! {
-                                    <LabelTag label="Active" color=ColorTemperature::Success />
-                                }),
-                                AccountStatus::Inactive => ViewFn::from(move || view! {
-                                    <LabelTag label="InActive" color=ColorTemperature::Info />
-                                }),
-                                AccountStatus::Suspended => ViewFn::from(move || view! {
-                                    <LabelTag label="Suspended" color=ColorTemperature::Warning />
-                                }),
-                                AccountStatus::Deleted => ViewFn::from(move || view! {
-                                    <LabelTag label="Deleted" color=ColorTemperature::Danger />
-                                }),
-                            };
-                            hash_map_data.insert(
-                                "Status".to_string(),
-                                TableCellData::Html(status),
                             );
                             hash_map_data
                         })
                         .collect();
 
                     table_data.update(move |prev| {
-                        prev.1 = users;
+                        prev.1 = resources;
                     });
 
                     set_is_loading.set(false);
@@ -168,18 +141,18 @@ pub fn UsersList() -> impl IntoView {
 
     view! {
         <>
-            <Title text="Users"/>
+            <Title text="Organizations"/>
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Organizations"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px]">Users</h1>
+            <h1 class="mx-[20px]">Organizations</h1>
 
             <div class="mx-[20px] flex items-center justify-end">
-                <A href="/dashboard/users/create">
+                <A href="/dashboard/organizations/create">
                     <BasicButton
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
@@ -197,10 +170,10 @@ pub fn UsersList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreateUser() -> impl IntoView {
+pub fn CreateOrganization() -> impl IntoView {
     let form_ref = NodeRef::new();
-    let (form_is_valid, set_form_is_valid) = signal(false);
-    let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
+    let (main_form_is_valid, set_main_form_is_valid) = signal(false);
+    let submit_is_disabled = Memo::new(move |_| (!main_form_is_valid.get()));
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
@@ -212,32 +185,35 @@ pub fn CreateUser() -> impl IntoView {
     });
 
     Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if submission_confirmed.get() && main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data =
-                        deserialize_form_data_to_struct::<UserInput>(&form_data, true, None);
+                if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
+                    let deserialized_main_form_data = deserialize_form_data_to_struct::<
+                        OrganizationInput,
+                    >(
+                        &main_form_data, false, None
+                    );
 
-                    if deserialized_form_data.is_none() {
+                    if deserialized_main_form_data.is_none() {
                         set_is_loading.set(false);
                         return;
                     }
 
-                    let deserialized_form_data = deserialized_form_data.unwrap();
+                    let deserialized_main_form_data = deserialized_main_form_data.unwrap();
 
-                    let input_vars = SignUpVars {
-                        user: deserialized_form_data,
+                    let input_vars = CreateOrganizationVars {
+                        organization_input: deserialized_main_form_data,
                     };
 
                     let query = r#"
-                           mutation SignUp($user: UserInput!) {
-                                signUp(user: $user) {
+                           mutation CreateOrganization($organizationInput: OrganizationInput!) {
+                                createOrganization(organizationInput: $organizationInput) {
+                                    orgName
+                                    createdAt
+                                    updatedAt
                                     id
-                                    fullName
-                                    email
-                                    status
-                                    oauthClient
+                                    createdBy
                                 }
                            }
                        "#;
@@ -251,14 +227,16 @@ pub fn CreateUser() -> impl IntoView {
                         ),
                     );
 
-                    let response =
-                        perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
-                            Some(&headers),
-                            "http://localhost:8080/api/acl",
-                            query,
-                            input_vars,
-                        )
-                        .await;
+                    let response = perform_mutation_or_query_with_vars::<
+                        CreateOrganizationResponse,
+                        CreateOrganizationVars,
+                    >(
+                        Some(&headers),
+                        "http://localhost:8080/api/acl",
+                        query,
+                        input_vars,
+                    )
+                    .await;
 
                     match response.get_data() {
                         Some(_data) => {
@@ -267,11 +245,12 @@ pub fn CreateUser() -> impl IntoView {
                                 .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
                             {
                                 form.reset();
-                                set_form_is_valid.set(false);
+                                set_main_form_is_valid.set(false);
                                 set_submission_confirmed.set(false);
                             } else {
                                 set_submission_confirmed.set(false);
                             }
+
                             set_is_loading.set(false);
 
                             success_modal_is_open.update(|status| *status = true);
@@ -286,7 +265,7 @@ pub fn CreateUser() -> impl IntoView {
         }
     });
 
-    let handle_step_form_submit = move |ev: SubmitEvent| {
+    let handle_main_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
 
@@ -296,7 +275,7 @@ pub fn CreateUser() -> impl IntoView {
             .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
 
         if let Some(form) = target {
-            set_form_is_valid.set(form.check_validity());
+            set_main_form_is_valid.set(form.check_validity());
 
             if let Some(_submitter) = ev.submitter() {
                 confirm_modal_is_open.update(|status| *status = true);
@@ -306,10 +285,10 @@ pub fn CreateUser() -> impl IntoView {
 
     view! {
         <>
-            <Title text="New User"/>
+            <Title text="New Organization"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div>
-                    <p>"User created successfully!"</p>
+                    <p>"Organization created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -322,15 +301,14 @@ pub fn CreateUser() -> impl IntoView {
             </Show>
 
             <div class="mx-[20px]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Organizations", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New User</h1>
+            <h1 class="mx-[20px]">New Organization</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
+            <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
                 <div class="mx-[20px] flex flex-col gap-[20px]">
-                    <InputField field_type=InputFieldType::Email label="Email" required=true id_attr="email" name="email" />
-                    <InputField field_type=InputFieldType::Password label="Password" required=true id_attr="password" name="password" />
+                    <InputField field_type=InputFieldType::Text label="Organization Name" required=true id_attr="org_name" name="org_name" />
 
                     <BasicButton
                         button_text="Submit"

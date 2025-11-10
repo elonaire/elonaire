@@ -1,6 +1,7 @@
 pub mod blog;
 pub mod home;
 pub mod layout;
+pub mod organizations;
 pub mod permissions;
 pub mod portfolio;
 pub mod professional_details;

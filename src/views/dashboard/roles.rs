@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use icondata as IconData;
-use leptos::ev::{self, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;

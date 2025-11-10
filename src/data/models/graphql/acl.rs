@@ -221,6 +221,18 @@ pub struct Organization {
     pub updated_at: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateOrganizationVars {
+    #[serde(rename = "organizationInput", alias = "organization_input")]
+    pub organization_input: OrganizationInput,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateOrganizationResponse {
+    #[serde(rename = "createOrganization")]
+    pub create_organization: Option<Organization>, // this is the return type expected from the API on success
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FetchOrganizationsResponse {
     #[serde(rename = "fetchOrganizations")]

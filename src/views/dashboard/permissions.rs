@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use icondata as IconData;
-use leptos::ev::{self, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -10,17 +10,14 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::forms::checkbox::{CheckboxGroup, CheckboxOption};
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::components::general::tag::LabelTag;
 use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::acl::{
-    AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, CreateSystemRoleResponse,
-    CreateSystemRoleVars, FetchDepartmentsResponse, FetchOrganizationsResponse,
-    FetchPermissionsResponse, FetchResourcesResponse, FetchSystemRolesResponse, PermissionInput,
-    PermissionMetadata, RoleInput, RoleMetadata,
+    AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, FetchPermissionsResponse,
+    FetchResourcesResponse, PermissionInput, PermissionMetadata,
 };
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::{
