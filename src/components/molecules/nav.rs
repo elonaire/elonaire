@@ -9,9 +9,9 @@ pub fn Nav(
 ) -> impl IntoView {
     view! {
         <>
-            <div class="md:hidden flex mx-[20px] justify-between h-[47px]">
+        <div class="flex mx-[20px] md:mx-[100px] justify-between h-[47px]">
                 <button
-                    class="bg-transparent border-none"
+                    class="bg-transparent border-none cursor-pointer"
                     on:click=move |ev| onmenuclick.run(ev)
                 >
                     <Icon width="24" height="24" icon=IconId::IoMenu />

@@ -169,16 +169,16 @@ pub fn UsersList() -> impl IntoView {
     view! {
         <>
             <Title text="Users"/>
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px]">Users</h1>
+            <h1 class="mx-[20px] md:mx-[100px]">Users</h1>
 
-            <div class="mx-[20px] flex items-center justify-end">
+            <div class="mx-[20px] md:mx-[100px] flex items-center justify-end">
                 <A href="/dashboard/users/create">
                     <BasicButton
                         button_text="Create"
@@ -189,7 +189,7 @@ pub fn UsersList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -321,14 +321,14 @@ pub fn CreateUser() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New User</h1>
+            <h1 class="mx-[20px] md:mx-[100px]">New User</h1>
 
             <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
-                <div class="mx-[20px] flex flex-col gap-[20px]">
+                <div class="mx-[20px] md:mx-[100px] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Email label="Email" required=true id_attr="email" name="email" />
                     <InputField field_type=InputFieldType::Password label="Password" required=true id_attr="password" name="password" />
 

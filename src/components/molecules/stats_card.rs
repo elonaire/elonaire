@@ -28,7 +28,7 @@ pub fn StatsCard(
     });
 
     view! {
-        <div class="flex flex-col gap-[10px] p-[10px] border-light-gray border-[1px] rounded-[5px]">
+        <div class="flex flex-col gap-[10px] p-[10px] border-light-gray border-[1px] rounded-[5px] md:grow">
             <div class="flex flex-row justify-between h-[45px]">
                 <div class=format!("w-[45px] h-full flex items-center justify-center rounded-[5px] text-{color} bg-{color}/20")>
                     <Icon width="24" height="24" icon=icon />

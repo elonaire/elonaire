@@ -155,16 +155,16 @@ pub fn RolesList() -> impl IntoView {
     view! {
         <>
             <Title text="Roles"/>
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Roles"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px]">Roles</h1>
+            <h1 class="mx-[20px] md:mx-[100px]">Roles</h1>
 
-            <div class="mx-[20px] flex items-center justify-end">
+            <div class="mx-[20px] md:mx-[100px] flex items-center justify-end">
                 <A href="/dashboard/roles/create">
                     <BasicButton
                         button_text="Create"
@@ -175,7 +175,7 @@ pub fn RolesList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -517,15 +517,15 @@ pub fn CreateRole() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Roles", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">New Role</h1>
+            <h1 class="mx-[20px] md:mx-[100px]">New Role</h1>
 
-            <h2 class="mx-[20px]">Role Metadata</h2>
+            <h2 class="mx-[20px] md:mx-[100px]">Role Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
-                <div class="mx-[20px] flex flex-col gap-[20px]">
+                <div class="mx-[20px] md:mx-[100px] flex flex-col gap-[20px]">
                 <SelectInput
                 label="Admin Privilege"
                 name="admin_privilege"
@@ -553,9 +553,9 @@ pub fn CreateRole() -> impl IntoView {
                 </div>
             </ReactiveForm>
 
-            <h2 class="mx-[20px]">Role Info</h2>
+            <h2 class="mx-[20px] md:mx-[100px]">Role Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[20px] flex flex-col gap-[20px]">
+                <div class="mx-[20px] md:mx-[100px] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Role Name" required=true id_attr="role_name" name="role_name" />
 
                     <BasicButton

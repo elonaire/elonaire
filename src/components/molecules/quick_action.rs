@@ -17,13 +17,13 @@ pub fn QuickAction(
                     <Icon width="24" height="24" icon=icon />
                 </div>
                 <div class="flex flex-col">
-                    <p>{title}</p>
+                    <p class="font-bold">{title}</p>
                     <p class="text-small">{description}</p>
                 </div>
             </div>
 
             <div class="text-gray">
-                <Icon width="24" height="24" icon=IconData::BsChevronRight />
+                <Icon width="15" height="15" icon=IconData::BsChevronRight />
             </div>
         </div>
     }

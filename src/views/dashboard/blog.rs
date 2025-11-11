@@ -72,13 +72,13 @@ pub fn BlogList() -> impl IntoView {
     view! {
         <>
             <Title text="My Blog Posts"/>
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Blog Posts"] />
             </div>
 
-            <h1 class="mx-[20px]">Blog Posts</h1>
+            <h1 class="mx-[20px] md:mx-[100px]">Blog Posts</h1>
 
-            <div class="mx-[20px] flex items-center justify-end">
+            <div class="mx-[20px] md:mx-[100px] flex items-center justify-end">
                 <A href="/dashboard/blog/create">
                     <BasicButton
                         button_text="Create"
@@ -89,7 +89,7 @@ pub fn BlogList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -382,14 +382,14 @@ pub fn CreateBlog() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[20px]">
+            <div class="mx-[20px] md:mx-[100px]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Blog Posts", "New"] />
             </div>
 
-            <h1 class="mx-[20px]">Create New Blog Post</h1>
+            <h1 class="mx-[20px] md:mx-[100px]">Create New Blog Post</h1>
 
             <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
-                <div class="mx-[20px] flex flex-col gap-[20px]">
+                <div class="mx-[20px] md:mx-[100px] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <InputField field_type=InputFieldType::Text label="Short Description" required=true id_attr="short_description" name="short_description" />
                     <SelectInput
