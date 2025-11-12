@@ -8,14 +8,14 @@ use leptos_router::components::{A, Outlet};
 use crate::components::molecules::nav::Nav;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-struct MenuItem<'a> {
-    label: &'a str,
-    icon: IconId,
-    path: &'a str,
+pub struct MenuItem<'a> {
+    pub label: &'a str,
+    pub icon: IconId,
+    pub path: &'a str,
 }
 
 impl<'a> MenuItem<'a> {
-    fn new(label: &'a str, icon: IconId, path: &'a str) -> Self {
+    pub fn new(label: &'a str, icon: IconId, path: &'a str) -> Self {
         Self { label, icon, path }
     }
 }

@@ -199,12 +199,11 @@ pub fn CreateResource() -> impl IntoView {
                         >(
                             &main_form_data, false, None
                         );
-                        let deserialized_metadata_form_data =
-                            deserialize_form_data_to_struct::<ResourceMetadata>(
-                                &metadata_form_data,
-                                false,
-                                Some(&["permission_ids"]),
-                            );
+                        let deserialized_metadata_form_data = deserialize_form_data_to_struct::<
+                            ResourceMetadata,
+                        >(
+                            &metadata_form_data, false, None
+                        );
 
                         if deserialized_main_form_data.is_none()
                             || deserialized_metadata_form_data.is_none()
