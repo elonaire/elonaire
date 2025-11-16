@@ -175,16 +175,16 @@ pub fn PortfolioList() -> impl IntoView {
     view! {
         <>
             <Title text="My Portfolio"/>
-            <div class="mx-[20px] md:mx-[100px]">
+            <div class="mx-[5%] md:mx-[10%]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px] md:mx-[100px]">Portfolio</h1>
+            <h1 class="mx-[5%] md:mx-[10%]">Portfolio</h1>
 
-            <div class="mx-[20px] md:mx-[100px] flex items-center justify-end">
+            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
                 <A href="/dashboard/portfolio/create">
                     <BasicButton
                         button_text="Create"
@@ -195,7 +195,7 @@ pub fn PortfolioList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[20px] md:mx-[100px]">
+            <div class="mx-[5%] md:mx-[10%]">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -424,14 +424,14 @@ pub fn CreatePortfolio() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[20px] md:mx-[100px]">
+            <div class="mx-[5%] md:mx-[10%]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Portfolio", "New"] />
             </div>
 
-            <h1 class="mx-[20px] md:mx-[100px]">Create New Portfolio Project</h1>
+            <h1 class="mx-[5%] md:mx-[10%]">Create New Portfolio Project</h1>
 
             <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
-                <div class="mx-[20px] md:mx-[100px] flex flex-col gap-[20px]">
+                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />

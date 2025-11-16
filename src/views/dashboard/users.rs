@@ -169,16 +169,16 @@ pub fn UsersList() -> impl IntoView {
     view! {
         <>
             <Title text="Users"/>
-            <div class="mx-[20px] md:mx-[100px]">
+            <div class="mx-[5%] md:mx-[10%]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[20px] md:mx-[100px]">Users</h1>
+            <h1 class="mx-[5%] md:mx-[10%]">Users</h1>
 
-            <div class="mx-[20px] md:mx-[100px] flex items-center justify-end">
+            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
                 <A href="/dashboard/users/create">
                     <BasicButton
                         button_text="Create"
@@ -189,7 +189,7 @@ pub fn UsersList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[20px] md:mx-[100px]">
+            <div class="mx-[5%] md:mx-[10%]">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -321,14 +321,14 @@ pub fn CreateUser() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[20px] md:mx-[100px]">
+            <div class="mx-[5%] md:mx-[10%]">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Users", "New"] />
             </div>
 
-            <h1 class="mx-[20px] md:mx-[100px]">New User</h1>
+            <h1 class="mx-[5%] md:mx-[10%]">New User</h1>
 
             <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
-                <div class="mx-[20px] md:mx-[100px] flex flex-col gap-[20px]">
+                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Email label="Email" required=true id_attr="email" name="email" />
                     <InputField field_type=InputFieldType::Password label="Password" required=true id_attr="password" name="password" />
 

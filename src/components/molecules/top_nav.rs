@@ -9,12 +9,12 @@ pub fn TopNav(
 ) -> impl IntoView {
     view! {
         <>
-            <div class="flex mx-[20px] md:mx-[100px] justify-end h-[47px]">
+        <div class="flex mx-[5%] md:mx-[10%] justify-end h-[55px] md:h-[65px]">
                 <button
-                    class="bg-transparent border-none cursor-pointer text-light-gray"
+                    class="bg-transparent border-none cursor-pointer text-secondary"
                     on:click=move |ev| onmenuclick.run(ev)
                 >
-                    <Icon width="24" height="24" icon=IconId::CgClose />
+                    <Icon width="3rem" height="3rem" icon=IconId::CgClose />
                 </button>
             </div>
         </>

@@ -40,7 +40,7 @@ pub fn Home() -> impl IntoView {
                     {/* Only render content if expanded */}
                     {move || if collapsed.get() {
                         Some(view! {
-                            <div class="overflow-hidden mx-[20px]">
+                            <div class="overflow-hidden mx-[5%] md:mx-[10%]">
                                 <div class="flex items-center justify-between h-[45px] border-y border-gray-200">
                                     <p class="text-gray-300 font-medium">NAVIGATION</p>
                                     <button
@@ -89,7 +89,7 @@ pub fn Home() -> impl IntoView {
                     <Nav onmenuclick=handle_menu_click() />
 
 
-                    <div class="flex flex-col gap-[20px] mx-[20px]">
+                    <div class="flex flex-col gap-[20px] mx-[5%] md:mx-[10%]">
                         <div class="flex flex-col gap-[20px] text-center">
                             <h3>HELLO, MY NAME IS</h3>
                             <h1><span class="text-primary">ELON</span>" ASENEKA IDIONG'O"</h1>

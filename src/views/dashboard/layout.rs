@@ -93,7 +93,7 @@ pub fn DashboardLayout() -> impl IntoView {
                     {/* Only render content if expanded */}
                     {move || if collapsed.get() {
                         Some(view! {
-                            <div class="overflow-hidden mx-[20px]">
+                            <div class="overflow-hidden mx-[5%] md:mx-[10%]">
                                 <div class="flex items-center justify-between h-[45px] border-y border-gray-200">
                                     <p class="text-gray-300 font-medium">NAVIGATION</p>
                                     <button

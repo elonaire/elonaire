@@ -17,7 +17,7 @@ pub fn Nav(
 
     view! {
         <>
-        <div class="flex mx-[20px] md:mx-[100px] justify-between h-[47px]">
+        <div class="flex mx-[5%] md:mx-[10%] justify-between h-[47px]">
                 <button
                     class="bg-transparent border-none cursor-pointer"
                     on:click=move |ev| onmenuclick.run(ev)
