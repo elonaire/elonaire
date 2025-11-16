@@ -94,16 +94,6 @@
     width: 30%;
 }
 
-/* service-card */
-.service-card {
-    @apply w-full h-52 perspective-[1000px] overflow-hidden cursor-pointer mb-8;
-}
-
-/* wrapper (the flipping container) */
-.wrapper {
-    @apply relative w-full h-full text-center transition-transform duration-600 preserve-3d shadow-lg;
-}
-
 /* front & back shared */
 .flip-front,
 .flip-back {
@@ -113,10 +103,6 @@
 /* front */
 .flip-front {
     @apply bg-[var(--text-color-bg-primary)] text-[var(--text-color)] flex flex-col;
-}
-
-.image-wrapper {
-    @apply flex-1;
 }
 
 /* 80% */
