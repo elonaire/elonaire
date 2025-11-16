@@ -12,6 +12,7 @@
     --color-light-gray: #EBEBEB;
     --color-mid-gray: #8D8D8D;
     --color-gray: #4D4D4D;
+    --color-navy: #000E1E;
     --font-primary: "Inter", sans-serif;
 }
 
@@ -91,4 +92,45 @@
 .animate-progress-indeterminate {
     animation: progress-indeterminate 1.5s ease-in-out infinite;
     width: 30%;
+}
+
+/* service-card */
+.service-card {
+    @apply w-full h-52 perspective-[1000px] overflow-hidden cursor-pointer mb-8;
+}
+
+/* wrapper (the flipping container) */
+.wrapper {
+    @apply relative w-full h-full text-center transition-transform duration-600 preserve-3d shadow-lg;
+}
+
+/* front & back shared */
+.flip-front,
+.flip-back {
+    @apply absolute inset-0 backface-hidden;
+}
+
+/* front */
+.flip-front {
+    @apply bg-[var(--text-color-bg-primary)] text-[var(--text-color)] flex flex-col;
+}
+
+.image-wrapper {
+    @apply flex-1;
+}
+
+/* 80% */
+.title {
+    @apply m-2 text-lg font-medium;
+}
+
+/* 20% */
+
+/* back */
+.flip-back {
+    @apply bg-[var(--primary-color)] text-[var(--text-color-bg-primary)] p-4 overflow-y-auto flex flex-col rotate-y-180 flip-back;
+}
+
+.description {
+    @apply flex-1 text-sm leading-relaxed;
 }

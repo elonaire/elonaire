@@ -30,7 +30,7 @@ pub fn DashboardHome() -> impl IntoView {
 
             <h1 class="mx-[20px] md:mx-[100px]">Dashboard Overview</h1>
 
-            <div class="mx-[20px] md:mx-[100px] flex flex-col md:flex-row gap-[20px]">
+            <div class="mx-[20px] md:mx-[100px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
                 <StatsCard color="info" title="Total Projects" figures=RwSignal::new(25) icon=IconData::BiBriefcaseRegular percentage=RwSignal::new(-2) />
                 <StatsCard color="success" title="Published Posts" figures=RwSignal::new(12) icon=IconData::RiArticleDocumentLine percentage=RwSignal::new(3) />
                 <StatsCard color="warning" title="Monthly Visitors" figures=RwSignal::new(5) icon=IconData::FaUserGroupSolid percentage=RwSignal::new(-2) />

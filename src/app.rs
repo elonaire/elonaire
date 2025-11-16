@@ -30,7 +30,7 @@ use crate::{
             users::{CreateUser, Users, UsersList},
         },
         login::SignIn,
-        public::home::Home,
+        public::{about::About, home::Home},
     },
 };
 
@@ -62,7 +62,7 @@ pub fn App() -> impl IntoView {
             <Router>
                 <Routes fallback=|| "Page not found.">
                     <Route path=StaticSegment("") view=Home />
-                    // <Route path=StaticSegment("/dashboard") view=|| view! { <ProtectedRoute><Dashboard /></ProtectedRoute> } />
+                    <Route path=StaticSegment("/about") view=About />
                     <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />

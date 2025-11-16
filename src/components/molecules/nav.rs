@@ -24,14 +24,14 @@ pub fn Nav(
                 >
                     <Icon width="24" height="24" icon=IconId::IoMenu />
                 </button>
-                <img src="http://localhost:3001/view/54d31727-8115-445f-b9fb-5b2457d47c41" class="w-[47px] object-cover" alt="Logo" />
+                <img src="http://localhost:3001/view/114aa7a5-66a5-4e72-aa10-6c316b05a001" class="w-[47px] object-cover" alt="Logo" />
                 <div class="flex items-center justify-end gap-[20px]">
                     { move ||
                         if is_dashboard.get() || is_blog.get() {
                             Some(view! {
                                 <>
                                     <Icon width="24" height="24" icon=IconId::IoSearchOutline />
-                                    <img src="http://localhost:3001/view/46fdfb66-5bbb-4690-b3f3-b1b5e936ed5a" class="size-[27px] object-cover rounded-full" alt="dp" />
+                                    <img src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="size-[27px] object-cover rounded-full" alt="dp" />
                                 </>
                             })
                         } else {
