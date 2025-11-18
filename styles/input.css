@@ -94,29 +94,26 @@
     width: 30%;
 }
 
-/* front & back shared */
-.flip-front,
-.flip-back {
-    @apply absolute inset-0 backface-hidden;
-}
+/* ───── 3-D Flip Card Utilities ───── */
+@layer utilities {
+    .preserve-3d {
+        transform-style: preserve-3d;
+    }
 
-/* front */
-.flip-front {
-    @apply bg-[var(--text-color-bg-primary)] text-[var(--text-color)] flex flex-col;
-}
+    .backface-hidden {
+        backface-visibility: hidden;
+    }
 
-/* 80% */
-.title {
-    @apply m-2 text-lg font-medium;
-}
+    .rotate-y-180 {
+        transform: rotateY(180deg);
+    }
 
-/* 20% */
+    /* Smooth flip on hover */
+    .group:hover .flip-back {
+        transform: rotateY(0deg);
+    }
 
-/* back */
-.flip-back {
-    @apply bg-[var(--primary-color)] text-[var(--text-color-bg-primary)] p-4 overflow-y-auto flex flex-col rotate-y-180 flip-back;
-}
-
-.description {
-    @apply flex-1 text-sm leading-relaxed;
+    .flip-back {
+        transition: transform 0.7s ease;
+    }
 }

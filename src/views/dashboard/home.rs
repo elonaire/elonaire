@@ -12,14 +12,14 @@ use crate::components::{
 
 #[island]
 pub fn DashboardHome() -> impl IntoView {
-    let timeline_items = RwSignal::new(vec![TimelineItem::new(
-        "New Project Created",
-        Some("Techie Tenka Project was created."),
-        Some(IconData::AiPlusOutlined),
-        None,
-        TimelineStatus::Success,
-        ViewFn::from(|| view! { <p>"Project created with Leptos!"</p> }),
-    )]);
+    let timeline_items = RwSignal::new(vec![TimelineItem {
+        time_info: "3 mins ago".into(),
+        title: "New Project Created".into(),
+        more_info: Some("Techie Tenka Project was created.".into()),
+        status: TimelineStatus::Info,
+        content: ViewFn::from(|| view! { <p>"Project created with Leptos!"</p> }),
+        ..Default::default()
+    }]);
 
     view! {
         <>

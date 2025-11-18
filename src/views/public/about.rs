@@ -33,9 +33,11 @@ pub fn About() -> impl IntoView {
                         </div>
                     </div>
                 </div>
-                <SectionTitle title="My Services" />
+                <div class="mx-[5%] md:mx-[10%]">
+                    <SectionTitle title="My Services" />
+                </div>
                 <div class="mx-[5%] md:mx-[10%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
-                    // <FlipCard />
+                <FlipCard title="Software Engineering" image_url="https://miro.medium.com/v2/resize:fit:1400/1*CEGmzCboef_rJ6si2eiExQ.png" description="I can design and develop your software system" />
                     // <FlipCard />
                     // <FlipCard />
                 </div>

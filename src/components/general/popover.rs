@@ -62,7 +62,7 @@ pub fn Popover(
                     <div
                     class=open_classes
                     >
-                        {children.get().map(|child| child())}
+                        {move || children.get().map(|child| child())}
                     </div>
                 </div>
             </Show>

@@ -8,24 +8,51 @@ use crate::utils::forms::fire_custom_bubbled_and_cancelable_event;
 
 #[derive(Clone)]
 pub struct PanelInfo {
-    pub title: String,
-    pub icon: Option<IconId>,
+    pub title: ViewFn,
     pub is_open: RwSignal<bool>,
     pub children: ViewFn,
 }
 
-impl PanelInfo {
-    pub fn new(
-        title: &str,
-        icon: Option<IconId>,
-        is_open: RwSignal<bool>,
-        children: ViewFn,
-    ) -> Self {
+impl Default for PanelInfo {
+    fn default() -> Self {
         Self {
-            title: title.to_string(),
-            icon,
-            is_open,
+            title: ViewFn::from(|| view! {}),
+            is_open: RwSignal::new(false),
+            children: ViewFn::from(|| view! {}),
+        }
+    }
+}
+
+#[allow(dead_code)]
+impl PanelInfo {
+    pub fn builder(title: ViewFn, children: ViewFn) -> PanelInfo {
+        PanelInfo {
+            title,
             children,
+            ..Default::default()
+        }
+    }
+
+    pub fn title(mut self, title: ViewFn) -> Self {
+        self.title = title;
+        self
+    }
+
+    pub fn is_open(mut self, is_open: RwSignal<bool>) -> Self {
+        self.is_open = is_open;
+        self
+    }
+
+    pub fn children(mut self, children: ViewFn) -> Self {
+        self.children = children;
+        self
+    }
+
+    pub fn build(self) -> PanelInfo {
+        PanelInfo {
+            title: self.title,
+            is_open: self.is_open,
+            children: self.children,
         }
     }
 }
@@ -33,8 +60,7 @@ impl PanelInfo {
 impl std::fmt::Debug for PanelInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("PanelInfo")
-            .field("title", &self.title)
-            .field("icon", &self.icon)
+            .field("title", &"<ViewFn>")
             .field("is_open", &self.is_open)
             .field("children", &"<ViewFn>")
             .finish()
@@ -48,26 +74,43 @@ impl std::fmt::Debug for PanelInfo {
 /// <Panel is_open=panel_is_open title="Elonaire" icon=IconId::BsNodePlusFill >
 ///     <p>"Hey there, I am Mr Elonaire!"</p>
 /// </Panel>
-///
+///```
+/// ```
 /// // You can also group multiple panels by using the Collapse component
 /// // is_accordion prop enables only one panel to be open at a time. It's optional and the default is false.
 /// <Collapse is_accordion=true panel_items=RwSignal::new(vec![
-///    PanelInfo::new("title 1", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
-///    PanelInfo::new("title 2", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
-///    PanelInfo::new("title 3", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> })),
-///    PanelInfo::new("title 4", None, RwSignal::new(false), ViewFn::from(move || view!{ <p>"Panel content"</p> }))
+/// PanelInfo {
+///     title: ViewFn::from(move || view!{ <p>"title 1"</p> }),
+///     children: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// PanelInfo {
+///     title: ViewFn::from(move || view!{ <p>"title 2"</p> }),
+///     children: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// PanelInfo {
+///     title: ViewFn::from(move || view!{ <p>"title 3"</p> }),
+///     children: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// PanelInfo {
+///     title: ViewFn::from(move || view!{ <p>"title 4"</p> }),
+///     children: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
 /// ]) />
 /// ```
 #[component]
 pub fn Panel(
-    #[prop(into)] title: String,
-    #[prop(optional)] children: Option<Children>,
-    #[prop(optional)] icon: Option<IconId>,
+    title: ViewFn,
+    #[prop(optional)] children: Option<ChildrenFn>,
     #[prop(into)] is_open: RwSignal<bool>,
     #[prop(optional)] is_accordion: bool,
     #[prop(into, optional)] ext_panel_title_styles: String,
 ) -> impl IntoView {
     let panel_ref = NodeRef::new();
+    let (children, _set_children) = signal(children);
     let toggle_content = move |_| {
         if let Some(panel_element) = panel_ref.get() {
             fire_custom_bubbled_and_cancelable_event("togglepanel", true, true, &panel_element);
@@ -82,27 +125,21 @@ pub fn Panel(
         <div node_ref=panel_ref>
             <span
                 on:click=toggle_content
-                class=format!("flex flex-row items-center justify-between gap-2 mb-2 p-2 rounded cursor-pointer hover:bg-primary hover:text-white {}", ext_panel_title_styles)
+                class=move || format!("flex flex-row items-center justify-between gap-2 mb-2 p-2 rounded cursor-pointer ring ring-primary hover:bg-primary {} {}", ext_panel_title_styles, if is_open.get() { "bg-primary" } else { "" })
             >
-                <span class="flex flex-row items-center gap-2">
-                    {
-                        if icon.is_some() {
-                            Some(view!{ <Icon icon=icon.unwrap() /> })
+                {title.run()}
+                {
+                    move || {
+                        if children.get().is_some() {
+                            let icon_id = if is_open.get() {
+                                icondata::BsDashLg
+                            } else {
+                                icondata::BsPlusLg
+                            };
+                            Some(view!{ <Icon icon=icon_id /> })
                         } else {
                             None
                         }
-                    }
-                    <span>{title}</span>
-                </span>
-                {
-                    move || {
-                        let icon_id = if is_open.get() {
-                            icondata::BsDashLg
-                        } else {
-                            icondata::BsPlusLg
-                        };
-                        view!{ <Icon icon=icon_id /> }
-
                     }
                 }
             </span>
@@ -115,12 +152,38 @@ pub fn Panel(
                     }
                 }
             >
-                {children.map(|c| c())}
+                {move || children.get().map(|c| c())}
             </div>
         </div>
     }
 }
 
+/// ```
+/// // You can also group multiple panels by using the Collapse component
+/// // is_accordion prop enables only one panel to be open at a time. It's optional and the default is false.
+/// <Collapse is_accordion=true panel_items=RwSignal::new(vec![
+/// PanelInfo {
+///     title: "title 1",
+///     content: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// PanelInfo {
+///     title: "title 2",
+///     content: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// PanelInfo {
+///     title: "title 3",
+///     content: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// PanelInfo {
+///     title: "title 4",
+///     content: ViewFn::from(move || view!{ <p>"Panel content"</p> }),
+///     ..Default::default()
+/// },
+/// ]) />
+/// ```
 #[component]
 pub fn Collapse(
     #[prop(into)] panel_items: RwSignal<Vec<PanelInfo>>,
