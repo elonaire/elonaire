@@ -40,7 +40,7 @@ pub fn BasicButton(
     #[prop(default = None)] icon: Option<IconId>,
     #[prop(into, default = Signal::derive(move || false))] disabled: Signal<bool>,
     #[prop(into, default = ButtonType::Button)] button_type: ButtonType,
-    #[prop(default = true)] icon_before: bool,
+    #[prop(default = false)] icon_before: bool,
 ) -> impl IntoView {
     let button_text_styles = button_text.clone();
     let button_content_styles = move || {

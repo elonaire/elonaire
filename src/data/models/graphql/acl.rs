@@ -328,13 +328,14 @@ pub struct Resource {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PermissionInput {
     pub name: String,
-    pub resource: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct PermissionMetadata {
     #[serde(rename = "adminPrivilege", alias = "admin_privilege")]
     pub admin_privilege: AdminPrivilege,
+    #[serde(rename = "resourceId", alias = "resource_id")]
+    pub resource_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

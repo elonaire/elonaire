@@ -1,4 +1,4 @@
-use icondata as IconData;
+use icondata as IconId;
 use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
 use leptos_meta::*;
@@ -18,11 +18,11 @@ pub fn Home() -> impl IntoView {
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("About", IconData::BsInfoSquare, "/about"),
-            MenuItem::new("Resume", IconData::MdiCertificateOutline, "/resume"),
-            MenuItem::new("Portfolio", IconData::MdiTrophyAward, "/portfolio"),
-            MenuItem::new("Marketplace", IconData::MdiStore, "/portfolio"),
-            MenuItem::new("Blog", IconData::RiArticleDocumentLine, "/blog"),
+            MenuItem::new("About", IconId::BsInfoSquare, "/about"),
+            MenuItem::new("Resume", IconId::MdiCertificateOutline, "/resume"),
+            MenuItem::new("Portfolio", IconId::MdiTrophyAward, "/portfolio"),
+            MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace"),
+            MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog"),
         ]
     });
 
@@ -47,7 +47,7 @@ pub fn Home() -> impl IntoView {
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
-                                        <Icon width="24" height="24" icon=IconData::IoClose />
+                                        <Icon width="24" height="24" icon=IconId::IoClose />
                                     </button>
                                 </div>
                                 <nav>
@@ -91,12 +91,12 @@ pub fn Home() -> impl IntoView {
 
                     <div class="flex flex-col gap-[20px] mx-[5%] md:mx-[10%]">
                         <div class="flex flex-col gap-[20px] text-center">
-                            <h3>HELLO, MY NAME IS</h3>
-                            <h1><span class="text-primary">ELON</span>" ASENEKA IDIONG'O"</h1>
+                            <h3>Hello, my name is</h3>
+                            <h1><span class="text-primary">Elon</span>" Aseneka Idiong'o"</h1>
                             <img alt="dp" src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="h-[435px] object-cover rounded-[5px]" />
                             <p class="text-base font-bold">Software Engineer / UI/UX Designer / IoT Engineer</p>
                             <p>9+ years of experience overall and lately focused on designing and building intuitive and high performance Software.</p>
-                            <BasicButton button_text="Download my resume" icon=Some(IconData::FiDownload) icon_before=false style_ext="bg-primary text-white" />
+                            <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-white" />
                         </div>
                     </div>
 

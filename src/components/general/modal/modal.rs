@@ -77,22 +77,22 @@ pub fn BasicModal(
                                     move || match use_case {
                                         UseCase::Error => Some(view! {
                                             <span class="text-danger mr-2">
-                                                <Icon icon=IconId::BiErrorSolid />
+                                                <Icon width="2rem" height="2rem" icon=IconId::BiErrorSolid />
                                             </span>
                                         }),
                                         UseCase::Success => Some(view! {
                                             <span class="text-success mr-2">
-                                                <Icon icon=IconId::BiCheckCircleRegular />
+                                                <Icon width="2rem" height="2rem" icon=IconId::BiCheckCircleRegular />
                                             </span>
                                         }),
                                         UseCase::Info => Some(view! {
                                             <span class="text-blue-500 mr-2">
-                                                <Icon icon=IconId::AiInfoCircleOutlined />
+                                                <Icon width="2rem" height="2rem" icon=IconId::AiInfoCircleOutlined />
                                             </span>
                                         }),
                                         UseCase::Confirmation => Some(view! {
                                             <span class="text-warning mr-2">
-                                                <Icon icon=IconId::AiQuestionCircleOutlined />
+                                                <Icon width="2rem" height="2rem" icon=IconId::AiQuestionCircleOutlined />
                                             </span>
                                         }),
                                         UseCase::General => None,

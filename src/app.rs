@@ -32,7 +32,7 @@ use crate::{
         login::SignIn,
         public::{
             about::About, home::Home, portfolio::Portfolio as PublicPortfolio,
-            resume::Resume as PublicResume,
+            ratecard::Ratecard as PublicRatecard, resume::Resume as PublicResume,
         },
     },
 };
@@ -68,6 +68,7 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("/about") view=About />
                     <Route path=StaticSegment("/resume") view=PublicResume />
                     <Route path=StaticSegment("/portfolio") view=PublicPortfolio />
+                    <Route path=StaticSegment("/ratecard") view=PublicRatecard />
                     <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />

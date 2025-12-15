@@ -441,26 +441,26 @@ pub fn CreatePermission() -> impl IntoView {
             <h2 class="mx-[5%] md:mx-[10%]">Permission Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
-                <SelectInput
-                label="Admin Privilege"
-                name="admin_privilege"
-                required=true
-                id_attr="admin_privilege"
-                options=admin_privileges
-                />
+                    <SelectInput
+                    label="Resource"
+                    name="resource_id"
+                    required=true
+                    id_attr="resource_id"
+                    options=resources
+                    />
+                    <SelectInput
+                    label="Admin Privilege"
+                    name="admin_privilege"
+                    required=true
+                    id_attr="admin_privilege"
+                    options=admin_privileges
+                    />
                 </div>
             </ReactiveForm>
 
             <h2 class="mx-[5%] md:mx-[10%]">Permission Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
-                    <SelectInput
-                    label="Resource"
-                    name="resource"
-                    required=true
-                    id_attr="resource"
-                    options=resources
-                    />
                     <InputField field_type=InputFieldType::Text label="Permission Name" required=true id_attr="name" name="name" />
 
 

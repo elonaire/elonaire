@@ -157,7 +157,7 @@ pub fn Tabs(
                             .iter()
                             .enumerate()
                             .map(|(i, child)| {
-                                let dynamic_class = move || if current == i { leptos::logging::log!("current tab: {}", current); "block" } else { "hidden" };
+                                let dynamic_class = move || if current == i { "block" } else { "hidden" };
 
                                 view! {
                                     <div class=dynamic_class()>

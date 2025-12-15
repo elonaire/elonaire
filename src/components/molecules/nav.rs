@@ -4,7 +4,7 @@ use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::hooks::use_location;
 
-use crate::components::general::button::BasicButton;
+use leptos_router::components::A;
 
 #[component]
 pub fn Nav(
@@ -41,7 +41,7 @@ pub fn Nav(
                     { move ||
                         if !is_dashboard.get() && !is_blog.get() {
                             Some(view! {
-                                <BasicButton button_text="View My Ratecard" style_ext="border-2 border-primary text-primary hover:bg-primary hover:text-white" />
+                                <A attr:class="py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold" href="/ratecard">"Request Service"</A>
                             })
                         } else {
                             None
