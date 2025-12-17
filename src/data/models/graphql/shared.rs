@@ -420,9 +420,3 @@ pub struct PublicSiteResources {
     pub skills: Option<Vec<UserSkill>>,
     pub services: Option<Vec<UserService>>,
 }
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UserResourcesVars {
-    #[serde(rename = "userId")]
-    user_id: String,
-}

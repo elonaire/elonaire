@@ -13,6 +13,7 @@ use web_sys::HtmlFormElement;
 use crate::components::forms::radio_input::RadioOption;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
+use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::shared::{
     CreateProfessionalDetailsResponse, FetchSiteResourcesResponse, ProfessionalDetailsInputVars,
 };
@@ -32,6 +33,7 @@ use crate::{
             button::{BasicButton, ButtonType},
             modal::modal::{BasicModal, UseCase},
             table::data_table::{Column, DataTable},
+            tag::LabelTag,
         },
     },
     data::models::{
@@ -60,7 +62,6 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
     let table_data = RwSignal::new((
         vec![
             Column::new("Occupation", false),
-            Column::new("Description", true),
             Column::new("Status", true),
             Column::new("Start Date", true),
         ],
@@ -126,6 +127,20 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
                                 TableCellData::String(
                                     profession.occupation.as_ref().unwrap().to_owned(),
                                 ),
+                            );
+
+                            let status = if profession.active.is_some() && profession.active.unwrap() {
+                                ViewFn::from(move || view! {
+                                    <LabelTag label="Active" color=ColorTemperature::Success />
+                                })
+                            } else {
+                                ViewFn::from(move || view! {
+                                    <LabelTag label="Inactive" color=ColorTemperature::Warning />
+                                })
+                            };
+                            hash_map_data.insert(
+                                "Status".to_string(),
+                                TableCellData::Html(status),
                             );
 
                             hash_map_data.insert(

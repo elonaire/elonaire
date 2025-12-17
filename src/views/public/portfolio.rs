@@ -46,11 +46,11 @@ pub fn Portfolio() -> impl IntoView {
                             </div>
                         </Tab>
                         <Tab slot>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
-                            <FlipCard title="Software Engineering" image_url="https://miro.medium.com/v2/resize:fit:1400/1*CEGmzCboef_rJ6si2eiExQ.png" description="I can design and develop your software system" />
-                            // <FlipCard />
-                            // <FlipCard />
-                        </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                                <FlipCard title="Software Engineering" image_url="https://miro.medium.com/v2/resize:fit:1400/1*CEGmzCboef_rJ6si2eiExQ.png" description="I can design and develop your software system" />
+                                // <FlipCard />
+                                // <FlipCard />
+                            </div>
                         </Tab>
                         <Tab slot>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">

@@ -116,6 +116,12 @@ pub struct FetchUsersResponse {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct FetchSiteOwnerResponse {
+    #[serde(rename = "fetchSiteOwnerInfo")]
+    pub fetch_site_owner_info: Option<User>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SignUpResponse {
     #[serde(rename = "signUp")]
     pub sign_up: Option<User>, // this is the return type expected from the API on success

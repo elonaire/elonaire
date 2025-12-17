@@ -1,18 +1,48 @@
+use std::collections::HashMap;
+
 use icondata as IconId;
-use leptos::{ev, prelude::*};
+use leptos::{ev, prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
 use leptos_router::components::A;
+use reactive_stores::Store;
 
 use crate::{
     components::{general::button::BasicButton, molecules::nav::Nav},
+    data::models::{
+        general::acl::{
+            AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
+        },
+        graphql::{
+            acl::FetchSiteOwnerResponse,
+            shared::{FetchSiteResourcesResponse, UserProfessionalInfo},
+        },
+    },
+    utils::graphql_client::perform_query_without_vars,
     views::dashboard::layout::MenuItem,
 };
 
 #[island]
 pub fn Home() -> impl IntoView {
     // track collapsed state
+    let current_state = expect_context::<Store<AppStateContext>>();
     let (collapsed, set_collapsed) = signal(false);
+    let (is_loading, set_is_loading) = signal(false);
+    let (professions, set_professions) = signal(Vec::new() as Vec<UserProfessionalInfo>);
+    // State: index of the currently selected profession (default to first)
+    let (selected_profession, set_selected_profession) = signal(String::new());
+
+    let site_owner_info = move || current_state.site_owner_info(); // Should return ReadSignal<UserInfo>
+    // Derived signal for the current description
+    let current_description = Memo::new(move |_| {
+        professions
+            .get()
+            .iter()
+            .find(|r| r.id.clone().unwrap_or_default() == selected_profession.get())
+            .map(|r| r.description.clone())
+            .unwrap_or_default()
+    });
+
     let handle_menu_click =
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
@@ -24,6 +54,110 @@ pub fn Home() -> impl IntoView {
             MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace"),
             MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog"),
         ]
+    });
+
+    Effect::new(move || {
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let fetch_site_owner_query = r#"
+                   query FetchSiteOwnerInfo {
+                        fetchSiteOwnerInfo {
+                            firstName
+                            middleName
+                            lastName
+                            gender
+                            dob
+                            email
+                            country
+                            createdAt
+                            updatedAt
+                            profilePicture
+                            bio
+                            website
+                            address
+                            id
+                            fullName
+                            age
+                        }
+                   }
+               "#;
+
+            let fetch_professions_query = r#"
+                   query FetchSiteResources {
+                        fetchSiteResources {
+                            professionalInfo {
+                                description
+                                active
+                                occupation
+                                startDate
+                                id
+                                yearsOfExperience
+                            }
+                        }
+                   }
+               "#;
+
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let fetch_site_owner_response = perform_query_without_vars::<FetchSiteOwnerResponse>(
+                None,
+                "http://localhost:8080/api/acl",
+                fetch_site_owner_query,
+            )
+            .await;
+
+            let fetch_professions_response =
+                perform_query_without_vars::<FetchSiteResourcesResponse>(
+                    None,
+                    "http://localhost:8080/api/shared",
+                    fetch_professions_query,
+                )
+                .await;
+
+            match fetch_site_owner_response.get_data() {
+                Some(data) => {
+                    *current_state.site_owner_info().write() =
+                        data.fetch_site_owner_info.as_ref().unwrap().to_owned();
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+
+            match fetch_professions_response.get_data() {
+                Some(data) => {
+                    let professions = data
+                        .fetch_site_resources
+                        .as_ref()
+                        .unwrap()
+                        .professional_info
+                        .as_ref()
+                        .unwrap()
+                        .to_vec();
+
+                    if let Some(first) = &professions.first() {
+                        if let Some(id) = &first.id {
+                            set_selected_profession.set(id.clone());
+                        }
+                    }
+
+                    set_professions.set(professions);
+
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
     });
 
     view! {
@@ -92,10 +226,45 @@ pub fn Home() -> impl IntoView {
                     <div class="flex flex-col gap-[20px] mx-[5%] md:mx-[10%]">
                         <div class="flex flex-col gap-[20px] text-center">
                             <h3>Hello, my name is</h3>
-                            <h1><span class="text-primary">Elon</span>" Aseneka Idiong'o"</h1>
-                            <img alt="dp" src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="h-[435px] object-cover rounded-[5px]" />
-                            <p class="text-base font-bold">Software Engineer / UI/UX Designer / IoT Engineer</p>
-                            <p>9+ years of experience overall and lately focused on designing and building intuitive and high performance Software.</p>
+                            <h1><span class="text-primary">{move || site_owner_info().get().first_name}</span>{move || format!(" {} {}", site_owner_info().get().middle_name.unwrap_or_default(), site_owner_info().get().last_name.unwrap_or_default())}</h1>
+                            <img alt="dp" src={{move || site_owner_info().get().profile_picture}} class="h-[435px] object-cover rounded-[5px]" />
+                            <p class="text-base font-bold">
+                                {move || professions.get().into_iter().enumerate().map(|(idx, profession)| {
+                                    let occupation = profession.occupation.unwrap_or_default();
+                                    let profession_id = profession.id.unwrap_or_default();
+                                    // Clone only when needed: inside the closures
+                                    let is_selected = {
+                                        let profession_id = profession_id.clone();
+                                        move || selected_profession.get() == profession_id
+                                    };
+                                    let profession_id_for_click = profession_id.clone();
+                                    let on_click = move |_| {
+                                        set_selected_profession.set(profession_id_for_click.clone())
+                                    };
+
+                                    let is_last = move || idx == professions.get().len() - 1;
+
+                                    view! {
+                                        <span
+                                            class=move || format!("font-bold {}",if is_selected() {
+                                                "text-primary underline cursor-default"
+                                            } else {
+                                                "cursor-pointer hover:text-primary"
+                                            })
+                                            on:click=on_click
+                                        >
+                                            {occupation}
+                                        </span>
+                                        // Add separator except after the last one
+                                        {move || if is_last() { "" } else { " / " }}
+                                    }
+                                }).collect::<Vec<_>>()}
+                            </p>
+
+                            // The description paragraph that updates on click
+                            <p class="min-h-[90px]">
+                                {current_description}
+                            </p>
                             <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-white" />
                         </div>
                     </div>
