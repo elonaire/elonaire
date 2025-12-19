@@ -36,11 +36,12 @@ use crate::{
             tag::LabelTag,
         },
     },
-    data::models::{
-        general::acl::{
-            AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
+    data::{
+        context::store::{AppStateContext, AppStateContextStoreFields},
+        models::{
+            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            graphql::shared::UserProfessionalInfoInput,
         },
-        graphql::shared::UserProfessionalInfoInput,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };

@@ -1,12 +1,28 @@
 use leptos::prelude::*;
+use leptos::task::spawn_local;
 use leptos_meta::*;
+use reactive_stores::Store;
 
 use crate::components::molecules::{
     flip_card::FlipCard, headline::Headline, section_title::SectionTitle, top_nav::TopNav,
 };
+use crate::data::context::shared::fetch_services;
+use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
+use crate::data::context::users::fetch_site_owner_info;
 
 #[island]
 pub fn About() -> impl IntoView {
+    let current_state = expect_context::<Store<AppStateContext>>();
+    let site_owner_info = move || current_state.site_owner_info();
+    let services = move || current_state.services();
+
+    Effect::new(move || {
+        spawn_local(async move {
+            let _site_owner_info = fetch_site_owner_info(&current_state, None).await;
+            let _fetch_services_res = fetch_services(&current_state, None).await;
+        });
+    });
+
     view! {
         <Title text="About"/>
         <main>
@@ -22,8 +38,8 @@ pub fn About() -> impl IntoView {
                     </div>
                     <div class="max-w-[400px] flex flex-col gap-[20px] md:basis-1/2">
                         <div class="flex flex-col gap-[20px]">
-                            <h1 class="text-light-gray">"Hello, I am "<span class="text-primary">"Elon Aseneka Idiong'o"</span></h1>
-                            <p>"I’m a Rust developer specializing in embedded systems, full-stack WebAssembly apps, and service-oriented architectures using GraphQL and gRPC. I enjoy solving low-level challenges, designing reusable components, and pushing for both safety and usability in software. Oh, I am a big advocate for DevSecOps.  I also have a deep appreciation for lyrical storytelling, rhythm, and cultural substance, whether in hip-hop or product design."</p>
+                            <h1 class="text-light-gray">"Hello, I am "<span class="text-primary">{move || site_owner_info().get().full_name}</span></h1>
+                            <p>{move || site_owner_info().get().bio}</p>
                         </div>
 
                         <div class="flex flex-col gap-[20px]">
@@ -37,9 +53,20 @@ pub fn About() -> impl IntoView {
                     <SectionTitle title="My Services" />
                 </div>
                 <div class="mx-[5%] md:mx-[10%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
-                <FlipCard title="Software Engineering" image_url="https://miro.medium.com/v2/resize:fit:1400/1*CEGmzCboef_rJ6si2eiExQ.png" description="I can design and develop your software system" />
+                // <FlipCard title="Software Engineering" image_url="https://miro.medium.com/v2/resize:fit:1400/1*CEGmzCboef_rJ6si2eiExQ.png" description="I can design and develop your software system" />
                     // <FlipCard />
                     // <FlipCard />
+                    {
+                        move || services()
+                            .get()
+                            .iter()
+                            .map(|service| {
+                                view! {
+                                    <FlipCard title={service.title.clone().unwrap_or_default()} image_url={service.thumbnail.clone().unwrap_or_default()} description={service.description.clone().unwrap_or_default()} />
+                                }
+                            })
+                            .collect::<Vec<_>>()
+                    }
                 </div>
             </div>
         </main>

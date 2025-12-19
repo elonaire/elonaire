@@ -9,13 +9,14 @@ use reactive_stores::Store;
 
 use crate::{
     components::{general::button::BasicButton, molecules::nav::Nav},
-    data::models::{
-        general::acl::{
-            AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
+    data::{
+        context::{
+            store::{AppStateContext, AppStateContextStoreFields},
+            users::fetch_site_owner_info,
         },
-        graphql::{
-            acl::FetchSiteOwnerResponse,
-            shared::{FetchSiteResourcesResponse, UserProfessionalInfo},
+        models::{
+            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            graphql::shared::{FetchSiteResourcesResponse, UserProfessionalInfo},
         },
     },
     utils::graphql_client::perform_query_without_vars,
@@ -59,29 +60,6 @@ pub fn Home() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_site_owner_query = r#"
-                   query FetchSiteOwnerInfo {
-                        fetchSiteOwnerInfo {
-                            firstName
-                            middleName
-                            lastName
-                            gender
-                            dob
-                            email
-                            country
-                            createdAt
-                            updatedAt
-                            profilePicture
-                            bio
-                            website
-                            address
-                            id
-                            fullName
-                            age
-                        }
-                   }
-               "#;
-
             let fetch_professions_query = r#"
                    query FetchSiteResources {
                         fetchSiteResources {
@@ -106,13 +84,6 @@ pub fn Home() -> impl IntoView {
                 ),
             );
 
-            let fetch_site_owner_response = perform_query_without_vars::<FetchSiteOwnerResponse>(
-                None,
-                "http://localhost:8080/api/acl",
-                fetch_site_owner_query,
-            )
-            .await;
-
             let fetch_professions_response =
                 perform_query_without_vars::<FetchSiteResourcesResponse>(
                     None,
@@ -121,16 +92,7 @@ pub fn Home() -> impl IntoView {
                 )
                 .await;
 
-            match fetch_site_owner_response.get_data() {
-                Some(data) => {
-                    *current_state.site_owner_info().write() =
-                        data.fetch_site_owner_info.as_ref().unwrap().to_owned();
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+            let _site_owner_info = fetch_site_owner_info(&current_state, None).await;
 
             match fetch_professions_response.get_data() {
                 Some(data) => {

@@ -19,12 +19,6 @@ pub struct AuthDetails {
 }
 
 #[derive(Clone, Debug, Default, Store)]
-pub struct AppStateContext {
-    user: UserInfo,
-    site_owner_info: User,
-}
-
-#[derive(Clone, Debug, Default, Store)]
 #[allow(dead_code)]
 pub struct UserInfo {
     pub user_profile: User,

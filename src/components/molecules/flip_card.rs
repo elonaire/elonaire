@@ -22,13 +22,13 @@ pub fn FlipCard(
 
                 /* Footer – 20% */
                 <div class="h-1/5 p-4 flex items-center justify-center bg-primary absolute bottom-0 left-0 right-0">
-                    <h3 class="text-lg font-semibold text-light-gray">"Software Engineering"</h3>
+                    <h5 class="line-clamp-1 text-light-gray">{title.clone()}</h5>
                 </div>
             </div>
 
             /* Back Face */
             <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-secondary to-primary text-white p-6 flex flex-col justify-center rotate-y-180 flip-back">
-                <h3 class="text-xl font-bold mb-3">{title}</h3>
+                <h5 class="mb-3  text-light-gray">{title.clone()}</h5>
                 <p class="text-sm mb-4 leading-relaxed">
                     {description}
                 </p>

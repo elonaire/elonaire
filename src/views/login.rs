@@ -24,12 +24,12 @@ use crate::components::{
 use crate::data::models::general::acl::OauthClientName;
 use crate::data::models::graphql::acl::SignInResponse;
 use crate::data::models::graphql::acl::SignInVars;
-use crate::data::models::{
-    general::acl::{
-        AppStateContext, AppStateContextStoreFields, AuthCode, AuthDetails, AuthInfoStoreFields,
-        UserInfoStoreFields,
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::{
+        general::acl::{AuthCode, AuthDetails, AuthInfoStoreFields, UserInfoStoreFields},
+        graphql::acl::UserLoginsInput,
     },
-    graphql::acl::UserLoginsInput,
 };
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;

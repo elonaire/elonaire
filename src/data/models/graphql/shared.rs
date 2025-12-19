@@ -1,3 +1,4 @@
+use reactive_stores::Store;
 use serde::{Deserialize, Serialize};
 
 use crate::utils::custom_traits::EnumerableEnum;
@@ -129,7 +130,7 @@ pub struct UserServiceInput {
     pub thumbnail: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Store)]
 #[allow(dead_code)]
 pub struct UserService {
     pub id: Option<String>,

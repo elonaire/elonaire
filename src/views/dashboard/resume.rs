@@ -35,8 +35,9 @@ use crate::{
             table::data_table::{Column, DataTable},
         },
     },
-    data::models::general::acl::{
-        AppStateContext, AppStateContextStoreFields, AuthInfoStoreFields, UserInfoStoreFields,
+    data::{
+        context::store::{AppStateContext, AppStateContextStoreFields},
+        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };

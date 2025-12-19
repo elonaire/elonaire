@@ -9,7 +9,7 @@ use reactive_stores::Store;
 
 use crate::{
     components::general::hocs::protected_route::ProtectedRoute,
-    data::models::general::acl::AppStateContext,
+    data::context::store::AppStateContext,
     views::{
         dashboard::{
             blog::{Blog, BlogList, CreateBlog},
