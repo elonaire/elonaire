@@ -8,7 +8,7 @@ use leptos::wasm_bindgen::JsCast;
 use leptos_meta::*;
 use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
-use web_sys::HtmlFormElement;
+use web_sys::{HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
@@ -198,14 +198,19 @@ pub fn ResumeItemsList() -> impl IntoView {
 #[island]
 pub fn CreateResumeItem() -> impl IntoView {
     let form_ref = NodeRef::new();
+    let (achievement_field_value, set_achievement_field_value) = signal(String::new());
+    let add_is_disabled = Memo::new(move |_| !(achievement_field_value.get().len() > 10));
+    let (achievements, set_achievements) = signal(Vec::new() as Vec<String>);
     let (form_is_valid, set_form_is_valid) = signal(false);
-    let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
+    let submit_is_disabled =
+        Memo::new(move |_| !form_is_valid.get() || achievements.get().len() == 0);
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
+
     let resume_sections = RwSignal::new(
         UserResumeSection::variants_slice()
             .iter()
@@ -244,11 +249,12 @@ pub fn CreateResumeItem() -> impl IntoView {
 
                     let input_vars = ResumeItemInputVars {
                         resume_item: deserialized_form_data,
+                        achievements: achievements.get_untracked(),
                     };
 
                     let query = r#"
-                           mutation CreateResumeItem($resumeItem: UserResumeInput!) {
-                                createResumeItem(resumeItem: $resumeItem) {
+                           mutation CreateResumeItem($resumeItem: UserResumeInput!, $achievements: [String!]!) {
+                                createResumeItem(resumeItem: $resumeItem, achievements: $achievements) {
                                     title
                                     moreInfo
                                     startDate
@@ -325,6 +331,25 @@ pub fn CreateResumeItem() -> impl IntoView {
         }
     };
 
+    let handle_achievement_input_change = Callback::new(move |ev: ev::Event| {
+        let target = ev
+            .target()
+            .and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+
+        if let Some(input_el) = target {
+            let value: String = input_el.value();
+            set_achievement_field_value.set(value);
+        }
+    });
+
+    let handle_add_button_click = Callback::new(move |_ev: ev::MouseEvent| {
+        set_achievements.update(|prev| {
+            prev.push(achievement_field_value.get());
+        });
+
+        set_achievement_field_value.set(String::new());
+    });
+
     view! {
         <>
             <Title text="New Resume Item"/>
@@ -363,6 +388,25 @@ pub fn CreateResumeItem() -> impl IntoView {
                     id_attr="section"
                     options=resume_sections
                     />
+
+                    <div class="flex flex-col gap-[10px]">
+                        <h3>Achievements</h3>
+                        <ul class="list-disc">
+                            {
+                                move || achievements.get().iter().map(|achievement| view!{ <li>{achievement.to_owned()}</li> }).collect::<Vec<_>>()
+                            }
+                        </ul>
+                        <div class="flex flex-row items-center">
+                            <InputField field_type=InputFieldType::Text placeholder="Add Achievement" oninput=handle_achievement_input_change id_attr="achievement" ext_wrapper_styles="flex-1" ext_input_styles="rounded-r-none" />
+                            <BasicButton
+                                button_text="Add"
+                                style_ext="bg-primary text-white rounded-l-none"
+                                button_type=ButtonType::Button
+                                disabled=add_is_disabled
+                                onclick=handle_add_button_click
+                            />
+                        </div>
+                    </div>
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"

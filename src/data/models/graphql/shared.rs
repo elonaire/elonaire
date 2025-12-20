@@ -152,18 +152,19 @@ pub struct CreateResumeItemResponse {
 pub struct ResumeItemInputVars {
     #[serde(rename = "resumeItem")]
     pub resume_item: UserResumeInput, // The key should match the value provided in the corresponding query fragment
+    pub achievements: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserResumeInput {
     pub title: String,
     #[serde(rename = "moreInfo", alias = "more_info")]
-    pub more_info: String,
+    pub more_info: Option<String>,
     #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
     #[serde(rename = "endDate", alias = "end_date")]
-    pub end_date: String,
-    pub link: String,
+    pub end_date: Option<String>,
+    pub link: Option<String>,
     pub section: UserResumeSection,
 }
 
