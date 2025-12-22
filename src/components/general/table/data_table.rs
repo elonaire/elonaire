@@ -11,6 +11,7 @@ use leptos_icons::Icon;
 
 use super::pagination::Pagination;
 use crate::components::general::button::BasicButton;
+use crate::components::general::popover::Popover;
 use crate::utils::time::get_elapsed_time;
 
 #[derive(Clone)]
@@ -225,8 +226,7 @@ pub struct TableProps {
     pub data: Vec<HashMap<String, TableCellData>>,
     pub page_size: usize,
     pub on_row_click: Callback<HashMap<String, TableCellData>>,
-    pub on_row_edit: Callback<HashMap<String, TableCellData>>,
-    pub on_row_delete: Callback<HashMap<String, TableCellData>>,
+    pub on_row_action: Callback<(HashMap<String, TableCellData>, String)>,
     pub editable: bool,
     pub deletable: bool,
 }
@@ -382,12 +382,13 @@ pub fn DataTable(
     #[prop(optional, default = Callback::new(|_| {}))] on_row_click: Callback<
         HashMap<String, TableCellData>,
     >,
-    #[prop(optional, default = Callback::new(|_| {}))] on_row_edit: Callback<
+    #[prop(optional, default = Callback::new(|_| {}))] on_row_action: Callback<(
         HashMap<String, TableCellData>,
-    >,
-    #[prop(optional, default = Callback::new(|_| {}))] on_row_delete: Callback<
-        HashMap<String, TableCellData>,
-    >,
+        String,
+    )>,
+    // #[prop(optional, default = Callback::new(|_| {}))] on_row_delete: Callback<
+    //     HashMap<String, TableCellData>,
+    // >,
     #[prop(default = false, optional)] editable: bool,
     #[prop(default = false, optional)] deletable: bool,
 ) -> impl IntoView {
@@ -396,8 +397,7 @@ pub fn DataTable(
         data: data.get().1,
         page_size,
         on_row_click,
-        on_row_edit,
-        on_row_delete,
+        on_row_action,
         editable,
         deletable,
     });
@@ -438,21 +438,19 @@ pub fn DataTable(
         data.set((updated_columns, sorted_data));
     });
 
-    let on_click_edit_handler = move |row_data: HashMap<String, TableCellData>| {
-        Callback::new(move |_| {
-            props.get().on_row_edit.run(row_data.clone());
-        })
-    };
-
     let on_click_row_handler = move |row_data: HashMap<String, TableCellData>| {
         props.get().on_row_click.run(row_data);
     };
 
-    let on_click_delete_handler = move |row_data: HashMap<String, TableCellData>| {
-        Callback::new(move |_| {
-            props.get().on_row_delete.run(row_data.clone());
-        })
-    };
+    let on_click_action_handler =
+        move |(row_data, action_type): (HashMap<String, TableCellData>, String)| {
+            Callback::new(move |_| {
+                let action_type = action_type.clone();
+                let row_data = row_data.clone();
+
+                props.get().on_row_action.run((row_data, action_type));
+            })
+        };
 
     view! {
         <div class="w-full flex flex-col justify-between">
@@ -558,30 +556,44 @@ pub fn DataTable(
                                                 // Action columns
                                                 {if props.get().editable || props.get().deletable {
                                                     let row_data_edit = row_data.clone();
+                                                    let showing = RwSignal::new(false);
 
                                                     Some(view! {
                                                         <td class="flex flex-row items-center gap-2 h-full py-2">
-                                                            {if props.get().editable {
-                                                                Some(view! {
-                                                                    <BasicButton
-                                                                                    onclick=on_click_edit_handler(row_data_edit.clone())
-                                                                                    icon=Some(IconId::BsPencil)
-                                                                                />
-                                                                })
-                                                            } else {
-                                                                None
-                                                            }}
-                                                            {if props.get().deletable {
-                                                                Some(view! {
-                                                                    <BasicButton
-                                                                    style_ext="text-danger".to_string()
-                                                                                    onclick=on_click_delete_handler(row_data.clone())
-                                                                                    icon=Some(IconId::BsTrash)
-                                                                                />
-                                                                })
-                                                            } else {
-                                                                None
-                                                            }}
+                                                            <Popover showing=showing display_item=|| view!{
+                                                                <BasicButton
+                                                                                icon=Some(IconId::BsThreeDots)
+                                                                            />
+                                                                }>
+                                                                <div class="flex flex-col gap-2">
+                                                                    {if props.get().editable {
+                                                                        Some(view! {
+                                                                            <BasicButton
+                                                                                style_ext="text-gray px-0"
+                                                                                children_style_ext="justify-between gap-0"
+                                                                                button_text="Edit"
+                                                                                onclick=on_click_action_handler((row_data_edit.clone(), "edit".into()))
+                                                                                icon=Some(IconId::BsPencil)
+                                                                            />
+                                                                        })
+                                                                    } else {
+                                                                        None
+                                                                    }}
+                                                                    {if props.get().deletable {
+                                                                        Some(view! {
+                                                                            <BasicButton
+                                                                                style_ext="text-danger px-0"
+                                                                                children_style_ext="justify-between gap-0"
+                                                                                button_text="Delete"
+                                                                                onclick=on_click_action_handler((row_data.clone(), "delete".into()))
+                                                                                icon=Some(IconId::BsTrash)
+                                                                            />
+                                                                        })
+                                                                    } else {
+                                                                        None
+                                                                    }}
+                                                                </div>
+                                                            </Popover>
                                                         </td>
                                                     })
                                                 } else {
@@ -622,21 +634,14 @@ pub fn DataTable(
                         {move || if pagination_state.get().2.is_empty() {
                             Some(view! {
                                 <tr>
-                                    <td colspan={props.get().columns.len()}>
+                                    <td colspan={props.get().columns.len() + 1}>
                                         <div class="py-2 flex items-center justify-center">
-                                            <div class="flex flex-col text-light-gray items-center justify-center">
+                                            <div class="flex-1 flex flex-col text-light-gray items-center justify-center">
                                                 <Icon width="2em" height="2em" icon=IconId::ImDrawer2 />
                                                 <p>"No Content"</p>
                                             </div>
                                         </div>
                                     </td>
-                                    {if props.get().deletable || props.get().editable {
-                                        Some(view! {
-                                            <td></td>
-                                        })
-                                    } else {
-                                        None
-                                    }}
                                 </tr>
                             })
                         } else {

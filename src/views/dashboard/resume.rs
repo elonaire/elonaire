@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use icondata as IconId;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
+use leptos_icons::Icon;
 use leptos_meta::*;
 use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
@@ -181,7 +182,7 @@ pub fn ResumeItemsList() -> impl IntoView {
                 <A href="/dashboard/resume/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(IconId::BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-white"
                     />
@@ -302,6 +303,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                             set_is_loading.set(false);
 
                             success_modal_is_open.update(|status| *status = true);
+                            set_achievements.set(vec![]);
                         }
                         None => {
                             set_is_loading.set(false);
@@ -337,17 +339,15 @@ pub fn CreateResumeItem() -> impl IntoView {
             .and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
 
         if let Some(input_el) = target {
-            let value: String = input_el.value();
-            set_achievement_field_value.set(value);
+            set_achievement_field_value.set(input_el.value());
         }
     });
 
     let handle_add_button_click = Callback::new(move |_ev: ev::MouseEvent| {
         set_achievements.update(|prev| {
             prev.push(achievement_field_value.get());
+            set_achievement_field_value.set(String::new());
         });
-
-        set_achievement_field_value.set(String::new());
     });
 
     view! {
@@ -390,14 +390,25 @@ pub fn CreateResumeItem() -> impl IntoView {
                     />
 
                     <div class="flex flex-col gap-[10px]">
-                        <h3>Achievements</h3>
-                        <ul class="list-disc">
+                        <h3>Achievements<span class="text-red-500">"*"</span></h3>
+                        { move || if achievements.get().is_empty() {
+                            Some(view!{
+                                <div class="flex flex-col text-mid-gray">
+                                    <Icon icon=IconId::TbAwardOff />
+                                    <p class="text-sm">No achievements added yet.</p>
+                                </div>
+                            })
+                        } else {
+                            None
+                        }
+                        }
+                        <ul class="list-disc list-inside">
                             {
                                 move || achievements.get().iter().map(|achievement| view!{ <li>{achievement.to_owned()}</li> }).collect::<Vec<_>>()
                             }
                         </ul>
                         <div class="flex flex-row items-center">
-                            <InputField field_type=InputFieldType::Text placeholder="Add Achievement" oninput=handle_achievement_input_change id_attr="achievement" ext_wrapper_styles="flex-1" ext_input_styles="rounded-r-none" />
+                            <InputField field_type=InputFieldType::Text placeholder="Add Achievement" initial_value=achievement_field_value oninput=handle_achievement_input_change id_attr="achievement" ext_wrapper_styles="flex-1" ext_input_styles="rounded-r-none" />
                             <BasicButton
                                 button_text="Add"
                                 style_ext="bg-primary text-white rounded-l-none"

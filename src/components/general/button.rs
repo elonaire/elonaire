@@ -36,6 +36,7 @@ pub enum ButtonType {
 pub fn BasicButton(
     #[prop(into, optional)] button_text: String,
     #[prop(into, optional)] style_ext: String,
+    #[prop(into, optional)] children_style_ext: String,
     #[prop(default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(default = None)] icon: Option<IconId>,
     #[prop(into, default = Signal::derive(move || false))] disabled: Signal<bool>,
@@ -69,7 +70,7 @@ pub fn BasicButton(
             on:click=move |ev| onclick.run(ev)
             disabled={disabled}
         >
-            <span class=move || format!("flex flex-row items-center justify-center {}", button_content_styles())>
+            <span class=move || format!("flex flex-row items-center justify-center {} {}", button_content_styles(), children_style_ext)>
                 {move || match icon {
                     Some(button_icon) => view! {
                         <Icon width="1em" height="1em" icon=button_icon />

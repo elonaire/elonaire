@@ -95,7 +95,7 @@ pub fn InputField(
                     ext_input_styles
                 )}
                 type=input_field_type_str
-                value=initial_value
+                prop:value=initial_value
                 name=name
                 node_ref=input_node_ref
                 readonly=readonly
