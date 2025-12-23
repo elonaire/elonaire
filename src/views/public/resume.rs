@@ -17,7 +17,7 @@ use crate::{
             shared::{fetch_resume, fetch_skills},
             store::{AppStateContext, AppStateContextStoreFields},
         },
-        models::graphql::shared::{UserResumeSection, UserSkillType},
+        models::graphql::shared::{UserResume, UserResumeSection, UserSkill, UserSkillType},
     },
     utils::time::convert_date_to_human_readable_format,
 };
@@ -36,94 +36,42 @@ pub fn Resume() -> impl IntoView {
     let soft_skills = RwSignal::new(vec![] as Vec<PanelInfo>);
 
     Effect::new(move || {
-        resume().get().iter().for_each(|resume| {
-            let start_date =
-                convert_date_to_human_readable_format(resume.start_date.as_ref().unwrap());
-            let end_date = match resume.end_date.as_ref() {
-                Some(date) => convert_date_to_human_readable_format(date),
-                None => "Present".into(),
-            };
-            let years_of_experience = match resume.years_of_experience.as_ref() {
-                Some(years) => match years {
-                    0 => "< 1 year".to_string(),
-                    1 => "1 year".to_string(),
-                    _ => format!("{} years", years),
-                },
-                None => "".to_string(),
-            };
+        education_timeline_items.set(
+            resume()
+                .get()
+                .iter()
+                .filter(|resume| resume.section.as_ref() == Some(&UserResumeSection::Education))
+                .map(|resume| generate_timeline_item(resume))
+                .collect(),
+        );
 
-            let achievements = resume.achievements.as_ref().unwrap().to_vec();
-
-            let timeline_item = TimelineItem {
-                time_info: format!("{start_date} - {end_date} ({years_of_experience})"),
-                title: resume.title.as_ref().unwrap().to_owned(),
-                more_info: Some(resume.more_info.as_ref().unwrap_or(&"".into()).to_owned()),
-                status: TimelineStatus::Success,
-                content: ViewFn::from(move || {
-                    view! {
-                        <ul class="list-disc list-inside">
-                            {
-                                achievements.iter().map(|achievement| {
-                                    view! { <li>{achievement.description.as_ref().unwrap().to_owned()}</li> }
-                                }).collect::<Vec<_>>()
-                            }
-                        </ul>
-                    }
-                }),
-                ..Default::default()
-            };
-
-            match resume.section.as_ref().unwrap().to_owned() {
-                UserResumeSection::Education => {
-                    education_timeline_items.write().push(timeline_item.clone());
-                }
-                UserResumeSection::Experience => {
-                    experience_timeline_items
-                        .write()
-                        .push(timeline_item.clone());
-                }
-                _ => {}
-            };
-        });
+        experience_timeline_items.set(
+            resume()
+                .get()
+                .iter()
+                .filter(|resume| resume.section.as_ref() == Some(&UserResumeSection::Experience))
+                .map(|resume| generate_timeline_item(resume))
+                .collect(),
+        );
     });
 
     Effect::new(move || {
-        skills().get().iter().for_each(|skill| {
-            let skill = skill.clone();
-
-            let title_skill = skill.clone();
-            let children_skill = skill.clone();
-
-            let skill_view = PanelInfo {
-                title: ViewFn::from(move || {
-                    let level = title_skill.level.as_ref().unwrap().clone();
-
-                    view! {
-                        <div class="flex-1 flex flex-row items-center justify-between">
-                            <img src={title_skill.thumbnail.as_ref().unwrap().clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
-                            <p class="font-bold">{title_skill.name.as_ref().unwrap().clone()}</p>
-                            <p class="text-xs text-primary">{format!("{:?}", level)}</p>
-                        </div>
-                    }
-                }),
-                children: ViewFn::from(move || {
-                    view! {
-                        <p>{children_skill.description.as_ref().unwrap().clone()}</p>
-                    }
-                }),
-                ..Default::default()
-            };
-
-            match skill.r#type.as_ref().unwrap().to_owned() {
-                UserSkillType::Technical => {
-                    technical_skills.write().push(skill_view.clone());
-                }
-                UserSkillType::Soft => {
-                    soft_skills.write().push(skill_view.clone());
-                }
-                _ => {}
-            };
-        });
+        technical_skills.set(
+            skills()
+                .get()
+                .iter()
+                .filter(|skill| skill.r#type.as_ref() == Some(&UserSkillType::Technical))
+                .map(|skill| generate_panel_info(skill))
+                .collect(),
+        );
+        soft_skills.set(
+            skills()
+                .get()
+                .iter()
+                .filter(|skill| skill.r#type.as_ref() == Some(&UserSkillType::Soft))
+                .map(|skill| generate_panel_info(skill))
+                .collect(),
+        );
     });
 
     Effect::new(move || {
@@ -166,5 +114,71 @@ pub fn Resume() -> impl IntoView {
                 </div>
             </div>
         </main>
+    }
+}
+
+/// utility function to generate resume timeline items
+fn generate_timeline_item(resume: &UserResume) -> TimelineItem {
+    let start_date = convert_date_to_human_readable_format(resume.start_date.as_ref().unwrap());
+    let end_date = match resume.end_date.as_ref() {
+        Some(date) => convert_date_to_human_readable_format(date),
+        None => "Present".into(),
+    };
+    let years_of_experience = match resume.years_of_experience.as_ref() {
+        Some(years) => match years {
+            0 => "< 1 year".to_string(),
+            1 => "1 year".to_string(),
+            _ => format!("{} years", years),
+        },
+        None => "".to_string(),
+    };
+
+    let achievements = resume.achievements.as_ref().unwrap().to_vec();
+
+    TimelineItem {
+        time_info: format!("{start_date} - {end_date} ({years_of_experience})"),
+        title: resume.title.as_ref().unwrap().to_owned(),
+        more_info: Some(resume.more_info.as_ref().unwrap_or(&"".into()).to_owned()),
+        status: TimelineStatus::Success,
+        content: ViewFn::from(move || {
+            view! {
+                <ul class="list-disc list-inside">
+                    {
+                        achievements.iter().map(|achievement| {
+                            view! { <li>{achievement.description.as_ref().unwrap().to_owned()}</li> }
+                        }).collect::<Vec<_>>()
+                    }
+                </ul>
+            }
+        }),
+        ..Default::default()
+    }
+}
+
+/// A utility function to generate UserSkill panelinfo
+fn generate_panel_info(skill: &UserSkill) -> PanelInfo {
+    let skill = skill.clone();
+
+    let title_skill = skill.clone();
+    let children_skill = skill.clone();
+
+    PanelInfo {
+        title: ViewFn::from(move || {
+            let level = title_skill.level.as_ref().unwrap().clone();
+
+            view! {
+                <div class="flex-1 flex flex-row items-center justify-between">
+                    <img src={title_skill.thumbnail.as_ref().unwrap().clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
+                    <p class="font-bold">{title_skill.name.as_ref().unwrap().clone()}</p>
+                    <p class="text-xs text-primary">{format!("{:?}", level)}</p>
+                </div>
+            }
+        }),
+        children: ViewFn::from(move || {
+            view! {
+                <p>{children_skill.description.as_ref().unwrap().clone()}</p>
+            }
+        }),
+        ..Default::default()
     }
 }

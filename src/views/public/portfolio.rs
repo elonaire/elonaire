@@ -43,29 +43,63 @@ pub fn Portfolio() -> impl IntoView {
     );
 
     Effect::new(move || {
-        portfolio().get().iter().for_each(|portfolio| {
-            match portfolio.category.as_ref().unwrap().to_owned() {
-                UserPortfolioCategory::JavaScript => {
-                    javascript_projects.write().push(portfolio.clone());
-                }
-                UserPortfolioCategory::Rust => {
-                    rust_projects.write().push(portfolio.clone());
-                }
-                UserPortfolioCategory::Database => {
-                    database_projects.write().push(portfolio.clone());
-                }
-                UserPortfolioCategory::DevOps => {
-                    devops_projects.write().push(portfolio.clone());
-                }
-                UserPortfolioCategory::Cloud => {
-                    cloud_projects.write().push(portfolio.clone());
-                }
-                UserPortfolioCategory::Mobile => {
-                    mobile_projects.write().push(portfolio.clone());
-                }
-                _ => {}
-            };
-        });
+        javascript_projects.set(
+            portfolio()
+                .get()
+                .iter()
+                .filter(|project| {
+                    project.category.as_ref() == Some(&UserPortfolioCategory::JavaScript)
+                })
+                .map(|project| project.to_owned())
+                .collect(),
+        );
+
+        rust_projects.set(
+            portfolio()
+                .get()
+                .iter()
+                .filter(|project| project.category.as_ref() == Some(&UserPortfolioCategory::Rust))
+                .map(|project| project.to_owned())
+                .collect(),
+        );
+
+        database_projects.set(
+            portfolio()
+                .get()
+                .iter()
+                .filter(|project| {
+                    project.category.as_ref() == Some(&UserPortfolioCategory::Database)
+                })
+                .map(|project| project.to_owned())
+                .collect(),
+        );
+
+        devops_projects.set(
+            portfolio()
+                .get()
+                .iter()
+                .filter(|project| project.category.as_ref() == Some(&UserPortfolioCategory::DevOps))
+                .map(|project| project.to_owned())
+                .collect(),
+        );
+
+        cloud_projects.set(
+            portfolio()
+                .get()
+                .iter()
+                .filter(|project| project.category.as_ref() == Some(&UserPortfolioCategory::Cloud))
+                .map(|project| project.to_owned())
+                .collect(),
+        );
+
+        mobile_projects.set(
+            portfolio()
+                .get()
+                .iter()
+                .filter(|project| project.category.as_ref() == Some(&UserPortfolioCategory::Mobile))
+                .map(|project| project.to_owned())
+                .collect(),
+        );
     });
 
     Effect::new(move || {
