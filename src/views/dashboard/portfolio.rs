@@ -10,6 +10,7 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
+use crate::components::forms::textarea::Textarea;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::models::graphql::shared::{
@@ -433,7 +434,7 @@ pub fn CreatePortfolio() -> impl IntoView {
             <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
-                    <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
+                    <Textarea label="Description" required=true id_attr="description" name="description" />
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
                     <DatePicker label="End Date" required=true id_attr="end_date" initial_value=init_date name="end_date" />
                     <InputField field_type=InputFieldType::Text label="Link" required=true id_attr="link" name="link" />

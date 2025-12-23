@@ -36,7 +36,7 @@ pub struct AuthStatus {
     pub current_role: String,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, Store)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Store, PartialEq, Eq)]
 #[allow(dead_code)]
 pub struct User {
     pub id: Option<String>,

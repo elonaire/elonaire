@@ -242,6 +242,7 @@ pub struct CreateUserSkillVars {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct UserSkillInput {
     pub name: String,
+    pub description: String,
     #[serde(rename = "type")]
     pub r#type: UserSkillType,
     pub level: UserSkillLevel,
@@ -256,6 +257,7 @@ pub struct UserSkill {
     pub id: Option<String>,
     pub thumbnail: Option<String>,
     pub name: Option<String>,
+    pub description: Option<String>,
     pub level: Option<UserSkillLevel>,
     #[serde(rename = "type")]
     pub r#type: Option<UserSkillType>,

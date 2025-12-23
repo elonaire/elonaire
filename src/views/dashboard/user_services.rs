@@ -11,6 +11,7 @@ use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::input::CustomFileInput;
+use crate::components::forms::textarea::Textarea;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::models::graphql::shared::{
@@ -354,7 +355,7 @@ pub fn CreateUserService() -> impl IntoView {
             <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
-                    <InputField field_type=InputFieldType::Text label="Description" required=true id_attr="description" name="description" />
+                    <Textarea label="Description" required=true id_attr="description" name="description" />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
 
 

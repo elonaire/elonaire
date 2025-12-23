@@ -1,38 +1,140 @@
+use chrono::{DateTime, TimeZone, Utc};
 use icondata as IconData;
-use leptos::prelude::*;
+use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
+use reactive_stores::Store;
 
-use crate::components::{
-    general::{
-        collapse::{Collapse, PanelInfo},
-        timeline::{Timeline, TimelineItem, TimelineStatus},
+use crate::{
+    components::{
+        general::{
+            collapse::{Collapse, PanelInfo},
+            timeline::{Timeline, TimelineItem, TimelineStatus},
+        },
+        molecules::{headline::Headline, section_title::SectionTitle, top_nav::TopNav},
     },
-    molecules::{headline::Headline, section_title::SectionTitle, top_nav::TopNav},
+    data::{
+        context::{
+            shared::{fetch_resume, fetch_skills},
+            store::{AppStateContext, AppStateContextStoreFields},
+        },
+        models::graphql::shared::{UserResumeSection, UserSkillType},
+    },
+    utils::time::convert_date_to_human_readable_format,
 };
 
 #[island]
 pub fn Resume() -> impl IntoView {
-    let timeline_items = RwSignal::new(vec![TimelineItem {
-        time_info: "Sep 1 2016 - Jun 1 2024 (10+ years)".into(),
-        title: "New Project Created".into(),
-        more_info: Some("Techie Tenka Project was created.".into()),
-        status: TimelineStatus::Success,
-        content: ViewFn::from(|| view! { <p>"Project created with Leptos!"</p> }),
-        ..Default::default()
-    }]);
+    let current_state = expect_context::<Store<AppStateContext>>();
+    let resume = move || current_state.resume();
+    let skills = move || current_state.skills();
+    let (is_loading, set_is_loading) = signal(false);
 
-    let technical_skills = RwSignal::new(vec![
-        PanelInfo {
-            title: ViewFn::from(move || view! { <p>"title 1"</p> }),
-            children: ViewFn::from(move || view! { <p>"Panel content"</p> }),
-            ..Default::default()
-        },
-        PanelInfo {
-            title: ViewFn::from(move || view! { <p>"title 2"</p> }),
-            children: ViewFn::from(move || view! { <p>"Panel content"</p> }),
-            ..Default::default()
-        },
-    ]);
+    let education_timeline_items = RwSignal::new(vec![] as Vec<TimelineItem>);
+    let experience_timeline_items = RwSignal::new(vec![] as Vec<TimelineItem>);
+
+    let technical_skills = RwSignal::new(vec![] as Vec<PanelInfo>);
+    let soft_skills = RwSignal::new(vec![] as Vec<PanelInfo>);
+
+    Effect::new(move || {
+        resume().get().iter().for_each(|resume| {
+            let start_date =
+                convert_date_to_human_readable_format(resume.start_date.as_ref().unwrap());
+            let end_date = match resume.end_date.as_ref() {
+                Some(date) => convert_date_to_human_readable_format(date),
+                None => "Present".into(),
+            };
+            let years_of_experience = match resume.years_of_experience.as_ref() {
+                Some(years) => match years {
+                    0 => "< 1 year".to_string(),
+                    1 => "1 year".to_string(),
+                    _ => format!("{} years", years),
+                },
+                None => "".to_string(),
+            };
+
+            let achievements = resume.achievements.as_ref().unwrap().to_vec();
+
+            let timeline_item = TimelineItem {
+                time_info: format!("{start_date} - {end_date} ({years_of_experience})"),
+                title: resume.title.as_ref().unwrap().to_owned(),
+                more_info: Some(resume.more_info.as_ref().unwrap_or(&"".into()).to_owned()),
+                status: TimelineStatus::Success,
+                content: ViewFn::from(move || {
+                    view! {
+                        <ul class="list-disc list-inside">
+                            {
+                                achievements.iter().map(|achievement| {
+                                    view! { <li>{achievement.description.as_ref().unwrap().to_owned()}</li> }
+                                }).collect::<Vec<_>>()
+                            }
+                        </ul>
+                    }
+                }),
+                ..Default::default()
+            };
+
+            match resume.section.as_ref().unwrap().to_owned() {
+                UserResumeSection::Education => {
+                    education_timeline_items.write().push(timeline_item.clone());
+                }
+                UserResumeSection::Experience => {
+                    experience_timeline_items
+                        .write()
+                        .push(timeline_item.clone());
+                }
+                _ => {}
+            };
+        });
+    });
+
+    Effect::new(move || {
+        skills().get().iter().for_each(|skill| {
+            let skill = skill.clone();
+
+            let title_skill = skill.clone();
+            let children_skill = skill.clone();
+
+            let skill_view = PanelInfo {
+                title: ViewFn::from(move || {
+                    let level = title_skill.level.as_ref().unwrap().clone();
+
+                    view! {
+                        <div class="flex-1 flex flex-row items-center justify-between">
+                            <img src={title_skill.thumbnail.as_ref().unwrap().clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
+                            <p class="font-bold">{title_skill.name.as_ref().unwrap().clone()}</p>
+                            <p class="text-xs text-primary">{format!("{:?}", level)}</p>
+                        </div>
+                    }
+                }),
+                children: ViewFn::from(move || {
+                    view! {
+                        <p>{children_skill.description.as_ref().unwrap().clone()}</p>
+                    }
+                }),
+                ..Default::default()
+            };
+
+            match skill.r#type.as_ref().unwrap().to_owned() {
+                UserSkillType::Technical => {
+                    technical_skills.write().push(skill_view.clone());
+                }
+                UserSkillType::Soft => {
+                    soft_skills.write().push(skill_view.clone());
+                }
+                _ => {}
+            };
+        });
+    });
+
+    Effect::new(move || {
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let _fetch_resume_res = fetch_resume(&current_state, None).await;
+            let _fetch_skills_res = fetch_skills(&current_state, None).await;
+
+            set_is_loading.set(false);
+        });
+    });
 
     view! {
         <Title text="Resume"/>
@@ -45,11 +147,11 @@ pub fn Resume() -> impl IntoView {
                 <div class="mx-[5%] md:mx-[10%] flex flex-col md:flex-row gap-[40px]">
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Education" />
-                        <Timeline steps=timeline_items />
+                        <Timeline steps=education_timeline_items />
                     </div>
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Work Experience" />
-                        <Timeline steps=timeline_items />
+                        <Timeline steps=experience_timeline_items />
                     </div>
                 </div>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col md:flex-row gap-[40px]">
@@ -59,7 +161,7 @@ pub fn Resume() -> impl IntoView {
                     </div>
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Soft Skills" />
-                        <Collapse is_accordion=true panel_items=technical_skills />
+                        <Collapse is_accordion=true panel_items=soft_skills />
                     </div>
                 </div>
             </div>

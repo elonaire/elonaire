@@ -125,7 +125,7 @@ pub fn Panel(
         <div node_ref=panel_ref>
             <span
                 on:click=toggle_content
-                class=move || format!("flex flex-row items-center justify-between gap-2 mb-2 p-2 rounded cursor-pointer ring ring-primary hover:bg-primary {} {}", ext_panel_title_styles, if is_open.get() { "bg-primary" } else { "" })
+                class=move || format!("flex flex-row items-center justify-between gap-4 mb-2 p-2 rounded cursor-pointer ring ring-primary hover:bg-primary {} {}", ext_panel_title_styles, if is_open.get() { "bg-primary" } else { "" })
             >
                 {title.run()}
                 {

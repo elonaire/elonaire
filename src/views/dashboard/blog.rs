@@ -10,6 +10,7 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
+use crate::components::forms::textarea::Textarea;
 use crate::components::forms::toggle_switch::ToggleSwitch;
 use crate::components::general::spinner::Spinner;
 use crate::data::models::graphql::shared::{
@@ -391,7 +392,7 @@ pub fn CreateBlog() -> impl IntoView {
             <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
-                    <InputField field_type=InputFieldType::Text label="Short Description" required=true id_attr="short_description" name="short_description" />
+                    <Textarea label="Short Description" required=true id_attr="short_description" name="short_description" />
                     <SelectInput
                     label="Status"
                     name="status"

@@ -18,19 +18,19 @@ pub struct AuthDetails {
     pub url: Option<String>,
 }
 
-#[derive(Clone, Debug, Default, Store)]
+#[derive(Clone, Debug, Default, Store, PartialEq, Eq)]
 #[allow(dead_code)]
 pub struct UserInfo {
     pub user_profile: User,
     pub auth_info: AuthInfo,
 }
 
-#[derive(Clone, Debug, Default, Store)]
+#[derive(Clone, Debug, Default, Store, PartialEq, Eq)]
 pub struct AuthInfo {
     pub token: String,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum OauthClientName {
     Github,
     Google,

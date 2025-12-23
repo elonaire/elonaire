@@ -32,7 +32,7 @@ pub fn Textarea(
     // Create reactive state for display_error
 
     view! {
-        <div class="mb-2">
+        <div>
             <label class="block text-gray-500 text-sm font-bold mb-2" for=id_attr.clone()>
                 {label}
                 {move || if required {
