@@ -33,13 +33,11 @@ pub fn Textarea(
 
     view! {
         <div>
-            <label class="block text-gray-500 text-sm font-bold mb-2" for=id_attr.clone()>
+            <label class="block text-mid-gray text-sm font-bold mb-2" for=id_attr.clone()>
                 {label}
-                {move || if required {
-                    Some(view! { <span class="text-red-500">"*"</span> })
-                } else {
-                    None
-                }}
+                {move || required.then_some(view! {
+                    <span class="text-red-500 ml-1">*</span>
+                })}
             </label>
             <textarea
                 class=move || format!(

@@ -119,7 +119,7 @@ pub fn Tabs(
                                     leptos::logging::log!("current label: {}", index);
                                     "border-primary text-primary"
                                 } else {
-                                    "border-transparent text-gray-500"
+                                    "border-transparent text-mid-gray"
                                 }
                             };
 

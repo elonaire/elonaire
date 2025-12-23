@@ -33,6 +33,7 @@ pub struct UserPortfolio {
 pub struct UserPortfolioInputVars {
     #[serde(rename = "portfolioItem")]
     pub portfolio_item: UserPortfolioInput,
+    pub skills: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]

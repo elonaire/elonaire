@@ -63,7 +63,7 @@ pub fn ToggleSwitch(
                         )
                     ></div>
                 </div>
-                <div class="flex items-center ml-3 text-gray-500 font-medium">
+                <div class="flex items-center ml-3 text-mid-gray font-medium">
                     <p>{
                         move || {
                             if active.get() {

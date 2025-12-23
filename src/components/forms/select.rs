@@ -1,7 +1,13 @@
+use icondata as IconId;
 use leptos::ev;
 use leptos::html::Select;
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
+
+use crate::components::{
+    forms::input::{InputField, InputFieldType},
+    general::button::BasicButton,
+};
 
 // Define the SelectOption struct
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
@@ -42,7 +48,7 @@ pub fn SelectInput(
         String,
     >,
     #[prop(into)] label: String,
-    #[prop(into)] name: String,
+    #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Select>,
     #[prop(default = false, optional)] readonly: bool,
     #[prop(into)] options: RwSignal<Vec<SelectOption>>,
@@ -56,19 +62,17 @@ pub fn SelectInput(
 
     view! {
         <div>
-            <label for=id_attr.clone() class="block text-gray-500 text-sm font-bold">
+            <label for=id_attr.clone() class="block text-mid-gray text-sm font-bold">
                 {label}
-                {move || if required {
-                    Some(view! { <span class="text-red-500">"*"</span> })
-                } else {
-                    None
-                }}
+                {move || required.then_some(view! {
+                    <span class="text-red-500 ml-1">*</span>
+                })}
             </label>
             <select
                 node_ref=input_node_ref
                 name=name
                 class=move || format!(
-                    "form-input ring-0 shadow appearance-none border border-slate-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
+                    "form-input ring-0 shadow appearance-none border border-slate-400 rounded-[5px] w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
                     ext_input_styles
                 )
                 // value={initial_value.clone()}
@@ -99,6 +103,192 @@ pub fn SelectInput(
                     ""
                 }}
             </p>
+        </div>
+    }
+}
+
+/// Custom Select Input
+#[component]
+pub fn CustomSelectInput(
+    #[prop(into)] label: String,
+    #[prop(into, optional)] name: String,
+    #[prop(into)] options: RwSignal<Vec<SelectOption>>,
+    #[prop(into)] value: RwSignal<Vec<String>>,
+
+    // false = normal select (single)
+    // true  = checkbox-style multi select
+    #[prop(optional, default = false)] multiple: bool,
+
+    #[prop(optional, default = false)] required: bool,
+    #[prop(into, optional)] id_attr: String,
+    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<Vec<String>>,
+) -> impl IntoView {
+    let (open, set_open) = signal(false);
+    let (query, set_query) = signal(String::new());
+
+    // ---------- Derived state ----------
+
+    let filtered_options = Signal::derive(move || {
+        let q = query.get().to_lowercase();
+        options
+            .get()
+            .into_iter()
+            .filter(|o| o.label.to_lowercase().contains(&q))
+            .collect::<Vec<_>>()
+    });
+
+    // ---------- Selection logic ----------
+
+    let select_value = move |val: String| {
+        value.update(|current| {
+            if multiple {
+                if current.contains(&val) {
+                    current.retain(|v| v != &val);
+                } else {
+                    current.push(val);
+                }
+            } else {
+                current.clear();
+                current.push(val);
+            }
+        });
+
+        onchange.run(value.get());
+
+        if !multiple {
+            set_open.set(false);
+            set_query.set(String::new());
+        }
+    };
+
+    let remove_value = move |val: String| {
+        value.update(|current| {
+            current.retain(|v| v != &val);
+        });
+
+        onchange.run(value.get());
+    };
+
+    view! {
+        <div class="relative w-full">
+            <label for=id_attr.clone() class="block text-mid-gray text-sm font-bold">
+                {label}
+                {move || required.then_some(view! {
+                    <span class="text-red-500 ml-1">*</span>
+                })}
+            </label>
+
+            // Control with chips
+            <div
+                class="relative rounded-[5px] px-2 py-2 cursor-pointer flex flex-wrap gap-2 min-h-[40px] border border-slate-400 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow"
+                on:click=move |_| set_open.set(true)
+            >
+                {move || {
+                    let selected = value.get();
+
+                    if selected.is_empty() {
+                        Some(view! {
+                            <span class="text-mid-gray select-none">
+                            "Select…"
+                            </span>
+                        }.into_view())
+                    } else {
+                        None
+                    }
+                }}
+
+                {move || {
+                    let selected = value.get();
+
+                    if !selected.is_empty() {
+                        Some(options
+                            .get()
+                            .into_iter()
+                            .filter(|o| selected.contains(&o.value))
+                            .map(|o| {
+                                let val = o.value.clone();
+
+                                view! {
+                                    <span
+                                        class="flex items-center gap-1 px-2 py-1
+                                               bg-primary/20 text-primary rounded-[5px] text-sm"
+                                    >
+                                        {o.label}
+                                        <BasicButton icon=Some(IconId::CgClose) onclick=Callback::new(move |ev: ev::MouseEvent| {
+                                            ev.stop_propagation();
+                                            remove_value(val.clone());
+                                        }) />
+                                    </span>
+                                }
+                            })
+                            .collect::<Vec<_>>()
+                            .into_view())
+                    } else {
+                        None
+                    }
+
+                }}
+            </div>
+
+            // Overlay (click outside closes dropdown)
+            {move || open.get().then_some(view! {
+                <div
+                    class="fixed inset-0 z-10"
+                    on:click=move |_| {
+                        set_open.set(false);
+                        set_query.set(String::new());
+                    }
+                />
+            })}
+
+            // Dropdown
+            {move || open.get().then_some(view! {
+                <div class="absolute z-30 mt-1 w-full bg-white rounded-[5px] shadow">
+                    // Search
+                    <InputField placeholder="Search…" field_type=InputFieldType::Text id_attr="search" oninput=Callback::new(move |ev: ev::Event| {
+                        set_query.set(event_target_value(&ev));
+                    }) />
+
+                    // Options
+                    <ul class="max-h-48 overflow-y-auto">
+                        {move || filtered_options.get().into_iter().map(|opt| {
+                            let selected = value.get().contains(&opt.value);
+                            let val = opt.value.clone();
+
+                            view! {
+                                <li
+                                    class="px-3 py-2 hover:bg-gray-100 flex items-center
+                                           gap-2 cursor-pointer"
+                                    on:click=move |_| select_value(val.clone())
+                                >
+                                    {multiple.then_some(view! {
+                                        <input
+                                            type="checkbox"
+                                            checked=selected
+                                            class="pointer-events-none"
+                                        />
+                                    })}
+
+                                    <span class=move || if selected {
+                                        "font-semibold"
+                                    } else {
+                                        ""
+                                    }>
+                                        {opt.label.clone()}
+                                    </span>
+                                </li>
+                            }
+                        }).collect::<Vec<_>>()}
+                    </ul>
+                </div>
+            })}
+
+            // Hidden input for native form submission
+            <input
+                type="hidden"
+                name=name
+                value=move || value.get().join(",")
+            />
         </div>
     }
 }

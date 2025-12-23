@@ -4,7 +4,7 @@ use crate::data::models::{
     general::acl::UserInfo,
     graphql::{
         acl::User,
-        shared::{UserResume, UserService, UserSkill},
+        shared::{UserPortfolio, UserResume, UserService, UserSkill},
     },
 };
 
@@ -15,4 +15,5 @@ pub struct AppStateContext {
     services: Vec<UserService>,
     resume: Vec<UserResume>,
     skills: Vec<UserSkill>,
+    portfolio: Vec<UserPortfolio>,
 }

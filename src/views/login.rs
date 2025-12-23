@@ -251,7 +251,7 @@ pub fn SignIn() -> impl IntoView {
                         </div>
                         <div class="w-full max-w-md flex items-center my-6">
                             <hr class="flex-grow border-t border-gray-300"/>
-                            <span class="mx-4 text-gray-500">{"OR"}</span>
+                            <span class="mx-4 text-mid-gray">{"OR"}</span>
                             <hr class="flex-grow border-t border-gray-300"/>
                         </div>
 

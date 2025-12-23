@@ -99,7 +99,7 @@ pub fn DatePicker(
                     class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                     on:click={move |ev| toggle_calendar.run(ev)}
                 >
-                    <span class="text-gray-500"><Icon icon=IconId::BsCalendar2Date /></span>
+                    <span class="text-mid-gray"><Icon icon=IconId::BsCalendar2Date /></span>
                 </div>
             </div>
             {move || if show_calendar.get() {
@@ -286,7 +286,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                                 }
                             ) icon=Some(IconId::BiChevronRightRegular) />
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-gray-500 bg-white border-none rounded p-2">
+                        <div class="grid grid-cols-7 gap-1 text-mid-gray bg-white border-none rounded p-2">
                             {days_of_week.iter().map(|&day| view! { <div class="font-bold text-center text-sm">{day}</div> }).collect::<Vec<_>>()}
                             {render_days()}
                         </div>

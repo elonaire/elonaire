@@ -10,9 +10,11 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
+use crate::components::forms::select::CustomSelectInput;
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
+use crate::data::context::shared::fetch_portfolio;
 use crate::data::models::graphql::shared::{
     CreatePortfolioItemResponse, FetchSiteResourcesResponse, UserPortfolioCategory,
     UserPortfolioInputVars,
@@ -37,7 +39,10 @@ use crate::{
         },
     },
     data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
+        context::{
+            shared::fetch_skills,
+            store::{AppStateContext, AppStateContextStoreFields},
+        },
         models::{
             general::{
                 acl::{AuthInfoStoreFields, UserInfoStoreFields},
@@ -61,6 +66,7 @@ pub fn Portfolio() -> impl IntoView {
 #[island]
 pub fn PortfolioList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let portfolio = move || current_state.portfolio();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -74,102 +80,67 @@ pub fn PortfolioList() -> impl IntoView {
     ));
 
     Effect::new(move || {
+        let portfolio_data: Vec<HashMap<String, TableCellData>> = portfolio()
+            .get()
+            .iter()
+            .map(|portfolio| {
+                let mut hash_map_data = HashMap::new();
+
+                // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(portfolio.id.as_ref().unwrap().to_owned()),
+                );
+
+                hash_map_data.insert(
+                    "Title".to_string(),
+                    TableCellData::String(portfolio.title.as_ref().unwrap().to_owned()),
+                );
+
+                hash_map_data.insert(
+                    "YOE".to_string(),
+                    TableCellData::Usize(
+                        portfolio.years_of_experience.as_ref().unwrap().to_owned(),
+                    ),
+                );
+
+                hash_map_data.insert(
+                    "Start Date".to_string(),
+                    TableCellData::DateTime(portfolio.start_date.as_ref().unwrap().to_owned()),
+                );
+
+                hash_map_data.insert(
+                    "Category".to_string(),
+                    TableCellData::String(format!(
+                        "{:?}",
+                        portfolio.category.as_ref().unwrap().to_owned()
+                    )),
+                );
+                hash_map_data
+            })
+            .collect();
+
+        table_data.update(move |prev| {
+            prev.1 = portfolio_data;
+        });
+    });
+
+    Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_roles_query = r#"
-                   query FetchSiteResources {
-                        fetchSiteResources {
-                            portfolio {
-                                title
-                                description
-                                startDate
-                                endDate
-                                link
-                                category
-                                thumbnail
-                                id
-                                yearsOfExperience
-                            }
-                        }
-                   }
-               "#;
-            let mut headers = HashMap::new() as HashMap<String, String>;
-            headers.insert(
-                "Authorization".into(),
-                format!(
-                    "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
-                ),
-            );
+            // let mut headers = HashMap::new() as HashMap<String, String>;
+            // headers.insert(
+            //     "Authorization".into(),
+            //     format!(
+            //         "Bearer {}",
+            //         current_state.user().auth_info().token().get_untracked()
+            //     ),
+            // );
 
-            let fetch_roles_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/shared",
-                fetch_roles_query,
-            )
-            .await;
+            let _portfolio_res = fetch_portfolio(&current_state, None).await;
 
-            match fetch_roles_response.get_data() {
-                Some(data) => {
-                    let roles: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_site_resources
-                        .as_ref()
-                        .unwrap()
-                        .portfolio
-                        .as_ref()
-                        .unwrap()
-                        .to_vec()
-                        .iter()
-                        .map(|portfolio| {
-                            let mut hash_map_data = HashMap::new();
-
-                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
-                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
-                            hash_map_data.insert(
-                                "id".to_string(),
-                                TableCellData::String(portfolio.id.as_ref().unwrap().to_owned()),
-                            );
-
-                            hash_map_data.insert(
-                                "Title".to_string(),
-                                TableCellData::String(portfolio.title.as_ref().unwrap().to_owned()),
-                            );
-
-                            hash_map_data.insert(
-                                "YOE".to_string(),
-                                TableCellData::Usize(
-                                    portfolio.years_of_experience.as_ref().unwrap().to_owned(),
-                                ),
-                            );
-
-                            hash_map_data.insert(
-                                "Start Date".to_string(),
-                                TableCellData::DateTime(
-                                    portfolio.start_date.as_ref().unwrap().to_owned(),
-                                ),
-                            );
-
-                            hash_map_data.insert(
-                                "Category".to_string(),
-                                TableCellData::String(format!(
-                                    "{:?}",
-                                    portfolio.category.as_ref().unwrap().to_owned()
-                                )),
-                            );
-                            hash_map_data
-                        })
-                        .collect();
-
-                    table_data.update(move |prev| {
-                        prev.1 = roles;
-                    });
-
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+            set_is_loading.set(false);
         });
     });
 
@@ -207,14 +178,19 @@ pub fn PortfolioList() -> impl IntoView {
 pub fn CreatePortfolio() -> impl IntoView {
     let form_ref = NodeRef::new();
     let file_input_ref = NodeRef::new();
+    let applied_skills = RwSignal::new(Vec::new() as Vec<String>);
     let (form_is_valid, set_form_is_valid) = signal(false);
-    let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
+    let submit_is_disabled =
+        Memo::new(move |_| !form_is_valid.get() || applied_skills.get().is_empty());
     let current_state = expect_context::<Store<AppStateContext>>();
+    let skills = move || current_state.skills();
+    let skills_select_options = RwSignal::new(vec![] as Vec<SelectOption>);
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
+
     let portfolio_categories = RwSignal::new(
         UserPortfolioCategory::variants_slice()
             .iter()
@@ -300,16 +276,24 @@ pub fn CreatePortfolio() -> impl IntoView {
 
                                                 let input_vars = UserPortfolioInputVars {
                                                     portfolio_item: deserialized_form_data,
+                                                    skills: applied_skills.get_untracked(),
                                                 };
 
                                                 let query = r#"
-                                                       mutation CreatePortfolioItem($portfolioItem: UserPortfolioInput!) {
-                                                            createPortfolioItem(portfolioItem: $portfolioItem) {
+                                                       mutation CreatePortfolioItem($portfolioItem: UserPortfolioInput!, $skills: [String!]!) {
+                                                            createPortfolioItem(portfolioItem: $portfolioItem, skills: $skills) {
                                                                 id
                                                                 title
                                                                 description
+                                                                link
                                                                 startDate
                                                                 category
+                                                                thumbnail
+                                                                skills {
+                                                                    id
+                                                                    thumbnail
+                                                                    name
+                                                                }
                                                             }
                                                        }
                                                    "#;
@@ -390,6 +374,26 @@ pub fn CreatePortfolio() -> impl IntoView {
         }
     });
 
+    Effect::new(move || {
+        skills().get().iter().for_each(|skill| {
+            let skill_option = SelectOption {
+                value: skill.id.as_ref().unwrap().clone(),
+                label: skill.name.as_ref().unwrap().clone(),
+            };
+
+            skills_select_options.write().push(skill_option);
+        });
+    });
+
+    Effect::new(move || {
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let _fetch_skills_res = fetch_skills(&current_state, None).await;
+
+            set_is_loading.set(false);
+        });
+    });
+
     let handle_step_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
@@ -446,6 +450,19 @@ pub fn CreatePortfolio() -> impl IntoView {
                     options=portfolio_categories
                     />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
+                    <div class="flex flex-col gap-[10px]">
+                        <h3>Applied Skills</h3>
+                        <div class="flex flex-row items-center">
+                        <CustomSelectInput
+                                label="Skills"
+                                id_attr="skills"
+                                multiple=true
+                                required=true
+                                options=skills_select_options
+                                value=applied_skills
+                            />
+                        </div>
+                    </div>
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-white"

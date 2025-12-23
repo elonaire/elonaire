@@ -149,3 +149,50 @@ pub async fn fetch_skills(
         None => Err(fetch_skills_response.get_error().to_vec()),
     }
 }
+
+pub async fn fetch_portfolio(
+    current_state: &Store<AppStateContext>,
+    headers: Option<&HashMap<String, String>>,
+) -> Result<(), Vec<GraphQLErrorMessage>> {
+    let fetch_portfolio_query = r#"
+           query FetchSiteResources {
+                fetchSiteResources {
+                    portfolio {
+                        title
+                        description
+                        startDate
+                        endDate
+                        link
+                        category
+                        thumbnail
+                        id
+                        yearsOfExperience
+                    }
+                }
+           }
+       "#;
+
+    let fetch_portfolio_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
+        headers,
+        "http://localhost:8080/api/shared",
+        fetch_portfolio_query,
+    )
+    .await;
+
+    match fetch_portfolio_response.get_data() {
+        Some(data) => {
+            let owned_data = data
+                .fetch_site_resources
+                .as_ref()
+                .unwrap()
+                .portfolio
+                .as_ref()
+                .unwrap()
+                .to_vec();
+            *current_state.portfolio().write() = owned_data;
+
+            Ok(())
+        }
+        None => Err(fetch_portfolio_response.get_error().to_vec()),
+    }
+}
