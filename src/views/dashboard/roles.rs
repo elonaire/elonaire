@@ -16,6 +16,9 @@ use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::components::general::tag::LabelTag;
 use crate::components::schemas::props::ColorTemperature;
+use crate::data::context::shared::{
+    fetch_departments, fetch_organizations, fetch_permissions, fetch_roles,
+};
 use crate::data::models::graphql::acl::{
     AdminPrivilege, CreateSystemRoleResponse, CreateSystemRoleVars, FetchDepartmentsResponse,
     FetchOrganizationsResponse, FetchPermissionsResponse, FetchSystemRolesResponse, RoleInput,
@@ -57,6 +60,7 @@ pub fn Roles() -> impl IntoView {
 #[island]
 pub fn RolesList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let roles = move || current_state.roles();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -70,17 +74,6 @@ pub fn RolesList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_roles_query = r#"
-                   query FetchSystemRoles {
-                        fetchSystemRoles {
-                            roleName
-                            isAdmin
-                            isDefault
-                            isSuperAdmin
-                            id
-                        }
-                   }
-               "#;
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -90,66 +83,56 @@ pub fn RolesList() -> impl IntoView {
                 ),
             );
 
-            let fetch_roles_response = perform_query_without_vars::<FetchSystemRolesResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_roles_query,
-            )
-            .await;
+            let _fetch_roles_response = fetch_roles(&current_state, Some(&headers)).await;
 
-            match fetch_roles_response.get_data() {
-                Some(data) => {
-                    let roles: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_system_roles
-                        .as_ref()
-                        .unwrap()
-                        .to_vec()
-                        .iter()
-                        .map(|role| {
-                            let mut hash_map_data = HashMap::new();
+            set_is_loading.set(false);
+        });
+    });
 
-                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
-                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
-                            hash_map_data.insert(
-                                "id".to_string(),
-                                TableCellData::String(role.id.as_ref().unwrap().to_owned()),
-                            );
+    Effect::new(move || {
+        let roles: Vec<HashMap<String, TableCellData>> = roles()
+            .get()
+            .iter()
+            .map(|role| {
+                let mut hash_map_data = HashMap::new();
 
-                            hash_map_data.insert(
-                                "Role Name".to_string(),
-                                TableCellData::String(role.role_name.as_ref().unwrap().to_owned()),
-                            );
-                            let privilege = if role.is_admin.is_some() && role.is_admin.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Admin" color=ColorTemperature::Warning />
-                                })
-                            } else if role.is_super_admin.is_some() && role.is_super_admin.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Super Admin" color=ColorTemperature::Danger />
-                                })
-                            } else {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="None" />
-                                })
-                            };
-                            hash_map_data.insert(
-                                "Privilege".to_string(),
-                                TableCellData::Html(privilege),
-                            );
-                            hash_map_data
-                        })
-                        .collect();
+                // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(role.id.as_ref().unwrap().to_owned()),
+                );
 
-                    table_data.update(move |prev| {
-                        prev.1 = roles;
-                    });
+                hash_map_data.insert(
+                    "Role Name".to_string(),
+                    TableCellData::String(role.role_name.as_ref().unwrap().to_owned()),
+                );
+                let privilege = if role.is_admin.is_some() && role.is_admin.unwrap() {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="Admin" color=ColorTemperature::Warning />
+                        }
+                    })
+                } else if role.is_super_admin.is_some() && role.is_super_admin.unwrap() {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="Super Admin" color=ColorTemperature::Danger />
+                        }
+                    })
+                } else {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="None" />
+                        }
+                    })
+                };
+                hash_map_data.insert("Privilege".to_string(), TableCellData::Html(privilege));
+                hash_map_data
+            })
+            .collect();
 
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+        table_data.update(move |prev| {
+            prev.1 = roles;
         });
     });
 
@@ -192,15 +175,18 @@ pub fn CreateRole() -> impl IntoView {
     let submit_is_disabled =
         Memo::new(move |_| (!main_form_is_valid.get() || !metadata_form_is_valid.get()));
     let current_state = expect_context::<Store<AppStateContext>>();
+    let departments = move || current_state.departments();
+    let organizations = move || current_state.organizations();
+    let permissions = move || current_state.permissions();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let departments =
+    let departments_options =
         RwSignal::new(vec![SelectOption::new("", "Select Department")] as Vec<SelectOption>);
-    let organizations =
+    let organizations_options =
         RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
-    let permissions = RwSignal::new(vec![] as Vec<CheckboxOption>);
+    let permissions_options = RwSignal::new(vec![] as Vec<CheckboxOption>);
 
     let admin_privileges = RwSignal::new(
         AdminPrivilege::variants_slice()
@@ -329,37 +315,6 @@ pub fn CreateRole() -> impl IntoView {
 
     Effect::new(move || {
         spawn_local(async move {
-            let fetch_orgs_query = r#"
-                   query FetchOrganizations {
-                        fetchOrganizations {
-                            orgName
-                            id
-                        }
-                   }
-               "#;
-
-            let fetch_deps_query = r#"
-                   query FetchDepartments {
-                        fetchDepartments {
-                            depName
-                            id
-                        }
-                   }
-               "#;
-
-            let fetch_permissions_query = r#"
-                   query FetchCurrentRolePermissions {
-                        fetchCurrentRolePermissions {
-                           name
-                           isAdmin
-                           isSuperAdmin
-                           id
-                           createdBy
-                           resource
-                       }
-                   }
-               "#;
-
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -369,104 +324,49 @@ pub fn CreateRole() -> impl IntoView {
                 ),
             );
 
-            let fetch_orgs_response = perform_query_without_vars::<FetchOrganizationsResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_orgs_query,
-            )
-            .await;
+            let _fetch_organizations_res =
+                fetch_organizations(&current_state, Some(&headers)).await;
+            let _fetch_departments_res = fetch_departments(&current_state, Some(&headers)).await;
+            let _fetch_permissions_res = fetch_permissions(&current_state, Some(&headers)).await;
 
-            match fetch_orgs_response.get_data() {
-                Some(data) => {
-                    organizations.update(move |prev| {
-                        let mut orgs = data
-                            .fetch_organizations
-                            .as_ref()
-                            .unwrap()
-                            .iter()
-                            .map(|org| {
-                                SelectOption::new(
-                                    org.id.as_ref().unwrap().as_str(),
-                                    org.org_name.as_ref().unwrap().as_str(),
-                                )
-                            })
-                            .collect();
-
-                        prev.append(&mut orgs);
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
-
-            let fetch_deps_response = perform_query_without_vars::<FetchDepartmentsResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_deps_query,
-            )
-            .await;
-
-            match fetch_deps_response.get_data() {
-                Some(data) => {
-                    departments.update(move |prev| {
-                        let mut deps = data
-                            .fetch_departments
-                            .as_ref()
-                            .unwrap()
-                            .to_vec()
-                            .iter()
-                            .map(|dep| {
-                                SelectOption::new(
-                                    dep.id.as_ref().unwrap().as_str(),
-                                    dep.dep_name.as_ref().unwrap().as_str(),
-                                )
-                            })
-                            .collect();
-                        prev.append(&mut deps);
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
-
-            let fetch_permissions_response =
-                perform_query_without_vars::<FetchPermissionsResponse>(
-                    Some(&headers),
-                    "http://localhost:8080/api/acl",
-                    fetch_permissions_query,
-                )
-                .await;
-
-            match fetch_permissions_response.get_data() {
-                Some(data) => {
-                    permissions.update(move |prev| {
-                        let mut orgs = data
-                            .fetch_current_role_permissions
-                            .as_ref()
-                            .unwrap()
-                            .iter()
-                            .map(|permission| {
-                                CheckboxOption::new(
-                                    permission.id.as_ref().unwrap().as_str(),
-                                    permission.name.as_ref().unwrap().as_str(),
-                                    None,
-                                )
-                            })
-                            .collect();
-
-                        prev.append(&mut orgs);
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+            set_is_loading.set(false);
         });
+    });
+
+    Effect::new(move || {
+        organizations_options.set(
+            organizations()
+                .get()
+                .iter()
+                .map(|org| {
+                    SelectOption::new(org.id.as_ref().unwrap(), org.org_name.as_ref().unwrap())
+                })
+                .collect(),
+        );
+
+        departments_options.set(
+            departments()
+                .get()
+                .iter()
+                .map(|dep| {
+                    SelectOption::new(dep.id.as_ref().unwrap(), dep.dep_name.as_ref().unwrap())
+                })
+                .collect(),
+        );
+
+        permissions_options.set(
+            permissions()
+                .get()
+                .iter()
+                .map(|permission| {
+                    CheckboxOption::new(
+                        permission.id.as_ref().unwrap(),
+                        permission.name.as_ref().unwrap(),
+                        None,
+                    )
+                })
+                .collect(),
+        );
     });
 
     let handle_metadata_form_submit = move |ev: SubmitEvent| {
@@ -538,18 +438,18 @@ pub fn CreateRole() -> impl IntoView {
                 label="Organization"
                 name="organization_id"
                 id_attr="organization_id"
-                options=organizations
+                options=organizations_options
                 />
                 <SelectInput
                 label="Department"
                 name="department_id"
                 id_attr="department_id"
-                options=departments
+                options=departments_options
                 />
                 <CheckboxGroup
                     legend="Permissions"
                     name="permission_ids"
-                    options=permissions
+                    options=permissions_options
                 />
                 </div>
             </ReactiveForm>

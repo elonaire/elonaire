@@ -138,7 +138,7 @@ pub struct RoleInput {
     pub role_name: String,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, Store)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Store, PartialEq, Eq)]
 pub struct SystemRole {
     pub id: Option<String>,
     #[serde(rename = "roleName", alias = "role_name")]
@@ -214,7 +214,7 @@ pub struct OrganizationInput {
     pub org_name: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Organization {
     pub id: Option<String>,
     #[serde(rename = "orgName")]
@@ -259,7 +259,7 @@ pub struct DepartmentMetadata {
     pub department_id: Option<String>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Department {
     pub id: Option<String>,
     #[serde(rename = "depName")]
@@ -319,7 +319,7 @@ pub struct CreateResourceResponse {
     pub create_resource: Option<Resource>, // this is the return type expected from the API on success
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Resource {
     pub id: Option<String>,
     pub name: Option<String>,
@@ -358,7 +358,7 @@ pub struct CreatePermissionResponse {
     pub create_permission: Option<Permission>, // this is the return type expected from the API on success
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Permission {
     pub id: Option<String>,
     pub name: Option<String>,

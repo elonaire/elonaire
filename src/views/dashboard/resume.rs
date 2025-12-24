@@ -166,7 +166,7 @@ pub fn ResumeItemsList() -> impl IntoView {
 pub fn CreateResumeItem() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (achievement_field_value, set_achievement_field_value) = signal(String::new());
-    let add_is_disabled = Memo::new(move |_| !(achievement_field_value.get().len() > 10));
+    let add_is_disabled = Memo::new(move |_| !achievement_field_value.get().len() > 10);
     let (achievements, set_achievements) = signal(Vec::new() as Vec<String>);
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled =

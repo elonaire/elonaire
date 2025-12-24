@@ -13,6 +13,7 @@ use web_sys::HtmlFormElement;
 use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
+use crate::data::context::shared::{fetch_departments, fetch_organizations};
 use crate::data::models::graphql::acl::{
     CreateDepartmentResponse, CreateDepartmentVars, DepartmentInput, DepartmentMetadata,
     FetchDepartmentsResponse, FetchOrganizationsResponse,
@@ -52,6 +53,7 @@ pub fn Departments() -> impl IntoView {
 #[island]
 pub fn DepartmentsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let departments = move || current_state.departments();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -63,19 +65,40 @@ pub fn DepartmentsList() -> impl IntoView {
     ));
 
     Effect::new(move || {
+        let departments_data: Vec<HashMap<String, TableCellData>> = departments()
+            .get()
+            .iter()
+            .map(|department| {
+                let mut hash_map_data = HashMap::new();
+
+                // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(department.id.as_ref().unwrap().to_owned()),
+                );
+
+                hash_map_data.insert(
+                    "Name".to_string(),
+                    TableCellData::String(department.dep_name.as_ref().unwrap().to_owned()),
+                );
+
+                hash_map_data.insert(
+                    "Date of Creation".to_string(),
+                    TableCellData::DateTime(department.created_at.as_ref().unwrap().to_owned()),
+                );
+                hash_map_data
+            })
+            .collect();
+
+        table_data.update(move |prev| {
+            prev.1 = departments_data;
+        });
+    });
+
+    Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_departments_query = r#"
-                   query FetchDepartments {
-                        fetchDepartments {
-                            depName
-                            createdAt
-                            updatedAt
-                            id
-                            createdBy
-                        }
-                   }
-               "#;
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -85,59 +108,9 @@ pub fn DepartmentsList() -> impl IntoView {
                 ),
             );
 
-            let fetch_departments_response =
-                perform_query_without_vars::<FetchDepartmentsResponse>(
-                    Some(&headers),
-                    "http://localhost:8080/api/acl",
-                    fetch_departments_query,
-                )
-                .await;
+            let _fetch_departments_res = fetch_departments(&current_state, Some(&headers)).await;
 
-            match fetch_departments_response.get_data() {
-                Some(data) => {
-                    let departments: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_departments
-                        .as_ref()
-                        .unwrap()
-                        .to_vec()
-                        .iter()
-                        .map(|department| {
-                            let mut hash_map_data = HashMap::new();
-
-                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
-                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
-                            hash_map_data.insert(
-                                "id".to_string(),
-                                TableCellData::String(department.id.as_ref().unwrap().to_owned()),
-                            );
-
-                            hash_map_data.insert(
-                                "Name".to_string(),
-                                TableCellData::String(
-                                    department.dep_name.as_ref().unwrap().to_owned(),
-                                ),
-                            );
-
-                            hash_map_data.insert(
-                                "Date of Creation".to_string(),
-                                TableCellData::DateTime(
-                                    department.created_at.as_ref().unwrap().to_owned(),
-                                ),
-                            );
-                            hash_map_data
-                        })
-                        .collect();
-
-                    table_data.update(move |prev| {
-                        prev.1 = departments;
-                    });
-
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+            set_is_loading.set(false);
         });
     });
 
@@ -178,15 +151,17 @@ pub fn CreateDepartment() -> impl IntoView {
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
     let (metadata_form_is_valid, set_metadata_form_is_valid) = signal(false);
     let submit_is_disabled =
-        Memo::new(move |_| (!main_form_is_valid.get() || !metadata_form_is_valid.get()));
+        Memo::new(move |_| !main_form_is_valid.get() || !metadata_form_is_valid.get());
     let current_state = expect_context::<Store<AppStateContext>>();
+    let departments = move || current_state.departments();
+    let organizations = move || current_state.organizations();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let departments =
+    let departments_options =
         RwSignal::new(vec![SelectOption::new("", "Select Department")] as Vec<SelectOption>);
-    let organizations =
+    let organizations_options =
         RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
 
     let onprimary_handler = Callback::new(move |_| {
@@ -299,24 +274,6 @@ pub fn CreateDepartment() -> impl IntoView {
 
     Effect::new(move || {
         spawn_local(async move {
-            let fetch_orgs_query = r#"
-                   query FetchOrganizations {
-                        fetchOrganizations {
-                            orgName
-                            id
-                        }
-                   }
-               "#;
-
-            let fetch_deps_query = r#"
-                   query FetchDepartments {
-                        fetchDepartments {
-                            depName
-                            id
-                        }
-                   }
-               "#;
-
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -326,70 +283,37 @@ pub fn CreateDepartment() -> impl IntoView {
                 ),
             );
 
-            let fetch_orgs_response = perform_query_without_vars::<FetchOrganizationsResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_orgs_query,
-            )
-            .await;
+            let _fetch_orgs = fetch_organizations(&current_state, Some(&headers)).await;
 
-            match fetch_orgs_response.get_data() {
-                Some(data) => {
-                    organizations.update(move |prev| {
-                        let mut orgs = data
-                            .fetch_organizations
-                            .as_ref()
-                            .unwrap()
-                            .iter()
-                            .map(|org| {
-                                SelectOption::new(
-                                    org.id.as_ref().unwrap().as_str(),
-                                    org.org_name.as_ref().unwrap().as_str(),
-                                )
-                            })
-                            .collect();
+            let _fetch_departments_res = fetch_departments(&current_state, Some(&headers)).await;
 
-                        prev.append(&mut orgs);
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
-
-            let fetch_deps_response = perform_query_without_vars::<FetchDepartmentsResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_deps_query,
-            )
-            .await;
-
-            match fetch_deps_response.get_data() {
-                Some(data) => {
-                    departments.update(move |prev| {
-                        let mut deps = data
-                            .fetch_departments
-                            .as_ref()
-                            .unwrap()
-                            .to_vec()
-                            .iter()
-                            .map(|dep| {
-                                SelectOption::new(
-                                    dep.id.as_ref().unwrap().as_str(),
-                                    dep.dep_name.as_ref().unwrap().as_str(),
-                                )
-                            })
-                            .collect();
-                        prev.append(&mut deps);
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+            set_is_loading.set(false);
         });
+    });
+
+    Effect::new(move || {
+        departments_options.set(
+            departments()
+                .get()
+                .iter()
+                .map(|dep| {
+                    SelectOption::new(dep.id.as_ref().unwrap(), dep.dep_name.as_ref().unwrap())
+                })
+                .collect(),
+        );
+
+        organizations_options.set(
+            organizations()
+                .get()
+                .iter()
+                .map(|org| {
+                    SelectOption::new(
+                        org.id.as_ref().unwrap().as_str(),
+                        org.org_name.as_ref().unwrap().as_str(),
+                    )
+                })
+                .collect(),
+        );
     });
 
     let handle_metadata_form_submit = move |ev: SubmitEvent| {
@@ -454,13 +378,13 @@ pub fn CreateDepartment() -> impl IntoView {
                 label="Organization"
                 name="organization_id"
                 id_attr="organization_id"
-                options=organizations
+                options=organizations_options
                 />
                 <SelectInput
                 label="Department"
                 name="department_id"
                 id_attr="department_id"
-                options=departments
+                options=departments_options
                 />
                 </div>
             </ReactiveForm>

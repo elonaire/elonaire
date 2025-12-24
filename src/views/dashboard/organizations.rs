@@ -12,6 +12,7 @@ use web_sys::HtmlFormElement;
 
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
+use crate::data::context::shared::fetch_organizations;
 use crate::data::models::graphql::acl::{
     CreateOrganizationResponse, CreateOrganizationVars, FetchOrganizationsResponse,
     OrganizationInput,
@@ -51,6 +52,7 @@ pub fn Organizations() -> impl IntoView {
 #[island]
 pub fn OrganizationsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let organizations = move || current_state.organizations();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -64,17 +66,6 @@ pub fn OrganizationsList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_resources_query = r#"
-                   query FetchOrganizations {
-                        fetchOrganizations {
-                            orgName
-                            createdAt
-                            updatedAt
-                            id
-                            createdBy
-                        }
-                   }
-               "#;
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -84,59 +75,41 @@ pub fn OrganizationsList() -> impl IntoView {
                 ),
             );
 
-            let fetch_resources_response =
-                perform_query_without_vars::<FetchOrganizationsResponse>(
-                    Some(&headers),
-                    "http://localhost:8080/api/acl",
-                    fetch_resources_query,
-                )
-                .await;
+            let _fetch_orgs = fetch_organizations(&current_state, Some(&headers)).await;
 
-            match fetch_resources_response.get_data() {
-                Some(data) => {
-                    let resources: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_organizations
-                        .as_ref()
-                        .unwrap()
-                        .to_vec()
-                        .iter()
-                        .map(|organization| {
-                            let mut hash_map_data = HashMap::new();
+            set_is_loading.set(false);
+        });
+    });
 
-                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
-                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
-                            hash_map_data.insert(
-                                "id".to_string(),
-                                TableCellData::String(organization.id.as_ref().unwrap().to_owned()),
-                            );
+    Effect::new(move || {
+        let orgs: Vec<HashMap<String, TableCellData>> = organizations()
+            .get()
+            .iter()
+            .map(|organization| {
+                let mut hash_map_data = HashMap::new();
 
-                            hash_map_data.insert(
-                                "Name".to_string(),
-                                TableCellData::String(
-                                    organization.org_name.as_ref().unwrap().to_owned(),
-                                ),
-                            );
+                // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(organization.id.as_ref().unwrap().to_owned()),
+                );
 
-                            hash_map_data.insert(
-                                "Date of Creation".to_string(),
-                                TableCellData::DateTime(
-                                    organization.created_at.as_ref().unwrap().to_owned(),
-                                ),
-                            );
-                            hash_map_data
-                        })
-                        .collect();
+                hash_map_data.insert(
+                    "Name".to_string(),
+                    TableCellData::String(organization.org_name.as_ref().unwrap().to_owned()),
+                );
 
-                    table_data.update(move |prev| {
-                        prev.1 = resources;
-                    });
+                hash_map_data.insert(
+                    "Date of Creation".to_string(),
+                    TableCellData::DateTime(organization.created_at.as_ref().unwrap().to_owned()),
+                );
+                hash_map_data
+            })
+            .collect();
 
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+        table_data.update(move |prev| {
+            prev.1 = orgs;
         });
     });
 
@@ -174,7 +147,7 @@ pub fn OrganizationsList() -> impl IntoView {
 pub fn CreateOrganization() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
-    let submit_is_disabled = Memo::new(move |_| (!main_form_is_valid.get()));
+    let submit_is_disabled = Memo::new(move |_| !main_form_is_valid.get());
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);

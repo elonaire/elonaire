@@ -15,6 +15,7 @@ use crate::components::forms::textarea::Textarea;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::components::schemas::props::ColorTemperature;
+use crate::data::context::shared::fetch_professions;
 use crate::data::models::graphql::shared::{
     CreateProfessionalDetailsResponse, FetchSiteResourcesResponse, ProfessionalDetailsInputVars,
 };
@@ -59,6 +60,7 @@ pub fn ProfessionalDetails() -> impl IntoView {
 #[island]
 pub fn ProfessionalDetailsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let professions = move || current_state.professions();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -73,20 +75,6 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_roles_query = r#"
-                   query FetchSiteResources {
-                        fetchSiteResources {
-                            professionalInfo {
-                                description
-                                active
-                                occupation
-                                startDate
-                                id
-                                yearsOfExperience
-                            }
-                        }
-                   }
-               "#;
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -96,75 +84,56 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
                 ),
             );
 
-            let fetch_roles_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/shared",
-                fetch_roles_query,
-            )
-            .await;
+            let _fetch_professions_res = fetch_professions(&current_state, Some(&headers)).await;
 
-            match fetch_roles_response.get_data() {
-                Some(data) => {
-                    let roles: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_site_resources
-                        .as_ref()
-                        .unwrap()
-                        .professional_info
-                        .as_ref()
-                        .unwrap()
-                        .to_vec()
-                        .iter()
-                        .map(|profession| {
-                            let mut hash_map_data = HashMap::new();
+            set_is_loading.set(false);
+        });
+    });
 
-                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
-                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
-                            hash_map_data.insert(
-                                "id".to_string(),
-                                TableCellData::String(profession.id.as_ref().unwrap().to_owned()),
-                            );
+    Effect::new(move || {
+        let roles: Vec<HashMap<String, TableCellData>> = professions()
+            .get()
+            .iter()
+            .map(|profession| {
+                let mut hash_map_data = HashMap::new();
 
-                            hash_map_data.insert(
-                                "Occupation".to_string(),
-                                TableCellData::String(
-                                    profession.occupation.as_ref().unwrap().to_owned(),
-                                ),
-                            );
+                // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(profession.id.as_ref().unwrap().to_owned()),
+                );
 
-                            let status = if profession.active.is_some() && profession.active.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Active" color=ColorTemperature::Success />
-                                })
-                            } else {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Inactive" color=ColorTemperature::Warning />
-                                })
-                            };
-                            hash_map_data.insert(
-                                "Status".to_string(),
-                                TableCellData::Html(status),
-                            );
+                hash_map_data.insert(
+                    "Occupation".to_string(),
+                    TableCellData::String(profession.occupation.as_ref().unwrap().to_owned()),
+                );
 
-                            hash_map_data.insert(
-                                "Start Date".to_string(),
-                                TableCellData::DateTime(
-                                    profession.start_date.as_ref().unwrap().to_owned(),
-                                ),
-                            );
-                            hash_map_data
-                        })
-                        .collect();
+                let status = if profession.active.is_some() && profession.active.unwrap() {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="Active" color=ColorTemperature::Success />
+                        }
+                    })
+                } else {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="Inactive" color=ColorTemperature::Warning />
+                        }
+                    })
+                };
+                hash_map_data.insert("Status".to_string(), TableCellData::Html(status));
 
-                    table_data.update(move |prev| {
-                        prev.1 = roles;
-                    });
+                hash_map_data.insert(
+                    "Start Date".to_string(),
+                    TableCellData::DateTime(profession.start_date.as_ref().unwrap().to_owned()),
+                );
+                hash_map_data
+            })
+            .collect();
 
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+        table_data.update(move |prev| {
+            prev.1 = roles;
         });
     });
 

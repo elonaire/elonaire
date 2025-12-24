@@ -15,6 +15,7 @@ use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::components::general::tag::LabelTag;
 use crate::components::schemas::props::ColorTemperature;
+use crate::data::context::shared::{fetch_permissions, fetch_resources};
 use crate::data::models::graphql::acl::{
     AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, FetchPermissionsResponse,
     FetchResourcesResponse, PermissionInput, PermissionMetadata,
@@ -55,6 +56,7 @@ pub fn Permissions() -> impl IntoView {
 #[island]
 pub fn PermissionsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let permissions = move || current_state.permissions();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -69,20 +71,6 @@ pub fn PermissionsList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let fetch_permissions_query = r#"
-                   query FetchCurrentRolePermissions {
-                        fetchCurrentRolePermissions {
-                           name
-                           isAdmin
-                           isSuperAdmin
-                           id
-                           createdBy
-                           resource {
-                               name
-                           }
-                       }
-                   }
-               "#;
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -92,71 +80,70 @@ pub fn PermissionsList() -> impl IntoView {
                 ),
             );
 
-            let fetch_permissions_response =
-                perform_query_without_vars::<FetchPermissionsResponse>(
-                    Some(&headers),
-                    "http://localhost:8080/api/acl",
-                    fetch_permissions_query,
-                )
-                .await;
+            let _fetch_permissions_res = fetch_permissions(&current_state, Some(&headers)).await;
 
-            match fetch_permissions_response.get_data() {
-                Some(data) => {
-                    let permissions: Vec<HashMap<String, TableCellData>> = data
-                        .fetch_current_role_permissions
-                        .as_ref()
-                        .unwrap()
-                        .to_vec()
-                        .iter()
-                        .map(|permission| {
-                            let mut hash_map_data = HashMap::new();
+            set_is_loading.set(false);
+        });
+    });
 
-                            // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
-                            // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
-                            hash_map_data.insert(
-                                "id".to_string(),
-                                TableCellData::String(permission.id.as_ref().unwrap().to_owned()),
-                            );
+    Effect::new(move || {
+        let permissions: Vec<HashMap<String, TableCellData>> = permissions()
+            .get()
+            .iter()
+            .map(|permission| {
+                let mut hash_map_data = HashMap::new();
 
-                            hash_map_data.insert(
-                                "Name".to_string(),
-                                TableCellData::String(permission.name.as_ref().unwrap().to_owned()),
-                            );
-                            hash_map_data.insert(
-                                "Resource".to_string(),
-                                TableCellData::String(permission.resource.as_ref().unwrap().name.as_ref().unwrap().to_owned()),
-                            );
-                            let privilege = if permission.is_admin.is_some() && permission.is_admin.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Admin" color=ColorTemperature::Warning />
-                                })
-                            } else if permission.is_super_admin.is_some() && permission.is_super_admin.unwrap() {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="Super Admin" color=ColorTemperature::Danger />
-                                })
-                            } else {
-                                ViewFn::from(move || view! {
-                                    <LabelTag label="None" />
-                                })
-                            };
-                            hash_map_data.insert(
-                                "Privilege".to_string(),
-                                TableCellData::Html(privilege),
-                            );
-                            hash_map_data
-                        })
-                        .collect();
+                // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
+                // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
+                hash_map_data.insert(
+                    "id".to_string(),
+                    TableCellData::String(permission.id.as_ref().unwrap().to_owned()),
+                );
 
-                    table_data.update(move |prev| {
-                        prev.1 = permissions;
-                    });
+                hash_map_data.insert(
+                    "Name".to_string(),
+                    TableCellData::String(permission.name.as_ref().unwrap().to_owned()),
+                );
+                hash_map_data.insert(
+                    "Resource".to_string(),
+                    TableCellData::String(
+                        permission
+                            .resource
+                            .as_ref()
+                            .unwrap()
+                            .name
+                            .as_ref()
+                            .unwrap()
+                            .to_owned(),
+                    ),
+                );
+                let privilege = if permission.is_admin.is_some() && permission.is_admin.unwrap() {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="Admin" color=ColorTemperature::Warning />
+                        }
+                    })
+                } else if permission.is_super_admin.is_some() && permission.is_super_admin.unwrap()
+                {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="Super Admin" color=ColorTemperature::Danger />
+                        }
+                    })
+                } else {
+                    ViewFn::from(move || {
+                        view! {
+                            <LabelTag label="None" />
+                        }
+                    })
+                };
+                hash_map_data.insert("Privilege".to_string(), TableCellData::Html(privilege));
+                hash_map_data
+            })
+            .collect();
 
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+        table_data.update(move |prev| {
+            prev.1 = permissions;
         });
     });
 
@@ -197,13 +184,14 @@ pub fn CreatePermission() -> impl IntoView {
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
     let (metadata_form_is_valid, set_metadata_form_is_valid) = signal(false);
     let submit_is_disabled =
-        Memo::new(move |_| (!main_form_is_valid.get() || !metadata_form_is_valid.get()));
+        Memo::new(move |_| !main_form_is_valid.get() || !metadata_form_is_valid.get());
     let current_state = expect_context::<Store<AppStateContext>>();
+    let resources = move || current_state.resources();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let resources =
+    let resources_options =
         RwSignal::new(vec![SelectOption::new("", "Select Resource")] as Vec<SelectOption>);
 
     let admin_privileges = RwSignal::new(
@@ -331,16 +319,6 @@ pub fn CreatePermission() -> impl IntoView {
 
     Effect::new(move || {
         spawn_local(async move {
-            let fetch_resources_query = r#"
-                   query FetchResources {
-                        fetchResources {
-                            name
-                            id
-                            createdBy
-                        }
-                   }
-               "#;
-
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
@@ -350,38 +328,25 @@ pub fn CreatePermission() -> impl IntoView {
                 ),
             );
 
-            let fetch_resources_response = perform_query_without_vars::<FetchResourcesResponse>(
-                Some(&headers),
-                "http://localhost:8080/api/acl",
-                fetch_resources_query,
-            )
-            .await;
+            let _fetch_resources_res = fetch_resources(&current_state, Some(&headers)).await;
 
-            match fetch_resources_response.get_data() {
-                Some(data) => {
-                    resources.update(move |prev| {
-                        let mut resources = data
-                            .fetch_resources
-                            .as_ref()
-                            .unwrap()
-                            .iter()
-                            .map(|resources| {
-                                SelectOption::new(
-                                    resources.id.as_ref().unwrap().as_str(),
-                                    resources.name.as_ref().unwrap().as_str(),
-                                )
-                            })
-                            .collect();
-
-                        prev.append(&mut resources);
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+            set_is_loading.set(false);
         });
+    });
+
+    Effect::new(move || {
+        resources_options.set(
+            resources()
+                .get()
+                .iter()
+                .map(|resources| {
+                    SelectOption::new(
+                        resources.id.as_ref().unwrap(),
+                        resources.name.as_ref().unwrap(),
+                    )
+                })
+                .collect(),
+        );
     });
 
     let handle_metadata_form_submit = move |ev: SubmitEvent| {
@@ -447,7 +412,7 @@ pub fn CreatePermission() -> impl IntoView {
                     name="resource_id"
                     required=true
                     id_attr="resource_id"
-                    options=resources
+                    options=resources_options
                     />
                     <SelectInput
                     label="Admin Privilege"
