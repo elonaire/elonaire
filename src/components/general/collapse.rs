@@ -121,6 +121,10 @@ pub fn Panel(
         }
     };
 
+    Effect::new(move || {
+        leptos::logging::log!("Effect -> is_open: {}", is_open.get());
+    });
+
     view! {
         <div node_ref=panel_ref>
             <span
@@ -190,15 +194,22 @@ pub fn Collapse(
     #[prop(default = false)] is_accordion: bool,
 ) -> impl IntoView {
     let handle_panel_toggle = move |index| {
+        leptos::logging::log!("index {index} is being toggled");
+        leptos::logging::log!("is_accordion Collapse: {is_accordion}");
         if is_accordion {
             panel_items.update(|panels| {
+                let mut updated_panels = Vec::new();
                 for (i, panel) in panels.iter().enumerate() {
                     if i == index {
                         panel.is_open.update(|val| *val = !*val);
                     } else {
-                        panel.is_open.update(|val| *val = false);
+                        panel.is_open.set(false);
                     }
+
+                    updated_panels.push(panel.clone());
                 }
+
+                *panels = updated_panels;
             });
         }
     };
@@ -211,8 +222,10 @@ pub fn Collapse(
                 let:((index, panel_item))
             >
                 {
+                    leptos::logging::log!("panel_item.is_open: {}", panel_item.is_open.get());
                     view! {
                         <Panel on:togglepanel=move |ev: CustomEvent| {
+                            leptos::logging::log!("togglepanel event fired");
                             ev.stop_propagation();
                             handle_panel_toggle(index)
                         } title=panel_item.title.clone() is_open=panel_item.is_open is_accordion=is_accordion>

@@ -41,7 +41,7 @@ pub fn Nav(
                     { move ||
                         if !is_dashboard.get() && !is_blog.get() {
                             Some(view! {
-                                <A attr:class="py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold" href="/ratecard">"Request Service"</A>
+                                <A attr:class="py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold" href="/ratecard">"Request Service"</A>
                             })
                         } else {
                             None

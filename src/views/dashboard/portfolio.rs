@@ -162,7 +162,7 @@ pub fn PortfolioList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -194,13 +194,7 @@ pub fn CreatePortfolio() -> impl IntoView {
     let portfolio_categories = RwSignal::new(
         UserPortfolioCategory::variants_slice()
             .iter()
-            .map(|category| {
-                let mut label = format!("{}", category);
-                if label.is_empty() {
-                    label = "Select Category".to_string();
-                }
-                SelectOption::new(format!("{}", category).as_str(), label.as_str())
-            })
+            .map(|category| SelectOption::new(category, category))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -447,6 +441,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                     name="category"
                     required=true
                     id_attr="category"
+                    placeholder="Select Category"
                     options=portfolio_categories
                     />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
@@ -465,7 +460,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                     </div>
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

@@ -155,7 +155,7 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -323,7 +323,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     />
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

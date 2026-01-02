@@ -66,7 +66,7 @@ pub fn RadioInputField(
     legend_class: String,
 ) -> impl IntoView {
     // Create reactive state for display_error
-    let base_fieldset_class = "border border-gray-300 rounded p-4";
+    let base_fieldset_class = "border border-mid-gray rounded p-4";
     let base_legend_class = "text-mid-gray text-sm font-bold px-2";
 
     let container_class = if horizontal {
@@ -100,7 +100,9 @@ pub fn RadioInputField(
                                 view! {
                                     <label class="inline-flex items-center gap-2 text-mid-gray text-sm cursor-pointer px-2 py-1 rounded">
                                         <input
-                                            class="leading-tight rounded-full border-gray-300 text-blue-600 shadow-sm focus:border-blue-600 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
+                                            class="leading-tight size-5 rounded-full border-2 border-mid-gray text-secondary shadow-sm
+                                                       focus:outline-none focus:ring-0 focus:border-secondary
+                                                       checked:bg-secondary checked:border-secondary accent-secondary"
                                             type="radio"
                                             name=name.clone()
                                             value=option_value

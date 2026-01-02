@@ -66,7 +66,10 @@ pub fn CheckboxInputField(
                 for=id_attr.clone()
             >
                 <input
-                    class=format!("leading-tight rounded border-gray-300 text-blue-950 shadow-sm focus:border-blue-950 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 {}", ext_input_styles)
+                    class=format!("leading-tight size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
+                               focus:outline-none focus:ring-0 focus:border-secondary
+                               checked:bg-secondary checked:border-secondary
+                               accent-secondary {}", ext_input_styles)
                     type="checkbox"
                     value=initial_value
                     name=name
@@ -128,7 +131,7 @@ pub fn CheckboxGroup(
     #[prop(default = false, optional)]
     horizontal: bool,
 ) -> impl IntoView {
-    let base_fieldset_class = "border border-gray-300 rounded p-4";
+    let base_fieldset_class = "border border-mid-gray rounded p-4";
     let base_legend_class = "text-mid-gray text-sm font-bold px-2";
 
     let container_class = if horizontal {
@@ -161,11 +164,14 @@ pub fn CheckboxGroup(
                         view! {
                             <div class="mb-2">
                                 <label
-                                    class="inline-flex items-center gap-2 text-gray-700 text-sm cursor-pointer"
+                                    class="inline-flex items-center gap-2 text-gray text-sm cursor-pointer"
                                     for=option_id.clone()
                                 >
                                     <input
-                                        class=format!("leading-tight rounded border-gray-300 text-blue-950 shadow-sm focus:border-blue-950 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 {}", ext_input_styles)
+                                        class=format!("leading-tight size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
+                                                   focus:outline-none focus:ring-0 focus:border-secondary
+                                                   checked:bg-secondary checked:border-secondary
+                                                   accent-secondary {}", ext_input_styles)
                                         type="checkbox"
                                         value=option_value.clone()
                                         name=name.clone()

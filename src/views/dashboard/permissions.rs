@@ -165,7 +165,7 @@ pub fn PermissionsList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -191,19 +191,12 @@ pub fn CreatePermission() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let resources_options =
-        RwSignal::new(vec![SelectOption::new("", "Select Resource")] as Vec<SelectOption>);
+    let resources_options = RwSignal::new(vec![] as Vec<SelectOption>);
 
     let admin_privileges = RwSignal::new(
         AdminPrivilege::variants_slice()
             .iter()
-            .map(|admin_privilege| {
-                let mut label = format!("{}", admin_privilege);
-                if label.is_empty() {
-                    label = "Select Admin Privilege".to_string();
-                }
-                SelectOption::new(format!("{}", admin_privilege).as_str(), label.as_str())
-            })
+            .map(|admin_privilege| SelectOption::new(admin_privilege, admin_privilege))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -412,6 +405,7 @@ pub fn CreatePermission() -> impl IntoView {
                     name="resource_id"
                     required=true
                     id_attr="resource_id"
+                    placeholder="Select Resource"
                     options=resources_options
                     />
                     <SelectInput
@@ -419,6 +413,7 @@ pub fn CreatePermission() -> impl IntoView {
                     name="admin_privilege"
                     required=true
                     id_attr="admin_privilege"
+                    placeholder="Select Admin Privilege"
                     options=admin_privileges
                     />
                 </div>
@@ -432,7 +427,7 @@ pub fn CreatePermission() -> impl IntoView {
 
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

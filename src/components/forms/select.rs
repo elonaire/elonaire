@@ -48,6 +48,7 @@ pub fn SelectInput(
         String,
     >,
     #[prop(into)] label: String,
+    #[prop(into)] placeholder: String,
     #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Select>,
     #[prop(default = false, optional)] readonly: bool,
@@ -72,7 +73,7 @@ pub fn SelectInput(
                 node_ref=input_node_ref
                 name=name
                 class=move || format!(
-                    "form-input ring-0 shadow appearance-none border border-slate-400 rounded-[5px] w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
+                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded-[5px] w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow {}",
                     ext_input_styles
                 )
                 // value={initial_value.clone()}
@@ -81,6 +82,7 @@ pub fn SelectInput(
                 id=id_attr.clone()
                 required=required
             >
+                <option class="text-light-gray" value="">{placeholder}</option>
                 {move || options.get().into_iter()
                     .map(|option| {
                         view! {
@@ -180,7 +182,7 @@ pub fn CustomSelectInput(
 
             // Control with chips
             <div
-                class="relative rounded-[5px] px-2 py-2 cursor-pointer flex flex-wrap gap-2 min-h-[40px] border border-slate-400 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow"
+                class="relative rounded-[5px] px-2 py-2 cursor-pointer flex flex-wrap gap-2 min-h-[40px] border border-mid-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow"
                 on:click=move |_| set_open.set(true)
             >
                 {move || {
@@ -243,7 +245,7 @@ pub fn CustomSelectInput(
 
             // Dropdown
             {move || open.get().then_some(view! {
-                <div class="absolute z-30 mt-1 w-full bg-white rounded-[5px] shadow">
+                <div class="absolute z-30 mt-1 w-full bg-contrast-white rounded-[5px] shadow">
                     // Search
                     <InputField placeholder="Search…" field_type=InputFieldType::Text id_attr="search" oninput=Callback::new(move |ev: ev::Event| {
                         set_query.set(event_target_value(&ev));
@@ -257,7 +259,7 @@ pub fn CustomSelectInput(
 
                             view! {
                                 <li
-                                    class="px-3 py-2 hover:bg-gray-100 flex items-center
+                                    class="px-3 py-2 hover:bg-light-gray flex items-center
                                            gap-2 cursor-pointer"
                                     on:click=move |_| select_value(val.clone())
                                 >

@@ -36,9 +36,9 @@ pub fn ProgressBar(
             ProgressComponentSize::Lg => "h-4",
         };
         if indeterminate {
-            format!("w-full bg-gray-200 rounded-full {} relative", height)
+            format!("w-full bg-light-gray rounded-full {} relative", height)
         } else {
-            format!("w-full bg-gray-200 rounded-full {}", height)
+            format!("w-full bg-light-gray rounded-full {}", height)
         }
     };
 
@@ -82,7 +82,7 @@ pub fn ProgressBar(
         </div>
         {if show_percentage && !indeterminate {
             Some(view! {
-                <div class="text-xs text-center mt-1 text-gray-600">
+                <div class="text-xs text-center mt-1 text-mid-gray">
                     {move || format!("{:.0}%", (progress.get()).min(100.0).max(0.0))}
                 </div>
             })

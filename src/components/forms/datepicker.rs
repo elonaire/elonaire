@@ -232,7 +232,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
     };
 
     view! {
-        <div class="w-full max-w-md bg-white border-none rounded">
+        <div class="w-full max-w-md bg-contrast-white border-none rounded">
             {move || if viewing_years.get() {
                 Some(view! {
                     <div>
@@ -241,7 +241,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                             <span class="cursor-pointer">"Years"</span>
                             <BasicButton onclick=next_year_page icon=Some(IconId::BiChevronRightRegular) />
                         </div>
-                        <div class="grid grid-cols-4 gap-1 bg-white -none rounded p-2">
+                        <div class="grid grid-cols-4 gap-1 bg-contrast-white -none rounded p-2">
                             {move || render_years()}
                         </div>
                     </div>
@@ -286,7 +286,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                                 }
                             ) icon=Some(IconId::BiChevronRightRegular) />
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-mid-gray bg-white border-none rounded p-2">
+                        <div class="grid grid-cols-7 gap-1 text-mid-gray bg-contrast-white border-none rounded p-2">
                             {days_of_week.iter().map(|&day| view! { <div class="font-bold text-center text-sm">{day}</div> }).collect::<Vec<_>>()}
                             {render_days()}
                         </div>

@@ -67,7 +67,7 @@ pub fn Spinner(
 
     if with_backdrop {
         view! {
-            <div class="fixed inset-0 bg-gray-100 opacity-50 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-light-gray opacity-50 flex items-center justify-center z-50">
                 {spinner}
             </div>
         }

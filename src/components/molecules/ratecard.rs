@@ -27,6 +27,7 @@ pub fn RatecardComponent() -> impl IntoView {
                         id_attr="time_bounds"
                         name="time_bounds"
                         options=time_bounds
+                        placeholder="Select Timebound"
                         ext_input_styles="text-light-gray"
                         />
                     </div>
@@ -35,7 +36,7 @@ pub fn RatecardComponent() -> impl IntoView {
             <div class="p-[10px]">
             </div>
             <div class="p-[10px]">
-                <BasicButton button_text="Request Service" icon=Some(IconId::BsArrowRight) style_ext="bg-primary text-white" />
+                <BasicButton button_text="Request Service" icon=Some(IconId::BsArrowRight) style_ext="bg-primary text-contrast-white" />
             </div>
         </div>
     }

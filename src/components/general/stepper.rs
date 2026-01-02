@@ -171,7 +171,7 @@ pub fn Stepper(
             <div class="relative flex items-center w-full mb-4">
                 // Line between steps (md+ screens only)
                 <div class="hidden md:flex justify-center w-full absolute top-4">
-                    <div class="w-full border-t border-gray-300 absolute z-0" />
+                    <div class="w-full border-t border-mid-gray absolute z-0" />
                 </div>
                 <div class="relative flex flex-wrap md:flex-nowrap justify-center md:justify-between w-full md:space-x-2">
                     <For
@@ -189,7 +189,7 @@ pub fn Stepper(
                                     set_current_step.update(|step| *step = index);
                                 } class=move || {
                                     format!(
-                                        "relative flex items-center cursor-pointer bg-white space-x-2 px-4 mb-2 z-9 {}",
+                                        "relative flex items-center cursor-pointer bg-contrast-white space-x-2 px-4 mb-2 z-9 {}",
                                         if !is_current() { "hidden md:flex" } else { "" }
                                     )
                                 }>
@@ -197,9 +197,9 @@ pub fn Stepper(
                                         format!(
                                             "w-8 h-8 flex items-center justify-center rounded-full text-sm {}",
                                             if is_current() {
-                                                "bg-primary text-white"
+                                                "bg-primary text-contrast-white"
                                             } else {
-                                                "bg-gray-200 text-gray-800"
+                                                "bg-light-gray text-gray"
                                             }
                                         )
                                     }>
@@ -223,7 +223,7 @@ pub fn Stepper(
                                         if is_current() {
                                             "font-bold text-primary"
                                         } else {
-                                            "text-gray-800"
+                                            "text-gray"
                                         }
                                     )}>
                                         { step_label.label.clone() }
@@ -234,7 +234,7 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div on:submit=handle_step_form_submit class=format!("mb-4 p-4 border border-gray-300 rounded w-full {}", ext_wrapper_styles)>
+            <div on:submit=handle_step_form_submit class=format!("mb-4 p-4 border border-mid-gray rounded w-full {}", ext_wrapper_styles)>
             {
                     move || {
                         let current = current_step.get();

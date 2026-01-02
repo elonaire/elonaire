@@ -62,7 +62,6 @@ pub enum UserPortfolioCategory {
 impl EnumerableEnum for UserPortfolioCategory {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::JavaScript),
             format!("{:?}", Self::Rust),
             format!("{:?}", Self::Database),
@@ -279,7 +278,6 @@ pub enum UserSkillLevel {
 impl EnumerableEnum for UserSkillLevel {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::Beginner),
             format!("{:?}", Self::Intermediate),
             format!("{:?}", Self::Advanced),
@@ -343,7 +341,6 @@ pub enum BlogStatus {
 impl EnumerableEnum for BlogStatus {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::Draft),
             format!("{:?}", Self::Published),
             format!("{:?}", Self::Archived),
@@ -363,7 +360,6 @@ pub enum BlogCategory {
 impl EnumerableEnum for BlogCategory {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::WebDevelopment),
             format!("{:?}", Self::MobileDevelopment),
             format!("{:?}", Self::ArtificialIntelligence),

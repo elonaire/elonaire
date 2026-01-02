@@ -230,29 +230,29 @@ pub fn SignIn() -> impl IntoView {
             <Spinner />
         </Show>
 
-        <div class="flex flex-col items-center justify-center p-8 bg-white">
+        <div class="flex flex-col items-center justify-center p-8 bg-contrast-white min-h-svh">
             // <Breadcrumbs custom_route_names=["Home", "Sign In"] />
                         <h1 class="text-4xl font-bold my-4">{"Sign In"}</h1>
                         <div class="w-full max-w-md flex flex-col items-center gap-2 md:flex-row md:justify-between my-4">
                                                 <BasicButton
                                                     button_text="Sign in with Google"
-                                                    style_ext="bg-red-500 hover:bg-red-400 transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full"
+                                                    style_ext="bg-danger hover:bg-danger transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-contrast-white w-full"
                                                     onclick=onsocial_sign_in(OauthClientName::Google)
                                                     icon=Some(IconId::AiGoogleOutlined) // Assuming you have icons for Google
                                                     icon_before=true
                                                 />
                                                 <BasicButton
                                                     button_text="Sign in with GitHub"
-                                                    style_ext="bg-gray-700 hover:bg-gray-600 transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full"
+                                                    style_ext="bg-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-contrast-white w-full"
                                                     onclick=onsocial_sign_in(OauthClientName::Github)
                                                     icon=Some(IconId::AiGithubOutlined) // Assuming you have icons for GitHub
                                                     icon_before=true
                                                 />
                         </div>
                         <div class="w-full max-w-md flex items-center my-6">
-                            <hr class="flex-grow border-t border-gray-300"/>
+                            <hr class="flex-grow border-t border-mid-gray"/>
                             <span class="mx-4 text-mid-gray">{"OR"}</span>
-                            <hr class="flex-grow border-t border-gray-300"/>
+                            <hr class="flex-grow border-t border-mid-gray"/>
                         </div>
 
                         <ReactiveForm form_ref=login_form_ref on:submit=handle_step_form_submit ext_styles="w-full max-w-md">
@@ -282,15 +282,15 @@ pub fn SignIn() -> impl IntoView {
                             </div>
 
                             <div class="flex items-center justify-between mb-6">
-                                <a class="text-sm text-blue-500 hover:text-blue-700" href="#">{ "Forgot Password?" }</a>
+                                <a class="text-sm text-secondary hover:secondary" href="#">{ "Forgot Password?" }</a>
                             </div>
                             <BasicButton
                                 button_text="Sign In"
-                                style_ext="bg-primary text-white px-4 py-2 hover:bg-secondary transition duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-white w-full"
+                                style_ext="bg-primary text-contrast-white px-4 py-2 hover:bg-primary transition duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-contrast-white w-full"
                                 button_type=ButtonType::Submit
                                 disabled=submit_is_disabled
                             />
-                            <div class="flex items-center justify-center mt-6 text-sm text-blue-500 hover:text-blue-400">
+                            <div class="flex items-center justify-center mt-6 text-sm text-secondary hover:text-secondary">
                                 <A href="/signup">"Don't have an account? Sign up"</A>
                             </div>
                         </ReactiveForm>

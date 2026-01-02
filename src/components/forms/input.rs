@@ -89,7 +89,7 @@ pub fn InputField(
             </label>
             <input
                 class={format!(
-                    "form-input ring-0 shadow appearance-none border border-slate-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent flex-grow {}",
+                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow {}",
                     ext_input_styles
                 )}
                 type=input_field_type_str
@@ -141,7 +141,7 @@ pub fn CustomFileInput(
                    button_text="Choose File"
                    icon=Some(IconData::FiUpload)
                    icon_before=true
-                   style_ext="w-full bg-primary text-white"
+                   style_ext="w-full bg-primary text-contrast-white"
                 />
         </div>
     }

@@ -125,11 +125,11 @@ pub fn Home() -> impl IntoView {
     view! {
         <Title text="Techie Tenka"/>
         <main>
-            <div class="relative min-h-screen bg-gray-100">
+            <div class="relative min-h-screen bg-contrast-white">
                 {/* Sidebar overlay */}
                 <div
                     class=move || format!(
-                        "fixed top-0 left-0 h-full transition-all duration-300 bg-white shadow-md z-40 {}",
+                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white shadow-md z-40 {}",
                         if collapsed.get() { "w-64" } else { "w-0" }
                     )
                 >
@@ -137,8 +137,8 @@ pub fn Home() -> impl IntoView {
                     {move || if collapsed.get() {
                         Some(view! {
                             <div class="overflow-hidden mx-[5%] md:mx-[10%]">
-                                <div class="flex items-center justify-between h-[45px] border-y border-gray-200">
-                                    <p class="text-gray-300 font-medium">NAVIGATION</p>
+                                <div class="flex items-center justify-between h-[45px] border-y border-light-gray">
+                                    <p class="text-mid-gray font-medium">NAVIGATION</p>
                                     <button
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
@@ -152,7 +152,7 @@ pub fn Home() -> impl IntoView {
                                         key=|menu_item| menu_item.path.to_owned()
                                         let(child)
                                     >
-                                        <div class="block rounded-[5px] hover:bg-gray-100 h-[45px]" on:click=move |_| set_collapsed.set(false)>
+                                        <div class="block rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
                                             <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
                                                 <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
                                                 <span class="flex-1">{child.label}</span>
@@ -171,7 +171,7 @@ pub fn Home() -> impl IntoView {
                 {move || if collapsed.get() {
                     Some(view! {
                         <div
-                            class="fixed inset-0 bg-gray-100 opacity-50 z-30"
+                            class="fixed inset-0 bg-contrast-white opacity-50 z-30"
                             on:click=move |_| set_collapsed.set(false)
                         />
                     })
@@ -227,7 +227,7 @@ pub fn Home() -> impl IntoView {
                             <p class="min-h-[90px]">
                                 {current_description}
                             </p>
-                            <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-white" />
+                            <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-contrast-white" />
                         </div>
                     </div>
 

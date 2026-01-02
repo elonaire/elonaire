@@ -36,14 +36,14 @@ pub fn Popover(
 
     // Determine the classes for the position and arrow
     let (position_class, _arrow_class) = match position {
-        Position::Top => ("bottom-full mb-2", "border-b-gray-800"),
-        Position::Bottom => ("top-full mt-2", "border-t-gray-800"),
+        Position::Top => ("bottom-full mb-2", "border-b-gray"),
+        Position::Bottom => ("top-full mt-2", "border-t-gray"),
     };
 
     // Dynamic classes based on popover state
     let open_classes = Memo::new(move |_| {
         format!(
-            "absolute {} md:min-w-48 bg-slate-50 border-[1px] border-gray-200 shadow-lg text-white text-sm rounded transition-all duration-300 z-30 {}",
+            "absolute {} md:min-w-48 bg-contrast-white border-[1px] border-light-gray shadow-lg text-contrast-white text-sm rounded transition-all duration-300 z-30 {}",
             position_class, style_ext
         )
     });

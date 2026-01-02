@@ -10,7 +10,7 @@ pub fn FlipCard(
     view! {
         <div class="relative w-full h-[247px] preserve-3d group transition-all duration-700">
             /* Front Face */
-            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-white flip-front">
+            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-contrast-white flip-front">
                 /* Image – 80% */
                 <div class="h-4/5 relative">
                     <img
@@ -27,7 +27,7 @@ pub fn FlipCard(
             </div>
 
             /* Back Face */
-            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-secondary to-primary text-white p-6 flex flex-col justify-center rotate-y-180 flip-back">
+            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-secondary to-primary text-contrast-white p-6 flex flex-col justify-center rotate-y-180 flip-back">
                 <h5 class="mb-3  text-light-gray">{title.clone()}</h5>
                 <p class="text-sm mb-4 leading-relaxed">
                     {description}

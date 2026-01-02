@@ -154,7 +154,7 @@ pub fn SkillsList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -181,25 +181,13 @@ pub fn CreateSkill() -> impl IntoView {
     let user_skill_levels = RwSignal::new(
         UserSkillLevel::variants_slice()
             .iter()
-            .map(|level| {
-                let mut label = format!("{}", level);
-                if label.is_empty() {
-                    label = "Select Skill Level".to_string();
-                }
-                SelectOption::new(format!("{}", level).as_str(), label.as_str())
-            })
+            .map(|level| SelectOption::new(level, level))
             .collect::<Vec<SelectOption>>(),
     );
     let user_skill_types = RwSignal::new(
         UserSkillType::variants_slice()
             .iter()
-            .map(|skill_type| {
-                let mut label = format!("{}", skill_type);
-                if label.is_empty() {
-                    label = "Select Skill Type".to_string();
-                }
-                SelectOption::new(format!("{}", skill_type).as_str(), label.as_str())
-            })
+            .map(|skill_type| SelectOption::new(skill_type, skill_type))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -415,6 +403,7 @@ pub fn CreateSkill() -> impl IntoView {
                     name="type"
                     required=true
                     id_attr="type"
+                    placeholder="Select Type"
                     options=user_skill_types
                     />
                     <SelectInput
@@ -422,13 +411,14 @@ pub fn CreateSkill() -> impl IntoView {
                     name="level"
                     required=true
                     id_attr="level"
+                    placeholder="Select Level"
                     options=user_skill_levels
                     />
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

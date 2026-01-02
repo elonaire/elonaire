@@ -75,7 +75,7 @@ pub fn Pagination(
                         }
                     }
                 }
-                <ButtonGroup style_ext="font-bold bg-primary text-white hover:bg-secondary".to_string()>
+                <ButtonGroup style_ext="font-bold bg-primary text-contrast-white hover:bg-secondary".to_string()>
                     <BasicButton onclick=on_first_click disabled=is_first_page icon=Some(IconId::BsChevronBarLeft) />
                     <BasicButton onclick=on_prev_click disabled=can_go_to_prev icon=Some(IconId::BsChevronLeft) />
                     <BasicButton onclick=on_next_click disabled=can_go_to_next icon=Some(IconId::BsChevronRight) />

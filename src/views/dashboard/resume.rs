@@ -150,7 +150,7 @@ pub fn ResumeItemsList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconId::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -181,13 +181,7 @@ pub fn CreateResumeItem() -> impl IntoView {
     let resume_sections = RwSignal::new(
         UserResumeSection::variants_slice()
             .iter()
-            .map(|section| {
-                let mut label = format!("{}", section);
-                if label.is_empty() {
-                    label = "Select Section".to_string();
-                }
-                SelectOption::new(format!("{}", section).as_str(), label.as_str())
-            })
+            .map(|section| SelectOption::new(section, section))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -352,6 +346,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                     name="section"
                     required=true
                     id_attr="section"
+                    placeholder="Select Section"
                     options=resume_sections
                     />
 
@@ -377,7 +372,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                             <InputField field_type=InputFieldType::Text placeholder="Add Achievement" initial_value=achievement_field_value oninput=handle_achievement_input_change id_attr="achievement" ext_wrapper_styles="flex-1" ext_input_styles="rounded-r-none" />
                             <BasicButton
                                 button_text="Add"
-                                style_ext="bg-primary text-white rounded-l-none"
+                                style_ext="bg-primary text-contrast-white rounded-l-none"
                                 button_type=ButtonType::Button
                                 disabled=add_is_disabled
                                 onclick=handle_add_button_click
@@ -386,7 +381,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                     </div>
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

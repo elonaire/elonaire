@@ -200,7 +200,6 @@ pub enum AdminPrivilege {
 impl EnumerableEnum for AdminPrivilege {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::Admin),
             format!("{:?}", Self::SuperAdmin),
             format!("{:?}", Self::None),

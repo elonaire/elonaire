@@ -69,10 +69,10 @@ pub fn BasicModal(
         <>
             <Show when=move || is_open.get() fallback=|| ()>
                 <Portal mount=document().get_element_by_id("modal-root").unwrap()>
-                    <div class="fixed inset-0 bg-gray-900 opacity-50 z-10"></div>
+                    <div class="fixed inset-0 bg-gray opacity-50 z-10"></div>
                         <div on:click=handle_backdrop_click class="fixed inset-0 flex items-center justify-center bg-transparent z-11">
                         <div on:click=move |e| e.stop_propagation() class="bg-slate-50 rounded shadow-lg -translate-y-1/4 w-full max-w-md m-2">
-                            <div class="flex items-center mb-4 border-gray-300 border-b p-4">
+                            <div class="flex items-center border-light-gray border-b p-4">
                                 {
                                     move || match use_case {
                                         UseCase::Error => Some(view! {
@@ -86,7 +86,7 @@ pub fn BasicModal(
                                             </span>
                                         }),
                                         UseCase::Info => Some(view! {
-                                            <span class="text-blue-500 mr-2">
+                                            <span class="text-info mr-2">
                                                 <Icon width="2rem" height="2rem" icon=IconId::AiInfoCircleOutlined />
                                             </span>
                                         }),
@@ -100,16 +100,16 @@ pub fn BasicModal(
                                 }
                                 <span class="font-semibold text-lg">{move || title.get()}</span>
                             </div>
-                            <div class="mb-4 p-4">
+                            <div class="p-4">
                                 {move || children.get().map(|c| c())}
                             </div>
-                            <div class="flex justify-end space-x-2 p-4">
+                            <div class="flex justify-end space-x-2 p-4 border-light-gray border-t">
                                                     {move || {
                                                         if use_case == UseCase::Confirmation {
                                                             Some(view! {
                                                                     <BasicButton
                                                                         button_text="Cancel".to_string()
-                                                                        style_ext="bg-gray-400 text-white".to_string()
+                                                                        style_ext="bg-mid-gray text-contrast-white".to_string()
                                                                         onclick=oncancel_handler(false)
                                                                     />
                                                             })
@@ -119,7 +119,7 @@ pub fn BasicModal(
                                                     }}
                                                     <BasicButton
                                                         button_text=primary_button_text.get()
-                                                        style_ext="bg-blue-500 text-white".to_string()
+                                                        style_ext="bg-primary text-contrast-white".to_string()
                                                         onclick=onclick_primary_handler()
                                                     />
                                                 </div>

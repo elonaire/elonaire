@@ -104,7 +104,7 @@ pub fn ButtonGroup(
                     let style_ext_view = style_ext_view.clone();
                     let class_name = move || {
                         let mut base = format!(
-                            "font-bold py-2 px-4 border border-gray-200 border-l-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed {}",
+                            "font-bold py-2 px-4 border border-light-gray border-l-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed {}",
                             style_ext_view
                         );
                         if index == 0 {

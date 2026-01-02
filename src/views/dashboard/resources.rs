@@ -132,7 +132,7 @@ pub fn ResourcesList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -159,10 +159,8 @@ pub fn CreateResource() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let departments_options =
-        RwSignal::new(vec![SelectOption::new("", "Select Department")] as Vec<SelectOption>);
-    let organizations_options =
-        RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
+    let departments_options = RwSignal::new(vec![] as Vec<SelectOption>);
+    let organizations_options = RwSignal::new(vec![] as Vec<SelectOption>);
 
     let onprimary_handler = Callback::new(move |_| {
         set_submission_confirmed.set(true);
@@ -372,12 +370,14 @@ pub fn CreateResource() -> impl IntoView {
                 label="Organization"
                 name="organization_id"
                 id_attr="organization_id"
+                placeholder="Select Organization"
                 options=organizations_options
                 />
                 <SelectInput
                 label="Department"
                 name="department_id"
                 id_attr="department_id"
+                placeholder="Select Department"
                 options=departments_options
                 />
                 </div>
@@ -390,7 +390,7 @@ pub fn CreateResource() -> impl IntoView {
 
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

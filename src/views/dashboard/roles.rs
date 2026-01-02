@@ -154,7 +154,7 @@ pub fn RolesList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -182,22 +182,14 @@ pub fn CreateRole() -> impl IntoView {
     let confirm_modal_is_open = RwSignal::new(false);
     let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
-    let departments_options =
-        RwSignal::new(vec![SelectOption::new("", "Select Department")] as Vec<SelectOption>);
-    let organizations_options =
-        RwSignal::new(vec![SelectOption::new("", "Select Organization")] as Vec<SelectOption>);
+    let departments_options = RwSignal::new(vec![] as Vec<SelectOption>);
+    let organizations_options = RwSignal::new(vec![] as Vec<SelectOption>);
     let permissions_options = RwSignal::new(vec![] as Vec<CheckboxOption>);
 
     let admin_privileges = RwSignal::new(
         AdminPrivilege::variants_slice()
             .iter()
-            .map(|admin_privilege| {
-                let mut label = format!("{}", admin_privilege);
-                if label.is_empty() {
-                    label = "Select Admin Privilege".to_string();
-                }
-                SelectOption::new(format!("{}", admin_privilege).as_str(), label.as_str())
-            })
+            .map(|admin_privilege| SelectOption::new(admin_privilege, admin_privilege))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -432,18 +424,21 @@ pub fn CreateRole() -> impl IntoView {
                 name="admin_privilege"
                 required=true
                 id_attr="admin_privilege"
+                placeholder="Select Admin Privilege"
                 options=admin_privileges
                 />
                 <SelectInput
                 label="Organization"
                 name="organization_id"
                 id_attr="organization_id"
+                placeholder="Select Organization"
                 options=organizations_options
                 />
                 <SelectInput
                 label="Department"
                 name="department_id"
                 id_attr="department_id"
+                placeholder="Select Department"
                 options=departments_options
                 />
                 <CheckboxGroup
@@ -461,7 +456,7 @@ pub fn CreateRole() -> impl IntoView {
 
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />

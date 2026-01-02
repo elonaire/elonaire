@@ -85,7 +85,7 @@ pub fn BlogList() -> impl IntoView {
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
                         icon_before=true
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                     />
                 </A>
             </div>
@@ -112,14 +112,7 @@ pub fn CreateBlog() -> impl IntoView {
     let blog_statuses = RwSignal::new(
         BlogStatus::variants_slice()
             .iter()
-            .map(|status| {
-                let mut label = format!("{}", status);
-                if label.is_empty() {
-                    label = "Select Status".to_string();
-                }
-
-                SelectOption::new(format!("{}", status).as_str(), label.as_str())
-            })
+            .map(|status| SelectOption::new(status, status))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -128,9 +121,6 @@ pub fn CreateBlog() -> impl IntoView {
             .iter()
             .map(|category| {
                 let mut label = format!("{}", category);
-                if label.is_empty() {
-                    label = "Select Category".to_string();
-                }
 
                 if category == "WebDevelopment" {
                     label = "Web Development".to_string();
@@ -140,7 +130,7 @@ pub fn CreateBlog() -> impl IntoView {
                     label = "Artificial Intelligence".to_string();
                 }
 
-                SelectOption::new(format!("{}", category).as_str(), label.as_str())
+                SelectOption::new(category, &label)
             })
             .collect::<Vec<SelectOption>>(),
     );
@@ -398,6 +388,7 @@ pub fn CreateBlog() -> impl IntoView {
                     name="status"
                     required=true
                     id_attr="status"
+                    placeholder="Select Status"
                     options=blog_statuses
                     />
                     <SelectInput
@@ -405,6 +396,7 @@ pub fn CreateBlog() -> impl IntoView {
                     name="category"
                     required=true
                     id_attr="category"
+                    placeholder="Select Category"
                     options=blog_categories
                     />
                     <ToggleSwitch
@@ -424,7 +416,7 @@ pub fn CreateBlog() -> impl IntoView {
                     <CustomFileInput input_node_ref=content_file_input_ref label="Content File" name="content_file" id_attr="content_file" accept="text/markdown" required=true />
                     <BasicButton
                         button_text="Submit"
-                        style_ext="bg-primary text-white"
+                        style_ext="bg-primary text-contrast-white"
                         button_type=ButtonType::Submit
                         disabled=submit_is_disabled
                     />
