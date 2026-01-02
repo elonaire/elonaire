@@ -194,8 +194,6 @@ pub fn Collapse(
     #[prop(default = false)] is_accordion: bool,
 ) -> impl IntoView {
     let handle_panel_toggle = move |index| {
-        leptos::logging::log!("index {index} is being toggled");
-        leptos::logging::log!("is_accordion Collapse: {is_accordion}");
         if is_accordion {
             panel_items.update(|panels| {
                 let mut updated_panels = Vec::new();
