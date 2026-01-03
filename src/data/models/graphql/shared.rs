@@ -421,3 +421,63 @@ pub struct PublicSiteResources {
     pub skills: Option<Vec<UserSkill>>,
     pub services: Option<Vec<UserService>>,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchRatecardsResponse {
+    #[serde(rename = "fetchRatecards")]
+    pub fetch_ratecards: Option<Vec<Ratecard>>, // this is the return type expected from the API on success
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Ratecard {
+    pub id: String,
+    pub name: String,
+    pub services: Vec<UserService>,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchBillingRateResponse {
+    #[serde(rename = "fetchBillingRate")]
+    pub fetch_billing_rate: Option<String>, // this is the return type expected from the API on success
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]
+pub enum BillingInterval {
+    Hourly,
+    Weekly,
+    Monthly,
+    Annual,
+}
+
+impl EnumerableEnum for BillingInterval {
+    fn variants_slice() -> Vec<String> {
+        vec![
+            format!("{:?}", Self::Hourly),
+            format!("{:?}", Self::Weekly),
+            format!("{:?}", Self::Monthly),
+            format!("{:?}", Self::Annual),
+        ]
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FetchBillingRateVars {
+    #[serde(rename = "billingInterval")]
+    pub billing_interval: BillingInterval,
+    #[serde(rename = "serviceIds")]
+    pub service_ids: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BillingIntervalForm {
+    pub billing_interval: BillingInterval,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ServiceIdsForm {
+    pub service_ids: Vec<String>,
+}

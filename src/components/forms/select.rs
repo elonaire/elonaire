@@ -47,8 +47,8 @@ pub fn SelectInput(
     #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<
         String,
     >,
-    #[prop(into)] label: String,
-    #[prop(into)] placeholder: String,
+    #[prop(into, optional)] label: String,
+    #[prop(into, optional)] placeholder: String,
     #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Select>,
     #[prop(default = false, optional)] readonly: bool,
@@ -64,10 +64,15 @@ pub fn SelectInput(
     view! {
         <div>
             <label for=id_attr.clone() class="block text-mid-gray text-sm font-bold">
-                {label}
-                {move || required.then_some(view! {
-                    <span class="text-red-500 ml-1">*</span>
-                })}
+                {label.clone()}
+                { if !label.clone().is_empty() && required {
+                    Some(view! {
+                        <span class="text-red-500 ml-1">*</span>
+                    })
+                } else {
+                    None
+                }
+                }
             </label>
             <select
                 node_ref=input_node_ref
@@ -82,7 +87,13 @@ pub fn SelectInput(
                 id=id_attr.clone()
                 required=required
             >
-                <option class="text-light-gray" value="">{placeholder}</option>
+                {
+                    if placeholder.is_empty() {
+                        None
+                    } else {
+                        Some(view!{ <option class="text-light-gray" value="">{placeholder}</option> })
+                    }
+                }
                 {move || options.get().into_iter()
                     .map(|option| {
                         view! {

@@ -34,11 +34,11 @@ impl CheckboxOption {
     }
 }
 
-/// Checkbox is a component that renders a single checkbox input field.
+/// CheckboxInputField is a component that renders a single checkbox input field.
 /// It can be used in forms to collect user input.
 /// Example usage:
 /// ```
-/// <Checkbox
+/// <CheckboxInputField
 ///     label="Remember me"
 ///     name="remember"
 /// />
@@ -47,7 +47,7 @@ impl CheckboxOption {
 pub fn CheckboxInputField(
     #[prop(into)] initial_value: RwSignal<String>,
     #[prop(into)] label: String,
-    #[prop(into)] name: String,
+    #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false, optional)] readonly: bool,
     #[prop(default = false, optional)] required: bool,
@@ -62,7 +62,7 @@ pub fn CheckboxInputField(
     view! {
         <div class=format!("{}", ext_wrapper_styles)>
             <label
-                class="inline-flex items-center gap-2 text-mid-gray text-sm font-bold"
+                class="inline-flex items-center gap-2"
                 for=id_attr.clone()
             >
                 <input
@@ -81,6 +81,9 @@ pub fn CheckboxInputField(
                     required=required
                     checked=checked
                 />
+                <div class="flex flex-col">
+                    <span>{label}</span>
+                </div>
             </label>
         </div>
     }

@@ -11,10 +11,13 @@ use crate::{
                 FetchDepartmentsResponse, FetchOrganizationsResponse, FetchPermissionsResponse,
                 FetchResourcesResponse, FetchSystemRolesResponse,
             },
-            shared::FetchSiteResourcesResponse,
+            shared::{
+                FetchBillingRateResponse, FetchBillingRateVars, FetchRatecardsResponse,
+                FetchSiteResourcesResponse, Ratecard,
+            },
         },
     },
-    utils::graphql_client::perform_query_without_vars,
+    utils::graphql_client::{perform_mutation_or_query_with_vars, perform_query_without_vars},
 };
 use reactive_stores::Store;
 
@@ -420,5 +423,71 @@ pub async fn fetch_roles(
             Ok(())
         }
         None => Err(fetch_roles_response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_ratecards(
+    headers: Option<&HashMap<String, String>>,
+) -> Result<Vec<Ratecard>, Vec<GraphQLErrorMessage>> {
+    let fetch_ratecards_query = r#"
+        query FetchRatecards {
+            fetchRatecards {
+                name
+                createdAt
+                updatedAt
+                id
+                services {
+                    title
+                    description
+                    thumbnail
+                    id
+                }
+            }
+        }
+       "#;
+
+    let fetch_ratecards_response = perform_query_without_vars::<FetchRatecardsResponse>(
+        headers,
+        "http://localhost:8080/api/shared",
+        fetch_ratecards_query,
+    )
+    .await;
+
+    match fetch_ratecards_response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_ratecards.as_ref().unwrap().to_vec();
+
+            Ok(owned_data)
+        }
+        None => Err(fetch_ratecards_response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_billing_rate(
+    vars: FetchBillingRateVars,
+    headers: Option<&HashMap<String, String>>,
+) -> Result<String, Vec<GraphQLErrorMessage>> {
+    let fetch_billing_rate_query = r#"
+        query FetchBillingRate($billingInterval: BillingInterval!, $serviceIds: [String!]!) {
+            fetchBillingRate(billingInterval: $billingInterval, serviceIds: $serviceIds)
+        }
+       "#;
+
+    let fetch_billing_rate_response =
+        perform_mutation_or_query_with_vars::<FetchBillingRateResponse, FetchBillingRateVars>(
+            headers,
+            "http://localhost:8080/api/shared",
+            fetch_billing_rate_query,
+            vars,
+        )
+        .await;
+
+    match fetch_billing_rate_response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_billing_rate.as_ref().unwrap().to_owned();
+
+            Ok(owned_data)
+        }
+        None => Err(fetch_billing_rate_response.get_error().to_vec()),
     }
 }
