@@ -6,7 +6,9 @@ use chrono::{DateTime, Datelike, Duration, NaiveDate, TimeZone, Weekday};
 use icondata as IconId;
 use leptos::ev;
 use leptos::prelude::*;
+use leptos::wasm_bindgen::JsCast;
 use leptos_icons::Icon;
+use web_sys::HtmlInputElement;
 
 /// This is a custom date picker component that allows users to select a date from a calendar.
 ///
@@ -54,16 +56,6 @@ pub fn DatePicker(
         set_selected_date.set(initial_value.get());
     });
 
-    Effect::new(move |_| {
-        // This is a hack to ensure that reactivity works well for this component during select
-        let _select_hack = selected_date.get();
-
-        // Fire a bubbling Change event so that the form can capture changes
-        if let Some(input_el) = date_input_ref.get() {
-            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
-        }
-    });
-
     let toggle_calendar = Callback::new(move |_| {
         set_show_calendar.update(|val| *val = !*val);
     });
@@ -72,6 +64,14 @@ pub fn DatePicker(
         set_selected_date.set(Some(date));
         onchange.run(date);
         set_show_calendar.set(false);
+
+        if let Some(el) = date_input_ref.get() as Option<HtmlInputElement> {
+            let input: HtmlInputElement = el.unchecked_into();
+            input.set_value(&selected_date_value.get());
+
+            fire_bubbled_and_cancelable_event("input", true, true, &input);
+            fire_bubbled_and_cancelable_event("change", true, true, &input);
+        }
     });
 
     view! {

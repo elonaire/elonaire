@@ -187,7 +187,6 @@ pub fn CreatePortfolio() -> impl IntoView {
     let skills_select_options = RwSignal::new(vec![] as Vec<SelectOption>);
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
@@ -199,15 +198,7 @@ pub fn CreatePortfolio() -> impl IntoView {
     );
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if form_is_valid.get() {
             set_is_loading.set(true);
             if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
                 if let Ok(files_form_data) = FormData::new() {
@@ -329,9 +320,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                         {
                                                             form.reset();
                                                             set_form_is_valid.set(false);
-                                                            set_submission_confirmed.set(false);
                                                         } else {
-                                                            set_submission_confirmed.set(false);
                                                         }
                                                         set_is_loading.set(false);
 
@@ -340,7 +329,6 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                     }
                                                     None => {
                                                         set_is_loading.set(false);
-                                                        set_submission_confirmed.set(false);
                                                     }
                                                 };
                                             };
@@ -352,20 +340,22 @@ pub fn CreatePortfolio() -> impl IntoView {
                                             err
                                         );
                                         set_is_loading.set(false);
-                                        set_submission_confirmed.set(false);
                                     }
                                 };
                             }
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
                                 set_is_loading.set(false);
-                                set_submission_confirmed.set(false);
                             }
                         };
                     });
                 };
             };
         }
+    });
+
+    let onreset_handler = Callback::new(move |_ev: ev::Event| {
+        init_date.set(None);
     });
 
     Effect::new(move || {

@@ -192,15 +192,7 @@ pub fn CreateSkill() -> impl IntoView {
     );
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if form_is_valid.get() {
             set_is_loading.set(true);
             if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
                 if let Ok(files_form_data) = FormData::new() {
@@ -314,9 +306,7 @@ pub fn CreateSkill() -> impl IntoView {
                                                         {
                                                             form.reset();
                                                             set_form_is_valid.set(false);
-                                                            set_submission_confirmed.set(false);
                                                         } else {
-                                                            set_submission_confirmed.set(false);
                                                         }
                                                         set_is_loading.set(false);
 
@@ -325,7 +315,6 @@ pub fn CreateSkill() -> impl IntoView {
                                                     }
                                                     None => {
                                                         set_is_loading.set(false);
-                                                        set_submission_confirmed.set(false);
                                                     }
                                                 };
                                             };
@@ -337,20 +326,23 @@ pub fn CreateSkill() -> impl IntoView {
                                             err
                                         );
                                         set_is_loading.set(false);
-                                        set_submission_confirmed.set(false);
                                     }
                                 };
                             }
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
                                 set_is_loading.set(false);
-                                set_submission_confirmed.set(false);
                             }
                         };
                     });
                 };
             };
         }
+    });
+
+    // This is to force the form to reset the date input
+    let onreset_handler = Callback::new(move |_ev: ev::Event| {
+        init_date.set(None);
     });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {

@@ -205,15 +205,10 @@ pub fn CreateUser() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
@@ -269,9 +264,7 @@ pub fn CreateUser() -> impl IntoView {
                             {
                                 form.reset();
                                 set_form_is_valid.set(false);
-                                set_submission_confirmed.set(false);
                             } else {
-                                set_submission_confirmed.set(false);
                             }
                             set_is_loading.set(false);
 
@@ -279,7 +272,6 @@ pub fn CreateUser() -> impl IntoView {
                         }
                         None => {
                             set_is_loading.set(false);
-                            set_submission_confirmed.set(false);
                         }
                     };
                 };

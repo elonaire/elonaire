@@ -185,7 +185,6 @@ pub enum UserResumeSection {
 impl EnumerableEnum for UserResumeSection {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::Education),
             format!("{:?}", Self::Experience),
             format!("{:?}", Self::Achievements),
@@ -295,7 +294,6 @@ pub enum UserSkillType {
 impl EnumerableEnum for UserSkillType {
     fn variants_slice() -> Vec<String> {
         vec![
-            String::new(),
             format!("{:?}", Self::Technical),
             format!("{:?}", Self::Soft),
         ]
@@ -480,4 +478,58 @@ pub struct BillingIntervalForm {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServiceIdsForm {
     pub service_ids: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceRequestInput {
+    pub description: String,
+    #[serde(rename = "startDate", alias = "start_date")]
+    pub start_date: String,
+    #[serde(rename = "endDate", alias = "end_date")]
+    pub end_date: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceRequestInputMetadata {
+    #[serde(rename = "supportingDocsFileIds", alias = "supporting_docs_file_ids")]
+    pub supporting_docs_file_ids: Vec<String>,
+    #[serde(rename = "serviceIds", alias = "service_ids")]
+    pub service_ids: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct UploadedFileId {
+    pub id: String,
+    #[serde(rename = "fileId")]
+    pub file_id: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceRequest {
+    pub id: String,
+    pub description: String,
+    #[serde(rename = "supportingDocs")]
+    pub supporting_docs: Vec<UploadedFileId>,
+    #[serde(rename = "startDate")]
+    pub start_date: String,
+    #[serde(rename = "endDate")]
+    pub end_date: String,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateServiceRequestVars {
+    #[serde(rename = "serviceRequestInput")]
+    pub service_request_input: ServiceRequestInput,
+    #[serde(rename = "serviceRequestInputMetadata")]
+    pub service_request_input_metadata: ServiceRequestInputMetadata,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateServiceRequestResponse {
+    #[serde(rename = "createServiceRequest")]
+    pub create_service_request: Option<ServiceRequest>, // this is the return type expected from the API on success
 }

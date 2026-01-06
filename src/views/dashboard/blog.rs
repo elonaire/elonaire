@@ -107,7 +107,6 @@ pub fn CreateBlog() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
     let blog_statuses = RwSignal::new(
         BlogStatus::variants_slice()
@@ -136,11 +135,7 @@ pub fn CreateBlog() -> impl IntoView {
     );
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if form_is_valid.get() {
             set_is_loading.set(true);
             if let Some(thumbnail_file_input) =
                 thumbnail_file_input_ref.to_owned().get() as Option<HtmlInputElement>
@@ -235,7 +230,6 @@ pub fn CreateBlog() -> impl IntoView {
                                                     );
 
                                                 if deserialized_form_data.is_none() {
-                                                    set_submission_confirmed.set(false);
                                                     set_is_loading.set(false);
                                                     return;
                                                 }
@@ -299,9 +293,7 @@ pub fn CreateBlog() -> impl IntoView {
                                                         {
                                                             form.reset();
                                                             set_form_is_valid.set(false);
-                                                            set_submission_confirmed.set(false);
                                                         } else {
-                                                            set_submission_confirmed.set(false);
                                                         }
                                                         set_is_loading.set(false);
 
@@ -310,7 +302,6 @@ pub fn CreateBlog() -> impl IntoView {
                                                     }
                                                     None => {
                                                         set_is_loading.set(false);
-                                                        set_submission_confirmed.set(false);
                                                     }
                                                 };
                                             };
@@ -321,14 +312,12 @@ pub fn CreateBlog() -> impl IntoView {
                                                 err
                                             );
                                             set_is_loading.set(false);
-                                            set_submission_confirmed.set(false);
                                         }
                                     };
                                 }
                                 Err(err) => {
                                     leptos::logging::error!("Failed to upload files: {:?}", err);
                                     set_is_loading.set(false);
-                                    set_submission_confirmed.set(false);
                                 }
                             };
                         });

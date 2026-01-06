@@ -67,7 +67,7 @@ pub fn CheckboxInputField(
             >
                 <input
                     class=format!("leading-tight size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
-                               focus:outline-none focus:ring-0 focus:border-secondary
+                               focus:outline-none focus:ring-0 bg-transparent focus:border-secondary
                                checked:bg-secondary checked:border-secondary
                                accent-secondary {}", ext_input_styles)
                     type="checkbox"
@@ -172,7 +172,7 @@ pub fn CheckboxGroup(
                                 >
                                     <input
                                         class=format!("leading-tight size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
-                                                   focus:outline-none focus:ring-0 focus:border-secondary
+                                                   focus:outline-none focus:ring-0 focus:border-secondary bg-transparent
                                                    checked:bg-secondary checked:border-secondary
                                                    accent-secondary {}", ext_input_styles)
                                         type="checkbox"

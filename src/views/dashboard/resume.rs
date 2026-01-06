@@ -166,7 +166,7 @@ pub fn ResumeItemsList() -> impl IntoView {
 pub fn CreateResumeItem() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (achievement_field_value, set_achievement_field_value) = signal(String::new());
-    let add_is_disabled = Memo::new(move |_| !achievement_field_value.get().len() > 10);
+    let add_is_disabled = Memo::new(move |_| !(achievement_field_value.get().len() > 10));
     let (achievements, set_achievements) = signal(Vec::new() as Vec<String>);
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled =
@@ -174,7 +174,6 @@ pub fn CreateResumeItem() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
@@ -186,15 +185,7 @@ pub fn CreateResumeItem() -> impl IntoView {
     );
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
@@ -256,9 +247,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                             {
                                 form.reset();
                                 set_form_is_valid.set(false);
-                                set_submission_confirmed.set(false);
                             } else {
-                                set_submission_confirmed.set(false);
                             }
                             set_is_loading.set(false);
 
@@ -267,12 +256,15 @@ pub fn CreateResumeItem() -> impl IntoView {
                         }
                         None => {
                             set_is_loading.set(false);
-                            set_submission_confirmed.set(false);
                         }
                     };
                 };
             });
         }
+    });
+
+    let onreset_handler = Callback::new(move |_ev: ev::Event| {
+        init_date.set(None);
     });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {

@@ -142,6 +142,8 @@ pub fn SignIn() -> impl IntoView {
         ev.prevent_default();
         ev.stop_propagation();
 
+        leptos::logging::log!("submit clicked");
+
         // Implement logic to show form validity
         let target = ev
             .target()

@@ -180,15 +180,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
     let (is_loading, set_is_loading) = signal(false);
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && form_is_valid.get() {
+        if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
@@ -247,9 +239,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                             {
                                 form.reset();
                                 set_form_is_valid.set(false);
-                                set_submission_confirmed.set(false);
                             } else {
-                                set_submission_confirmed.set(false);
                             }
                             set_is_loading.set(false);
 
@@ -257,12 +247,15 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                         }
                         None => {
                             set_is_loading.set(false);
-                            set_submission_confirmed.set(false);
                         }
                     };
                 };
             });
         }
+    });
+
+    let onreset_handler = Callback::new(move |_ev: ev::Event| {
+        init_date.set(None);
     });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {

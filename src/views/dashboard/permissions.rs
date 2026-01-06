@@ -189,7 +189,6 @@ pub fn CreatePermission() -> impl IntoView {
     let resources = move || current_state.resources();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
     let resources_options = RwSignal::new(vec![] as Vec<SelectOption>);
 
@@ -201,11 +200,7 @@ pub fn CreatePermission() -> impl IntoView {
     );
 
     let onprimary_handler = Callback::new(move |_| {
-        set_submission_confirmed.set(true);
-    });
-
-    Effect::new(move || {
-        if submission_confirmed.get() && metadata_form_is_valid.get() && main_form_is_valid.get() {
+        if metadata_form_is_valid.get() && main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(metadata_form_data) = get_form_data_from_form_ref(&metadata_form_ref) {
@@ -279,9 +274,7 @@ pub fn CreatePermission() -> impl IntoView {
                                 {
                                     form.reset();
                                     set_main_form_is_valid.set(false);
-                                    set_submission_confirmed.set(false);
                                 } else {
-                                    set_submission_confirmed.set(false);
                                 }
 
                                 if let Some(form) = metadata_form_ref
@@ -290,9 +283,7 @@ pub fn CreatePermission() -> impl IntoView {
                                 {
                                     form.reset();
                                     set_main_form_is_valid.set(false);
-                                    set_submission_confirmed.set(false);
                                 } else {
-                                    set_submission_confirmed.set(false);
                                 }
 
                                 set_is_loading.set(false);
@@ -301,7 +292,6 @@ pub fn CreatePermission() -> impl IntoView {
                             }
                             None => {
                                 set_is_loading.set(false);
-                                set_submission_confirmed.set(false);
                             }
                         };
                     };

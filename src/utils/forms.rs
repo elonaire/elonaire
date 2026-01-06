@@ -12,10 +12,13 @@ pub fn get_form_data_from_form_ref(form_ref: &NodeRef<Form>) -> Option<FormData>
     Some(form_data)
 }
 
+/// `deserialize_bool` - Whether to deserialize boolean values
+///
+/// `vec_fields` - The fields that should be deserialized as Vec<String>, e.g. Checkbox fields
 pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
     form_data: &FormData,
     deserialize_bool: bool,
-    checkbox_fields: Option<&[&str]>,
+    vec_fields: Option<&[&str]>,
 ) -> Option<T> {
     let entries = js_sys::try_iter(form_data).ok()?.unwrap();
     let mut map = Map::new();
@@ -26,7 +29,7 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
         let key = arr.get(0).as_string()?;
         let value = arr.get(1);
 
-        let is_checkbox_field = checkbox_fields
+        let is_vec_field = vec_fields
             .map(|fields| fields.contains(&key.as_str()))
             .unwrap_or(false);
 
@@ -53,7 +56,7 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
                     }
                 },
                 None => {
-                    if is_checkbox_field {
+                    if is_vec_field {
                         // Always store as array for defined checkbox fields
                         map.insert(key, Value::Array(vec![val]));
                     } else {
