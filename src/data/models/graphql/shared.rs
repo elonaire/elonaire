@@ -522,27 +522,27 @@ pub struct ServiceRequestInputMetadata {
     pub service_ids: Vec<String>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Store)]
 pub struct UploadedFileId {
     pub id: String,
     #[serde(rename = "fileId")]
     pub file_id: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Store)]
 pub struct ServiceRequest {
-    pub id: String,
-    pub description: String,
+    pub id: Option<String>,
+    pub description: Option<String>,
     #[serde(rename = "supportingDocs")]
-    pub supporting_docs: Vec<UploadedFileId>,
+    pub supporting_docs: Option<Vec<UploadedFileId>>,
     #[serde(rename = "startDate")]
-    pub start_date: String,
+    pub start_date: Option<String>,
     #[serde(rename = "endDate")]
-    pub end_date: String,
+    pub end_date: Option<String>,
     #[serde(rename = "createdAt")]
-    pub created_at: String,
+    pub created_at: Option<String>,
     #[serde(rename = "updatedAt")]
-    pub updated_at: String,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -557,6 +557,12 @@ pub struct CreateServiceRequestVars {
 pub struct CreateServiceRequestResponse {
     #[serde(rename = "createServiceRequest")]
     pub create_service_request: Option<ServiceRequest>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchServiceRequestsResponse {
+    #[serde(rename = "fetchServiceRequests")]
+    pub fetch_service_requests: Option<Vec<ServiceRequest>>, // this is the return type expected from the API on success
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

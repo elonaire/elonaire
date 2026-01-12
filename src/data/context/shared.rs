@@ -13,8 +13,8 @@ use crate::{
             },
             shared::{
                 FetchBillingRateResponse, FetchBillingRateVars, FetchCurrenciesResponse,
-                FetchRatecardsResponse, FetchServiceRatesResponse, FetchSiteResourcesResponse,
-                Ratecard, ServiceRate,
+                FetchRatecardsResponse, FetchServiceRatesResponse, FetchServiceRequestsResponse,
+                FetchSiteResourcesResponse, Ratecard, ServiceRate,
             },
         },
     },
@@ -571,6 +571,46 @@ pub async fn fetch_currencies(
             let owned_data = data.fetch_currencies.as_ref().unwrap().to_vec();
 
             *current_state.currencies().write() = owned_data;
+
+            Ok(())
+        }
+        None => Err(response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_service_requests(
+    current_state: &Store<AppStateContext>,
+    headers: Option<&HashMap<String, String>>,
+) -> Result<(), Vec<GraphQLErrorMessage>> {
+    let query = r#"
+        query FetchServiceRequests {
+            fetchServiceRequests {
+                description
+                startDate
+                endDate
+                createdAt
+                updatedAt
+                id
+                supportingDocs {
+                    fileId
+                    id
+                }
+            }
+        }
+       "#;
+
+    let response = perform_query_without_vars::<FetchServiceRequestsResponse>(
+        headers,
+        "http://localhost:8080/api/shared",
+        query,
+    )
+    .await;
+
+    match response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_service_requests.as_ref().unwrap().to_vec();
+
+            *current_state.service_requests().write() = owned_data;
 
             Ok(())
         }
