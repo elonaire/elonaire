@@ -426,15 +426,40 @@ pub struct FetchRatecardsResponse {
     pub fetch_ratecards: Option<Vec<Ratecard>>, // this is the return type expected from the API on success
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Store)]
 pub struct Ratecard {
-    pub id: String,
-    pub name: String,
-    pub services: Vec<UserService>,
+    pub id: Option<String>,
+    pub name: Option<String>,
+    pub services: Option<Vec<UserService>>,
     #[serde(rename = "createdAt")]
-    pub created_at: String,
+    pub created_at: Option<String>,
     #[serde(rename = "updatedAt")]
-    pub updated_at: String,
+    pub updated_at: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RatecardInput {
+    pub name: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RatecardInputMetadata {
+    #[serde(rename = "serviceIds")]
+    pub service_ids: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateRatecardVars {
+    #[serde(rename = "ratecardInput")]
+    pub ratecard_input: RatecardInput,
+    #[serde(rename = "ratecardInputMetadata")]
+    pub ratecard_input_metadata: RatecardInputMetadata,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateRatecardResponse {
+    #[serde(rename = "createRatecard")]
+    pub create_ratecard: Option<Ratecard>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Deserialize, Serialize)]

@@ -13,11 +13,10 @@ use web_sys::HtmlFormElement;
 use crate::components::forms::select::{CustomSelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
-use crate::data::context::shared::{fetch_currencies, fetch_service_rates, fetch_services};
+use crate::data::context::shared::{fetch_ratecards, fetch_services};
 use crate::data::models::graphql::shared::{
-    CreateServiceRateResponse, CreateServiceRateVars, ServiceRateInput, ServiceRateInputMetadata,
+    CreateRatecardResponse, CreateRatecardVars, RatecardInput, RatecardInputMetadata,
 };
-use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -40,7 +39,7 @@ use crate::{
 };
 
 #[island]
-pub fn ServiceRates() -> impl IntoView {
+pub fn Ratecards() -> impl IntoView {
     view! {
         <>
             <Outlet />
@@ -49,16 +48,15 @@ pub fn ServiceRates() -> impl IntoView {
 }
 
 #[island]
-pub fn ServiceRatesList() -> impl IntoView {
+pub fn RatecardsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
-    let service_rates = move || current_state.service_rates();
+    let ratecards = move || current_state.ratecards();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
         vec![
-            Column::new("Service Title", false),
-            Column::new("Base Rate", true),
-            Column::new("Currency", true),
+            Column::new("Name", false),
+            Column::new("Date of Creation", true),
         ],
         vec![],
     ));
@@ -75,71 +73,58 @@ pub fn ServiceRatesList() -> impl IntoView {
                 ),
             );
 
-            let _response = fetch_service_rates(&current_state, Some(&headers)).await;
+            let _response = fetch_ratecards(&current_state, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
     });
 
     Effect::new(move || {
-        let service_rates_rows: Vec<HashMap<String, TableCellData>> = service_rates()
+        let ratecards_rows: Vec<HashMap<String, TableCellData>> = ratecards()
             .get()
             .iter()
-            .map(|service_rate| {
+            .map(|ratecard| {
                 let mut hash_map_data = HashMap::new();
 
                 // This id is the unique identifier of the table row. and is a MUST for the table to function properly.
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".into(),
-                    TableCellData::String(service_rate.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(ratecard.id.as_ref().unwrap().to_owned()),
                 );
 
                 hash_map_data.insert(
-                    "Service Title".into(),
-                    TableCellData::String(
-                        service_rate
-                            .service
-                            .as_ref()
-                            .unwrap()
-                            .title
-                            .as_ref()
-                            .unwrap()
-                            .to_owned(),
-                    ),
+                    "Name".into(),
+                    TableCellData::String(ratecard.name.as_ref().unwrap().to_owned()),
                 );
 
                 hash_map_data.insert(
-                    "Base Rate".into(),
-                    TableCellData::String(format!(
-                        "{:.2}",
-                        service_rate.base_rate.as_ref().unwrap()
-                    )),
+                    "Date of Creation".into(),
+                    TableCellData::DateTime(ratecard.created_at.as_ref().unwrap().to_owned()),
                 );
-                hash_map_data.insert("Currency".into(), TableCellData::String("N/A".into()));
                 hash_map_data
             })
             .collect();
 
         table_data.update(move |prev| {
-            prev.1 = service_rates_rows;
+            prev.1 = ratecards_rows;
         });
     });
 
     view! {
         <>
-            <Title text="Service Rates"/>
+            <Title text="Rate Cards"/>
             <div class="mx-[5%] md:mx-[10%]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Service Rates"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Rate Cards"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Service Rates</h1>
+            <h1 class="mx-[5%] md:mx-[10%]">Rate Cards</h1>
 
             <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
-                <A href="/dashboard/service-rates/create">
+                <A href="/dashboard/ratecards/create">
                     <BasicButton
                         button_text="Create"
                         icon=Some(IconData::BsPlusLg)
@@ -157,35 +142,27 @@ pub fn ServiceRatesList() -> impl IntoView {
 }
 
 #[island]
-pub fn CreateServiceRate() -> impl IntoView {
+pub fn CreateRatecard() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
     let selected_services_options = RwSignal::new(vec![] as Vec<String>);
-    let selected_currency_options = RwSignal::new(vec![] as Vec<String>);
     let submit_is_disabled = Memo::new(move |_| {
-        (!main_form_is_valid.get()
-            || selected_services_options.get().is_empty()
-            || selected_currency_options.get().is_empty())
+        (!main_form_is_valid.get() || selected_services_options.get().is_empty())
     });
     let current_state = expect_context::<Store<AppStateContext>>();
     let services = move || current_state.services();
-    let currencies = move || current_state.currencies();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
     let services_options = RwSignal::new(vec![] as Vec<SelectOption>);
-    let currency_options = RwSignal::new(vec![] as Vec<SelectOption>);
 
     let onprimary_handler = Callback::new(move |_| {
-        if !selected_services_options.get().is_empty()
-            && !selected_currency_options.get().is_empty()
-            && main_form_is_valid.get()
-        {
+        if !selected_services_options.get().is_empty() && main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
                 if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
                     let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                        ServiceRateInput,
+                        RatecardInput,
                     >(
                         &main_form_data, false, None
                     );
@@ -198,22 +175,26 @@ pub fn CreateServiceRate() -> impl IntoView {
 
                     let deserialized_main_form_data = deserialized_main_form_data.unwrap();
 
-                    let input_vars = CreateServiceRateVars {
-                        service_rate_input: deserialized_main_form_data,
-                        service_rate_input_metadata: ServiceRateInputMetadata {
-                            service_id: selected_services_options.get_untracked().join(","),
-                            currency_id: selected_currency_options.get_untracked().join(","),
+                    let input_vars = CreateRatecardVars {
+                        ratecard_input: deserialized_main_form_data,
+                        ratecard_input_metadata: RatecardInputMetadata {
+                            service_ids: selected_services_options.get_untracked(),
                         },
                     };
 
                     let query = r#"
-                           mutation CreateServiceRate($serviceRateInput: ServiceRateInput!, $serviceRateInputMetadata: ServiceRateInputMetadata!) {
-                                createServiceRate(serviceRateInput: $serviceRateInput, serviceRateInputMetadata: $serviceRateInputMetadata) {
-                                   hourWeek
-                                   createdAt
-                                   updatedAt
-                                   id
-                                   baseRate
+                           mutation CreateRatecard($ratecardInput: RatecardInput!, $ratecardInputMetadata: RatecardInputMetadata!) {
+                                createRatecard(ratecardInput: $ratecardInput, ratecardInputMetadata: $ratecardInputMetadata) {
+                                    name
+                                    createdAt
+                                    updatedAt
+                                    id
+                                    services {
+                                        title
+                                        description
+                                        thumbnail
+                                        id
+                                    }
                                }
                            }
                        "#;
@@ -228,8 +209,8 @@ pub fn CreateServiceRate() -> impl IntoView {
                     );
 
                     let response = perform_mutation_or_query_with_vars::<
-                        CreateServiceRateResponse,
-                        CreateServiceRateVars,
+                        CreateRatecardResponse,
+                        CreateRatecardVars,
                     >(
                         Some(&headers),
                         "http://localhost:8080/api/shared",
@@ -252,6 +233,7 @@ pub fn CreateServiceRate() -> impl IntoView {
                             set_is_loading.set(false);
 
                             success_modal_is_open.update(|status| *status = true);
+                            selected_services_options.set(vec![]);
                         }
                         None => {
                             set_is_loading.set(false);
@@ -274,7 +256,6 @@ pub fn CreateServiceRate() -> impl IntoView {
             );
 
             let _fetch_services_res = fetch_services(&current_state, Some(&headers)).await;
-            let _fetch_currencies_res = fetch_currencies(&current_state, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -289,19 +270,6 @@ pub fn CreateServiceRate() -> impl IntoView {
                     SelectOption::new(
                         service.id.as_ref().unwrap(),
                         service.title.as_ref().unwrap(),
-                    )
-                })
-                .collect(),
-        );
-
-        currency_options.set(
-            currencies()
-                .get()
-                .iter()
-                .map(|currency| {
-                    SelectOption::new(
-                        currency.id.as_ref().unwrap(),
-                        currency.name.as_ref().unwrap(),
                     )
                 })
                 .collect(),
@@ -328,10 +296,10 @@ pub fn CreateServiceRate() -> impl IntoView {
 
     view! {
         <>
-            <Title text="New Service Rate"/>
+            <Title text="New Rate Card"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div class="p-[10px]">
-                    <p>"Service Rate created successfully!"</p>
+                    <p>"Rate Card created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
@@ -344,34 +312,27 @@ pub fn CreateServiceRate() -> impl IntoView {
             </Show>
 
             <div class="mx-[5%] md:mx-[10%]">
-                <Breadcrumbs custom_route_names=["Home", "Dashboard", "ServiceRates", "New"] />
+                <Breadcrumbs custom_route_names=["Home", "Dashboard", "Rate Cards", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Service Rate</h1>
+            <h1 class="mx-[5%] md:mx-[10%]">New Rate Card</h1>
 
             <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
-                <h2>Service Rate Metadata</h2>
+                <h2>Rate Card Metadata</h2>
                 <CustomSelectInput
-                    label="Service"
+                    label="Services"
                     required=true
-                    id_attr="service_id"
+                    id_attr="service_ids"
                     options=services_options
                     value=selected_services_options
-                />
-                <CustomSelectInput
-                    label="Currency"
-                    required=true
-                    id_attr="currency_id"
-                    options=currency_options
-                    value=selected_currency_options
+                    multiple=true
                 />
             </div>
 
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
                 <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
-                    <h2>Service Rate Info</h2>
-                    <InputField field_type=InputFieldType::Number label="Base Rate" required=true id_attr="base_rate" name="base_rate" />
-                    <InputField field_type=InputFieldType::Number label="Hour Week" id_attr="hour_week" name="hour_week" />
+                    <h2>Rate Card Info</h2>
+                    <InputField field_type=InputFieldType::Text label="Name" required=true id_attr="name" name="name" />
 
                     <BasicButton
                         button_text="Submit"

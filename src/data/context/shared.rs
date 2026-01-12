@@ -428,8 +428,9 @@ pub async fn fetch_roles(
 }
 
 pub async fn fetch_ratecards(
+    current_state: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
-) -> Result<Vec<Ratecard>, Vec<GraphQLErrorMessage>> {
+) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_ratecards_query = r#"
         query FetchRatecards {
             fetchRatecards {
@@ -458,7 +459,9 @@ pub async fn fetch_ratecards(
         Some(data) => {
             let owned_data = data.fetch_ratecards.as_ref().unwrap().to_vec();
 
-            Ok(owned_data)
+            *current_state.ratecards().write() = owned_data;
+
+            Ok(())
         }
         None => Err(fetch_ratecards_response.get_error().to_vec()),
     }

@@ -6,6 +6,7 @@ pub mod organizations;
 pub mod permissions;
 pub mod portfolio;
 pub mod professional_details;
+pub mod ratecards;
 pub mod resources;
 pub mod resume;
 pub mod roles;

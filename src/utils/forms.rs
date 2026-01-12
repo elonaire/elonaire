@@ -43,8 +43,6 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
                 Value::String(s)
             };
 
-            leptos::logging::log!("Deserialized value: {:?}", val);
-
             // Merge into existing entry if present
             match map.get_mut(&key) {
                 Some(existing) => match existing {

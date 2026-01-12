@@ -5,8 +5,8 @@ use crate::data::models::{
     graphql::{
         acl::{Department, Organization, Permission, Resource, SystemRole, User},
         shared::{
-            Currency, ServiceRate, UserPortfolio, UserProfessionalInfo, UserResume, UserService,
-            UserSkill,
+            Currency, Ratecard, ServiceRate, UserPortfolio, UserProfessionalInfo, UserResume,
+            UserService, UserSkill,
         },
     },
 };
@@ -27,4 +27,5 @@ pub struct AppStateContext {
     roles: Vec<SystemRole>,
     service_rates: Vec<ServiceRate>,
     currencies: Vec<Currency>,
+    ratecards: Vec<Ratecard>,
 }

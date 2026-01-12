@@ -1,23 +1,40 @@
+use std::collections::HashMap;
+
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
+use reactive_stores::Store;
 
 use crate::{
     components::molecules::{headline::Headline, ratecard::RatecardComponent, top_nav::TopNav},
-    data::{context::shared::fetch_ratecards, models::graphql::shared::Ratecard},
+    data::{
+        context::{
+            shared::fetch_ratecards,
+            store::{AppStateContext, AppStateContextStoreFields},
+        },
+        models::{
+            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            graphql::shared::Ratecard,
+        },
+    },
 };
 
 #[island]
 pub fn Ratecard() -> impl IntoView {
-    let (ratecards, set_ratecards) = signal(vec![] as Vec<Ratecard>);
+    let current_state = expect_context::<Store<AppStateContext>>();
+    let ratecards = move || current_state.ratecards();
 
     Effect::new(move || {
         spawn_local(async move {
-            let ratecards_res = fetch_ratecards(None).await;
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
 
-            if let Ok(ratecards) = ratecards_res {
-                // Process ratecards data here
-                set_ratecards.set(ratecards);
-            }
+            let _ratecards_res = fetch_ratecards(&current_state, None).await;
         });
     });
 
@@ -31,13 +48,13 @@ pub fn Ratecard() -> impl IntoView {
                 <Headline title="My Ratecard" description="How much do I charge?" />
                 <div class="mx-[5%] md:mx-[10%] flex flex-col md:flex-row gap-[10px]">
                     <For
-                        each=move || ratecards.get()
+                        each=move || ratecards().get()
                         key=|ratecard| ratecard.id.clone()
                         children=move |ratecard| {
                             view! {
                                 <RatecardComponent
-                                    name=RwSignal::new(ratecard.name.clone())
-                                    services=RwSignal::new(ratecard.services.to_vec())
+                                    name=RwSignal::new(ratecard.name.as_ref().unwrap().clone())
+                                    services=RwSignal::new(ratecard.services.as_ref().unwrap().to_vec())
                                 />
                             }
                         }
