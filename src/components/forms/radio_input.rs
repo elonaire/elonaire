@@ -31,22 +31,66 @@ impl RadioOption {
     }
 }
 
-/// This component represents a radio input field.
-/// Example usage:
-/// ```
-/// <RadioInputField label="Male" id_attr="male_lone" />
-/// ```
+/// This component represents a single radio input field.
+///
 /// It also allows the use of children properties to customize the appearance and behavior of the radio input field. You may use the children property to add custom content to the radio input field. e.g images
+///
 /// Example usage:
 /// ```
-/// <RadioInputField id_attr="male">
-///     <div class="flex items-center gap-2">
-///         <span class="text-gray-700 text-sm">Male</span>
-///     </div>
-/// </RadioInputField>
+/// <RadioInputField label="Male" value="male" id_attr="male_lone" />
 /// ```
 #[component]
 pub fn RadioInputField(
+    #[prop(into, optional, default = RwSignal::new("".to_string()))] initial_value: RwSignal<
+        String,
+    >,
+    #[prop(into, optional)] name: String,
+    #[prop(into, optional)] label: String,
+    #[prop(default = false, optional)] required: bool,
+    #[prop(optional, default = false)] is_selected: bool,
+    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
+    #[prop(optional)] children: Option<ViewFn>,
+) -> impl IntoView {
+    view! {
+        <label for=move || initial_value.get() class="inline-flex items-center gap-2 text-mid-gray text-sm cursor-pointer px-2 py-1 rounded">
+            <input
+                class="leading-tight size-5 rounded-full border-2 border-mid-gray text-secondary shadow-sm
+                           focus:outline-none focus:ring-0 focus:border-secondary
+                           checked:bg-secondary checked:border-secondary accent-secondary"
+                type="radio"
+                name=name
+                value=initial_value
+                checked=is_selected
+                id=move || initial_value.get()
+                required=required
+                on:input=move |ev| {
+                    oninput.run(ev);
+                }
+            />
+            <div class="flex flex-col">
+                <span>{label}</span>
+                {children.map(|children| children.run())}
+            </div>
+        </label>
+    }
+}
+/// This component represents grouped radio input fields.
+///
+/// It also allows the use of children properties to customize the appearance and behavior of the radio input field. You may use the children property to add custom content to the radio input field. e.g images
+///
+/// Example usage:
+/// ```
+/// <RadioInputGroup id_attr="male" options=vec![
+///    RadioOption::new("true", "Active", None),
+///    RadioOption::new("false", "InActive", None),
+///]>
+///     <div class="flex items-center gap-2">
+///         <span class="text-gray-700 text-sm">Male</span>
+///     </div>
+/// </RadioInputGroup>
+/// ```
+#[component]
+pub fn RadioInputGroup(
     #[prop(into, optional, default = RwSignal::new("".to_string()))] initial_value: RwSignal<
         String,
     >,
@@ -83,7 +127,7 @@ pub fn RadioInputField(
                     <legend class=legend_combined_class>
                         {legend}
                         {if required {
-                            Some(view! { <span class="text-red-500 ml-1">*</span> })
+                            Some(view! { <span class="text-danger ml-1">*</span> })
                         } else {
                             None
                         }}

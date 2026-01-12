@@ -9,6 +9,7 @@ pub mod professional_details;
 pub mod resources;
 pub mod resume;
 pub mod roles;
+pub mod service_rates;
 pub mod skills;
 pub mod user_services;
 pub mod users;

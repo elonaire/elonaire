@@ -400,12 +400,12 @@ pub fn CreatePortfolio() -> impl IntoView {
         <>
             <Title text="Create Portfolio"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
-                <div>
+                <div class="p-[10px]">
                     <p>"Portfolio Project created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
-                <div>
+                <div class="p-[10px]">
                     <p>"Are you sure that you want to submit?"</p>
                 </div>
             </BasicModal>

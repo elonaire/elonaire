@@ -533,3 +533,81 @@ pub struct CreateServiceRequestResponse {
     #[serde(rename = "createServiceRequest")]
     pub create_service_request: Option<ServiceRequest>, // this is the return type expected from the API on success
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceRateInput {
+    #[serde(rename = "baseRate", alias = "base_rate")]
+    pub base_rate: String,
+    #[serde(rename = "hourWeek", alias = "hour_week")]
+    pub hour_week: Option<u8>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceRateInputMetadata {
+    #[serde(rename = "serviceId")]
+    pub service_id: String,
+    #[serde(rename = "currencyId")]
+    pub currency_id: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Store)]
+pub struct ServiceRate {
+    pub id: Option<String>,
+    pub service: Option<UserService>,
+    #[serde(rename = "baseRate")]
+    pub base_rate: Option<String>,
+    #[serde(rename = "hourWeek")]
+    pub hour_week: Option<u8>,
+    #[serde(rename = "currencyId")]
+    pub currency_id: Option<CurrencyId>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<String>,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Store)]
+pub struct CurrencyId {
+    pub id: Option<String>,
+    #[serde(rename = "currencyId")]
+    pub currency_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreateServiceRateVars {
+    #[serde(rename = "serviceRateInput")]
+    pub service_rate_input: ServiceRateInput,
+    #[serde(rename = "serviceRateInputMetadata")]
+    pub service_rate_input_metadata: ServiceRateInputMetadata,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateServiceRateResponse {
+    #[serde(rename = "createServiceRate")]
+    pub create_service_rate: Option<ServiceRate>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchServiceRatesResponse {
+    #[serde(rename = "fetchServiceRates")]
+    pub fetch_service_rates: Option<Vec<ServiceRate>>, // this is the return type expected from the API on success
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Store)]
+pub struct Currency {
+    pub id: Option<String>,
+    pub code: Option<String>,
+    pub numeric: Option<String>,
+    pub name: Option<String>,
+    pub symbol: Option<String>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<String>,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FetchCurrenciesResponse {
+    #[serde(rename = "fetchCurrencies")]
+    pub fetch_currencies: Option<Vec<Currency>>, // this is the return type expected from the API on success
+}

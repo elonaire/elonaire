@@ -37,7 +37,7 @@ pub fn Textarea(
             <label class="block text-mid-gray text-sm font-bold" for=id_attr.clone()>
                 {label}
                 {move || required.then_some(view! {
-                    <span class="text-red-500 ml-1">*</span>
+                    <span class="text-danger ml-1">*</span>
                 })}
             </label>
             <textarea

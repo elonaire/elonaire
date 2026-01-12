@@ -9,3 +9,7 @@ backend = "http://localhost:3001"
 [[proxy]]
 rewrite = "/api/shared"
 backend = "http://localhost:3002"
+
+[[proxy]]
+rewrite = "/api/payments"
+backend = "http://localhost:3013"

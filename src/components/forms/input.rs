@@ -76,6 +76,11 @@ pub fn InputField(
         InputFieldType::Week => "week",
     };
 
+    let step = match field_type {
+        InputFieldType::Number => Some("any"),
+        _ => None,
+    };
+
     view! {
         <div class=move || format!("{}", ext_wrapper_styles)>
             <label
@@ -84,7 +89,7 @@ pub fn InputField(
             >
                 {label}
                 {move || required.then_some(view! {
-                    <span class="text-red-500 ml-1">*</span>
+                    <span class="text-danger ml-1">*</span>
                 })}
             </label>
             <input
@@ -106,6 +111,7 @@ pub fn InputField(
                 on:change={move |ev| onchange.run(ev)}
                 accept=accept
                 multiple=multiple
+                step=step
             />
         </div>
     }

@@ -2,11 +2,20 @@ use icondata as IconId;
 use leptos::ev;
 use leptos::html::Select;
 use leptos::prelude::*;
+use leptos::wasm_bindgen::JsCast;
 use serde::{Deserialize, Serialize};
+use web_sys::HtmlInputElement;
 
-use crate::components::{
-    forms::input::{InputField, InputFieldType},
-    general::button::BasicButton,
+use crate::{
+    components::{
+        forms::{
+            checkbox::CheckboxInputField,
+            input::{InputField, InputFieldType},
+            radio_input::RadioInputField,
+        },
+        general::button::BasicButton,
+    },
+    utils::forms::fire_bubbled_and_cancelable_event,
 };
 
 // Define the SelectOption struct
@@ -67,7 +76,7 @@ pub fn SelectInput(
                 {label.clone()}
                 { if !label.clone().is_empty() && required {
                     Some(view! {
-                        <span class="text-red-500 ml-1">*</span>
+                        <span class="text-danger ml-1">*</span>
                     })
                 } else {
                     None
@@ -109,7 +118,7 @@ pub fn SelectInput(
                     })
                     .collect::<Vec<_>>()}
             </select>
-            <p class="text-red-500 text-xs italic">
+            <p class="text-danger text-xs italic">
                 {move || if display_error.get() {
                     "This field is required"
                 } else {
@@ -124,9 +133,8 @@ pub fn SelectInput(
 #[component]
 pub fn CustomSelectInput(
     #[prop(into)] label: String,
-    #[prop(into, optional)] name: String,
     #[prop(into)] options: RwSignal<Vec<SelectOption>>,
-    #[prop(into)] value: RwSignal<Vec<String>>,
+    #[prop(into, optional, default = RwSignal::new(Vec::new()))] value: RwSignal<Vec<String>>,
 
     // false = normal select (single)
     // true  = checkbox-style multi select
@@ -138,6 +146,7 @@ pub fn CustomSelectInput(
 ) -> impl IntoView {
     let (open, set_open) = signal(false);
     let (query, set_query) = signal(String::new());
+    // let input_ref = NodeRef::new();
 
     // ---------- Derived state ----------
 
@@ -185,15 +194,15 @@ pub fn CustomSelectInput(
     view! {
         <div class="relative w-full">
             <label for=id_attr.clone() class="block text-mid-gray text-sm font-bold">
-                {label}
+                {label.clone()}
                 {move || required.then_some(view! {
-                    <span class="text-red-500 ml-1">*</span>
+                    <span class="text-danger ml-1">*</span>
                 })}
             </label>
 
             // Control with chips
             <div
-                class="relative rounded-[5px] px-2 py-2 cursor-pointer flex flex-wrap gap-2 min-h-[40px] border border-mid-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow"
+                class="relative rounded-[5px] px-3 py-2 cursor-pointer flex items-center flex-wrap gap-2 min-h-[40px] border border-mid-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow"
                 on:click=move |_| set_open.set(true)
             >
                 {move || {
@@ -275,12 +284,20 @@ pub fn CustomSelectInput(
                                     on:click=move |_| select_value(val.clone())
                                 >
                                     {multiple.then_some(view! {
-                                        <input
-                                            type="checkbox"
-                                            checked=selected
-                                            class="pointer-events-none"
-                                        />
+                                        <CheckboxInputField checked=selected />
                                     })}
+
+                                    {
+                                        if !multiple {
+                                            Some(
+                                                view! {
+                                                    <RadioInputField is_selected=selected />
+                                                }
+                                            )
+                                        } else {
+                                            None
+                                        }
+                                    }
 
                                     <span class=move || if selected {
                                         "font-semibold"
@@ -295,13 +312,6 @@ pub fn CustomSelectInput(
                     </ul>
                 </div>
             })}
-
-            // Hidden input for native form submission
-            <input
-                type="hidden"
-                name=name
-                value=move || value.get().join(",")
-            />
         </div>
     }
 }

@@ -12,8 +12,9 @@ use crate::{
                 FetchResourcesResponse, FetchSystemRolesResponse,
             },
             shared::{
-                FetchBillingRateResponse, FetchBillingRateVars, FetchRatecardsResponse,
-                FetchSiteResourcesResponse, Ratecard,
+                FetchBillingRateResponse, FetchBillingRateVars, FetchCurrenciesResponse,
+                FetchRatecardsResponse, FetchServiceRatesResponse, FetchSiteResourcesResponse,
+                Ratecard, ServiceRate,
             },
         },
     },
@@ -489,5 +490,87 @@ pub async fn fetch_billing_rate(
             Ok(owned_data)
         }
         None => Err(fetch_billing_rate_response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_service_rates(
+    current_state: &Store<AppStateContext>,
+    headers: Option<&HashMap<String, String>>,
+) -> Result<(), Vec<GraphQLErrorMessage>> {
+    let fetch_service_rates_query = r#"
+        query FetchServiceRates {
+            fetchServiceRates {
+                hourWeek
+                createdAt
+                updatedAt
+                id
+                baseRate
+                service {
+                    title
+                    description
+                    thumbnail
+                    id
+                }
+                currencyId {
+                    currencyId
+                    id
+                }
+            }
+        }
+       "#;
+
+    let fetch_service_rates_response = perform_query_without_vars::<FetchServiceRatesResponse>(
+        headers,
+        "http://localhost:8080/api/shared",
+        fetch_service_rates_query,
+    )
+    .await;
+
+    match fetch_service_rates_response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_service_rates.as_ref().unwrap().to_vec();
+
+            *current_state.service_rates().write() = owned_data;
+
+            Ok(())
+        }
+        None => Err(fetch_service_rates_response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_currencies(
+    current_state: &Store<AppStateContext>,
+    headers: Option<&HashMap<String, String>>,
+) -> Result<(), Vec<GraphQLErrorMessage>> {
+    let query = r#"
+        query FetchCurrencies {
+            fetchCurrencies {
+                code
+                numeric
+                name
+                symbol
+                createdAt
+                updatedAt
+                id
+            }
+        }
+       "#;
+
+    let response = perform_query_without_vars::<FetchCurrenciesResponse>(
+        headers,
+        "http://localhost:8080/api/payments",
+        query,
+    )
+    .await;
+
+    match response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_currencies.as_ref().unwrap().to_vec();
+
+            *current_state.currencies().write() = owned_data;
+
+            Ok(())
+        }
+        None => Err(response.get_error().to_vec()),
     }
 }

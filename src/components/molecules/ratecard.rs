@@ -456,8 +456,8 @@ pub fn RatecardComponent(
                     </div>
                 </BasicModal>
                 <BasicModal title="Confirm" on_click_primary=onprimary_confirm_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false stack_number=1>
-                    <div>
-                        <p class="p-[10px]">"Are you sure that you want to submit?"</p>
+                    <div class="p-[10px]">
+                        <p>"Are you sure that you want to submit?"</p>
                     </div>
                 </BasicModal>
             <div class="border-b-[0.5px]">

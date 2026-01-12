@@ -47,6 +47,11 @@ pub fn DashboardLayout() -> impl IntoView {
                 "/dashboard/services",
             ),
             MenuItem::new(
+                "Service Rates",
+                IconData::FaMoneyCheckDollarSolid,
+                "/dashboard/service-rates",
+            ),
+            MenuItem::new(
                 "Resume",
                 IconData::MdiCertificateOutline,
                 "/dashboard/resume",

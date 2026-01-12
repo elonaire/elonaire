@@ -45,8 +45,8 @@ impl CheckboxOption {
 /// ```
 #[component]
 pub fn CheckboxInputField(
-    #[prop(into)] initial_value: RwSignal<String>,
-    #[prop(into)] label: String,
+    #[prop(into, optional, default = RwSignal::new("".into()))] initial_value: RwSignal<String>,
+    #[prop(into, optional)] label: String,
     #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(default = false, optional)] readonly: bool,
@@ -151,7 +151,7 @@ pub fn CheckboxGroup(
             <legend class=legend_combined_class>
                 {legend}
                 {move || required.then_some(view! {
-                    <span class="text-red-500 ml-1">*</span>
+                    <span class="text-danger ml-1">*</span>
                 })}
             </legend>
             <div class=container_class>

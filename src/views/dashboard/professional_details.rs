@@ -27,7 +27,7 @@ use crate::{
         forms::{
             datepicker::DatePicker,
             input::{InputField, InputFieldType},
-            radio_input::RadioInputField,
+            radio_input::RadioInputGroup,
             reactive_form::ReactiveForm,
         },
         general::{
@@ -280,12 +280,12 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
         <>
             <Title text="New Profession"/>
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
-                <div>
+                <div class="p-[10px]">
                     <p>"Profession created successfully!"</p>
                 </div>
             </BasicModal>
             <BasicModal title="Confirm" on_click_primary=onprimary_handler is_open=confirm_modal_is_open use_case=UseCase::Confirmation disable_auto_close=false>
-                <div>
+                <div class="p-[10px]">
                     <p>"Are you sure that you want to submit?"</p>
                 </div>
             </BasicModal>
@@ -305,7 +305,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     <Textarea label="Description" required=true id_attr="description" name="description" />
 
                     <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <RadioInputField
+                    <RadioInputGroup
                         legend="Select Status"
                         name="active"
                         required=true
