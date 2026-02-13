@@ -12,11 +12,11 @@ use crate::{
 #[component]
 pub fn BlogPostMetadata(
     #[prop(into)] category: BlogCategory,
-    #[prop(into)] read_time: String,
+    #[prop(into)] read_time: u32,
 ) -> impl IntoView {
     view! {
         <div class="flex items-center gap-[16px] text-mid-gray">
-            <p class="text-xs">{category.to_string()}</p><div class="size-[5px] rounded-full bg-mid-gray" /><p class="text-xs">{read_time}</p>
+            <p class="text-xs">{category.to_string()}</p><div class="size-[5px] rounded-full bg-mid-gray" /><p class="text-xs">{format!("{} min read", read_time)}</p>
         </div>
     }
 }
@@ -25,7 +25,7 @@ pub fn BlogPostMetadata(
 #[component]
 pub fn BlogDetailMetadata(
     #[prop(into)] date_of_creation: String,
-    #[prop(into)] read_time: String,
+    #[prop(into)] read_time: u32,
     #[prop(into)] author_profile_pic: String,
     #[prop(into)] author_name: String,
 ) -> impl IntoView {
@@ -37,7 +37,7 @@ pub fn BlogDetailMetadata(
             <div class="size-[5px] rounded-full bg-mid-gray" />
             <p class="text-xs flex items-center gap-[10px]"><span><Icon icon=IconId::BsCalendar2Date /></span><span>{formated_creation_date}</span></p>
             <div class="size-[5px] rounded-full bg-mid-gray" />
-            <p class="text-xs">{read_time}</p>
+            <p class="text-xs">{format!("{} min read", read_time)}</p>
         </div>
     }
 }

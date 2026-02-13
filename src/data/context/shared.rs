@@ -334,6 +334,7 @@ pub async fn fetch_single_blog_post(
                     id
                     author
                     content
+                    readTime
                     comments {
                         content
                         createdAt

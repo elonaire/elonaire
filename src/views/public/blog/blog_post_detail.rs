@@ -50,7 +50,7 @@ pub fn BlogPostDetail() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
 
     // Add scroll event listener to toggle menu visibility
-    window_event_listener(ev::scroll, move |_| {
+    let window_scroll_listener = window_event_listener(ev::scroll, move |_| {
         if let Some(comments_el) = comments_ref.get() as Option<HtmlDivElement> {
             let rect = comments_el.get_bounding_client_rect();
             if let Ok(window_height) = window().inner_height() {
@@ -213,6 +213,11 @@ pub fn BlogPostDetail() -> impl IntoView {
         }
     });
 
+    // Ensure removal when component goes out of scope
+    on_cleanup(move || {
+        window_scroll_listener.remove(); // Explicitly detach
+    });
+
     view! {
         <Title text="Blog Detail"/>
 
@@ -247,7 +252,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                     Some(author_details) => {
                                                         Some(
                                                             view! {
-                                                                <BlogDetailMetadata date_of_creation={blog_post.created_at.as_ref().unwrap().to_owned()} read_time="2 mins read" author_profile_pic={author_details.profile_picture.as_ref().unwrap().to_owned()} author_name={author_details.full_name.as_ref().unwrap().to_owned()} />
+                                                                <BlogDetailMetadata date_of_creation={blog_post.created_at.as_ref().unwrap().to_owned()} read_time={blog_post.read_time.as_ref().unwrap().to_owned()} author_profile_pic={author_details.profile_picture.as_ref().unwrap().to_owned()} author_name={author_details.full_name.as_ref().unwrap().to_owned()} />
                                                             }
                                                         )
                                                     }

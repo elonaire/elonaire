@@ -86,6 +86,7 @@ pub fn BlogHome() -> impl IntoView {
                             updatedAt
                             id
                             author
+                            readTime
                         }
                         metadata {
                             requestId
@@ -135,6 +136,7 @@ pub fn BlogHome() -> impl IntoView {
                             updatedAt
                             id
                             author
+                            readTime
                         }
                         metadata {
                             requestId
@@ -206,7 +208,7 @@ pub fn BlogHome() -> impl IntoView {
                                 .iter()
                                 .map(|blog_post| {
                                     view! {
-                                        <BlogPostPreview thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned() title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned() short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned() category=blog_post.category.unwrap().to_owned() read_time="2 mins" link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned() />
+                                        <BlogPostPreview thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned() title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned() short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned() category=blog_post.category.unwrap().to_owned() read_time=blog_post.read_time.as_ref().unwrap_or(&0).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned() />
                                     }
                                 })
                                 .collect_view()

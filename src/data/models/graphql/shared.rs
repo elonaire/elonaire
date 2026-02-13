@@ -410,6 +410,8 @@ pub struct BlogPost {
     pub author: Option<String>,
     #[serde(skip_serializing)]
     pub full_author_details: Option<User>,
+    #[serde(rename = "readTime")]
+    pub read_time: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

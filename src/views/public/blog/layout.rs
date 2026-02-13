@@ -4,7 +4,10 @@ use icondata as IconId;
 use leptos::{ev, prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
-use leptos_router::components::{A, Outlet};
+use leptos_router::{
+    components::{A, Outlet},
+    hooks::use_location,
+};
 use reactive_stores::Store;
 
 use crate::{
@@ -18,17 +21,19 @@ use crate::{
 
 #[island]
 pub fn BlogLayout() -> impl IntoView {
-    // track collapsed state
     let current_state = expect_context::<Store<AppStateContext>>();
+    // track collapsed state
     let (collapsed, set_collapsed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
+    let current_path = use_location().pathname;
 
     let handle_menu_click =
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("About", IconId::BsInfoSquare, "/blog/about"),
+            MenuItem::new("Blog Home", IconId::MdiFolderHomeOutline, "/blog"),
+            MenuItem::new("About", IconId::BsInfo, "/blog/about"),
             MenuItem::new("Categories", IconId::BiFilterAltRegular, "/blog/categories"),
             MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
             MenuItem::new("Contact", IconId::BiMessageAddRegular, "/blog/contact"),
@@ -79,12 +84,19 @@ pub fn BlogLayout() -> impl IntoView {
                                         key=|menu_item| menu_item.path.to_owned()
                                         let(child)
                                     >
-                                        <div class="block rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
-                                            <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
-                                                <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
-                                                <span class="flex-1">{child.label}</span>
-                                            </A>
-                                        </div>
+                                        { move || {
+                                            let is_active = current_path.get() == child.path;
+                                            view! {
+                                                <div class=format!("block rounded-[5px] hover:bg-light-gray h-[40px] my-[5px] {}", if is_active { "bg-primary text-contrast-white" } else { "" }) on:click=move |_| set_collapsed.set(false)>
+                                                    <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
+                                                        <span class=format!("{}", if is_active { "text-contrast-white" } else { "text-mid-gray" })><Icon width="24" height="24" icon=child.icon /></span>
+                                                        <span class="flex-1">{child.label}</span>
+                                                    </A>
+                                                </div>
+                                            }
+                                        }
+
+                                        }
                                     </For>
                                 </nav>
                             </div>

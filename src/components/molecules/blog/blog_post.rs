@@ -12,7 +12,7 @@ pub fn BlogPostPreview(
     #[prop(into)] title: String,
     #[prop(into)] short_description: String,
     #[prop(into)] category: BlogCategory,
-    #[prop(into)] read_time: String,
+    #[prop(into)] read_time: u32,
     #[prop(into)] link: String,
 ) -> impl IntoView {
     view! {
