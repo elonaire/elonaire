@@ -29,7 +29,7 @@ pub fn About() -> impl IntoView {
     view! {
         <Title text="About"/>
         <main>
-            <div class="min-h-screen bg-navy flex flex-col gap-[40px]">
+            <div class="min-h-svh bg-navy flex flex-col gap-[40px]">
                 <div class="sticky top-0 z-10 bg-navy">
                     <TopNav />
                 </div>

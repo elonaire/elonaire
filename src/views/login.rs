@@ -103,7 +103,13 @@ pub fn SignIn() -> impl IntoView {
             let query = r#"
                    mutation SignIn($rawUserDetails: UserLoginsInput!) {
                        signIn(rawUserDetails: $rawUserDetails) {
-                           url
+                           data {
+                               url
+                           }
+                           metadata {
+                               newAccessToken
+                               requestId
+                           }
                        }
                    }
                "#;
@@ -122,7 +128,7 @@ pub fn SignIn() -> impl IntoView {
                     Some(data) => {
                         match &data.sign_in {
                             Some(auth_details) => {
-                                navigate(auth_details.url.as_ref().unwrap().as_str());
+                                navigate(auth_details.get_data().url.as_ref().unwrap().as_str());
                             }
                             None => {
                                 set_is_loading.set(false);
@@ -176,7 +182,13 @@ pub fn SignIn() -> impl IntoView {
                             let query = r#"
                                    mutation SignIn($rawUserDetails: UserLoginsInput!) {
                                        signIn(rawUserDetails: $rawUserDetails) {
-                                            token
+                                            data {
+                                                token
+                                            }
+                                            metadata {
+                                                newAccessToken
+                                                requestId
+                                            }
                                        }
                                    }
                                "#;
@@ -206,7 +218,12 @@ pub fn SignIn() -> impl IntoView {
                                             set_is_loading.set(false);
 
                                             *current_state.user().auth_info().token().write() =
-                                                auth_details.token.as_ref().unwrap().to_owned();
+                                                auth_details
+                                                    .get_data()
+                                                    .token
+                                                    .as_ref()
+                                                    .unwrap()
+                                                    .to_owned();
                                         }
                                         None => {
                                             set_is_loading.set(false);

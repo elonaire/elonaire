@@ -1,44 +1,23 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
-use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
-use leptos::wasm_bindgen::JsCast;
 use leptos_meta::*;
-use leptos_router::components::{A, Outlet};
+use leptos_router::components::Outlet;
 use reactive_stores::Store;
-use web_sys::HtmlFormElement;
 
-use crate::components::forms::select::{CustomSelectInput, SelectOption};
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
-use crate::data::context::shared::{
-    fetch_currencies, fetch_service_rates, fetch_service_requests, fetch_services,
-};
-use crate::data::models::graphql::shared::{
-    CreateServiceRateResponse, CreateServiceRateVars, ServiceRateInput, ServiceRateInputMetadata,
-};
-use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
+use crate::data::context::shared::fetch_service_requests;
 use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
+    components::general::{
+        breadcrumbs::Breadcrumbs,
+        table::data_table::{Column, DataTable},
     },
     data::{
         context::store::{AppStateContext, AppStateContextStoreFields},
         models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
 #[island]

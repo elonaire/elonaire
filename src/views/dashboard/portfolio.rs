@@ -16,8 +16,7 @@ use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_portfolio;
 use crate::data::models::graphql::shared::{
-    CreatePortfolioItemResponse, FetchSiteResourcesResponse, UserPortfolioCategory,
-    UserPortfolioInputVars,
+    CreatePortfolioItemResponse, UserPortfolioCategory, UserPortfolioInputVars,
 };
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::{
@@ -267,17 +266,23 @@ pub fn CreatePortfolio() -> impl IntoView {
                                                 let query = r#"
                                                        mutation CreatePortfolioItem($portfolioItem: UserPortfolioInput!, $skills: [String!]!) {
                                                             createPortfolioItem(portfolioItem: $portfolioItem, skills: $skills) {
-                                                                id
-                                                                title
-                                                                description
-                                                                link
-                                                                startDate
-                                                                category
-                                                                thumbnail
-                                                                skills {
+                                                                data {
                                                                     id
+                                                                    title
+                                                                    description
+                                                                    link
+                                                                    startDate
+                                                                    category
                                                                     thumbnail
-                                                                    name
+                                                                    skills {
+                                                                        id
+                                                                        thumbnail
+                                                                        name
+                                                                    }
+                                                                }
+                                                                metadata {
+                                                                    newAccessToken
+                                                                    requestId
                                                                 }
                                                             }
                                                        }

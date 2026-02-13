@@ -1,5 +1,13 @@
-use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
-use leptos::prelude::*;
+use std::collections::HashMap;
+
+use crate::data::{
+    context::{
+        shared::check_auth,
+        store::{AppStateContext, AppStateContextStoreFields},
+    },
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+};
+use leptos::{prelude::*, task::spawn_local};
 use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
 
@@ -15,18 +23,47 @@ pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
     let user = move || current_state.user(); // Should return ReadSignal<UserInfo>
     let navigate = use_navigate();
 
+    let is_authenticated = Memo::new(move |_| !user().auth_info().token().get().is_empty());
+
     // Effect to handle navigation based on auth status
     Effect::new(move |_| {
-        if user().get().auth_info.token.is_empty() {
-            // User is not authenticated, redirect to sign-in
-            navigate("/sign-in", Default::default());
+        if !is_authenticated.get() {
+            // User is not authenticated, try checking if they have an active session
+            let navigate = navigate.clone();
+            let current_state = current_state.clone();
+            spawn_local(async move {
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        current_state.user().auth_info().token().get_untracked()
+                    ),
+                );
+
+                let check_auth = check_auth(Some(&headers)).await;
+
+                match check_auth {
+                    Ok(auth) => {
+                        *current_state.user().auth_info().token().write() = auth
+                            .new_access_token
+                            .as_ref()
+                            .unwrap_or(&String::new())
+                            .to_owned();
+                    }
+                    Err(_) => {
+                        // User is not authenticated, and server failed to verify session.
+                        navigate("/sign-in", Default::default());
+                    }
+                }
+            });
         }
     });
 
     view! {
         <>
             {move || {
-                if !user().get().auth_info.token.is_empty() {
+                if is_authenticated.get() {
                     // User is authenticated, render children
                     Some(children().into_view())
                 } else {

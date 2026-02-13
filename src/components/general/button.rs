@@ -36,6 +36,8 @@ pub enum ButtonType {
 pub fn BasicButton(
     #[prop(into, optional)] button_text: String,
     #[prop(into, optional)] style_ext: String,
+    #[prop(into, optional, default = Signal::derive(move || "".to_string()))]
+    style_ext_reactive: Signal<String>,
     #[prop(into, optional)] children_style_ext: String,
     #[prop(default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(default = None)] icon: Option<IconId>,
@@ -64,8 +66,9 @@ pub fn BasicButton(
                 }
             }
             class=move || format!(
-                "font-bold py-2 px-4 cursor-pointer rounded-[5px] disabled:opacity-50 disabled:cursor-not-allowed {}",
-                style_ext
+                "font-bold py-2 px-4 cursor-pointer rounded-[5px] disabled:opacity-50 disabled:cursor-not-allowed {} {}",
+                style_ext,
+                style_ext_reactive.get()
             )
             on:click=move |ev| onclick.run(ev)
             disabled={disabled}

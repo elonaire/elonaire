@@ -209,11 +209,17 @@ pub fn CreateServiceRate() -> impl IntoView {
                     let query = r#"
                            mutation CreateServiceRate($serviceRateInput: ServiceRateInput!, $serviceRateInputMetadata: ServiceRateInputMetadata!) {
                                 createServiceRate(serviceRateInput: $serviceRateInput, serviceRateInputMetadata: $serviceRateInputMetadata) {
-                                   hourWeek
-                                   createdAt
-                                   updatedAt
-                                   id
-                                   baseRate
+                                   data {
+                                        hourWeek
+                                        createdAt
+                                        updatedAt
+                                        id
+                                        baseRate
+                                   }
+                                   metadata {
+                                        newAccessToken
+                                        requestId
+                                   }
                                }
                            }
                        "#;

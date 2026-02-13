@@ -19,22 +19,28 @@ pub async fn fetch_site_owner_info(
     let fetch_site_owner_query = r#"
            query FetchSiteOwnerInfo {
                 fetchSiteOwnerInfo {
-                    firstName
-                    middleName
-                    lastName
-                    gender
-                    dob
-                    email
-                    country
-                    createdAt
-                    updatedAt
-                    profilePicture
-                    bio
-                    website
-                    address
-                    id
-                    fullName
-                    age
+                    data {
+                        firstName
+                        middleName
+                        lastName
+                        gender
+                        dob
+                        email
+                        country
+                        createdAt
+                        updatedAt
+                        profilePicture
+                        bio
+                        website
+                        address
+                        id
+                        fullName
+                        age
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
+                    }
                 }
            }
        "#;
@@ -48,7 +54,12 @@ pub async fn fetch_site_owner_info(
 
     match fetch_site_owner_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_site_owner_info.as_ref().unwrap().to_owned();
+            let owned_data = data
+                .fetch_site_owner_info
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_owned();
             *current_state.site_owner_info().write() = owned_data;
 
             Ok(())

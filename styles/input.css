@@ -78,6 +78,37 @@
     .text-small {
         @apply text-xs md:text-sm font-normal leading-normal text-gray;
     }
+
+    ul {
+        @apply list-disc list-inside;
+    }
+
+    ol {
+        @apply list-decimal list-inside;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    article pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    article code {
+        white-space: pre-wrap;
+        /* only for inline code */
+        word-break: break-word;
+    }
 }
 
 @keyframes progress-indeterminate {
@@ -117,15 +148,4 @@
     .flip-back {
         transition: transform 0.7s ease;
     }
-}
-
-.scrollbar-hidden::-webkit-scrollbar {
-    display: none;
-}
-
-.scrollbar-hidden {
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
 }

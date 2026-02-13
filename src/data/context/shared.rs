@@ -8,12 +8,15 @@ use crate::{
         context::store::{AppStateContext, AppStateContextStoreFields},
         models::graphql::{
             acl::{
-                FetchDepartmentsResponse, FetchOrganizationsResponse, FetchPermissionsResponse,
-                FetchResourcesResponse, FetchSystemRolesResponse,
+                AuthStatus, CheckAuthResponse, FetchDepartmentsResponse,
+                FetchOrganizationsResponse, FetchPermissionsResponse, FetchResourcesResponse,
+                FetchSingleUserResponse, FetchSingleUserVars, FetchSystemRolesResponse, User,
             },
             shared::{
-                FetchBillingRateResponse, FetchBillingRateVars, FetchCurrenciesResponse,
-                FetchRatecardsResponse, FetchServiceRatesResponse, FetchServiceRequestsResponse,
+                BlogPost, FetchBillingRateResponse, FetchBillingRateVars,
+                FetchBlogPostsQueryFilters, FetchBlogPostsResponse, FetchBlogPostsVars,
+                FetchCurrenciesResponse, FetchRatecardsResponse, FetchServiceRatesResponse,
+                FetchServiceRequestsResponse, FetchSingleBlogPostResponse, FetchSingleBlogPostVars,
                 FetchSiteResourcesResponse, Ratecard, ServiceRate,
             },
         },
@@ -29,11 +32,17 @@ pub async fn fetch_services(
     let fetch_services_query = r#"
            query FetchSiteResources {
                 fetchSiteResources {
-                    services {
-                        title
-                        description
-                        thumbnail
-                        id
+                    data {
+                        services {
+                            title
+                            description
+                            thumbnail
+                            id
+                        }
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
                     }
                 }
            }
@@ -52,6 +61,7 @@ pub async fn fetch_services(
                 .fetch_site_resources
                 .as_ref()
                 .unwrap()
+                .get_data()
                 .services
                 .as_ref()
                 .unwrap()
@@ -71,13 +81,19 @@ pub async fn fetch_professions(
     let fetch_professions_query = r#"
            query FetchSiteResources {
                 fetchSiteResources {
-                    professionalInfo {
-                        description
-                        active
-                        occupation
-                        startDate
-                        id
-                        yearsOfExperience
+                    data {
+                        professionalInfo {
+                            description
+                            active
+                            occupation
+                            startDate
+                            id
+                            yearsOfExperience
+                        }
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
                     }
                 }
            }
@@ -96,6 +112,7 @@ pub async fn fetch_professions(
                 .fetch_site_resources
                 .as_ref()
                 .unwrap()
+                .get_data()
                 .professional_info
                 .as_ref()
                 .unwrap()
@@ -115,19 +132,25 @@ pub async fn fetch_resume(
     let fetch_resume_query = r#"
            query FetchSiteResources {
                 fetchSiteResources {
-                    resume {
-                        title
-                        moreInfo
-                        startDate
-                        endDate
-                        link
-                        section
-                        id
-                        yearsOfExperience
-                        achievements {
+                    data {
+                        resume {
+                            title
+                            moreInfo
+                            startDate
+                            endDate
+                            link
+                            section
                             id
-                            description
+                            yearsOfExperience
+                            achievements {
+                                id
+                                description
+                            }
                         }
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
                     }
                 }
            }
@@ -146,6 +169,7 @@ pub async fn fetch_resume(
                 .fetch_site_resources
                 .as_ref()
                 .unwrap()
+                .get_data()
                 .resume
                 .as_ref()
                 .unwrap()
@@ -165,15 +189,21 @@ pub async fn fetch_skills(
     let fetch_skills_query = r#"
            query FetchSiteResources {
                 fetchSiteResources {
-                    skills {
-                        thumbnail
-                        name
-                        description
-                        level
-                        type
-                        startDate
-                        id
-                        yearsOfExperience
+                    data {
+                        skills {
+                            thumbnail
+                            name
+                            description
+                            level
+                            type
+                            startDate
+                            id
+                            yearsOfExperience
+                        }
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
                     }
                 }
            }
@@ -192,6 +222,7 @@ pub async fn fetch_skills(
                 .fetch_site_resources
                 .as_ref()
                 .unwrap()
+                .get_data()
                 .skills
                 .as_ref()
                 .unwrap()
@@ -211,16 +242,22 @@ pub async fn fetch_portfolio(
     let fetch_portfolio_query = r#"
            query FetchSiteResources {
                 fetchSiteResources {
-                    portfolio {
-                        title
-                        description
-                        startDate
-                        endDate
-                        link
-                        category
-                        thumbnail
-                        id
-                        yearsOfExperience
+                    data {
+                        portfolio {
+                            title
+                            description
+                            startDate
+                            endDate
+                            link
+                            category
+                            thumbnail
+                            id
+                            yearsOfExperience
+                        }
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
                     }
                 }
            }
@@ -239,6 +276,7 @@ pub async fn fetch_portfolio(
                 .fetch_site_resources
                 .as_ref()
                 .unwrap()
+                .get_data()
                 .portfolio
                 .as_ref()
                 .unwrap()
@@ -251,6 +289,121 @@ pub async fn fetch_portfolio(
     }
 }
 
+pub async fn fetch_blog_posts(
+    headers: Option<&HashMap<String, String>>,
+    filters: FetchBlogPostsVars,
+    query: &str,
+) -> Result<Vec<BlogPost>, Vec<GraphQLErrorMessage>> {
+    let fetch_blog_posts_response = perform_mutation_or_query_with_vars::<
+        FetchBlogPostsResponse,
+        FetchBlogPostsVars,
+    >(
+        headers, "http://localhost:8080/api/shared", query, filters
+    )
+    .await;
+
+    match fetch_blog_posts_response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_blog_posts.as_ref().unwrap().get_data().to_vec();
+
+            Ok(owned_data)
+        }
+        None => Err(fetch_blog_posts_response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_single_blog_post(
+    headers: Option<&HashMap<String, String>>,
+    vars: FetchSingleBlogPostVars,
+) -> Result<BlogPost, Vec<GraphQLErrorMessage>> {
+    let query = r#"
+        query FetchSingleBlogPost($blogIdOrSlug: String!) {
+            fetchSingleBlogPost(blogIdOrSlug: $blogIdOrSlug) {
+                data {
+                    title
+                    shortDescription
+                    status
+                    thumbnail
+                    category
+                    link
+                    publishedDate
+                    isFeatured
+                    isPremium
+                    createdAt
+                    updatedAt
+                    id
+                    author
+                    content
+                    comments {
+                        content
+                        createdAt
+                        updatedAt
+                        id
+                        replyCount
+                        author
+                    }
+                }
+                metadata {
+                    requestId
+                    newAccessToken
+                }
+            }
+        }
+       "#;
+
+    let response = perform_mutation_or_query_with_vars::<
+        FetchSingleBlogPostResponse,
+        FetchSingleBlogPostVars,
+    >(headers, "http://localhost:8080/api/shared", query, vars)
+    .await;
+
+    match response.get_data() {
+        Some(data) => {
+            let owned_data = data.fetch_single_blog_post.as_ref().unwrap().get_data();
+
+            Ok(owned_data)
+        }
+        None => Err(response.get_error().to_vec()),
+    }
+}
+
+pub async fn check_auth(
+    headers: Option<&HashMap<String, String>>,
+) -> Result<AuthStatus, Vec<GraphQLErrorMessage>> {
+    let check_auth_query = r#"
+        query CheckAuth {
+            checkAuth {
+                data {
+                    isAuth
+                    sub
+                    currentRole
+                    newAccessToken
+                }
+                metadata {
+                    requestId
+                    newAccessToken
+                }
+            }
+        }
+       "#;
+
+    let check_auth_response = perform_query_without_vars::<CheckAuthResponse>(
+        headers,
+        "http://localhost:8080/api/acl",
+        check_auth_query,
+    )
+    .await;
+
+    match check_auth_response.get_data() {
+        Some(data) => {
+            let owned_data = data.check_auth.as_ref().unwrap().get_data();
+
+            Ok(owned_data)
+        }
+        None => Err(check_auth_response.get_error().to_vec()),
+    }
+}
+
 pub async fn fetch_departments(
     current_state: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
@@ -258,25 +411,31 @@ pub async fn fetch_departments(
     let fetch_departments_query = r#"
            query FetchDepartments {
                 fetchDepartments {
-                    depName
-                    createdAt
-                    updatedAt
-                    id
-                    createdBy
+                    data {
+                        depName
+                        createdAt
+                        updatedAt
+                        id
+                        createdBy
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
+                    }
                 }
            }
        "#;
 
     let fetch_departments_response = perform_query_without_vars::<FetchDepartmentsResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        "http://localhost:8080/api/acl",
         fetch_departments_query,
     )
     .await;
 
     match fetch_departments_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_departments.as_ref().unwrap().to_vec();
+            let owned_data = data.fetch_departments.as_ref().unwrap().get_data().to_vec();
             *current_state.departments().write() = owned_data;
 
             Ok(())
@@ -292,11 +451,17 @@ pub async fn fetch_organizations(
     let fetch_orgs_query = r#"
            query FetchOrganizations {
                 fetchOrganizations {
-                    orgName
-                    createdAt
-                    updatedAt
-                    id
-                    createdBy
+                    data {
+                        orgName
+                        createdAt
+                        updatedAt
+                        id
+                        createdBy
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
+                    }
                 }
            }
        "#;
@@ -310,7 +475,12 @@ pub async fn fetch_organizations(
 
     match fetch_orgs_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_organizations.as_ref().unwrap().to_vec();
+            let owned_data = data
+                .fetch_organizations
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_vec();
             *current_state.organizations().write() = owned_data;
 
             Ok(())
@@ -326,15 +496,21 @@ pub async fn fetch_permissions(
     let fetch_permissions_query = r#"
            query FetchCurrentRolePermissions {
                 fetchCurrentRolePermissions {
-                   name
-                   isAdmin
-                   isSuperAdmin
-                   id
-                   createdBy
-                   resource {
-                       name
-                   }
-               }
+                    data {
+                        name
+                        isAdmin
+                        isSuperAdmin
+                        id
+                        createdBy
+                        resource {
+                            name
+                        }
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
+                    }
+                }
            }
        "#;
 
@@ -351,6 +527,7 @@ pub async fn fetch_permissions(
                 .fetch_current_role_permissions
                 .as_ref()
                 .unwrap()
+                .get_data()
                 .to_vec();
             *current_state.permissions().write() = owned_data;
 
@@ -367,10 +544,16 @@ pub async fn fetch_resources(
     let fetch_resources_query = r#"
            query FetchResources {
                 fetchResources {
-                    name
-                    id
-                    createdBy
-                    createdAt
+                    data {
+                        name
+                        id
+                        createdBy
+                        createdAt
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
+                    }
                 }
            }
        "#;
@@ -384,7 +567,7 @@ pub async fn fetch_resources(
 
     match fetch_resources_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_resources.as_ref().unwrap().to_vec();
+            let owned_data = data.fetch_resources.as_ref().unwrap().get_data().to_vec();
             *current_state.resources().write() = owned_data;
 
             Ok(())
@@ -400,11 +583,17 @@ pub async fn fetch_roles(
     let fetch_roles_query = r#"
            query FetchSystemRoles {
                 fetchSystemRoles {
-                    roleName
-                    isAdmin
-                    isDefault
-                    isSuperAdmin
-                    id
+                    data {
+                        roleName
+                        isAdmin
+                        isDefault
+                        isSuperAdmin
+                        id
+                    }
+                    metadata {
+                        newAccessToken
+                        requestId
+                    }
                 }
            }
        "#;
@@ -418,12 +607,63 @@ pub async fn fetch_roles(
 
     match fetch_roles_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_system_roles.as_ref().unwrap().to_vec();
+            let owned_data = data
+                .fetch_system_roles
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_vec();
             *current_state.roles().write() = owned_data;
 
             Ok(())
         }
         None => Err(fetch_roles_response.get_error().to_vec()),
+    }
+}
+
+pub async fn fetch_author_info(
+    vars: &FetchSingleUserVars,
+    headers: Option<&HashMap<String, String>>,
+) -> Result<User, Vec<GraphQLErrorMessage>> {
+    let fetch_author_info_query = r#"
+        query FetchSingleUser($userId: String!) {
+            fetchSingleUser(userId: $userId) {
+                data {
+                    profilePicture
+                    bio
+                    id
+                    fullName
+                    email
+                }
+                metadata {
+                    requestId
+                    newAccessToken
+                }
+            }
+        }
+       "#;
+
+    let fetch_auth_info_response =
+        perform_mutation_or_query_with_vars::<FetchSingleUserResponse, FetchSingleUserVars>(
+            headers,
+            "http://localhost:8080/api/acl",
+            fetch_author_info_query,
+            vars.to_owned(),
+        )
+        .await;
+
+    match fetch_auth_info_response.get_data() {
+        Some(data) => {
+            let owned_data = data
+                .fetch_single_user
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_owned();
+
+            Ok(owned_data)
+        }
+        None => Err(fetch_auth_info_response.get_error().to_vec()),
     }
 }
 
@@ -434,15 +674,21 @@ pub async fn fetch_ratecards(
     let fetch_ratecards_query = r#"
         query FetchRatecards {
             fetchRatecards {
-                name
-                createdAt
-                updatedAt
-                id
-                services {
-                    title
-                    description
-                    thumbnail
+                data {
+                    name
+                    createdAt
+                    updatedAt
                     id
+                    services {
+                        title
+                        description
+                        thumbnail
+                        id
+                    }
+                }
+                metadata {
+                    newAccessToken
+                    requestId
                 }
             }
         }
@@ -457,7 +703,7 @@ pub async fn fetch_ratecards(
 
     match fetch_ratecards_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_ratecards.as_ref().unwrap().to_vec();
+            let owned_data = data.fetch_ratecards.as_ref().unwrap().get_data().to_vec();
 
             *current_state.ratecards().write() = owned_data;
 
@@ -473,7 +719,13 @@ pub async fn fetch_billing_rate(
 ) -> Result<String, Vec<GraphQLErrorMessage>> {
     let fetch_billing_rate_query = r#"
         query FetchBillingRate($billingInterval: BillingInterval!, $serviceIds: [String!]!) {
-            fetchBillingRate(billingInterval: $billingInterval, serviceIds: $serviceIds)
+            fetchBillingRate(billingInterval: $billingInterval, serviceIds: $serviceIds) {
+                data
+                metadata {
+                    newAccessToken
+                    requestId
+                }
+            }
         }
        "#;
 
@@ -488,7 +740,12 @@ pub async fn fetch_billing_rate(
 
     match fetch_billing_rate_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_billing_rate.as_ref().unwrap().to_owned();
+            let owned_data = data
+                .fetch_billing_rate
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_owned();
 
             Ok(owned_data)
         }
@@ -503,20 +760,26 @@ pub async fn fetch_service_rates(
     let fetch_service_rates_query = r#"
         query FetchServiceRates {
             fetchServiceRates {
-                hourWeek
-                createdAt
-                updatedAt
-                id
-                baseRate
-                service {
-                    title
-                    description
-                    thumbnail
+                data {
+                    hourWeek
+                    createdAt
+                    updatedAt
                     id
+                    baseRate
+                    service {
+                        title
+                        description
+                        thumbnail
+                        id
+                    }
+                    currencyId {
+                        currencyId
+                        id
+                    }
                 }
-                currencyId {
-                    currencyId
-                    id
+                metadata {
+                    newAccessToken
+                    requestId
                 }
             }
         }
@@ -531,7 +794,12 @@ pub async fn fetch_service_rates(
 
     match fetch_service_rates_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_service_rates.as_ref().unwrap().to_vec();
+            let owned_data = data
+                .fetch_service_rates
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_vec();
 
             *current_state.service_rates().write() = owned_data;
 
@@ -548,13 +816,19 @@ pub async fn fetch_currencies(
     let query = r#"
         query FetchCurrencies {
             fetchCurrencies {
-                code
-                numeric
-                name
-                symbol
-                createdAt
-                updatedAt
-                id
+                data {
+                    code
+                    numeric
+                    name
+                    symbol
+                    createdAt
+                    updatedAt
+                    id
+                }
+                metadata {
+                    newAccessToken
+                    requestId
+                }
             }
         }
        "#;
@@ -568,7 +842,7 @@ pub async fn fetch_currencies(
 
     match response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_currencies.as_ref().unwrap().to_vec();
+            let owned_data = data.fetch_currencies.as_ref().unwrap().get_data().to_vec();
 
             *current_state.currencies().write() = owned_data;
 
@@ -585,15 +859,21 @@ pub async fn fetch_service_requests(
     let query = r#"
         query FetchServiceRequests {
             fetchServiceRequests {
-                description
-                startDate
-                endDate
-                createdAt
-                updatedAt
-                id
-                supportingDocs {
-                    fileId
+                data {
+                    description
+                    startDate
+                    endDate
+                    createdAt
+                    updatedAt
                     id
+                    supportingDocs {
+                        fileId
+                        id
+                    }
+                }
+                metadata {
+                    newAccessToken
+                    requestId
                 }
             }
         }
@@ -608,7 +888,12 @@ pub async fn fetch_service_requests(
 
     match response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_service_requests.as_ref().unwrap().to_vec();
+            let owned_data = data
+                .fetch_service_requests
+                .as_ref()
+                .unwrap()
+                .get_data()
+                .to_vec();
 
             *current_state.service_requests().write() = owned_data;
 

@@ -185,15 +185,21 @@ pub fn CreateRatecard() -> impl IntoView {
                     let query = r#"
                            mutation CreateRatecard($ratecardInput: RatecardInput!, $ratecardInputMetadata: RatecardInputMetadata!) {
                                 createRatecard(ratecardInput: $ratecardInput, ratecardInputMetadata: $ratecardInputMetadata) {
-                                    name
-                                    createdAt
-                                    updatedAt
-                                    id
-                                    services {
-                                        title
-                                        description
-                                        thumbnail
+                                    data {
+                                        name
+                                        createdAt
+                                        updatedAt
                                         id
+                                        services {
+                                            title
+                                            description
+                                            thumbnail
+                                            id
+                                        }
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
                                     }
                                }
                            }

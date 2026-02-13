@@ -1,18 +1,15 @@
 use icondata as IconId;
 use leptos::prelude::*;
-use std::collections::HashMap;
 
-use crate::components::general::{
-    button::{BasicButton, ButtonGroup},
-    table::data_table::TableCellData,
-};
+use crate::components::general::button::{BasicButton, ButtonGroup};
 
 /// This is a pagination component which emits an `on_page_change` event using a callback
 #[component]
 pub fn Pagination(
-    /// pagination_state: (current_page, total_pages, current_data)
-    pagination_state: Memo<(usize, usize, Vec<HashMap<String, TableCellData>>)>,
-    on_page_change: Callback<usize>,
+    /// pagination_state: (current_page, total_pages)
+    #[prop(into)]
+    pagination_state: Signal<(usize, usize)>,
+    #[prop(optional, default = Callback::new(|_| {}))] on_page_change: Callback<usize>,
 ) -> impl IntoView {
     let current_page = Memo::new(move |_| pagination_state.get().0);
     let total_pages = Memo::new(move |_| pagination_state.get().1);

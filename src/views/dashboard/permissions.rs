@@ -17,13 +17,11 @@ use crate::components::general::tag::LabelTag;
 use crate::components::schemas::props::ColorTemperature;
 use crate::data::context::shared::{fetch_permissions, fetch_resources};
 use crate::data::models::graphql::acl::{
-    AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, FetchPermissionsResponse,
-    FetchResourcesResponse, PermissionInput, PermissionMetadata,
+    AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, PermissionInput,
+    PermissionMetadata,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -235,13 +233,19 @@ pub fn CreatePermission() -> impl IntoView {
                         let query = r#"
                                mutation CreatePermission($permissionInput: PermissionInput!, $permissionMetadata: PermissionMetadata!) {
                                     createPermission(permissionInput: $permissionInput, permissionMetadata: $permissionMetadata) {
-                                        name
-                                        isAdmin
-                                        isSuperAdmin
-                                        createdAt
-                                        updatedAt
-                                        id
-                                        createdBy
+                                        data {
+                                            name
+                                            isAdmin
+                                            isSuperAdmin
+                                            createdAt
+                                            updatedAt
+                                            id
+                                            createdBy
+                                        }
+                                        metadata {
+                                            newAccessToken
+                                            requestId
+                                        }
                                     }
                                }
                            "#;

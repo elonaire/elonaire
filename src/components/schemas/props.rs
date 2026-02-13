@@ -6,6 +6,7 @@ pub enum ColorTemperature {
     Warning,
     Info,
     Primary,
+    Gray,
 }
 
 #[derive(Debug, Clone)]

@@ -12,6 +12,7 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
 use crate::components::forms::textarea::Textarea;
 use crate::components::forms::toggle_switch::ToggleSwitch;
+use crate::components::general::richtext_editor::{ExtraFormatingOption, RichTextEditor};
 use crate::components::general::spinner::Spinner;
 use crate::data::models::graphql::shared::{
     BlogCategory, BlogStatus, CreateBlogPostResponse, CreateBlogPostVars,
@@ -101,7 +102,6 @@ pub fn BlogList() -> impl IntoView {
 pub fn CreateBlog() -> impl IntoView {
     let form_ref = NodeRef::new();
     let thumbnail_file_input_ref = NodeRef::new();
-    let content_file_input_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
     let current_state = expect_context::<Store<AppStateContext>>();
@@ -140,110 +140,81 @@ pub fn CreateBlog() -> impl IntoView {
             if let Some(thumbnail_file_input) =
                 thumbnail_file_input_ref.to_owned().get() as Option<HtmlInputElement>
             {
-                if let Some(content_file_input) =
-                    content_file_input_ref.to_owned().get() as Option<HtmlInputElement>
-                {
-                    if let Ok(files_form_data) = FormData::new() {
-                        if let Some(thumbnail_filelist) = thumbnail_file_input.files() {
-                            for i in 0..thumbnail_filelist.length() {
-                                if let Some(file) = thumbnail_filelist.item(i) {
-                                    if let Err(e) =
-                                        files_form_data.append_with_blob("thumbnail", &file)
-                                    {
-                                        leptos::logging::error!("Failed to append Blob: {:?}", e);
-                                    };
-                                }
+                if let Ok(files_form_data) = FormData::new() {
+                    if let Some(thumbnail_filelist) = thumbnail_file_input.files() {
+                        for i in 0..thumbnail_filelist.length() {
+                            if let Some(file) = thumbnail_filelist.item(i) {
+                                if let Err(e) = files_form_data.append_with_blob("thumbnail", &file)
+                                {
+                                    leptos::logging::error!("Failed to append Blob: {:?}", e);
+                                };
                             }
                         }
+                    }
 
-                        if let Some(content_filelist) = content_file_input.files() {
-                            for i in 0..content_filelist.length() {
-                                if let Some(file) = content_filelist.item(i) {
-                                    if let Err(e) =
-                                        files_form_data.append_with_blob("content_file", &file)
-                                    {
-                                        leptos::logging::error!("Failed to append Blob: {:?}", e);
-                                    };
-                                }
-                            }
-                        }
-
-                        spawn_local(async move {
-                            match gloo_net::http::Request::post(
-                                "http://localhost:8080/api/files/upload",
+                    spawn_local(async move {
+                        match gloo_net::http::Request::post(
+                            "http://localhost:8080/api/files/upload",
+                        )
+                        .header(
+                            "Authorization",
+                            format!(
+                                "Bearer {}",
+                                current_state.user().auth_info().token().get_untracked()
                             )
-                            .header(
-                                "Authorization",
-                                format!(
-                                    "Bearer {}",
-                                    current_state.user().auth_info().token().get_untracked()
-                                )
-                                .as_str(),
-                            )
-                            .body(files_form_data)
-                            .unwrap()
-                            .send()
-                            .await
-                            {
-                                Ok(response) => {
-                                    match response.json::<Vec<UploadedFileResponse>>().await {
-                                        Ok(uploaded_files) => {
-                                            if let Some(form_data) =
-                                                get_form_data_from_form_ref(&form_ref)
-                                            {
-                                                let thumbnail = uploaded_files
-                                                    .iter()
-                                                    .find(|file| file.field_name == "thumbnail");
-                                                let content_file = uploaded_files
-                                                    .iter()
-                                                    .find(|file| file.field_name == "content_file");
-                                                // Implement logic to handle form data
-                                                if let Err(e) = form_data.append_with_str(
-                                                    "thumbnail",
-                                                    format!(
-                                                        "http://localhost:3001/view/{}",
-                                                        thumbnail.unwrap().file_name
-                                                    )
-                                                    .as_str(),
-                                                ) {
-                                                    leptos::logging::log!(
-                                                        "Error appending thumbnail: {:?}",
-                                                        e
-                                                    );
-                                                    return;
-                                                };
+                            .as_str(),
+                        )
+                        .body(files_form_data)
+                        .unwrap()
+                        .send()
+                        .await
+                        {
+                            Ok(response) => {
+                                match response.json::<Vec<UploadedFileResponse>>().await {
+                                    Ok(uploaded_files) => {
+                                        if let Some(form_data) =
+                                            get_form_data_from_form_ref(&form_ref)
+                                        {
+                                            let thumbnail = uploaded_files
+                                                .iter()
+                                                .find(|file| file.field_name == "thumbnail");
+                                            // Implement logic to handle form data
+                                            if let Err(e) = form_data.append_with_str(
+                                                "thumbnail",
+                                                format!(
+                                                    "http://localhost:3001/view/{}",
+                                                    thumbnail.unwrap().file_name
+                                                )
+                                                .as_str(),
+                                            ) {
+                                                leptos::logging::log!(
+                                                    "Error appending thumbnail: {:?}",
+                                                    e
+                                                );
+                                                return;
+                                            };
 
-                                                if let Err(e) = form_data.append_with_str(
-                                                    "content_file",
-                                                    content_file.unwrap().file_id.as_str(),
-                                                ) {
-                                                    leptos::logging::log!(
-                                                        "Error appending content file: {:?}",
-                                                        e
-                                                    );
-                                                    return;
-                                                };
+                                            let deserialized_form_data =
+                                                deserialize_form_data_to_struct::<BlogPostInput>(
+                                                    &form_data, true, None,
+                                                );
 
-                                                let deserialized_form_data =
-                                                    deserialize_form_data_to_struct::<BlogPostInput>(
-                                                        &form_data, true, None,
-                                                    );
+                                            if deserialized_form_data.is_none() {
+                                                set_is_loading.set(false);
+                                                return;
+                                            }
 
-                                                if deserialized_form_data.is_none() {
-                                                    set_is_loading.set(false);
-                                                    return;
-                                                }
+                                            let deserialized_form_data =
+                                                deserialized_form_data.unwrap();
 
-                                                let deserialized_form_data =
-                                                    deserialized_form_data.unwrap();
+                                            let input_vars = CreateBlogPostVars {
+                                                blog_post: deserialized_form_data,
+                                            };
 
-                                                let input_vars = CreateBlogPostVars {
-                                                    blog_post: deserialized_form_data,
-                                                };
-
-                                                let query = r#"
-                                                       mutation CreateBlogPost($blogPost: BlogPostInput!) {
-                                                            createBlogPost(blogPost: $blogPost) {
+                                            let query = r#"
+                                                   mutation CreateBlogPost($blogPost: BlogPostInput!) {
+                                                        createBlogPost(blogPost: $blogPost) {
+                                                            data {
                                                                 id
                                                                 shortDescription
                                                                 title
@@ -253,75 +224,76 @@ pub fn CreateBlog() -> impl IntoView {
                                                                 thumbnail
                                                                 publishedDate
                                                             }
-                                                       }
-                                                   "#;
-
-                                                let mut headers =
-                                                    HashMap::new() as HashMap<String, String>;
-                                                headers.insert(
-                                                    "Authorization".into(),
-                                                    format!(
-                                                        "Bearer {}",
-                                                        current_state
-                                                            .user()
-                                                            .auth_info()
-                                                            .token()
-                                                            .get_untracked()
-                                                    ),
-                                                );
-
-                                                let response =
-                                                    perform_mutation_or_query_with_vars::<
-                                                        CreateBlogPostResponse,
-                                                        CreateBlogPostVars,
-                                                    >(
-                                                        Some(&headers),
-                                                        "http://localhost:8080/api/shared",
-                                                        query,
-                                                        input_vars,
-                                                    )
-                                                    .await;
-
-                                                match response.get_data() {
-                                                    Some(_data) => {
-                                                        if let Some(form) = form_ref
-                                                            .get_untracked()
-                                                            .and_then(|el| {
-                                                                el.dyn_into::<HtmlFormElement>()
-                                                                    .ok()
-                                                            })
-                                                        {
-                                                            form.reset();
-                                                            set_form_is_valid.set(false);
-                                                        } else {
+                                                            metadata {
+                                                                newAccessToken
+                                                                requestId
+                                                            }
                                                         }
-                                                        set_is_loading.set(false);
+                                                   }
+                                               "#;
 
-                                                        success_modal_is_open
-                                                            .update(|status| *status = true);
-                                                    }
-                                                    None => {
-                                                        set_is_loading.set(false);
-                                                    }
-                                                };
-                                            };
-                                        }
-                                        Err(err) => {
-                                            leptos::logging::error!(
-                                                "Failed to parse uploaded file response: {:?}",
-                                                err
+                                            let mut headers =
+                                                HashMap::new() as HashMap<String, String>;
+                                            headers.insert(
+                                                "Authorization".into(),
+                                                format!(
+                                                    "Bearer {}",
+                                                    current_state
+                                                        .user()
+                                                        .auth_info()
+                                                        .token()
+                                                        .get_untracked()
+                                                ),
                                             );
-                                            set_is_loading.set(false);
-                                        }
-                                    };
-                                }
-                                Err(err) => {
-                                    leptos::logging::error!("Failed to upload files: {:?}", err);
-                                    set_is_loading.set(false);
-                                }
-                            };
-                        });
-                    };
+
+                                            let response = perform_mutation_or_query_with_vars::<
+                                                CreateBlogPostResponse,
+                                                CreateBlogPostVars,
+                                            >(
+                                                Some(&headers),
+                                                "http://localhost:8080/api/shared",
+                                                query,
+                                                input_vars,
+                                            )
+                                            .await;
+
+                                            match response.get_data() {
+                                                Some(_data) => {
+                                                    if let Some(form) =
+                                                        form_ref.get_untracked().and_then(|el| {
+                                                            el.dyn_into::<HtmlFormElement>().ok()
+                                                        })
+                                                    {
+                                                        form.reset();
+                                                        set_form_is_valid.set(false);
+                                                    } else {
+                                                    }
+                                                    set_is_loading.set(false);
+
+                                                    success_modal_is_open
+                                                        .update(|status| *status = true);
+                                                }
+                                                None => {
+                                                    set_is_loading.set(false);
+                                                }
+                                            };
+                                        };
+                                    }
+                                    Err(err) => {
+                                        leptos::logging::error!(
+                                            "Failed to parse uploaded file response: {:?}",
+                                            err
+                                        );
+                                        set_is_loading.set(false);
+                                    }
+                                };
+                            }
+                            Err(err) => {
+                                leptos::logging::error!("Failed to upload files: {:?}", err);
+                                set_is_loading.set(false);
+                            }
+                        };
+                    });
                 };
             };
         }
@@ -402,7 +374,7 @@ pub fn CreateBlog() -> impl IntoView {
                           id_attr="is_featured"
                     />
                     <CustomFileInput input_node_ref=thumbnail_file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
-                    <CustomFileInput input_node_ref=content_file_input_ref label="Content File" name="content_file" id_attr="content_file" accept="text/markdown" required=true />
+                    <RichTextEditor name="content" extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock, ExtraFormatingOption::MarkdownUpload, ExtraFormatingOption::ImageUpload, ExtraFormatingOption::Lists] />
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-contrast-white"

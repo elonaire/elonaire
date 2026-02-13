@@ -407,6 +407,10 @@ pub fn DataTable(
 
     // Derived signal for paginated data
     let pagination_state = Memo::new(move |_| props.get().paginate(current_page.get()));
+    let current_page_total_pages = Memo::new(move |_| {
+        let derived_state = pagination_state.get();
+        (derived_state.0, derived_state.1)
+    });
 
     let offset_rows = Memo::new(move |_| {
         let no_of_rows = pagination_state.get().2.len();
@@ -651,7 +655,7 @@ pub fn DataTable(
                 </table>
             </div>
             <Pagination
-                pagination_state={pagination_state}
+                pagination_state={current_page_total_pages}
                 on_page_change={on_page_change}
             />
         </div>

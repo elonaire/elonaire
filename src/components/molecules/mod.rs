@@ -1,4 +1,6 @@
+pub mod blog;
 pub mod flip_card;
+pub mod footer;
 pub mod headline;
 pub mod nav;
 pub mod quick_action;

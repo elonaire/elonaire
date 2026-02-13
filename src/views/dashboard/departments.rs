@@ -16,11 +16,8 @@ use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::{fetch_departments, fetch_organizations};
 use crate::data::models::graphql::acl::{
     CreateDepartmentResponse, CreateDepartmentVars, DepartmentInput, DepartmentMetadata,
-    FetchDepartmentsResponse, FetchOrganizationsResponse,
 };
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -197,11 +194,17 @@ pub fn CreateDepartment() -> impl IntoView {
                         let query = r#"
                                mutation CreateDepartment($departmentInput: DepartmentInput!, $departmentMetadata: DepartmentMetadata!) {
                                     createDepartment(departmentInput: $departmentInput, departmentMetadata: $departmentMetadata) {
-                                        depName
-                                        createdAt
-                                        updatedAt
-                                        id
-                                        createdBy
+                                        data {
+                                            depName
+                                            createdAt
+                                            updatedAt
+                                            id
+                                            createdBy
+                                        }
+                                        metadata {
+                                            newAccessToken
+                                            requestId
+                                        }
                                     }
                                }
                            "#;

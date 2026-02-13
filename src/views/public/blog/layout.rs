@@ -1,100 +1,56 @@
-use icondata as IconData;
-use icondata::Icon as IconId;
-use leptos::{ev, prelude::*};
+use std::collections::HashMap;
+
+use icondata as IconId;
+use leptos::{ev, prelude::*, task::spawn_local};
 use leptos_icons::Icon;
+use leptos_meta::*;
 use leptos_router::components::{A, Outlet};
+use reactive_stores::Store;
 
-use crate::components::molecules::nav::Nav;
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct MenuItem<'a> {
-    pub label: &'a str,
-    pub icon: IconId,
-    pub path: &'a str,
-}
-
-impl<'a> MenuItem<'a> {
-    pub fn new(label: &'a str, icon: IconId, path: &'a str) -> Self {
-        Self { label, icon, path }
-    }
-}
+use crate::{
+    components::molecules::nav::Nav,
+    data::{
+        context::store::{AppStateContext, AppStateContextStoreFields},
+        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+    },
+    views::dashboard::layout::MenuItem,
+};
 
 #[island]
-pub fn DashboardLayout() -> impl IntoView {
+pub fn BlogLayout() -> impl IntoView {
     // track collapsed state
+    let current_state = expect_context::<Store<AppStateContext>>();
     let (collapsed, set_collapsed) = signal(false);
+    let (is_loading, set_is_loading) = signal(false);
 
     let handle_menu_click =
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("Dashboard", IconData::MdiMonitorDashboard, "/dashboard"),
-            MenuItem::new(
-                "Professional Details",
-                IconData::MdiBadgeAccountHorizontalOutline,
-                "/dashboard/professional-details",
-            ),
-            MenuItem::new(
-                "Portfolio",
-                IconData::MdiTrophyAward,
-                "/dashboard/portfolio",
-            ),
-            MenuItem::new(
-                "Services",
-                IconData::BsWrenchAdjustable,
-                "/dashboard/services",
-            ),
-            MenuItem::new(
-                "Service Rates",
-                IconData::FaMoneyBillTransferSolid,
-                "/dashboard/service-rates",
-            ),
-            MenuItem::new(
-                "Service Requests",
-                IconData::FaFileContractSolid,
-                "/dashboard/service-requests",
-            ),
-            MenuItem::new(
-                "Ratecards",
-                IconData::FaMoneyCheckDollarSolid,
-                "/dashboard/ratecards",
-            ),
-            MenuItem::new(
-                "Resume",
-                IconData::MdiCertificateOutline,
-                "/dashboard/resume",
-            ),
-            MenuItem::new(
-                "Skills",
-                IconData::BiCertificationRegular,
-                "/dashboard/skills",
-            ),
-            MenuItem::new("Users", IconData::FaUserGroupSolid, "/dashboard/users"),
-            MenuItem::new("Roles", IconData::FaUserLockSolid, "/dashboard/roles"),
-            MenuItem::new(
-                "Permissions",
-                IconData::FaUserShieldSolid,
-                "/dashboard/permissions",
-            ),
-            MenuItem::new("Resources", IconData::BsTools, "/dashboard/resources"),
-            MenuItem::new(
-                "Organizations",
-                IconData::BsBuildings,
-                "/dashboard/organizations",
-            ),
-            MenuItem::new(
-                "Departments",
-                IconData::MdiFolderAccountOutline,
-                "/dashboard/departments",
-            ),
-            MenuItem::new("Blog", IconData::RiArticleDocumentLine, "/dashboard/blog"),
-            MenuItem::new("Media", IconData::AiFileImageOutlined, "/dashboard/media"),
+            MenuItem::new("About", IconId::BsInfoSquare, "/blog/about"),
+            MenuItem::new("Categories", IconId::BiFilterAltRegular, "/blog/categories"),
+            MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
+            MenuItem::new("Contact", IconId::BiMessageAddRegular, "/blog/contact"),
         ]
     });
 
+    Effect::new(move || {
+        set_is_loading.set(true);
+        spawn_local(async move {
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+        });
+    });
+
     view! {
-        // <Title text="Dashboard"/>
+        <Title text="Techie Tenka"/>
         <main>
             <div class="relative min-h-svh bg-contrast-white">
                 {/* Sidebar overlay */}
@@ -114,7 +70,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
-                                        <Icon width="24" height="24" icon=IconData::IoClose />
+                                        <Icon width="24" height="24" icon=IconId::IoClose />
                                     </button>
                                 </div>
                                 <nav>
@@ -142,7 +98,7 @@ pub fn DashboardLayout() -> impl IntoView {
                 {move || if collapsed.get() {
                     Some(view! {
                         <div
-                            class="fixed inset-0 bg-light-gray opacity-50 z-30"
+                            class="fixed inset-0 bg-contrast-white opacity-50 z-30"
                             on:click=move |_| set_collapsed.set(false)
                         />
                     })

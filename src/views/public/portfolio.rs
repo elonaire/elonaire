@@ -114,7 +114,7 @@ pub fn Portfolio() -> impl IntoView {
     view! {
         <Title text="Portfolio"/>
         <main>
-            <div class="min-h-screen bg-navy flex flex-col gap-[40px] text-light-gray">
+            <div class="min-h-svh bg-navy flex flex-col gap-[40px] text-light-gray">
                 <div class="sticky top-0 z-10 bg-navy">
                     <TopNav />
                 </div>

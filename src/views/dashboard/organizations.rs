@@ -14,12 +14,9 @@ use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_organizations;
 use crate::data::models::graphql::acl::{
-    CreateOrganizationResponse, CreateOrganizationVars, FetchOrganizationsResponse,
-    OrganizationInput,
+    CreateOrganizationResponse, CreateOrganizationVars, OrganizationInput,
 };
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -178,11 +175,17 @@ pub fn CreateOrganization() -> impl IntoView {
                     let query = r#"
                            mutation CreateOrganization($organizationInput: OrganizationInput!) {
                                 createOrganization(organizationInput: $organizationInput) {
-                                    orgName
-                                    createdAt
-                                    updatedAt
-                                    id
-                                    createdBy
+                                    data {
+                                        orgName
+                                        createdAt
+                                        updatedAt
+                                        id
+                                        createdBy
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
+                                    }
                                 }
                            }
                        "#;

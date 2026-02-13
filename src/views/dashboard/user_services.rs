@@ -222,10 +222,16 @@ pub fn CreateUserService() -> impl IntoView {
                                                 let query = r#"
                                                        mutation CreateUserService($userService: UserServiceInput!) {
                                                             createUserService(userService: $userService) {
-                                                                title
-                                                                description
-                                                                thumbnail
-                                                                id
+                                                                data {
+                                                                    title
+                                                                    description
+                                                                    thumbnail
+                                                                    id
+                                                                }
+                                                                metadata {
+                                                                    newAccessToken
+                                                                    requestId
+                                                                }
                                                             }
                                                        }
                                                    "#;

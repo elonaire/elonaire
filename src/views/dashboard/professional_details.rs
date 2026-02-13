@@ -17,11 +17,9 @@ use crate::components::general::table::data_table::TableCellData;
 use crate::components::schemas::props::ColorTemperature;
 use crate::data::context::shared::fetch_professions;
 use crate::data::models::graphql::shared::{
-    CreateProfessionalDetailsResponse, FetchSiteResourcesResponse, ProfessionalDetailsInputVars,
+    CreateProfessionalDetailsResponse, ProfessionalDetailsInputVars,
 };
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -175,7 +173,6 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
@@ -202,11 +199,17 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                     let query = r#"
                            mutation CreateProfessionalDetails($professionalDetails: UserProfessionalInfoInput!) {
                                 createProfessionalDetails(professionalDetails: $professionalDetails) {
-                                    description
-                                    active
-                                    occupation
-                                    startDate
-                                    id
+                                    data {
+                                        description
+                                        active
+                                        occupation
+                                        startDate
+                                        id
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
+                                    }
                                 }
                            }
                        "#;

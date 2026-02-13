@@ -70,11 +70,17 @@ pub fn UsersList() -> impl IntoView {
             let fetch_users_query = r#"
                    query FetchUsers {
                         fetchUsers {
-                            id
-                            email
-                            status
-                            oauthClient
-                            fullName
+                            data {
+                                id
+                                email
+                                status
+                                oauthClient
+                                fullName
+                            }
+                            metadata {
+                                newAccessToken
+                                requestId
+                            }
                         }
                    }
                "#;
@@ -100,6 +106,7 @@ pub fn UsersList() -> impl IntoView {
                         .fetch_users
                         .as_ref()
                         .unwrap()
+                        .get_data()
                         .to_vec()
                         .iter()
                         .map(|user| {
@@ -229,11 +236,17 @@ pub fn CreateUser() -> impl IntoView {
                     let query = r#"
                            mutation SignUp($user: UserInput!) {
                                 signUp(user: $user) {
-                                    id
-                                    fullName
-                                    email
-                                    status
-                                    oauthClient
+                                    data {
+                                        id
+                                        fullName
+                                        email
+                                        status
+                                        oauthClient
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
+                                    }
                                 }
                            }
                        "#;

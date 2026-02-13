@@ -207,14 +207,20 @@ pub fn CreateResumeItem() -> impl IntoView {
                     let query = r#"
                            mutation CreateResumeItem($resumeItem: UserResumeInput!, $achievements: [String!]!) {
                                 createResumeItem(resumeItem: $resumeItem, achievements: $achievements) {
-                                    title
-                                    moreInfo
-                                    startDate
-                                    endDate
-                                    link
-                                    section
-                                    id
-                                    yearsOfExperience
+                                    data {
+                                        title
+                                        moreInfo
+                                        startDate
+                                        endDate
+                                        link
+                                        section
+                                        id
+                                        yearsOfExperience
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
+                                    }
                                 }
                            }
                        "#;

@@ -175,7 +175,6 @@ pub fn CreateSkill() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let (submission_confirmed, set_submission_confirmed) = signal(false);
     let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
     let user_skill_levels = RwSignal::new(
@@ -258,13 +257,19 @@ pub fn CreateSkill() -> impl IntoView {
                                                 let query = r#"
                                                        mutation CreateSkill($skill: UserSkillInput!) {
                                                             createSkill(skill: $skill) {
-                                                                thumbnail
-                                                                name
-                                                                description
-                                                                level
-                                                                type
-                                                                startDate
-                                                                id
+                                                                data {
+                                                                    thumbnail
+                                                                    name
+                                                                    description
+                                                                    level
+                                                                    type
+                                                                    startDate
+                                                                    id
+                                                                }
+                                                                metadata {
+                                                                    newAccessToken
+                                                                    requestId
+                                                                }
                                                             }
                                                        }
                                                    "#;

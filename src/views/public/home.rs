@@ -63,13 +63,19 @@ pub fn Home() -> impl IntoView {
             let fetch_professions_query = r#"
                    query FetchSiteResources {
                         fetchSiteResources {
-                            professionalInfo {
-                                description
-                                active
-                                occupation
-                                startDate
-                                id
-                                yearsOfExperience
+                            data {
+                                professionalInfo {
+                                    description
+                                    active
+                                    occupation
+                                    startDate
+                                    id
+                                    yearsOfExperience
+                                }
+                            }
+                            metadata {
+                                newAccessToken
+                                requestId
                             }
                         }
                    }
@@ -100,6 +106,7 @@ pub fn Home() -> impl IntoView {
                         .fetch_site_resources
                         .as_ref()
                         .unwrap()
+                        .get_data()
                         .professional_info
                         .as_ref()
                         .unwrap()
@@ -125,7 +132,7 @@ pub fn Home() -> impl IntoView {
     view! {
         <Title text="Techie Tenka"/>
         <main>
-            <div class="relative min-h-screen bg-contrast-white">
+            <div class="relative min-h-svh bg-contrast-white">
                 {/* Sidebar overlay */}
                 <div
                     class=move || format!(

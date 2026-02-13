@@ -229,14 +229,20 @@ pub fn CreateRole() -> impl IntoView {
                         let query = r#"
                                mutation CreateSystemRole($roleInput: RoleInput!, $roleMetadata: RoleMetadata!) {
                                     createSystemRole(roleInput: $roleInput, roleMetadata: $roleMetadata) {
-                                        roleName
-                                        createdAt
-                                        isAdmin
-                                        isDefault
-                                        isSuperAdmin
-                                        updatedAt
-                                        id
-                                        createdBy
+                                        data {
+                                            roleName
+                                            createdAt
+                                            isAdmin
+                                            isDefault
+                                            isSuperAdmin
+                                            updatedAt
+                                            id
+                                            createdBy
+                                        }
+                                        metadata {
+                                            newAccessToken
+                                            requestId
+                                        }
                                     }
                                }
                            "#;

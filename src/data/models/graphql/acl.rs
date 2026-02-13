@@ -2,7 +2,10 @@ use reactive_stores::Store;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    data::models::general::acl::{AuthDetails, OauthClientName},
+    data::models::general::{
+        acl::{AuthDetails, OauthClientName},
+        shared::ApiResponse,
+    },
     utils::custom_traits::EnumerableEnum,
 };
 
@@ -15,10 +18,10 @@ pub struct UserLoginsInput {
     pub oauth_client: Option<OauthClientName>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct SignInResponse {
     #[serde(rename = "signIn")]
-    pub sign_in: Option<AuthDetails>, // this is the return type expected from the API on success
+    pub sign_in: Option<ApiResponse<AuthDetails>>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -34,6 +37,8 @@ pub struct AuthStatus {
     pub sub: String,
     #[serde(rename = "currentRole")]
     pub current_role: String,
+    #[serde(rename = "newAccessToken")]
+    pub new_access_token: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Store, PartialEq, Eq)]
@@ -109,22 +114,34 @@ pub struct UserInput {
     pub address: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchUsersResponse {
     #[serde(rename = "fetchUsers")]
-    pub fetch_users: Option<Vec<User>>, // this is the return type expected from the API on success
+    pub fetch_users: Option<ApiResponse<Vec<User>>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchSiteOwnerResponse {
     #[serde(rename = "fetchSiteOwnerInfo")]
-    pub fetch_site_owner_info: Option<User>, // this is the return type expected from the API on success
+    pub fetch_site_owner_info: Option<ApiResponse<User>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct FetchSingleUserVars {
+    #[serde(rename = "userId")]
+    pub user_id: String, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct FetchSingleUserResponse {
+    #[serde(rename = "fetchSingleUser")]
+    pub fetch_single_user: Option<ApiResponse<User>>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct SignUpResponse {
     #[serde(rename = "signUp")]
-    pub sign_up: Option<User>, // this is the return type expected from the API on success
+    pub sign_up: Option<ApiResponse<User>>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -157,16 +174,16 @@ pub struct SystemRole {
     pub updated_at: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchSystemRolesResponse {
     #[serde(rename = "fetchSystemRoles")]
-    pub fetch_system_roles: Option<Vec<SystemRole>>, // this is the return type expected from the API on success
+    pub fetch_system_roles: Option<ApiResponse<Vec<SystemRole>>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CreateSystemRoleResponse {
     #[serde(rename = "createSystemRole")]
-    pub create_system_role: Option<SystemRole>, // this is the return type expected from the API on success
+    pub create_system_role: Option<ApiResponse<SystemRole>>, // this is the return type expected from the API on success
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -232,16 +249,16 @@ pub struct CreateOrganizationVars {
     pub organization_input: OrganizationInput,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CreateOrganizationResponse {
     #[serde(rename = "createOrganization")]
-    pub create_organization: Option<Organization>, // this is the return type expected from the API on success
+    pub create_organization: Option<ApiResponse<Organization>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchOrganizationsResponse {
     #[serde(rename = "fetchOrganizations")]
-    pub fetch_organizations: Option<Vec<Organization>>, // this is the return type expected from the API on success
+    pub fetch_organizations: Option<ApiResponse<Vec<Organization>>>, // this is the return type expected from the API on success
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -279,16 +296,16 @@ pub struct CreateDepartmentVars {
     pub department_metadata: DepartmentMetadata,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CreateDepartmentResponse {
     #[serde(rename = "createDepartment")]
-    pub create_department: Option<Department>, // this is the return type expected from the API on success
+    pub create_department: Option<ApiResponse<Department>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchDepartmentsResponse {
     #[serde(rename = "fetchDepartments")]
-    pub fetch_departments: Option<Vec<Department>>, // this is the return type expected from the API on success
+    pub fetch_departments: Option<ApiResponse<Vec<Department>>>, // this is the return type expected from the API on success
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -312,10 +329,10 @@ pub struct CreateResourceVars {
     pub resource_metadata: ResourceMetadata,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CreateResourceResponse {
     #[serde(rename = "createResource")]
-    pub create_resource: Option<Resource>, // this is the return type expected from the API on success
+    pub create_resource: Option<ApiResponse<Resource>>, // this is the return type expected from the API on success
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -351,10 +368,10 @@ pub struct CreatePermissionVars {
     pub permission_metadata: PermissionMetadata,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CreatePermissionResponse {
     #[serde(rename = "createPermission")]
-    pub create_permission: Option<Permission>, // this is the return type expected from the API on success
+    pub create_permission: Option<ApiResponse<Permission>>, // this is the return type expected from the API on success
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -374,14 +391,20 @@ pub struct Permission {
     pub updated_at: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchPermissionsResponse {
     #[serde(rename = "fetchCurrentRolePermissions")]
-    pub fetch_current_role_permissions: Option<Vec<Permission>>, // this is the return type expected from the API on success
+    pub fetch_current_role_permissions: Option<ApiResponse<Vec<Permission>>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FetchResourcesResponse {
     #[serde(rename = "fetchResources")]
-    pub fetch_resources: Option<Vec<Resource>>, // this is the return type expected from the API on success
+    pub fetch_resources: Option<ApiResponse<Vec<Resource>>>, // this is the return type expected from the API on success
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct CheckAuthResponse {
+    #[serde(rename = "checkAuth")]
+    pub check_auth: Option<ApiResponse<AuthStatus>>, // this is the return type expected from the API on success
 }

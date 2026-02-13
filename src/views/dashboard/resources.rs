@@ -18,9 +18,7 @@ use crate::data::models::graphql::acl::{
     CreateResourceResponse, CreateResourceVars, FetchDepartmentsResponse,
     FetchOrganizationsResponse, FetchResourcesResponse, ResourceInput, ResourceMetadata,
 };
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -197,9 +195,15 @@ pub fn CreateResource() -> impl IntoView {
                         let query = r#"
                                mutation CreateResource($resourceInput: ResourceInput!, $resourceMetadata: ResourceMetadata!) {
                                     createResource(resourceInput: $resourceInput, resourceMetadata: $resourceMetadata) {
-                                        name
-                                        id
-                                        createdBy
+                                        data {
+                                            name
+                                            id
+                                            createdBy
+                                        }
+                                        metadata {
+                                            newAccessToken
+                                            requestId
+                                        }
                                     }
                                }
                            "#;
