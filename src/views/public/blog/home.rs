@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-
 use icondata as IconId;
-use leptos::{prelude::*, tachys::view::fragment::IntoFragment, task::spawn_local};
+use leptos::{prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
 
@@ -10,7 +8,6 @@ use crate::{
         forms::{
             input::{InputField, InputFieldType},
             reactive_form::ReactiveForm,
-            select::SelectInput,
         },
         general::{
             badge::Badge,

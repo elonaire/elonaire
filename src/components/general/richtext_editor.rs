@@ -1,4 +1,5 @@
 use icondata as IconId;
+use js_sys::wasm_bindgen::prelude::Closure;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
 use leptos::{ev, prelude::*};
@@ -8,6 +9,7 @@ use web_sys::{Element, FormData, HtmlDivElement, HtmlInputElement, Node, window}
 
 use crate::components::forms::input::{InputField, InputFieldType};
 use crate::components::forms::select::{SelectInput, SelectOption};
+use crate::components::forms::textarea::Textarea;
 use crate::components::general::button::BasicButton;
 use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::data::models::general::{
@@ -234,20 +236,37 @@ pub fn RichTextEditor(
             return;
         }
 
+        // ===== CODE BLOCK =====
         if let Some((pre, code)) = current_code_block() {
             ev.prevent_default();
             handle_code_enter(&pre, &code, &last_enter_empty);
-        } else if let Some((list, li)) = current_list_item() {
-            ev.prevent_default();
-            handle_list_enter(&list, &li);
-        } else {
-            ev.prevent_default();
-            if let Some(editor) = editor_ref.get() {
-                insert_clean_line(&editor);
-            }
+            update_button_states();
+            return;
         }
 
-        update_button_states();
+        // ===== LIST ITEM =====
+        if let Some((list, li)) = current_list_item() {
+            ev.prevent_default();
+            handle_list_enter(&list, &li);
+            update_button_states();
+            return;
+        }
+
+        // ===== DEFAULT =====
+        // DO NOT prevent default here.
+        // Let browser handle <h1>, <p>, etc.
+
+        // Optional: run state update async after DOM mutation
+        let _ = window()
+            .unwrap()
+            .set_timeout_with_callback_and_timeout_and_arguments_0(
+                Closure::once_into_js(move || {
+                    update_button_states();
+                })
+                .as_ref()
+                .unchecked_ref(),
+                0,
+            );
     };
 
     // Update button states on selection change
@@ -374,7 +393,7 @@ pub fn RichTextEditor(
 
     // Add this effect to position the cursor
     Effect::new(move |_| {
-        if let Some(editor) = editor_ref.get() {
+        if let Some(editor) = editor_ref.get() as Option<HtmlDivElement> {
             if let Some(doc) = window().and_then(|w| w.document()) {
                 if let Ok(Some(selection)) = doc.get_selection() {
                     if let Some(p) = editor.first_element_child() {
@@ -391,7 +410,7 @@ pub fn RichTextEditor(
 
     let apply_heading = Callback::new(move |ev: ev::Event| {
         let tag = event_target_value(&ev);
-        if let Some(editor) = editor_ref.get() {
+        if let Some(editor) = editor_ref.get() as Option<HtmlDivElement> {
             if let Some(doc) = window().and_then(|w| w.document()) {
                 if let Ok(Some(selection)) = doc.get_selection() {
                     if let Ok(range) = selection.get_range_at(0) {
@@ -440,8 +459,7 @@ pub fn RichTextEditor(
     });
 
     let handle_on_input = move |_: ev::Event| {
-        if let Some(editor) = editor_ref.get() {
-            leptos::logging::log!("This is changing");
+        if let Some(editor) = editor_ref.get() as Option<HtmlDivElement> {
             set_tracked_content.set(editor.inner_html());
         }
     };
@@ -465,15 +483,17 @@ pub fn RichTextEditor(
                         match gloo_file::futures::read_as_text(&file.into()).await {
                             Ok(markdown_content) => {
                                 // Parse markdown to HTML using markdown crate
-                                let html_output = markdown::to_html(&markdown_content);
+                                // let html_output = markdown::to_html(&markdown_content);
+                                if let Ok(html_output) = markdown::to_html_with_options(
+                                    &markdown_content,
+                                    &markdown::Options::gfm(),
+                                ) {
+                                    // Update the editor content
+                                    initial_content.set(html_output.clone());
 
-                                // Update the editor content
-                                initial_content.set(html_output.clone());
-
-                                // Also update the tracked content
-                                set_tracked_content.set(html_output);
-
-                                leptos::logging::log!("Markdown file loaded successfully");
+                                    // Also update the tracked content
+                                    set_tracked_content.set(html_output);
+                                };
                             }
                             Err(err) => {
                                 leptos::logging::error!("Failed to read markdown file: {:?}", err);
@@ -518,15 +538,6 @@ pub fn RichTextEditor(
             // Toolbar
             <div class="flex gap-2 items-center flex-wrap border-b-[1px] border-light-gray p-[10px]">
                 {
-                    // if extra_formating_options.contains(&ExtraFormatingOption::Heading) {
-                    //     Some(
-                    //         view!{
-                    //             <SelectInput id_attr="font-sizes" options=font_options onchange=apply_heading />
-                    //         }
-                    //     )
-                    // } else {
-                    //     None
-                    // }
                     extra_formating_options.contains(&ExtraFormatingOption::Heading).then(|| view!{
                         <SelectInput id_attr="font-sizes" options=font_options onchange=apply_heading />
                     })
@@ -628,7 +639,7 @@ pub fn RichTextEditor(
             <InputField field_type=InputFieldType::File input_node_ref=file_input_ref accept="image/*" onchange=on_file_change ext_input_styles="hidden" id_attr=format!("{}-file-input", id_attr) />
 
 
-            <InputField field_type=InputFieldType::Text id_attr=format!("{}-text-input", id_attr) ext_input_styles="hidden" initial_value=tracked_content name=name />
+            <Textarea id_attr=format!("{}-text-input", id_attr) ext_input_styles="hidden" initial_value=tracked_content name=name />
 
             <InputField
                 field_type=InputFieldType::File
@@ -688,59 +699,6 @@ fn exit_code_block(pre: &Element) {
     sel.add_range(&new_range).ok();
 }
 
-fn insert_clean_line(editor: &HtmlDivElement) {
-    let doc = window().and_then(|w| w.document()).unwrap();
-    let selection = doc.get_selection().unwrap().unwrap();
-    let range = selection.get_range_at(0).unwrap();
-
-    // Create a clean block
-    let block = doc.create_element("p").unwrap();
-    let br = doc.create_element("br").unwrap();
-    block.append_child(&br).ok();
-
-    // Find the current block: the closest p ancestor that is a direct child of editor
-    let mut node = range.start_container().unwrap();
-    let editor_as_node: &web_sys::Node = editor.as_ref();
-    loop {
-        if let Some(el) = node.dyn_ref::<web_sys::Element>() {
-            if el.tag_name().eq_ignore_ascii_case("p") {
-                if let Some(parent) = el.parent_element() {
-                    if parent.is_same_node(Some(editor_as_node)) {
-                        // Found current block: el
-                        // Insert new block after el
-                        let next_sibling = el.next_sibling();
-                        match next_sibling {
-                            Some(sib) => {
-                                editor.insert_before(&block, Some(&sib)).ok();
-                            }
-                            None => {
-                                editor.append_child(&block).ok();
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        match node.parent_node() {
-            Some(parent) => node = parent,
-            None => {
-                // Not found, append to editor
-                editor.append_child(&block).ok();
-                break;
-            }
-        }
-    }
-
-    // Move cursor inside the new block
-    let new_range = doc.create_range().unwrap();
-    new_range.set_start(&block, 0).ok();
-    new_range.set_end(&block, 0).ok();
-
-    selection.remove_all_ranges().ok();
-    selection.add_range(&new_range).ok();
-}
-
 fn insert_code_block() {
     if let Some(doc) = window().and_then(|w| w.document()) {
         if let Ok(Some(selection)) = doc.get_selection() {
@@ -792,24 +750,37 @@ fn current_code_block() -> Option<(web_sys::Element, web_sys::Element)> {
 }
 
 fn is_current_line_empty(code: &Element) -> bool {
-    let doc = window().unwrap().document().unwrap();
-    let sel = doc.get_selection().unwrap().unwrap();
+    let doc = match window().and_then(|w| w.document()) {
+        Some(d) => d,
+        None => return false,
+    };
+
+    let sel = match doc.get_selection().ok().flatten() {
+        Some(s) if s.range_count() > 0 => s,
+        _ => return false,
+    };
+
     let range = match sel.get_range_at(0) {
         Ok(r) => r,
         Err(_) => return false,
     };
 
-    let text = code.text_content().unwrap_or_default();
-
-    let offset_u32 = match range.start_offset() {
-        Ok(o) => o,
+    let container = match range.start_container() {
+        Ok(n) => n,
         Err(_) => return false,
     };
 
-    let offset = offset_u32 as usize;
-    let offset = offset.min(text.len());
+    if container.node_type() != Node::TEXT_NODE {
+        return false;
+    }
 
-    let before = &text[..offset];
+    let text_node: web_sys::Text = container.unchecked_into();
+    let value = text_node.data();
+
+    let offset = range.start_offset().unwrap_or(0) as usize;
+    let offset = offset.min(value.len());
+
+    let before = &value[..offset];
     let line_start = before.rfind('\n').map(|i| i + 1).unwrap_or(0);
     let line = &before[line_start..];
 
@@ -818,13 +789,22 @@ fn is_current_line_empty(code: &Element) -> bool {
 
 fn handle_code_enter(pre: &Element, code: &Element, last_enter_empty: &RwSignal<bool>) {
     let doc = window().unwrap().document().unwrap();
-    let sel = doc.get_selection().unwrap().unwrap();
+    let sel = match doc.get_selection().unwrap() {
+        Some(s) if s.range_count() > 0 => s,
+        _ => return,
+    };
+
     let range = sel.get_range_at(0).unwrap();
+    let container = range.start_container().unwrap();
+
+    if !code.contains(Some(&container)) {
+        return;
+    }
 
     let empty = is_current_line_empty(code);
 
+    // Exit code block on double empty enter
     if empty && last_enter_empty.get_untracked() {
-        // EXIT CODE BLOCK
         last_enter_empty.set(false);
 
         let p = doc.create_element("p").unwrap();
@@ -843,18 +823,45 @@ fn handle_code_enter(pre: &Element, code: &Element, last_enter_empty: &RwSignal<
         return;
     }
 
-    // NORMAL ENTER INSIDE CODE
     last_enter_empty.set(empty);
 
-    let text = doc.create_text_node("\n");
-    range.insert_node(&text).ok();
+    if !range.collapsed() {
+        range.delete_contents().ok();
+    }
 
-    let new_range = doc.create_range().unwrap();
-    new_range.set_start_after(&text).ok();
-    new_range.set_end_after(&text).ok();
+    match container.node_type() {
+        Node::TEXT_NODE => {
+            let text_node: web_sys::Text = container.unchecked_into();
+            let offset = range.start_offset().unwrap() as usize;
+            let value = text_node.data();
 
-    sel.remove_all_ranges().ok();
-    sel.add_range(&new_range).ok();
+            let offset = offset.min(value.len());
+            let (before, after) = value.split_at(offset);
+
+            text_node.set_data(&format!("{before}\n{after}"));
+
+            let new_range = doc.create_range().unwrap();
+            new_range.set_start(&text_node, (offset + 1) as u32).ok();
+            new_range.set_end(&text_node, (offset + 1) as u32).ok();
+
+            sel.remove_all_ranges().ok();
+            sel.add_range(&new_range).ok();
+        }
+
+        Node::ELEMENT_NODE => {
+            let text = doc.create_text_node("\n");
+            range.insert_node(&text).ok();
+
+            let new_range = doc.create_range().unwrap();
+            new_range.set_start_after(&text).ok();
+            new_range.set_end_after(&text).ok();
+
+            sel.remove_all_ranges().ok();
+            sel.add_range(&new_range).ok();
+        }
+
+        _ => {}
+    }
 }
 
 fn insert_list(editor: &HtmlDivElement, list_type: &str) {

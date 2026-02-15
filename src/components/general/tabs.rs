@@ -116,7 +116,6 @@ pub fn Tabs(
                         labels.iter().enumerate().map(|(index, label)| {
                             let dynamic_class = move || {
                                 if current == index {
-                                    leptos::logging::log!("current label: {}", index);
                                     "border-primary text-primary"
                                 } else {
                                     "border-transparent text-mid-gray"

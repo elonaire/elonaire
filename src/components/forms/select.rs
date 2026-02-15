@@ -2,20 +2,15 @@ use icondata as IconId;
 use leptos::ev;
 use leptos::html::Select;
 use leptos::prelude::*;
-use leptos::wasm_bindgen::JsCast;
 use serde::{Deserialize, Serialize};
-use web_sys::HtmlInputElement;
 
-use crate::{
-    components::{
-        forms::{
-            checkbox::CheckboxInputField,
-            input::{InputField, InputFieldType},
-            radio_input::RadioInputField,
-        },
-        general::button::BasicButton,
+use crate::components::{
+    forms::{
+        checkbox::CheckboxInputField,
+        input::{InputField, InputFieldType},
+        radio_input::RadioInputField,
     },
-    utils::forms::fire_bubbled_and_cancelable_event,
+    general::button::BasicButton,
 };
 
 // Define the SelectOption struct

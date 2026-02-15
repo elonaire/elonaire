@@ -207,6 +207,14 @@ pub fn CreateBlog() -> impl IntoView {
                                             let deserialized_form_data =
                                                 deserialized_form_data.unwrap();
 
+                                            leptos::logging::log!(
+                                                "html_output after serialization: {}",
+                                                deserialized_form_data
+                                                    .content
+                                                    .matches('\n')
+                                                    .count()
+                                            );
+
                                             let input_vars = CreateBlogPostVars {
                                                 blog_post: deserialized_form_data,
                                             };
@@ -374,7 +382,7 @@ pub fn CreateBlog() -> impl IntoView {
                           id_attr="is_featured"
                     />
                     <CustomFileInput input_node_ref=thumbnail_file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
-                    <RichTextEditor name="content" extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock, ExtraFormatingOption::MarkdownUpload, ExtraFormatingOption::ImageUpload, ExtraFormatingOption::Lists] />
+                    <RichTextEditor name="content" extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock, ExtraFormatingOption::MarkdownUpload, ExtraFormatingOption::ImageUpload, ExtraFormatingOption::Lists, ExtraFormatingOption::Heading] />
                     <BasicButton
                         button_text="Submit"
                         style_ext="bg-primary text-contrast-white"

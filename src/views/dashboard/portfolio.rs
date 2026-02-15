@@ -19,9 +19,7 @@ use crate::data::models::graphql::shared::{
     CreatePortfolioItemResponse, UserPortfolioCategory, UserPortfolioInputVars,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{

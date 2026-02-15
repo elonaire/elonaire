@@ -168,7 +168,6 @@ pub fn CreateRatecard() -> impl IntoView {
                     );
 
                     if deserialized_main_form_data.is_none() {
-                        leptos::logging::log!("Something failed to deserialize");
                         set_is_loading.set(false);
                         return;
                     }

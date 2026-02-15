@@ -9,7 +9,7 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement, HtmlSelectElement, Su
 
 use crate::components::forms::checkbox::CheckboxInputField;
 use crate::components::forms::datepicker::DatePicker;
-use crate::components::forms::input::{CustomFileInput, InputField, InputFieldType};
+use crate::components::forms::input::CustomFileInput;
 use crate::components::forms::reactive_form::ReactiveForm;
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::button::ButtonType;
@@ -129,8 +129,6 @@ pub fn RatecardComponent(
         ev.prevent_default();
         ev.stop_propagation();
 
-        leptos::logging::log!("services_form valid");
-
         // Implement logic to show form validity
         let target = ev
             .target()
@@ -144,8 +142,6 @@ pub fn RatecardComponent(
     let handle_billing_interval_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
-
-        leptos::logging::log!("billing_interval_form valid");
 
         // Implement logic to show form validity
         let target = ev
@@ -161,8 +157,6 @@ pub fn RatecardComponent(
         ev.prevent_default();
         ev.stop_propagation();
 
-        leptos::logging::log!("service_request_form valid");
-
         // Implement logic to show form validity
         let target = ev
             .target()
@@ -172,7 +166,6 @@ pub fn RatecardComponent(
             set_service_request_form_is_valid.set(form.check_validity());
 
             if let Some(_submitter) = ev.submitter() {
-                leptos::logging::log!("From submitter");
                 confirm_modal_is_open.update(|status| *status = true);
             }
         }
@@ -181,8 +174,6 @@ pub fn RatecardComponent(
     let handle_service_request_metadata_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
-
-        leptos::logging::log!("service_request_metadata_form valid");
 
         // Implement logic to show form validity
         let target = ev

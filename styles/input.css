@@ -13,6 +13,7 @@
     --color-mid-gray: #8D8D8D;
     --color-gray: #4D4D4D;
     --color-navy: #000E1E;
+    --color-editor-dark: #171717;
     --color-contrast-white: #F0F0F0;
     --font-primary: "Inter", sans-serif;
 }
@@ -99,15 +100,19 @@
     }
 
     article pre {
-        white-space: pre-wrap;
-        word-break: break-word;
-        overflow-wrap: anywhere;
+        white-space: pre;
+        /* Changed from pre-wrap */
+        overflow-x: auto;
+        /* Add horizontal scroll */
+        background-color: #171717;
+        padding: 5px;
+        border-radius: 5px;
     }
 
     article code {
-        white-space: pre-wrap;
-        /* only for inline code */
-        word-break: break-word;
+        white-space: pre;
+        /* Changed from pre-wrap */
+        /* Removed word-break to prevent wrapping */
     }
 }
 

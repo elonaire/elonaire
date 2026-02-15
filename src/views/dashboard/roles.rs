@@ -20,14 +20,10 @@ use crate::data::context::shared::{
     fetch_departments, fetch_organizations, fetch_permissions, fetch_roles,
 };
 use crate::data::models::graphql::acl::{
-    AdminPrivilege, CreateSystemRoleResponse, CreateSystemRoleVars, FetchDepartmentsResponse,
-    FetchOrganizationsResponse, FetchPermissionsResponse, FetchSystemRolesResponse, RoleInput,
-    RoleMetadata,
+    AdminPrivilege, CreateSystemRoleResponse, CreateSystemRoleVars, RoleInput, RoleMetadata,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{

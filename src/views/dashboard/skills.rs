@@ -15,8 +15,7 @@ use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_skills;
 use crate::data::models::graphql::shared::{
-    CreateUserSkillResponse, CreateUserSkillVars, FetchSiteResourcesResponse, UserSkillLevel,
-    UserSkillType,
+    CreateUserSkillResponse, CreateUserSkillVars, UserSkillLevel, UserSkillType,
 };
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::{

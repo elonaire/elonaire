@@ -1,5 +1,3 @@
-use chrono::{DateTime, TimeZone, Utc};
-use icondata as IconData;
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
 use reactive_stores::Store;

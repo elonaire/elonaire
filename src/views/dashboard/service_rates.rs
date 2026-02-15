@@ -17,7 +17,6 @@ use crate::data::context::shared::{fetch_currencies, fetch_service_rates, fetch_
 use crate::data::models::graphql::shared::{
     CreateServiceRateResponse, CreateServiceRateVars, ServiceRateInput, ServiceRateInputMetadata,
 };
-use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -191,7 +190,6 @@ pub fn CreateServiceRate() -> impl IntoView {
                     );
 
                     if deserialized_main_form_data.is_none() {
-                        leptos::logging::log!("Something failed to deserialize");
                         set_is_loading.set(false);
                         return;
                     }

@@ -61,15 +61,9 @@ pub fn BlogPostDetail() -> impl IntoView {
         }
     });
 
-    let handle_on_input = Callback::new(move |comment: String| {
-        leptos::logging::log!("val: {}", comment);
-    });
-
     let handle_comment_form_submit = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
-
-        leptos::logging::log!("comment_form valid");
 
         // Implement logic to show form validity
         let target = ev
@@ -140,7 +134,6 @@ pub fn BlogPostDetail() -> impl IntoView {
                     );
 
                     if deserialized_main_form_data.is_none() {
-                        leptos::logging::log!("Something failed to deserialize");
                         set_is_loading.set(false);
                         return;
                     }
@@ -282,7 +275,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                         // WYSIWYG editor goes here
                                         <ReactiveForm on:submit=handle_comment_form_submit form_ref=comment_form_ref>
                                             <div class="flex flex-col gap-[20px]">
-                                                <RichTextEditor name="content" on_input=handle_on_input extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock] />
+                                                <RichTextEditor name="content" extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock] />
                                                 <div class="flex gap-[20px] items-center justify-end">
                                                     <BasicButton
                                                         button_text="Submit"

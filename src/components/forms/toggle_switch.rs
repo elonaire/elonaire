@@ -53,7 +53,7 @@ pub fn ToggleSwitch(
                     <div
                         class=move || format!(
                             "block w-14 h-8 rounded-full {}",
-                            if active.get() { "bg-gray" } else { "bg-mid-gray" }
+                            if active.get() { "bg-secondary" } else { "bg-mid-gray" }
                         )
                     ></div>
                     <div

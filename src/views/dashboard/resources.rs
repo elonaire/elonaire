@@ -15,8 +15,7 @@ use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::{fetch_departments, fetch_organizations, fetch_resources};
 use crate::data::models::graphql::acl::{
-    CreateResourceResponse, CreateResourceVars, FetchDepartmentsResponse,
-    FetchOrganizationsResponse, FetchResourcesResponse, ResourceInput, ResourceMetadata,
+    CreateResourceResponse, CreateResourceVars, ResourceInput, ResourceMetadata,
 };
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{

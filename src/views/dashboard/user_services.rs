@@ -14,9 +14,7 @@ use crate::components::forms::input::CustomFileInput;
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
-use crate::data::models::graphql::shared::{
-    CreateUserServiceResponse, FetchSiteResourcesResponse, UserServiceInputVars,
-};
+use crate::data::models::graphql::shared::{CreateUserServiceResponse, UserServiceInputVars};
 use crate::data::{
     context::shared::fetch_services,
     models::{general::files::UploadedFileResponse, graphql::shared::UserServiceInput},

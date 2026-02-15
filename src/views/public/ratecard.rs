@@ -11,10 +11,7 @@ use crate::{
             shared::fetch_ratecards,
             store::{AppStateContext, AppStateContextStoreFields},
         },
-        models::{
-            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-            graphql::shared::Ratecard,
-        },
+        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
     },
 };
 
