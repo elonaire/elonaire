@@ -12,7 +12,6 @@ use crate::components::forms::datepicker::DatePicker;
 use crate::components::forms::input::CustomFileInput;
 use crate::components::forms::reactive_form::ReactiveForm;
 use crate::components::forms::textarea::Textarea;
-use crate::components::general::button::ButtonType;
 use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::components::general::spinner::Spinner;
 use crate::components::{
@@ -420,7 +419,7 @@ pub fn RatecardComponent(
     });
 
     view! {
-        <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] text-light-gray min-h-[564px] min-w-[400px]">
+        <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] text-light-gray min-h-[564px] max-w-[400px] flex-1">
             <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false primary_button_text="Submit" disable_primary_close=true on_click_primary=handle_service_request_modal_primary_click primary_is_disabled=modal_primary_is_disabled>
                 <>
                 <Show when=move || is_loading.get()>

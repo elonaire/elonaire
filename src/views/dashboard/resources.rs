@@ -114,16 +114,16 @@ pub fn ResourcesList() -> impl IntoView {
     view! {
         <>
             <Title text="Resources"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resources"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Resources</h1>
+            <h1 class="display-constraints">Resources</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/resources/create">
                     <BasicButton
                         button_text="Create"
@@ -134,7 +134,7 @@ pub fn ResourcesList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -350,15 +350,15 @@ pub fn CreateResource() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Resources", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Resource</h1>
+            <h1 class="display-constraints">New Resource</h1>
 
-            <h2 class="mx-[5%] md:mx-[10%]">Resource Metadata</h2>
+            <h2 class="display-constraints">Resource Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                 <SelectInput
                 label="Organization"
                 name="organization_id"
@@ -376,9 +376,9 @@ pub fn CreateResource() -> impl IntoView {
                 </div>
             </ReactiveForm>
 
-            <h2 class="mx-[5%] md:mx-[10%]">Resource Info</h2>
+            <h2 class="display-constraints">Resource Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Resource Name" required=true id_attr="name" name="name" />
 
                     <BasicButton

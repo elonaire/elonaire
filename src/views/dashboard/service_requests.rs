@@ -98,16 +98,16 @@ pub fn ServiceRequestsList() -> impl IntoView {
     view! {
         <>
             <Title text="Service Requests"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Service Requests"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Service Requests</h1>
+            <h1 class="display-constraints">Service Requests</h1>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>

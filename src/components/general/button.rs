@@ -44,6 +44,7 @@ pub fn BasicButton(
     #[prop(into, default = Signal::derive(move || false))] disabled: Signal<bool>,
     #[prop(into, default = ButtonType::Button)] button_type: ButtonType,
     #[prop(default = false)] icon_before: bool,
+    #[prop(optional)] children: Option<ChildrenFn>,
 ) -> impl IntoView {
     let button_text_styles = button_text.clone();
     let button_content_styles = move || {
@@ -73,15 +74,30 @@ pub fn BasicButton(
             on:click=move |ev| onclick.run(ev)
             disabled={disabled}
         >
-            <span class=move || format!("flex flex-row items-center justify-center {} {}", button_content_styles(), children_style_ext)>
-                {move || match icon {
-                    Some(button_icon) => view! {
-                        <Icon width="1em" height="1em" icon=button_icon />
-                    }.into(),
-                    None => None,
-                }}
-                <span>{button_text}</span>
-            </span>
+            {
+                if let Some(children) = &children {
+                    Some(children())
+                } else {
+                    None
+                }
+            }
+            {
+                if children.is_none() {
+                    Some(view! {
+                        <span class=move || format!("flex flex-row items-center justify-center {} {}", button_content_styles(), children_style_ext)>
+                            {move || match icon {
+                                Some(button_icon) => view! {
+                                    <Icon width="1em" height="1em" icon=button_icon />
+                                }.into(),
+                                None => None,
+                            }}
+                            <span>{button_text}</span>
+                        </span>
+                    })
+                } else {
+                    None
+                }
+            }
         </button>
     }
 }

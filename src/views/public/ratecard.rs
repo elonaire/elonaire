@@ -43,7 +43,7 @@ pub fn Ratecard() -> impl IntoView {
                     <TopNav />
                 </div>
                 <Headline title="My Ratecard" description="How much do I charge?" />
-                <div class="mx-[5%] md:mx-[10%] flex flex-col md:flex-row gap-[10px]">
+                <div class="display-constraints flex flex-col md:flex-row md:justify-center gap-[10px]">
                     <For
                         each=move || ratecards().get()
                         key=|ratecard| ratecard.id.clone()

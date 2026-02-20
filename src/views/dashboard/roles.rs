@@ -135,16 +135,16 @@ pub fn RolesList() -> impl IntoView {
     view! {
         <>
             <Title text="Roles"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Roles"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Roles</h1>
+            <h1 class="display-constraints">Roles</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/roles/create">
                     <BasicButton
                         button_text="Create"
@@ -155,7 +155,7 @@ pub fn RolesList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -402,15 +402,15 @@ pub fn CreateRole() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Roles", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Role</h1>
+            <h1 class="display-constraints">New Role</h1>
 
-            <h2 class="mx-[5%] md:mx-[10%]">Role Metadata</h2>
+            <h2 class="display-constraints">Role Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                 <SelectInput
                 label="Admin Privilege"
                 name="admin_privilege"
@@ -441,9 +441,9 @@ pub fn CreateRole() -> impl IntoView {
                 </div>
             </ReactiveForm>
 
-            <h2 class="mx-[5%] md:mx-[10%]">Role Info</h2>
+            <h2 class="display-constraints">Role Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Role Name" required=true id_attr="role_name" name="role_name" />
 
                     <BasicButton

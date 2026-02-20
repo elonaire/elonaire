@@ -237,7 +237,7 @@ pub fn BlogPostDetail() -> impl IntoView {
 
                             Some(
                                 view! {
-                                    <article class="flex flex-col gap-[20px] mx-[5%] md:mx-[30%]">
+                                    <article class="flex flex-col gap-[20px] display-constraints blog-display-constraints">
                                         <h1>{blog_post.title.as_ref().unwrap().to_owned()}</h1>
                                         <div class="flex items-center">
                                             {
@@ -270,7 +270,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                         <BasicButton button_text="567" icon=Some(IconId::BiShareAltRegular) icon_before=true />
                                     </div>
 
-                                    <div class="flex flex-col gap-[20px] mx-[5%] md:mx-[30%]" node_ref=comments_ref>
+                                    <div class="flex flex-col gap-[20px] display-constraints blog-display-constraints" node_ref=comments_ref>
                                         <h3>{format!("Comments({})", blog_comments_ref.unwrap_or(&vec![]).len())}</h3>
                                         // WYSIWYG editor goes here
                                         <ReactiveForm on:submit=handle_comment_form_submit form_ref=comment_form_ref>
@@ -288,7 +288,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                         </ReactiveForm>
                                     </div>
 
-                                    <div class="flex flex-col gap-[20px] py-[20px] mx-[5%] md:mx-[30%] border-y border-light-gray">
+                                    <div class="flex flex-col gap-[20px] py-[20px] display-constraints blog-display-constraints border-y border-light-gray">
                                     {
                                         match blog_comments_ref {
                                             Some(comments) => {
@@ -311,7 +311,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                     }
 
                                     </div>
-                                    <div class="flex flex-col gap-[20px] mx-[5%] md:mx-[30%]">
+                                    <div class="flex flex-col gap-[20px] display-constraints blog-display-constraints">
                                         <h3>Meet the Author</h3>
                                         {
                                             match &blog_post.full_author_details {
@@ -351,10 +351,11 @@ pub fn BlogPostDetail() -> impl IntoView {
                         }
                     }
                 }
-                <div class="mt-auto">
-                    <Footer />
-                </div>
+
             </div>
         </main>
+        <div class="mt-auto">
+            <Footer />
+        </div>
     }
 }

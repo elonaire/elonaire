@@ -79,7 +79,7 @@ pub fn BasicModal(
                 <Portal mount=document().get_element_by_id("modal-root").unwrap()>
             <div class="fixed inset-0 bg-gray opacity-50" style=format!("z-index: {}", 10 + stack_number)></div>
                 <div on:click=handle_backdrop_click class="fixed inset-0 flex items-center justify-center bg-transparent" style=format!("z-index: {}", 10 + (stack_number + 1))>
-                        <div on:click=move |e| e.stop_propagation() class="bg-contrast-white rounded shadow-lg -translate-y-1/4 w-full max-w-md mx-[5%] md:mx-[10%]">
+                        <div on:click=move |e| e.stop_propagation() class="bg-contrast-white rounded shadow-lg -translate-y-1/4 w-full max-w-md display-constraints">
                             <div class="flex items-center border-light-gray border-b p-[10px]">
                                 {
                                     move || match use_case {

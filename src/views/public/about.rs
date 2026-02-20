@@ -34,7 +34,7 @@ pub fn About() -> impl IntoView {
                     <TopNav />
                 </div>
                 <Headline title="About Me" description="Who Am I?" />
-                <div class="flex flex-col md:flex-row md:justify-center md:gap-[20px] mx-[5%] md:mx-[10%] text-light-gray">
+                <div class="flex flex-col md:flex-row md:justify-center md:gap-[20px] display-constraints text-light-gray">
                     <div class="max-w-[400px] h-[479px] relative md:basis-1/2">
                         <img src="http://localhost:3001/view/e8d382ad-a79b-423d-a304-7e74c42c9cfc" alt="gallery-pic" class="rounded-[5px] w-[299px] h-[429px] object-cover"/>
                         <img src="http://localhost:3001/view/f069333b-361f-4402-9383-63c3e4c58cf5" alt="gallery-pic" class="rounded-[5px] w-[196px] h-[218px] absolute bottom-0 right-0 object-cover"/>
@@ -52,10 +52,10 @@ pub fn About() -> impl IntoView {
                         </div>
                     </div>
                 </div>
-                <div class="mx-[5%] md:mx-[10%]">
+                <div class="display-constraints">
                     <SectionTitle title="My Services" />
                 </div>
-                <div class="mx-[5%] md:mx-[10%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                <div class="display-constraints grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
                 // <FlipCard title="Software Engineering" image_url="https://miro.medium.com/v2/resize:fit:1400/1*CEGmzCboef_rJ6si2eiExQ.png" description="I can design and develop your software system" />
                     // <FlipCard />
                     // <FlipCard />

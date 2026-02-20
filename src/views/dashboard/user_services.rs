@@ -113,16 +113,16 @@ pub fn UserServicesList() -> impl IntoView {
     view! {
         <>
             <Title text="User Services"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Services"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">User Services</h1>
+            <h1 class="display-constraints">User Services</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/services/create">
                     <BasicButton
                         button_text="Create Service"
@@ -133,7 +133,7 @@ pub fn UserServicesList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -340,14 +340,14 @@ pub fn CreateUserService() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Services", "New Service"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Service</h1>
+            <h1 class="display-constraints">New Service</h1>
 
             <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <Textarea label="Description" required=true id_attr="description" name="description" />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />

@@ -113,16 +113,16 @@ pub fn OrganizationsList() -> impl IntoView {
     view! {
         <>
             <Title text="Organizations"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Organizations"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Organizations</h1>
+            <h1 class="display-constraints">Organizations</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/organizations/create">
                     <BasicButton
                         button_text="Create"
@@ -133,7 +133,7 @@ pub fn OrganizationsList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -271,14 +271,14 @@ pub fn CreateOrganization() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Organizations", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Organization</h1>
+            <h1 class="display-constraints">New Organization</h1>
 
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Organization Name" required=true id_attr="org_name" name="org_name" />
 
                     <BasicButton

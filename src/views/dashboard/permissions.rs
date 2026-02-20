@@ -148,16 +148,16 @@ pub fn PermissionsList() -> impl IntoView {
     view! {
         <>
             <Title text="Permissions"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Permissions"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Permissions</h1>
+            <h1 class="display-constraints">Permissions</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/permissions/create">
                     <BasicButton
                         button_text="Create"
@@ -168,7 +168,7 @@ pub fn PermissionsList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -385,15 +385,15 @@ pub fn CreatePermission() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Permissions", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Permission</h1>
+            <h1 class="display-constraints">New Permission</h1>
 
-            <h2 class="mx-[5%] md:mx-[10%]">Permission Metadata</h2>
+            <h2 class="display-constraints">Permission Metadata</h2>
             <ReactiveForm on:submit=handle_metadata_form_submit form_ref=metadata_form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <SelectInput
                     label="Resource"
                     name="resource_id"
@@ -413,9 +413,9 @@ pub fn CreatePermission() -> impl IntoView {
                 </div>
             </ReactiveForm>
 
-            <h2 class="mx-[5%] md:mx-[10%]">Permission Info</h2>
+            <h2 class="display-constraints">Permission Info</h2>
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Permission Name" required=true id_attr="name" name="name" />
 
 

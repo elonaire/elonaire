@@ -159,7 +159,7 @@ pub fn BlogHome() -> impl IntoView {
         <Title text="Blog Home"/>
         <main>
             <div class="min-h-svh flex flex-col gap-[40px] bg-contrast-white">
-                <div class="mx-[5%] md:mx-[10%]">
+                <div class="display-constraints">
                     {
                         move || {
                             let featured_posts_val = featured_posts.get();
@@ -188,8 +188,15 @@ pub fn BlogHome() -> impl IntoView {
                     }
 
                 </div>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[40px]">
-                    <div class="flex flex-col gap-[20px]">
+                <div class="bg-primary/25 hidden md:block">
+                    <div class="display-constraints flex flex-col gap-[20px] items-center justify-center  h-[284px]">
+                        <h1>"Find just what you are looking for"</h1>
+                        <p>"Search through our collection of articles"</p>
+
+                    </div>
+                </div>
+                <div class="display-constraints flex flex-col gap-[40px] md:flex-row">
+                    <div class="flex flex-col gap-[20px] md:basis-3/4">
                         <div class="flex items-center gap-[10px]">
                             <div class="flex-1">
                                 <BlogSection title="Latest Posts"/>
@@ -199,21 +206,25 @@ pub fn BlogHome() -> impl IntoView {
                                 <Badge text="0" ><span>"Filters"</span></Badge>
                             </div>
                         </div>
-                        { move || {
-                            let filtered_posts = other_posts.get();
-                            filtered_posts
-                                .iter()
-                                .map(|blog_post| {
-                                    view! {
-                                        <BlogPostPreview thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned() title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned() short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned() category=blog_post.category.unwrap().to_owned() read_time=blog_post.read_time.as_ref().unwrap_or(&0).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned() />
-                                    }
-                                })
-                                .collect_view()
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                            { move || {
+                                let filtered_posts = other_posts.get();
+                                filtered_posts
+                                    .iter()
+                                    .map(|blog_post| {
+                                        view! {
+                                            <BlogPostPreview thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned() title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned() short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned() category=blog_post.category.unwrap().to_owned() read_time=blog_post.read_time.as_ref().unwrap_or(&0).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned() />
+                                        }
+                                    })
+                                    .collect_view()
+                                }
                             }
-                        }
-                        <Pagination pagination_state=Memo::new(|_| (1, 1)) />
+                        </div>
+                        <div class="mt-auto">
+                            <Pagination pagination_state=Memo::new(|_| (1, 1)) />
+                        </div>
                     </div>
-                    <div class="flex flex-col gap-[40px]">
+                    <div class="flex flex-col gap-[40px]  md:basis-1/4">
                         <div class="flex flex-col gap-[20px]">
                             <BlogSection title="Stay Updated"/>
                             <div class="flex flex-col gap-[20px]">

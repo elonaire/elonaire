@@ -128,16 +128,16 @@ pub fn ServiceRatesList() -> impl IntoView {
     view! {
         <>
             <Title text="Service Rates"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Service Rates"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Service Rates</h1>
+            <h1 class="display-constraints">Service Rates</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/service-rates/create">
                     <BasicButton
                         button_text="Create"
@@ -148,7 +148,7 @@ pub fn ServiceRatesList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -347,13 +347,13 @@ pub fn CreateServiceRate() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "ServiceRates", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Service Rate</h1>
+            <h1 class="display-constraints">New Service Rate</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+            <div class="display-constraints flex flex-col gap-[20px]">
                 <h2>Service Rate Metadata</h2>
                 <CustomSelectInput
                     label="Service"
@@ -372,7 +372,7 @@ pub fn CreateServiceRate() -> impl IntoView {
             </div>
 
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <h2>Service Rate Info</h2>
                     <InputField field_type=InputFieldType::Number label="Base Rate" required=true id_attr="base_rate" name="base_rate" />
                     <InputField field_type=InputFieldType::Number label="Hour Week" id_attr="hour_week" name="hour_week" />

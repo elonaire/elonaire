@@ -90,7 +90,7 @@ pub fn Resume() -> impl IntoView {
                     <TopNav />
                 </div>
                 <Headline title="Resume" description="I am available for work" />
-                <div class="mx-[5%] md:mx-[10%] flex flex-col md:flex-row gap-[40px]">
+                <div class="display-constraints flex flex-col md:flex-row gap-[40px]">
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Education" />
                         <Timeline steps=education_timeline_items />
@@ -100,7 +100,7 @@ pub fn Resume() -> impl IntoView {
                         <Timeline steps=experience_timeline_items />
                     </div>
                 </div>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col md:flex-row gap-[40px]">
+                <div class="display-constraints flex flex-col md:flex-row gap-[40px]">
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Technical Skills" />
                         <Collapse is_accordion=true panel_items=technical_skills />

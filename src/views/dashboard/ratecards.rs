@@ -114,16 +114,16 @@ pub fn RatecardsList() -> impl IntoView {
     view! {
         <>
             <Title text="Rate Cards"/>
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Rate Cards"] />
             </div>
             <Show when=move || is_loading.get()>
                 <Spinner />
             </Show>
 
-            <h1 class="mx-[5%] md:mx-[10%]">Rate Cards</h1>
+            <h1 class="display-constraints">Rate Cards</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex items-center justify-end">
+            <div class="display-constraints flex items-center justify-end">
                 <A href="/dashboard/ratecards/create">
                     <BasicButton
                         button_text="Create"
@@ -134,7 +134,7 @@ pub fn RatecardsList() -> impl IntoView {
                 </A>
             </div>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <DataTable data=table_data editable=true deletable=true />
             </div>
         </>
@@ -316,13 +316,13 @@ pub fn CreateRatecard() -> impl IntoView {
                 <Spinner />
             </Show>
 
-            <div class="mx-[5%] md:mx-[10%]">
+            <div class="display-constraints">
                 <Breadcrumbs custom_route_names=["Home", "Dashboard", "Rate Cards", "New"] />
             </div>
 
-            <h1 class="mx-[5%] md:mx-[10%]">New Rate Card</h1>
+            <h1 class="display-constraints">New Rate Card</h1>
 
-            <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+            <div class="display-constraints flex flex-col gap-[20px]">
                 <h2>Rate Card Metadata</h2>
                 <CustomSelectInput
                     label="Services"
@@ -335,7 +335,7 @@ pub fn CreateRatecard() -> impl IntoView {
             </div>
 
             <ReactiveForm on:submit=handle_main_form_submit form_ref=form_ref>
-                <div class="mx-[5%] md:mx-[10%] flex flex-col gap-[20px]">
+                <div class="display-constraints flex flex-col gap-[20px]">
                     <h2>Rate Card Info</h2>
                     <InputField field_type=InputFieldType::Text label="Name" required=true id_attr="name" name="name" />
 

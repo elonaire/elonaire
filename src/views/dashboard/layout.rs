@@ -96,7 +96,7 @@ pub fn DashboardLayout() -> impl IntoView {
     view! {
         // <Title text="Dashboard"/>
         <main>
-            <div class="relative min-h-svh bg-contrast-white">
+            <div class="relative min-h-svh">
                 {/* Sidebar overlay */}
                 <div
                     class=move || format!(
@@ -107,8 +107,8 @@ pub fn DashboardLayout() -> impl IntoView {
                     {/* Only render content if expanded */}
                     {move || if collapsed.get() {
                         Some(view! {
-                            <div class="overflow-hidden mx-[5%] md:mx-[10%]">
-                                <div class="flex items-center justify-between h-[45px] border-y border-light-gray">
+                            <div class="flex flex-col mx-[5%]">
+                                <div class="flex items-center justify-between h-[47px] border-y border-light-gray">
                                     <p class="text-mid-gray font-medium">NAVIGATION</p>
                                     <button
                                         class="bg-transparent border-none"
@@ -117,13 +117,13 @@ pub fn DashboardLayout() -> impl IntoView {
                                         <Icon width="24" height="24" icon=IconData::IoClose />
                                     </button>
                                 </div>
-                                <nav>
+                                <nav class="flex flex-col">
                                     <For
                                         each=move || menu_items.get()
                                         key=|menu_item| menu_item.path.to_owned()
                                         let(child)
                                     >
-                                        <div class="block rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
+                                        <div class="flex rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
                                             <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
                                                 <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
                                                 <span class="flex-1">{child.label}</span>

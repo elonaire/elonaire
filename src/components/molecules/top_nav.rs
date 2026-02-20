@@ -7,7 +7,7 @@ use leptos_router::components::A;
 pub fn TopNav() -> impl IntoView {
     view! {
         <>
-        <div class="flex mx-[5%] md:mx-[10%] justify-end h-[55px] md:h-[65px]">
+        <div class="flex display-constraints justify-end h-[55px] md:h-[65px]">
                 <A
                     attr:class="bg-transparent border-none cursor-pointer text-secondary"
                     href="/"
