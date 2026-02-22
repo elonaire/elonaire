@@ -416,6 +416,12 @@ pub struct BlogPost {
     pub reaction_count: Option<u32>,
     #[serde(rename = "currentUserReaction")]
     pub current_user_reaction: Option<Reaction>,
+    #[serde(rename = "bookmarksCount")]
+    pub bookmarks_count: Option<u32>,
+    #[serde(rename = "sharesCount")]
+    pub shares_count: Option<u32>,
+    #[serde(rename = "currentUserBookmarked")]
+    pub current_user_bookmarked: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -782,4 +788,28 @@ pub struct ReactToBlogPostVars {
 pub struct ReactToBlogPostResponse {
     #[serde(rename = "reactToBlogPost")]
     pub react_to_blog_post: Option<ApiResponse<Reaction>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BookmarkBlogPostVars {
+    #[serde(rename = "blogPostId")]
+    pub blog_post_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BookmarkBlogPostResponse {
+    #[serde(rename = "bookmarkBlogPost")]
+    pub bookmark_blog_post: Option<ApiResponse<bool>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateBlogPostShareCountVars {
+    #[serde(rename = "blogPostId")]
+    pub blog_post_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateBlogPostShareCountResponse {
+    #[serde(rename = "updateBlogPostShareCount")]
+    pub update_blog_post_share_count: Option<ApiResponse<u32>>,
 }

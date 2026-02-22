@@ -347,6 +347,9 @@ pub async fn fetch_single_blog_post(
                         type
                         id
                     }
+                    bookmarksCount
+                    sharesCount
+                    currentUserBookmarked
                 }
                 metadata {
                     requestId

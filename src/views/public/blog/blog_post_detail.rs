@@ -27,9 +27,10 @@ use crate::components::{
 use crate::data::context::shared::{fetch_author_info, fetch_single_blog_post};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::models::graphql::shared::{
-    BlogCommentInput, BlogPost, CreateBlogCommentResponse, CreateBlogCommentVars,
-    FetchSingleBlogPostVars, ReactToBlogPostResponse, ReactToBlogPostVars, ReactionInput,
-    ReactionType,
+    BlogCommentInput, BlogPost, BookmarkBlogPostResponse, BookmarkBlogPostVars,
+    CreateBlogCommentResponse, CreateBlogCommentVars, FetchSingleBlogPostVars,
+    ReactToBlogPostResponse, ReactToBlogPostVars, ReactionInput, ReactionType,
+    UpdateBlogPostShareCountResponse, UpdateBlogPostShareCountVars,
 };
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
@@ -352,14 +353,6 @@ pub fn BlogPostDetail() -> impl IntoView {
         });
     };
 
-    // Effect::new(move || {
-    //     if let Some(blog_post) = blog_post.get() {
-    //         leptos::logging::log!("This effect right here is firing indefinitely!");
-    //         let reaction = blog_post.current_user_reaction.as_ref().map(|r| r.r#type);
-    //         set_selected_reaction.set(reaction);
-    //     }
-    // });
-
     let handle_share = Callback::new(move |_| {
         let url = window().location().href().unwrap_or_default();
         let title = blog_post
@@ -380,7 +373,61 @@ pub fn BlogPostDetail() -> impl IntoView {
                 match wasm_bindgen_futures::JsFuture::from(promise).await {
                     Ok(_) => {
                         // User accepted the share sheet — count this
-                        // increment_share_count(blog_id).await;
+                        let input_vars = UpdateBlogPostShareCountVars {
+                            blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+                        };
+
+                        let query = r#"
+                            mutation UpdateBlogPostShareCount($blogPostId: String!) {
+                                updateBlogPostShareCount(blogPostId: $blogPostId) {
+                                    data
+                                    metadata {
+                                        requestId
+                                        newAccessToken
+                                    }
+                                }
+                            }
+                           "#;
+
+                        let mut headers = HashMap::new() as HashMap<String, String>;
+                        headers.insert(
+                            "Authorization".into(),
+                            format!(
+                                "Bearer {}",
+                                current_state.user().auth_info().token().get_untracked()
+                            ),
+                        );
+
+                        let response = perform_mutation_or_query_with_vars::<
+                            UpdateBlogPostShareCountResponse,
+                            UpdateBlogPostShareCountVars,
+                        >(
+                            Some(&headers),
+                            "http://localhost:8080/api/shared",
+                            query,
+                            input_vars,
+                        )
+                        .await;
+
+                        match response.get_data() {
+                            Some(data) => {
+                                // increment reaction count in blog_post
+                                set_blog_post.update(|prev| {
+                                    if let Some(prev) = prev {
+                                        prev.bookmarks_count = Some(
+                                            data.update_blog_post_share_count
+                                                .as_ref()
+                                                .unwrap()
+                                                .get_data(),
+                                        );
+                                    };
+                                });
+                                set_is_loading.set(false);
+                            }
+                            None => {
+                                set_is_loading.set(false);
+                            }
+                        };
                     }
                     Err(err) => {
                         let name = js_sys::Reflect::get(&err, &"name".into())
@@ -399,6 +446,70 @@ pub fn BlogPostDetail() -> impl IntoView {
             let clipboard = navigator.clipboard();
             let _ = clipboard.write_text(&url);
         }
+    });
+
+    let handle_bookmark = Callback::new(move |_| {
+        spawn_local(async move {
+            let input_vars = BookmarkBlogPostVars {
+                blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+            };
+
+            let query = r#"
+                mutation BookmarkBlogPost($blogPostId: String!) {
+                    bookmarkBlogPost(blogPostId: $blogPostId) {
+                        data
+                        metadata {
+                            requestId
+                            newAccessToken
+                        }
+                    }
+                }
+               "#;
+
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let response = perform_mutation_or_query_with_vars::<
+                BookmarkBlogPostResponse,
+                BookmarkBlogPostVars,
+            >(
+                Some(&headers),
+                "http://localhost:8080/api/shared",
+                query,
+                input_vars,
+            )
+            .await;
+
+            match response.get_data() {
+                Some(data) => {
+                    // increment reaction count in blog_post
+                    set_blog_post.update(|prev| {
+                        if let Some(prev) = prev {
+                            if prev.current_user_bookmarked.is_some()
+                                && !prev.current_user_bookmarked.unwrap()
+                            {
+                                prev.bookmarks_count = prev.bookmarks_count.map(|val| val + 1);
+                            } else {
+                                prev.bookmarks_count = prev.bookmarks_count.map(|val| val - 1);
+                            }
+
+                            prev.current_user_bookmarked =
+                                Some(data.bookmark_blog_post.as_ref().unwrap().get_data());
+                        };
+                    });
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
     });
 
     // Ensure removal when component goes out of scope
@@ -517,9 +628,9 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 />
                                             </div>
                                         </div>
-                                        <BasicButton button_text="300" icon=Some(IconId::BiBookmarkRegular) icon_before=true />
+                                        <BasicButton button_text=blog_post.bookmarks_count.unwrap_or_default().to_string() icon=Some(IconId::BiBookmarkRegular) onclick=handle_bookmark icon_before=true style_ext=format!("{}", if blog_post.current_user_bookmarked.is_some() && blog_post.current_user_bookmarked.unwrap() { "text-primary" } else { "" }) />
                                         <BasicButton button_text=format!("{}", blog_comments_ref.as_ref().unwrap().len()) icon=Some(IconId::FaCommentRegular) onclick=handle_scroll_to_comments icon_before=true />
-                                        <BasicButton button_text="567" icon=Some(IconId::BiShareAltRegular) icon_before=true onclick=handle_share />
+                                        <BasicButton button_text=blog_post.shares_count.unwrap_or_default().to_string() icon=Some(IconId::BiShareAltRegular) icon_before=true onclick=handle_share />
                                     </div>
 
                                     <div class="flex flex-col gap-[20px] display-constraints blog-display-constraints" node_ref=comments_ref>
