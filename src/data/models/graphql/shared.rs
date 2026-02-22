@@ -412,6 +412,10 @@ pub struct BlogPost {
     pub full_author_details: Option<User>,
     #[serde(rename = "readTime")]
     pub read_time: Option<u32>,
+    #[serde(rename = "reactionCount")]
+    pub reaction_count: Option<u32>,
+    #[serde(rename = "currentUserReaction")]
+    pub current_user_reaction: Option<Reaction>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -760,8 +764,22 @@ pub struct CreateBlogCommentVars {
     #[serde(rename = "blogPostId")]
     pub blog_post_id: String,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateBlogCommentResponse {
     #[serde(rename = "addCommentToBlogPost")]
-    pub add_comment_to_blog_post: BlogComment,
+    pub add_comment_to_blog_post: Option<ApiResponse<BlogComment>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReactToBlogPostVars {
+    pub reaction: ReactionInput,
+    #[serde(rename = "blogPostId")]
+    pub blog_post_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReactToBlogPostResponse {
+    #[serde(rename = "reactToBlogPost")]
+    pub react_to_blog_post: Option<ApiResponse<Reaction>>,
 }

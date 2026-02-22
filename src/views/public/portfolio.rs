@@ -122,7 +122,7 @@ pub fn Portfolio() -> impl IntoView {
                 <div class="display-constraints flex flex-col md:flex-row gap-[40px]">
                     <Tabs tab_labels=portfolio_tabs>
                         <Tab slot>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
                                 {
                                     move || javascript_projects.get().iter().map(|project| {
                                         view!{
@@ -133,7 +133,7 @@ pub fn Portfolio() -> impl IntoView {
                             </div>
                         </Tab>
                         <Tab slot>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
                                 {
                                     move || rust_projects.get().iter().map(|project| {
                                         view!{
@@ -144,7 +144,7 @@ pub fn Portfolio() -> impl IntoView {
                             </div>
                         </Tab>
                         <Tab slot>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
                                 {
                                     move || database_projects.get().iter().map(|project| {
                                         view!{
@@ -155,7 +155,7 @@ pub fn Portfolio() -> impl IntoView {
                             </div>
                         </Tab>
                         <Tab slot>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
                                 {
                                     move || devops_projects.get().iter().map(|project| {
                                         view!{
@@ -166,7 +166,7 @@ pub fn Portfolio() -> impl IntoView {
                             </div>
                         </Tab>
                         <Tab slot>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
                                 {
                                     move || cloud_projects.get().iter().map(|project| {
                                         view!{
@@ -177,7 +177,7 @@ pub fn Portfolio() -> impl IntoView {
                             </div>
                         </Tab>
                         <Tab slot>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[20px]">
                                 {
                                     move || mobile_projects.get().iter().map(|project| {
                                         view!{

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use icondata as IconId;
+use js_sys::wasm_bindgen::prelude::Closure;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
 use leptos::{ev, prelude::*};
@@ -9,7 +10,7 @@ use leptos_meta::*;
 use leptos_router::components::A;
 use leptos_router::hooks::use_params_map;
 use reactive_stores::Store;
-use web_sys::{HtmlDivElement, HtmlFormElement};
+use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent};
 
 use crate::components::general::button::ButtonType;
 use crate::components::general::modal::modal::{BasicModal, UseCase};
@@ -27,6 +28,7 @@ use crate::data::context::shared::{fetch_author_info, fetch_single_blog_post};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::models::graphql::shared::{
     BlogCommentInput, CreateBlogCommentResponse, CreateBlogCommentVars, FetchSingleBlogPostVars,
+    ReactToBlogPostResponse, ReactToBlogPostVars, ReactionInput, ReactionType,
 };
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
@@ -48,6 +50,19 @@ pub fn BlogPostDetail() -> impl IntoView {
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let current_state = expect_context::<Store<AppStateContext>>();
+    let (show_reactions, set_show_reactions) = signal(false);
+    let hover_timer: StoredValue<Option<i32>> = StoredValue::new(None);
+    let (selected_reaction, set_selected_reaction) = signal::<Option<ReactionType>>(None);
+
+    let reactions = vec![
+        (ReactionType::Like, "👍"),
+        (ReactionType::Dislike, "👎"),
+        (ReactionType::Love, "❤️"),
+        (ReactionType::Haha, "😂"),
+        (ReactionType::Wow, "😮"),
+        (ReactionType::Sad, "😢"),
+        (ReactionType::Angry, "😡"),
+    ];
 
     // Add scroll event listener to toggle menu visibility
     let window_scroll_listener = window_event_listener(ev::scroll, move |_| {
@@ -88,8 +103,17 @@ pub fn BlogPostDetail() -> impl IntoView {
                 blog_id_or_slug: slug,
             };
 
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
             spawn_local(async move {
-                let blog_post = fetch_single_blog_post(None, vars).await;
+                let blog_post = fetch_single_blog_post(Some(&headers), vars).await;
 
                 if let Ok(mut blog_post) = blog_post {
                     if let Some(comments) = &mut blog_post.comments {
@@ -206,6 +230,163 @@ pub fn BlogPostDetail() -> impl IntoView {
         }
     });
 
+    let handle_scroll_to_comments = Callback::new(move |_| {
+        if let Some(el) = comments_ref.get() as Option<HtmlDivElement> {
+            el.scroll_into_view_with_bool(true);
+        }
+    });
+
+    // Clear timer helper
+    let clear_timer = move || {
+        if let Some(id) = hover_timer.get_value() {
+            window().clear_timeout_with_handle(id);
+            hover_timer.set_value(None);
+        }
+    };
+
+    let on_mouse_enter = move |_ev: MouseEvent| {
+        let id = window()
+            .set_timeout_with_callback_and_timeout_and_arguments_0(
+                &Closure::<dyn Fn()>::new(move || {
+                    set_show_reactions.set(true);
+                })
+                .into_js_value()
+                .unchecked_ref(),
+                1000,
+            )
+            .unwrap();
+        hover_timer.set_value(Some(id));
+    };
+
+    let on_mouse_leave = move |_ev: MouseEvent| {
+        clear_timer();
+        set_show_reactions.set(false);
+    };
+
+    let on_touch_start = move |_| {
+        let id = window()
+            .set_timeout_with_callback_and_timeout_and_arguments_0(
+                &Closure::<dyn Fn()>::new(move || {
+                    set_show_reactions.set(true);
+                })
+                .into_js_value()
+                .unchecked_ref(),
+                1000,
+            )
+            .unwrap();
+        hover_timer.set_value(Some(id));
+    };
+
+    let on_touch_end = move |_| {
+        // Only clear timer, don't hide reactions — let user pick
+        clear_timer();
+    };
+
+    Effect::new(move || {
+        let selected_reaction = selected_reaction.get();
+
+        if let Some(reaction) = selected_reaction {
+            spawn_local(async move {
+                let input_vars = ReactToBlogPostVars {
+                    reaction: ReactionInput { r#type: reaction },
+                    blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+                };
+
+                let query = r#"
+                    mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
+                        reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
+                            data {
+                                type
+                                id
+                            }
+                            metadata {
+                                requestId
+                                newAccessToken
+                            }
+                        }
+                    }
+                   "#;
+
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        current_state.user().auth_info().token().get_untracked()
+                    ),
+                );
+
+                let response = perform_mutation_or_query_with_vars::<
+                    ReactToBlogPostResponse,
+                    ReactToBlogPostVars,
+                >(
+                    Some(&headers),
+                    "http://localhost:8080/api/shared",
+                    query,
+                    input_vars,
+                )
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        set_is_loading.set(false);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
+                };
+            });
+        };
+    });
+
+    Effect::new(move || {
+        if let Some(blog_post) = blog_post.get() {
+            let reaction = blog_post.current_user_reaction.as_ref().map(|r| r.r#type);
+            set_selected_reaction.set(reaction);
+        }
+    });
+
+    let handle_share = Callback::new(move |_| {
+        let url = window().location().href().unwrap_or_default();
+        let title = blog_post
+            .get()
+            .map(|p| p.title.unwrap_or_default())
+            .unwrap_or_default();
+
+        let navigator = window().navigator();
+
+        // Check if Web Share API is supported
+        if js_sys::Reflect::has(&navigator, &"share".into()).unwrap_or(false) {
+            let share_data = web_sys::ShareData::new();
+            share_data.set_url(&url);
+            share_data.set_title(&title);
+
+            let promise = navigator.share_with_data(&share_data);
+            spawn_local(async move {
+                match wasm_bindgen_futures::JsFuture::from(promise).await {
+                    Ok(_) => {
+                        // User accepted the share sheet — count this
+                        // increment_share_count(blog_id).await;
+                    }
+                    Err(err) => {
+                        let name = js_sys::Reflect::get(&err, &"name".into())
+                            .unwrap_or_default()
+                            .as_string()
+                            .unwrap_or_default();
+                        if name != "AbortError" {
+                            leptos::logging::error!("Share failed: {:?}", err);
+                        }
+                        // AbortError = user cancelled, don't count
+                    }
+                }
+            });
+        } else {
+            // Fallback — copy to clipboard
+            let clipboard = navigator.clipboard();
+            let _ = clipboard.write_text(&url);
+        }
+    });
+
     // Ensure removal when component goes out of scope
     on_cleanup(move || {
         window_scroll_listener.remove(); // Explicitly detach
@@ -232,6 +413,17 @@ pub fn BlogPostDetail() -> impl IntoView {
                 {
                     move || {
                         let blog_post = blog_post.get();
+                        let selected_reaction_icon = match selected_reaction.get() {
+                            Some(ReactionType::Like)    => IconId::LuThumbsUp,
+                            Some(ReactionType::Dislike) => IconId::LuThumbsDown,
+                            Some(ReactionType::Love)    => IconId::AiHeartFilled,
+                            Some(ReactionType::Haha)    => IconId::FaFaceGrinTearsRegular,
+                            Some(ReactionType::Wow)     => IconId::FaFaceSurpriseRegular,
+                            Some(ReactionType::Sad)     => IconId::FaFaceSadTearRegular,
+                            Some(ReactionType::Angry)   => IconId::FaFaceAngryRegular,
+                            None                        => IconId::LuThumbsUp,
+                        };
+
                         if let Some(blog_post) = blog_post {
                             let blog_comments_ref = blog_post.comments.as_ref();
 
@@ -259,15 +451,64 @@ pub fn BlogPostDetail() -> impl IntoView {
                                     </article>
 
                                     // floating reaction menu
-                                    <div class=move || format!("flex items-center justify-between rounded-full bg-contrast-white border-[1px] border-light-gray absolute fixed bottom-[3%] left-1/2 z-10 -translate-x-1/2 shadow-lg px-[32px] py-[5px] mx-auto transition-all transition-discrete duration-300 {}", if menu_visible.get() {
+                                    <div class=move || format!("flex items-center justify-between rounded-full bg-contrast-white border-[1px] border-light-gray absolute fixed bottom-[3%] left-1/2 z-10 -translate-x-1/2 shadow-lg mx-auto transition-all transition-discrete duration-300 h-[47px] {}", if menu_visible.get() {
                                                 "translate-y-0 block"
                                             } else {
                                                 "translate-y-[-100%] hidden"
                                             })>
-                                        <BasicButton button_text="2K" icon=Some(IconId::LuThumbsUp) icon_before=true />
+                                        // <BasicButton button_text="2K" icon=Some(IconId::LuThumbsUp) icon_before=true />
+                                        <div
+                                            class="relative"
+                                            on:mouseenter=on_mouse_enter
+                                            on:mouseleave=on_mouse_leave
+                                            on:touchstart=on_touch_start
+                                            on:touchend=on_touch_end
+                                        >
+                                            {/* Reactions popup */}
+                                            <div class=move || format!(
+                                                "absolute bottom-full flex items-center gap-[20px] bg-contrast-white border border-light-gray rounded-full px-3 py-2 shadow-lg transition-all duration-200 {}",
+                                                if show_reactions.get() { "opacity-100 translate-y-0 pointer-events-auto" }
+                                                else { "opacity-0 translate-y-2 pointer-events-none" }
+                                            )>
+                                                {reactions.iter().map(|(reaction_type, emoji)| {
+                                                    let reaction_type = *reaction_type;
+                                                    let is_selected = move || selected_reaction.get() == Some(reaction_type);
+                                                    view! {
+                                                        <button
+                                                            class=move || format!(
+                                                                "text-xl transition-transform duration-150 cursor-pointer hover:scale-125 flex flex-col items-center gap-1 {}",
+                                                                if is_selected() { "scale-125" } else { "" }
+                                                            )
+                                                            on:click=move |_| {
+                                                                set_selected_reaction.set(Some(reaction_type));
+                                                                set_show_reactions.set(false);
+                                                            }
+                                                        >
+                                                            {*emoji}
+                                                        </button>
+                                                    }
+                                                }).collect::<Vec<_>>()}
+                                            </div>
+
+                                            {/* Like button — updates icon/text based on selected reaction */}
+                                            <div on:click=move |_| {
+                                                if selected_reaction.get().is_none() {
+                                                    set_selected_reaction.set(Some(ReactionType::Like));
+                                                } else {
+                                                    set_selected_reaction.set(None); // toggle off
+                                                }
+                                            }>
+                                                <BasicButton
+                                                    button_text=blog_post.reaction_count.as_ref().map(|count| count.to_string()).unwrap_or_default()
+                                                    icon=Some(selected_reaction_icon)
+                                                    icon_before=true
+                                                    style_ext=format!("{}", if blog_post.current_user_reaction.is_some() { "text-primary" } else { "" })
+                                                />
+                                            </div>
+                                        </div>
                                         <BasicButton button_text="300" icon=Some(IconId::BiBookmarkRegular) icon_before=true />
-                                        <BasicButton button_text="123" icon=Some(IconId::FaCommentRegular) icon_before=true />
-                                        <BasicButton button_text="567" icon=Some(IconId::BiShareAltRegular) icon_before=true />
+                                        <BasicButton button_text=format!("{}", blog_comments_ref.as_ref().unwrap().len()) icon=Some(IconId::FaCommentRegular) onclick=handle_scroll_to_comments icon_before=true />
+                                        <BasicButton button_text="567" icon=Some(IconId::BiShareAltRegular) icon_before=true onclick=handle_share />
                                     </div>
 
                                     <div class="flex flex-col gap-[20px] display-constraints blog-display-constraints" node_ref=comments_ref>

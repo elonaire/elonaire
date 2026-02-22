@@ -165,16 +165,16 @@ pub fn CheckboxGroup(
                         let option_id = format!("{}-{}", name, option_value);
 
                         view! {
-                            <div class="mb-2">
+                            <div>
                                 <label
-                                    class="inline-flex items-center gap-2 text-gray text-sm cursor-pointer"
+                                    class="flex gap-2 text-gray text-sm cursor-pointer"
                                     for=option_id.clone()
                                 >
                                     <input
-                                        class=format!("leading-tight size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
-                                                   focus:outline-none focus:ring-0 focus:border-secondary bg-transparent
-                                                   checked:bg-secondary checked:border-secondary
-                                                   accent-secondary {}", ext_input_styles)
+                                        class=format!("leading-tight shrink-0 size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
+                                                focus:outline-none focus:ring-0 focus:border-secondary bg-transparent
+                                                checked:bg-secondary checked:border-secondary
+                                                accent-secondary mt-0.5 {}", ext_input_styles)
                                         type="checkbox"
                                         value=option_value.clone()
                                         name=name.clone()

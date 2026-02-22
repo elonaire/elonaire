@@ -342,6 +342,11 @@ pub async fn fetch_single_blog_post(
                         replyCount
                         author
                     }
+                    reactionCount
+                    currentUserReaction {
+                        type
+                        id
+                    }
                 }
                 metadata {
                     requestId
