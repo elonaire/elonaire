@@ -27,8 +27,9 @@ use crate::components::{
 use crate::data::context::shared::{fetch_author_info, fetch_single_blog_post};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::models::graphql::shared::{
-    BlogCommentInput, CreateBlogCommentResponse, CreateBlogCommentVars, FetchSingleBlogPostVars,
-    ReactToBlogPostResponse, ReactToBlogPostVars, ReactionInput, ReactionType,
+    BlogCommentInput, BlogPost, CreateBlogCommentResponse, CreateBlogCommentVars,
+    FetchSingleBlogPostVars, ReactToBlogPostResponse, ReactToBlogPostVars, ReactionInput,
+    ReactionType,
 };
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
@@ -52,7 +53,12 @@ pub fn BlogPostDetail() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (show_reactions, set_show_reactions) = signal(false);
     let hover_timer: StoredValue<Option<i32>> = StoredValue::new(None);
-    let (selected_reaction, set_selected_reaction) = signal::<Option<ReactionType>>(None);
+    // let (selected_reaction, set_selected_reaction) = signal::<Option<ReactionType>>(None);
+    let selected_reaction = Memo::new(move |_| {
+        blog_post
+            .get()
+            .and_then(|bp: BlogPost| bp.current_user_reaction.as_ref().map(|r| r.r#type))
+    });
 
     let reactions = vec![
         (ReactionType::Like, "👍"),
@@ -282,69 +288,77 @@ pub fn BlogPostDetail() -> impl IntoView {
         clear_timer();
     };
 
-    Effect::new(move || {
-        let selected_reaction = selected_reaction.get();
+    let handle_reaction_click = move |reaction: ReactionType| {
+        spawn_local(async move {
+            let input_vars = ReactToBlogPostVars {
+                reaction: ReactionInput { r#type: reaction },
+                blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+            };
 
-        if let Some(reaction) = selected_reaction {
-            spawn_local(async move {
-                let input_vars = ReactToBlogPostVars {
-                    reaction: ReactionInput { r#type: reaction },
-                    blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
-                };
-
-                let query = r#"
-                    mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
-                        reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
-                            data {
-                                type
-                                id
-                            }
-                            metadata {
-                                requestId
-                                newAccessToken
-                            }
+            let query = r#"
+                mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
+                    reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
+                        data {
+                            type
+                            id
+                        }
+                        metadata {
+                            requestId
+                            newAccessToken
                         }
                     }
-                   "#;
+                }
+               "#;
 
-                let mut headers = HashMap::new() as HashMap<String, String>;
-                headers.insert(
-                    "Authorization".into(),
-                    format!(
-                        "Bearer {}",
-                        current_state.user().auth_info().token().get_untracked()
-                    ),
-                );
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
 
-                let response = perform_mutation_or_query_with_vars::<
-                    ReactToBlogPostResponse,
-                    ReactToBlogPostVars,
-                >(
-                    Some(&headers),
-                    "http://localhost:8080/api/shared",
-                    query,
-                    input_vars,
-                )
-                .await;
+            let response = perform_mutation_or_query_with_vars::<
+                ReactToBlogPostResponse,
+                ReactToBlogPostVars,
+            >(
+                Some(&headers),
+                "http://localhost:8080/api/shared",
+                query,
+                input_vars,
+            )
+            .await;
 
-                match response.get_data() {
-                    Some(_data) => {
-                        set_is_loading.set(false);
-                    }
-                    None => {
-                        set_is_loading.set(false);
-                    }
-                };
-            });
-        };
-    });
+            match response.get_data() {
+                Some(data) => {
+                    // increment reaction count in blog_post
+                    set_blog_post.update(|prev| {
+                        if let Some(prev) = prev {
+                            if prev.current_user_reaction.is_none() {
+                                prev.reaction_count = prev.reaction_count.map(|val| val + 1);
+                            }
 
-    Effect::new(move || {
-        if let Some(blog_post) = blog_post.get() {
-            let reaction = blog_post.current_user_reaction.as_ref().map(|r| r.r#type);
-            set_selected_reaction.set(reaction);
-        }
-    });
+                            prev.current_user_reaction =
+                                Some(data.react_to_blog_post.as_ref().unwrap().get_data());
+                        };
+                    });
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
+    };
+
+    // Effect::new(move || {
+    //     if let Some(blog_post) = blog_post.get() {
+    //         leptos::logging::log!("This effect right here is firing indefinitely!");
+    //         let reaction = blog_post.current_user_reaction.as_ref().map(|r| r.r#type);
+    //         set_selected_reaction.set(reaction);
+    //     }
+    // });
 
     let handle_share = Callback::new(move |_| {
         let url = window().location().href().unwrap_or_default();
@@ -480,8 +494,9 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                                 if is_selected() { "scale-125" } else { "" }
                                                             )
                                                             on:click=move |_| {
-                                                                set_selected_reaction.set(Some(reaction_type));
+                                                                // set_selected_reaction.set(Some(reaction_type));
                                                                 set_show_reactions.set(false);
+                                                                handle_reaction_click(reaction_type);
                                                             }
                                                         >
                                                             {*emoji}
@@ -492,11 +507,7 @@ pub fn BlogPostDetail() -> impl IntoView {
 
                                             {/* Like button — updates icon/text based on selected reaction */}
                                             <div on:click=move |_| {
-                                                if selected_reaction.get().is_none() {
-                                                    set_selected_reaction.set(Some(ReactionType::Like));
-                                                } else {
-                                                    set_selected_reaction.set(None); // toggle off
-                                                }
+                                                handle_reaction_click(ReactionType::Like);
                                             }>
                                                 <BasicButton
                                                     button_text=blog_post.reaction_count.as_ref().map(|count| count.to_string()).unwrap_or_default()
