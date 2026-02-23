@@ -438,6 +438,10 @@ pub struct BlogComment {
     pub created_at: Option<String>,
     #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
+    #[serde(rename = "currentUserReaction")]
+    pub current_user_reaction: Option<Reaction>,
+    #[serde(rename = "reactionCount")]
+    pub reaction_count: Option<u32>,
 }
 
 /* This is a Query for UserResources */
@@ -812,4 +816,17 @@ pub struct UpdateBlogPostShareCountVars {
 pub struct UpdateBlogPostShareCountResponse {
     #[serde(rename = "updateBlogPostShareCount")]
     pub update_blog_post_share_count: Option<ApiResponse<u32>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReactToBlogCommentVars {
+    pub reaction: ReactionInput,
+    #[serde(rename = "commentId")]
+    pub comment_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReactToBlogCommentResponse {
+    #[serde(rename = "reactToBlogComment")]
+    pub react_to_blog_comment: Option<ApiResponse<Reaction>>,
 }

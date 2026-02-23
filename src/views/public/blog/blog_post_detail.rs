@@ -16,6 +16,7 @@ use crate::components::general::button::ButtonType;
 use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::components::general::richtext_editor::ExtraFormatingOption;
 use crate::components::general::spinner::Spinner;
+use crate::components::molecules::blog::blog_comment::CommentReactionDetails;
 use crate::components::{
     forms::reactive_form::ReactiveForm,
     general::{button::BasicButton, richtext_editor::RichTextEditor},
@@ -27,10 +28,11 @@ use crate::components::{
 use crate::data::context::shared::{fetch_author_info, fetch_single_blog_post};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::models::graphql::shared::{
-    BlogCommentInput, BlogPost, BookmarkBlogPostResponse, BookmarkBlogPostVars,
+    BlogComment, BlogCommentInput, BlogPost, BookmarkBlogPostResponse, BookmarkBlogPostVars,
     CreateBlogCommentResponse, CreateBlogCommentVars, FetchSingleBlogPostVars,
-    ReactToBlogPostResponse, ReactToBlogPostVars, ReactionInput, ReactionType,
-    UpdateBlogPostShareCountResponse, UpdateBlogPostShareCountVars,
+    ReactToBlogCommentResponse, ReactToBlogCommentVars, ReactToBlogPostResponse,
+    ReactToBlogPostVars, ReactionInput, ReactionType, UpdateBlogPostShareCountResponse,
+    UpdateBlogPostShareCountVars,
 };
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
@@ -184,6 +186,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                                     createdAt
                                     updatedAt
                                     id
+                                    replyCount
+                                    author
                                 }
                                 metadata {
                                     requestId
@@ -214,7 +218,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                     .await;
 
                     match response.get_data() {
-                        Some(_data) => {
+                        Some(data) => {
                             if let Some(form) = comment_form_ref
                                 .get_untracked()
                                 .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
@@ -223,6 +227,29 @@ pub fn BlogPostDetail() -> impl IntoView {
                                 set_comment_form_is_valid.set(false);
                             } else {
                             }
+
+                            let mut new_comment =
+                                data.add_comment_to_blog_post.as_ref().unwrap().get_data();
+
+                            let user_id_vars = FetchSingleUserVars {
+                                user_id: new_comment.author.as_ref().unwrap().to_owned(),
+                            };
+                            let author_details = fetch_author_info(&user_id_vars, None).await;
+
+                            if let Ok(author_details) = author_details {
+                                new_comment.full_author_details = Some(author_details);
+                            };
+
+                            set_blog_post.update(|prev| {
+                                if let Some(prev) = prev {
+                                    prev.comments = prev.comments.as_ref().map(|c| {
+                                        let mut new_comments = c.to_vec();
+
+                                        new_comments.push(new_comment);
+                                        new_comments
+                                    });
+                                };
+                            });
 
                             set_is_loading.set(false);
 
@@ -352,6 +379,83 @@ pub fn BlogPostDetail() -> impl IntoView {
             };
         });
     };
+
+    let handle_comment_reaction_click = Callback::new(move |reaction: CommentReactionDetails| {
+        spawn_local(async move {
+            let input_vars = ReactToBlogCommentVars {
+                reaction: ReactionInput {
+                    r#type: reaction.reaction_type.clone(),
+                },
+                comment_id: reaction.comment_id.clone(),
+            };
+
+            let query = r#"
+                mutation ReactToBlogComment($reaction: ReactionInput!, $commentId: String!) {
+                    reactToBlogComment(reaction: $reaction, commentId: $commentId) {
+                        data {
+                            type
+                            id
+                        }
+                        metadata {
+                            requestId
+                            newAccessToken
+                        }
+                    }
+                }
+               "#;
+
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let response = perform_mutation_or_query_with_vars::<
+                ReactToBlogCommentResponse,
+                ReactToBlogCommentVars,
+            >(
+                Some(&headers),
+                "http://localhost:8080/api/shared",
+                query,
+                input_vars,
+            )
+            .await;
+
+            match response.get_data() {
+                Some(data) => {
+                    // increment reaction count in blog_post
+                    set_blog_post.update(|prev| {
+                        if let Some(prev) = prev {
+                            if let Some(comments) = prev.comments.as_mut() {
+                                comments.iter_mut().for_each(|comment| {
+                                    if comment.id.as_ref().unwrap().to_owned()
+                                        == reaction.comment_id
+                                    {
+                                        comment.current_user_reaction = data
+                                            .react_to_blog_comment
+                                            .as_ref()
+                                            .map(|val| val.get_data());
+
+                                        if comment.current_user_reaction.is_none() {
+                                            comment.reaction_count =
+                                                comment.reaction_count.map(|val| val + 1);
+                                        }
+                                    }
+                                });
+                            };
+                        };
+                    });
+                    set_is_loading.set(false);
+                }
+                None => {
+                    set_is_loading.set(false);
+                }
+            };
+        });
+    });
 
     let handle_share = Callback::new(move |_| {
         let url = window().location().href().unwrap_or_default();
@@ -661,7 +765,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                             comments.into_iter()
                                                             .map(|comment| {
                                                                 view! {
-                                                                    <BlogComment comment_id=comment.id.as_ref().unwrap_or(&String::new()).to_owned() content=comment.content.as_ref().unwrap_or(&String::new()).to_owned() date_of_creation=comment.created_at.as_ref().unwrap_or(&String::new()).to_owned() author_name=comment.full_author_details.as_ref().unwrap().full_name.as_ref().unwrap().to_owned() author_avatar=comment.full_author_details.as_ref().unwrap().profile_picture.as_ref().unwrap().to_owned() reply_count=comment.reply_count.as_ref().unwrap_or(&0).to_owned() />
+                                                                    <BlogComment comment_id=comment.id.as_ref().unwrap_or(&String::new()).to_owned() content=comment.content.as_ref().unwrap_or(&String::new()).to_owned() date_of_creation=comment.created_at.as_ref().unwrap_or(&String::new()).to_owned() author_name=comment.full_author_details.as_ref().unwrap().full_name.as_ref().unwrap().to_owned() author_avatar=comment.full_author_details.as_ref().unwrap().profile_picture.as_ref().unwrap().to_owned() reply_count=comment.reply_count.as_ref().unwrap_or(&0).to_owned() reaction_count=comment.reaction_count.as_ref().unwrap_or(&0).to_owned() current_user_reaction=comment.current_user_reaction.as_ref().map(|r| r.r#type) on_reaction=handle_comment_reaction_click />
                                                                 }
                                                             })
                                                             .collect_view()
@@ -672,7 +776,20 @@ pub fn BlogPostDetail() -> impl IntoView {
                                             None => None
                                         }
                                     }
-
+                                    {
+                                        match blog_comments_ref {
+                                            Some(comments) => {
+                                                if comments.is_empty() {
+                                                    Some(view! {
+                                                        <p class="text-2xl text-mid-gray text-center">"No Comments to display"</p>
+                                                    })
+                                                } else {
+                                                    None
+                                                }
+                                            },
+                                            None => None
+                                        }
+                                    }
                                     </div>
                                     <div class="flex flex-col gap-[20px] display-constraints blog-display-constraints">
                                         <h3>Meet the Author</h3>
