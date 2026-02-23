@@ -411,10 +411,10 @@ pub fn BlogPostDetail() -> impl IntoView {
 
                         match response.get_data() {
                             Some(data) => {
-                                // increment reaction count in blog_post
+                                // increment bookmarks_count in blog_post
                                 set_blog_post.update(|prev| {
                                     if let Some(prev) = prev {
-                                        prev.bookmarks_count = Some(
+                                        prev.shares_count = Some(
                                             data.update_blog_post_share_count
                                                 .as_ref()
                                                 .unwrap()
