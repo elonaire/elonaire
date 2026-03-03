@@ -48,7 +48,6 @@ pub fn RadioInputField(
     #[prop(into, optional)] label: String,
     #[prop(default = false, optional)] required: bool,
     #[prop(optional, default = false)] is_selected: bool,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     #[prop(optional)] children: Option<ViewFn>,
 ) -> impl IntoView {
     view! {
@@ -63,9 +62,6 @@ pub fn RadioInputField(
                 checked=is_selected
                 id=move || initial_value.get()
                 required=required
-                on:input=move |ev| {
-                    oninput.run(ev);
-                }
             />
             <div class="flex flex-col">
                 <span>{label}</span>

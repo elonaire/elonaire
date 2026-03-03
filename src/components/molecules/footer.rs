@@ -13,17 +13,17 @@ pub fn Footer() -> impl IntoView {
                         <p class="md:text-left">"Welcome to my personal blog that majorly covers topics in Software Engineering and also a space where I can speak my mind out on anything and everything."</p>
                     </div>
                     <div class="flex flex-col gap-[10px]">
-                        <h4 class="text-contrast-white">"Support"</h4>
+                        <h5 class="text-contrast-white">"Support"</h5>
                         <A href="/contact" attr:class="text-sm">"Contact"</A>
                         <A href="/faq" attr:class="text-sm">"FAQ"</A>
                     </div>
                     <div class="flex flex-col gap-[10px]">
-                        <h4 class="text-contrast-white">"Learn More"</h4>
+                        <h5 class="text-contrast-white">"Learn More"</h5>
                         <A href="/pricing" attr:class="text-sm">"Pricing"</A>
                         <A href="/about" attr:class="text-sm">"About"</A>
                     </div>
                     <div class="flex flex-col gap-[10px]">
-                        <h4 class="text-contrast-white">"Legal"</h4>
+                        <h5 class="text-contrast-white">"Legal"</h5>
                         <A href="/privacy" attr:class="text-sm">"Privacy Policy"</A>
                         <A href="/terms" attr:class="text-sm">"Terms of Service"</A>
                     </div>

@@ -111,7 +111,7 @@ pub fn CreateBlog() -> impl IntoView {
     let blog_statuses = RwSignal::new(
         BlogStatus::variants_slice()
             .iter()
-            .map(|status| SelectOption::new(status, status))
+            .map(|status| SelectOption::new(&format!("{status:?}"), &status.to_string()))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -119,17 +119,9 @@ pub fn CreateBlog() -> impl IntoView {
         BlogCategory::variants_slice()
             .iter()
             .map(|category| {
-                let mut label = format!("{}", category);
+                let label = category.to_string();
 
-                if category == "WebDevelopment" {
-                    label = "Web Development".to_string();
-                } else if category == "MobileDevelopment" {
-                    label = "Mobile Development".to_string();
-                } else if category == "ArtificialIntelligence" {
-                    label = "Artificial Intelligence".to_string();
-                }
-
-                SelectOption::new(category, &label)
+                SelectOption::new(&format!("{category:?}"), &label)
             })
             .collect::<Vec<SelectOption>>(),
     );

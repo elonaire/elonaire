@@ -31,7 +31,7 @@ pub fn DatePicker(
     #[prop(into, default = RwSignal::new(None), optional)] initial_value: RwSignal<
         Option<DateTime<Local>>,
     >,
-    #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
+    // #[prop(default = Callback::new(|_| {}), optional)] onchange: Callback<DateTime<Local>>,
     #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
@@ -62,7 +62,7 @@ pub fn DatePicker(
 
     let select_date = Callback::new(move |date: DateTime<Local>| {
         set_selected_date.set(Some(date));
-        onchange.run(date);
+        // onchange.run(date);
         set_show_calendar.set(false);
 
         if let Some(el) = date_input_ref.get() as Option<HtmlInputElement> {
@@ -90,7 +90,7 @@ pub fn DatePicker(
             <div class="relative">
                 <InputField
                     readonly=true
-                    onclick=Callback::new(move |ev: ev::MouseEvent| toggle_calendar.run(ev))
+                    on:click=move |ev: ev::MouseEvent| toggle_calendar.run(ev)
                     initial_value=selected_date_display_value
                     field_type=InputFieldType::Text
                     id_attr=format!("{id_attr}-no-sr")

@@ -32,8 +32,8 @@ pub fn Nav(
             MenuItem::new("Home", IconId::AiHomeOutlined, "/"),
             MenuItem::new("Blog Feed", IconId::BsRss, "/blog"),
             MenuItem::new("About", IconId::BsInfoCircle, "/blog/about"),
-            MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
-            MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
+            // MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
+            // MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
             MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
         ]
     });

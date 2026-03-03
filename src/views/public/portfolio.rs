@@ -30,9 +30,8 @@ pub fn Portfolio() -> impl IntoView {
     let portfolio_tabs = RwSignal::new(
         UserPortfolioCategory::variants_slice()
             .iter()
-            .filter(|category| !category.is_empty())
             .map(|category| {
-                let owned_category = category.to_owned(); // must implement Clone
+                let owned_category = category.to_string(); // must implement Clone
 
                 TabLabel::new(ViewFn::from(move || {
                     let owned_category = owned_category.clone();

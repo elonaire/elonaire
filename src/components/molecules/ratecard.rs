@@ -65,7 +65,12 @@ pub fn RatecardComponent(
     let billing_interval = RwSignal::new(
         BillingInterval::variants_slice()
             .iter()
-            .map(|billing_interval| SelectOption::new(billing_interval, billing_interval))
+            .map(|billing_interval| {
+                SelectOption::new(
+                    &format!("{billing_interval:?}"),
+                    &billing_interval.to_string(),
+                )
+            })
             .collect::<Vec<SelectOption>>(),
     );
     let (selected_billing_interval, set_selected_billing_interval) = signal("hr");
@@ -471,7 +476,7 @@ pub fn RatecardComponent(
                             required=true
                             initial_value=RwSignal::new("Hourly".into())
                             ext_input_styles="text-light-gray"
-                            onchange=Callback::new(move |ev: ev::Event| {
+                            on:change=move |ev: ev::Event| {
                                 let target = ev
                                     .target()
                                     .and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
@@ -486,7 +491,7 @@ pub fn RatecardComponent(
                                     };
                                     set_selected_billing_interval.set(short_name);
                                 }
-                            })
+                            }
                             />
                         </ReactiveForm>
                     </div>

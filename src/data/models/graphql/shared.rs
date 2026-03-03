@@ -65,15 +65,23 @@ pub enum UserPortfolioCategory {
 }
 
 impl EnumerableEnum for UserPortfolioCategory {
-    fn variants_slice() -> Vec<String> {
+    fn variants_slice() -> Vec<Self> {
         vec![
-            format!("{:?}", Self::JavaScript),
-            format!("{:?}", Self::Rust),
-            format!("{:?}", Self::Database),
-            format!("{:?}", Self::DevOps),
-            format!("{:?}", Self::Cloud),
-            format!("{:?}", Self::Mobile),
+            Self::JavaScript,
+            Self::Rust,
+            Self::Database,
+            Self::DevOps,
+            Self::Cloud,
+            Self::Mobile,
         ]
+    }
+}
+
+impl Display for UserPortfolioCategory {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 
@@ -188,19 +196,27 @@ pub enum UserResumeSection {
 }
 
 impl EnumerableEnum for UserResumeSection {
-    fn variants_slice() -> Vec<String> {
+    fn variants_slice() -> Vec<Self> {
         vec![
-            format!("{:?}", Self::Education),
-            format!("{:?}", Self::Experience),
-            format!("{:?}", Self::Achievements),
-            format!("{:?}", Self::Projects),
-            format!("{:?}", Self::Certifications),
-            format!("{:?}", Self::Volunteer),
-            format!("{:?}", Self::Publications),
-            format!("{:?}", Self::Languages),
-            format!("{:?}", Self::Interests),
-            format!("{:?}", Self::References),
+            Self::Education,
+            Self::Experience,
+            Self::Achievements,
+            Self::Projects,
+            Self::Certifications,
+            Self::Volunteer,
+            Self::Publications,
+            Self::Languages,
+            Self::Interests,
+            Self::References,
         ]
+    }
+}
+
+impl Display for UserResumeSection {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 
@@ -280,13 +296,21 @@ pub enum UserSkillLevel {
 }
 
 impl EnumerableEnum for UserSkillLevel {
-    fn variants_slice() -> Vec<String> {
+    fn variants_slice() -> Vec<Self> {
         vec![
-            format!("{:?}", Self::Beginner),
-            format!("{:?}", Self::Intermediate),
-            format!("{:?}", Self::Advanced),
-            format!("{:?}", Self::Expert),
+            Self::Beginner,
+            Self::Intermediate,
+            Self::Advanced,
+            Self::Expert,
         ]
+    }
+}
+
+impl Display for UserSkillLevel {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 
@@ -297,11 +321,16 @@ pub enum UserSkillType {
 }
 
 impl EnumerableEnum for UserSkillType {
-    fn variants_slice() -> Vec<String> {
-        vec![
-            format!("{:?}", Self::Technical),
-            format!("{:?}", Self::Soft),
-        ]
+    fn variants_slice() -> Vec<Self> {
+        vec![Self::Technical, Self::Soft]
+    }
+}
+
+impl Display for UserSkillType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 
@@ -341,12 +370,16 @@ pub enum BlogStatus {
 }
 
 impl EnumerableEnum for BlogStatus {
-    fn variants_slice() -> Vec<String> {
-        vec![
-            format!("{:?}", Self::Draft),
-            format!("{:?}", Self::Published),
-            format!("{:?}", Self::Archived),
-        ]
+    fn variants_slice() -> Vec<Self> {
+        vec![Self::Draft, Self::Published, Self::Archived]
+    }
+}
+
+impl Display for BlogStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 
@@ -357,16 +390,32 @@ pub enum BlogCategory {
     ArtificialIntelligence,
     Technology,
     Lifestyle,
+    Science,
+    Health,
+    EmbeddedSystems,
+    IoT,
+    UpCloseAndCandid,
+    Commentary,
+    Security,
+    Programming,
 }
 
 impl EnumerableEnum for BlogCategory {
-    fn variants_slice() -> Vec<String> {
+    fn variants_slice() -> Vec<Self> {
         vec![
-            format!("{:?}", Self::WebDevelopment),
-            format!("{:?}", Self::MobileDevelopment),
-            format!("{:?}", Self::ArtificialIntelligence),
-            format!("{:?}", Self::Technology),
-            format!("{:?}", Self::Lifestyle),
+            Self::WebDevelopment,
+            Self::MobileDevelopment,
+            Self::ArtificialIntelligence,
+            Self::Technology,
+            Self::Lifestyle,
+            Self::Science,
+            Self::Health,
+            Self::EmbeddedSystems,
+            Self::IoT,
+            Self::UpCloseAndCandid,
+            Self::Commentary,
+            Self::Security,
+            Self::Programming,
         ]
     }
 }
@@ -377,6 +426,8 @@ impl Display for BlogCategory {
             Self::ArtificialIntelligence => write!(f, "Artificial Intelligence"),
             Self::WebDevelopment => write!(f, "Web Development"),
             Self::MobileDevelopment => write!(f, "Mobile Development"),
+            Self::EmbeddedSystems => write!(f, "Embedded Systems"),
+            Self::UpCloseAndCandid => write!(f, "Up Close and Candid"),
             any_other => write!(f, "{any_other:?}"),
         }
     }
@@ -520,13 +571,16 @@ pub enum BillingInterval {
 }
 
 impl EnumerableEnum for BillingInterval {
-    fn variants_slice() -> Vec<String> {
-        vec![
-            format!("{:?}", Self::Hourly),
-            format!("{:?}", Self::Weekly),
-            format!("{:?}", Self::Monthly),
-            format!("{:?}", Self::Annual),
-        ]
+    fn variants_slice() -> Vec<Self> {
+        vec![Self::Hourly, Self::Weekly, Self::Monthly, Self::Annual]
+    }
+}
+
+impl Display for BillingInterval {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 
@@ -712,6 +766,8 @@ pub struct FetchBlogPostsQueryFilters {
     // pub is_premium: Option<bool>,
     #[serde(rename = "sortConfigs")]
     pub sort_configs: Option<SortConfigs>,
+    #[serde(rename = "searchTerm")]
+    pub search_term: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]

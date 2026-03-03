@@ -53,7 +53,6 @@ pub fn CheckboxInputField(
     #[prop(default = false, optional)] required: bool,
     #[prop(into, default = Signal::derive(move || false), optional)] checked: Signal<bool>,
     #[prop(into, optional)] placeholder: String,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] ext_input_styles: String,
     #[prop(into, optional)] ext_wrapper_styles: String,
@@ -127,7 +126,6 @@ pub fn CheckboxGroup(
     #[prop(into)] name: String,
     #[prop(default = false, optional)] readonly: bool,
     #[prop(default = false, optional)] required: bool,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     #[prop(into, optional)] ext_input_styles: String,
     #[prop(into, optional,default = "off".to_string())] autocomplete: String,
     /// Display options horizontally instead of vertically

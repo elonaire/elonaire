@@ -1,7 +1,10 @@
+use std::time::Duration;
+
 use icondata as IconId;
 use leptos::{prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
+use web_sys::{HtmlDivElement, MouseEvent};
 
 use crate::{
     components::{
@@ -54,6 +57,11 @@ pub fn BlogHome() -> impl IntoView {
         status: Some(BlogStatus::Published),
         ..Default::default()
     });
+    let search_area_ref = NodeRef::new();
+    let (query, set_query) = signal(String::new());
+    let (show_overlay, set_show_overlay) = signal(false);
+    let (is_loading, set_is_loading) = signal(false);
+    let (search_results, set_search_results) = signal(vec![] as Vec<BlogPost>);
 
     Effect::new(move || {
         set_is_loading.set(true);
@@ -155,6 +163,76 @@ pub fn BlogHome() -> impl IntoView {
         });
     });
 
+    let handle_search_focus = Callback::new(move |_| {
+        if let Some(el) = search_area_ref.get() as Option<HtmlDivElement> {
+            el.scroll_into_view_with_bool(true);
+            set_show_overlay.set(true);
+        }
+    });
+
+    let search_action = Action::new_local(move |q: &String| {
+        let q = q.clone();
+        async move {
+            let post_filters = FetchBlogPostsQueryFilters {
+                search_term: Some(q),
+                ..Default::default()
+            };
+            let other_posts_query = r#"
+            query FetchBlogPosts($filters: FetchBlogPostsQueryFilters) {
+                fetchBlogPosts(filters: $filters) {
+                    data {
+                        title
+                        category
+                        link
+                    }
+                    metadata {
+                        requestId
+                        newAccessToken
+                    }
+                }
+            }
+           "#;
+
+            let filters = FetchBlogPostsVars {
+                filters: post_filters,
+            };
+
+            match fetch_blog_posts(None, filters, other_posts_query).await {
+                Ok(posts) => posts,
+                Err(_) => vec![],
+            }
+        }
+    });
+
+    // Watch query changes
+    Effect::new(move |_| {
+        let q = query.get();
+        if q.is_empty() {
+            set_show_overlay.set(false);
+            set_search_results.set(vec![]);
+            return;
+        }
+        set_show_overlay.set(true);
+        // set_is_loading.set(true);
+        search_action.dispatch(q);
+    });
+
+    // Update results when action completes
+    Effect::new(move |_| {
+        if let Some(results) = search_action.value().get() {
+            set_search_results.set(results);
+            set_is_loading.set(false);
+        }
+    });
+
+    let handle_blur = Callback::new(move |_| {
+        // Small delay so clicks on results register first
+        set_timeout(
+            move || set_show_overlay.set(false),
+            Duration::from_millis(150),
+        );
+    });
+
     view! {
         <Title text="Blog Home"/>
         <main>
@@ -189,10 +267,69 @@ pub fn BlogHome() -> impl IntoView {
 
                 </div>
                 <div class="bg-primary/25 hidden md:block">
-                    <div class="display-constraints flex flex-col gap-[20px] items-center justify-center  h-[284px]">
+                    <div class="display-constraints flex flex-col gap-[20px] items-center justify-center h-[284px]" node_ref=search_area_ref>
                         <h1>"Find just what you are looking for"</h1>
                         <p>"Search through our collection of articles"</p>
+                        <div class="w-[384px] flex items-center gap-[10px]">
+                            <div class="flex-1 relative">
+                                <InputField field_type=InputFieldType::Text icon=IconId::BsSearch onfocus=handle_search_focus id_attr="search-input" onblur=handle_blur on:input=move |e| {
+                                    set_query.set(event_target_value(&e));
+                                } />
+                                {move || show_overlay.get().then(|| view! {
+                                    <div
+                                        class="absolute top-full mt-2 z-50 w-full bg-contrast-white rounded-[5px] shadow-2xl h-[43svh] overflow-y-auto"
+                                        on:mousedown=|e: MouseEvent| e.prevent_default()
+                                    >
+                                        // Loading state
+                                        {move || is_loading.get().then(|| view! {
+                                            <div class="flex items-center justify-center py-8 text-gray-400 text-sm">
+                                                <span>"Searching..."</span>
+                                            </div>
+                                        })}
 
+                                        // Results list
+                                        {move || {
+                                            let results = search_results.get();
+                                            (!results.is_empty()).then(|| view! {
+                                                <ul class="py-2 list-none">
+                                                    {results.into_iter().map(|article| view! {
+                                                        <li>
+                                                        <a
+
+                                                                href=format!("/blog/read/{}", article.link.unwrap_or("".into()))
+                                                                class="flex flex-col px-4 py-3 hover:bg-primary/10 \
+                                                                       transition-colors cursor-pointer group"
+                                                            >
+                                                                <span class="text-sm font-medium text-gray-900 \
+                                                                             group-hover:text-primary line-clamp-1">
+                                                                    {article.title.unwrap_or("".into())}
+                                                                </span>
+                                                                // Optional: subtitle/category
+                                                                <span class="text-xs text-gray-400 mt-0.5">
+                                                                    {article.category.unwrap().to_string()}
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                    }).collect_view()}
+                                                </ul>
+                                            })
+                                        }}
+
+                                        // Empty state
+                                        {move || {
+                                            let q = query.get();
+                                            let results = search_results.get();
+                                            (!q.is_empty() && results.is_empty() && !is_loading.get()).then(|| view! {
+                                                <div class="py-8 text-center text-sm text-gray-400">
+                                                    "No articles found for "
+                                                    <span class="font-medium text-gray-600">{q}</span>
+                                                </div>
+                                            })
+                                        }}
+                                    </div>
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="display-constraints flex flex-col gap-[40px] md:flex-row">
@@ -202,11 +339,11 @@ pub fn BlogHome() -> impl IntoView {
                                 <BlogSection title="Latest Posts"/>
                             </div>
                             <div class="flex items-center gap-[5px]">
-                                <Icon icon=IconId::BsFilter width="1rem" height="1rem" />
+                                <Icon icon=IconId::VsSettings width="1rem" height="1rem" />
                                 <Badge text="0" ><span>"Filters"</span></Badge>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                        <div class="grid grid-cols-1 md:grid-cols-2 md:grid-rows-5 md:auto-rows-min gap-[20px]">
                             { move || {
                                 let filtered_posts = other_posts.get();
                                 filtered_posts

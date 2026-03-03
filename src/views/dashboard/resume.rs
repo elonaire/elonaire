@@ -179,7 +179,7 @@ pub fn CreateResumeItem() -> impl IntoView {
     let resume_sections = RwSignal::new(
         UserResumeSection::variants_slice()
             .iter()
-            .map(|section| SelectOption::new(section, section))
+            .map(|section| SelectOption::new(&format!("{section:?}"), &section.to_string()))
             .collect::<Vec<SelectOption>>(),
     );
 
@@ -290,7 +290,7 @@ pub fn CreateResumeItem() -> impl IntoView {
         }
     };
 
-    let handle_achievement_input_change = Callback::new(move |ev: ev::Event| {
+    let handle_achievement_input_change = move |ev: ev::Event| {
         let target = ev
             .target()
             .and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
@@ -298,7 +298,7 @@ pub fn CreateResumeItem() -> impl IntoView {
         if let Some(input_el) = target {
             set_achievement_field_value.set(input_el.value());
         }
-    });
+    };
 
     let handle_add_button_click = Callback::new(move |_ev: ev::MouseEvent| {
         set_achievements.update(|prev| {
@@ -366,7 +366,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                             }
                         </ul>
                         <div class="flex flex-row items-center">
-                            <InputField field_type=InputFieldType::Text placeholder="Add Achievement" initial_value=achievement_field_value oninput=handle_achievement_input_change id_attr="achievement" ext_wrapper_styles="flex-1" ext_input_styles="rounded-r-none" />
+                            <InputField field_type=InputFieldType::Text placeholder="Add Achievement" initial_value=achievement_field_value on:input=handle_achievement_input_change id_attr="achievement" ext_wrapper_styles="flex-1" ext_input_styles="rounded-r-none" />
                             <BasicButton
                                 button_text="Add"
                                 style_ext="bg-primary text-contrast-white rounded-l-none"

@@ -25,10 +25,8 @@ pub fn Textarea(
     #[prop(default = false, optional)] readonly: bool,
     #[prop(default = false, optional)] required: bool,
     #[prop(into, optional)] placeholder: String,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
     #[prop(into, optional)] ext_input_styles: String,
     #[prop(into, optional)] id_attr: String,
-    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
 ) -> impl IntoView {
     // Create reactive state for display_error
 
@@ -48,11 +46,9 @@ pub fn Textarea(
                 name=name
                 node_ref=input_node_ref
                 readonly=readonly
-                on:input=move |ev| oninput.run(ev)
                 placeholder=placeholder
                 id=id_attr.clone()
                 required=required
-                on:change={move |ev| onchange.run(ev)}
             >
                 {move || initial_value.get()}
             </textarea>

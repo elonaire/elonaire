@@ -58,7 +58,7 @@ pub fn SelectInput(
     #[prop(default = false, optional)] readonly: bool,
     #[prop(into)] options: RwSignal<Vec<SelectOption>>,
     #[prop(default = false, optional)] required: bool,
-    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
+    // #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(into, optional)] ext_input_styles: String,
     #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
@@ -87,7 +87,7 @@ pub fn SelectInput(
                 )
                 // value={initial_value.clone()}
                 // readonly={readonly}
-                on:change=move |ev| onchange.run(ev)
+                // on:change=move |ev| onchange.run(ev)
                 id=id_attr.clone()
                 required=required
             >
@@ -137,7 +137,7 @@ pub fn CustomSelectInput(
 
     #[prop(optional, default = false)] required: bool,
     #[prop(into, optional)] id_attr: String,
-    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<Vec<String>>,
+    // #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<Vec<String>>,
 ) -> impl IntoView {
     let (open, set_open) = signal(false);
     let (query, set_query) = signal(String::new());
@@ -170,7 +170,7 @@ pub fn CustomSelectInput(
             }
         });
 
-        onchange.run(value.get());
+        // onchange.run(value.get());
 
         if !multiple {
             set_open.set(false);
@@ -183,7 +183,7 @@ pub fn CustomSelectInput(
             current.retain(|v| v != &val);
         });
 
-        onchange.run(value.get());
+        // onchange.run(value.get());
     };
 
     view! {
@@ -262,9 +262,9 @@ pub fn CustomSelectInput(
             {move || open.get().then_some(view! {
                 <div class="absolute z-30 mt-1 w-full bg-contrast-white rounded-[5px] shadow">
                     // Search
-                    <InputField placeholder="Search…" field_type=InputFieldType::Text id_attr="search" oninput=Callback::new(move |ev: ev::Event| {
+                    <InputField placeholder="Search…" field_type=InputFieldType::Text id_attr="search" on:input=move |ev: ev::Event| {
                         set_query.set(event_target_value(&ev));
-                    }) />
+                    } />
 
                     // Options
                     <ul class="max-h-48 overflow-y-auto">

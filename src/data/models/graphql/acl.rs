@@ -1,3 +1,5 @@
+use std::fmt::{self, Display};
+
 use reactive_stores::Store;
 use serde::{Deserialize, Serialize};
 
@@ -215,12 +217,17 @@ pub enum AdminPrivilege {
 }
 
 impl EnumerableEnum for AdminPrivilege {
-    fn variants_slice() -> Vec<String> {
-        vec![
-            format!("{:?}", Self::Admin),
-            format!("{:?}", Self::SuperAdmin),
-            format!("{:?}", Self::None),
-        ]
+    fn variants_slice() -> Vec<Self> {
+        vec![Self::Admin, Self::SuperAdmin, Self::None]
+    }
+}
+
+impl Display for AdminPrivilege {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::SuperAdmin => write!(f, "Super Admin"),
+            any_other => write!(f, "{any_other:?}"),
+        }
     }
 }
 

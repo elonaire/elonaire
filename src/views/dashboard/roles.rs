@@ -184,7 +184,12 @@ pub fn CreateRole() -> impl IntoView {
     let admin_privileges = RwSignal::new(
         AdminPrivilege::variants_slice()
             .iter()
-            .map(|admin_privilege| SelectOption::new(admin_privilege, admin_privilege))
+            .map(|admin_privilege| {
+                SelectOption::new(
+                    &format!("{admin_privilege:?}"),
+                    &admin_privilege.to_string(),
+                )
+            })
             .collect::<Vec<SelectOption>>(),
     );
 

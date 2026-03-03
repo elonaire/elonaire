@@ -311,7 +311,7 @@ pub fn RichTextEditor(
     });
 
     // Handle file selection
-    let on_file_change = Callback::new(move |_ev: ev::Event| {
+    let on_file_change = move |_ev: ev::Event| {
         if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
             if let Ok(files_form_data) = FormData::new() {
                 if let Some(filelist) = file_input.files() {
@@ -389,7 +389,7 @@ pub fn RichTextEditor(
                 });
             };
         };
-    });
+    };
 
     // Add this effect to position the cursor
     Effect::new(move |_| {
@@ -408,7 +408,7 @@ pub fn RichTextEditor(
         }
     });
 
-    let apply_heading = Callback::new(move |ev: ev::Event| {
+    let apply_heading = move |ev: ev::Event| {
         let tag = event_target_value(&ev);
         if let Some(editor) = editor_ref.get() as Option<HtmlDivElement> {
             if let Some(doc) = window().and_then(|w| w.document()) {
@@ -447,16 +447,16 @@ pub fn RichTextEditor(
                 }
             }
         }
-    });
+    };
 
-    let apply_language = Callback::new(move |ev: ev::Event| {
+    let apply_language = move |ev: ev::Event| {
         let lang = event_target_value(&ev);
         if let Some((pre, code)) = current_code_block() {
             code.set_attribute("class", &format!("language-{}", lang))
                 .ok();
         }
         show_language_picker.set(false);
-    });
+    };
 
     let handle_on_input = move |_: ev::Event| {
         if let Some(editor) = editor_ref.get() as Option<HtmlDivElement> {
@@ -475,7 +475,7 @@ pub fn RichTextEditor(
         }
     });
 
-    let on_md_file_change = Callback::new(move |_ev: ev::Event| {
+    let on_md_file_change = move |_ev: ev::Event| {
         if let Some(file_input) = md_file_input_ref.get() as Option<HtmlInputElement> {
             if let Some(files) = file_input.files() {
                 if let Some(file) = files.item(0) {
@@ -503,7 +503,7 @@ pub fn RichTextEditor(
                 }
             }
         }
-    });
+    };
 
     // Ordered list
     let ordered_list = Callback::new(move |_| {
@@ -539,7 +539,7 @@ pub fn RichTextEditor(
             <div class="flex gap-2 items-center flex-wrap border-b-[1px] border-light-gray p-[10px]">
                 {
                     extra_formating_options.contains(&ExtraFormatingOption::Heading).then(|| view!{
-                        <SelectInput id_attr="font-sizes" options=font_options onchange=apply_heading />
+                        <SelectInput id_attr="font-sizes" options=font_options on:change=apply_heading />
                     })
                 }
                 <BasicButton
@@ -590,7 +590,7 @@ pub fn RichTextEditor(
 
                         <Show when=move || show_language_picker.get()>
                             <div class="ml-2">
-                                <SelectInput id_attr="code-language" options=language_options onchange=apply_language />
+                                <SelectInput id_attr="code-language" options=language_options on:change=apply_language />
                             </div>
                         </Show>
                     })
@@ -636,7 +636,7 @@ pub fn RichTextEditor(
                 inner_html=move || initial_content.get()
                 on:input=handle_on_input
             />
-            <InputField field_type=InputFieldType::File input_node_ref=file_input_ref accept="image/*" onchange=on_file_change ext_input_styles="hidden" id_attr=format!("{}-file-input", id_attr) />
+            <InputField field_type=InputFieldType::File input_node_ref=file_input_ref accept="image/*" on:change=on_file_change ext_input_styles="hidden" id_attr=format!("{}-file-input", id_attr) />
 
 
             <Textarea id_attr=format!("{}-text-input", id_attr) ext_input_styles="hidden" initial_value=tracked_content name=name />
@@ -645,7 +645,7 @@ pub fn RichTextEditor(
                 field_type=InputFieldType::File
                 input_node_ref=md_file_input_ref
                 accept=".md,.markdown"
-                onchange=on_md_file_change
+                on:change=on_md_file_change
                 ext_input_styles="hidden"
                 id_attr=format!("{}-md-file-input", id_attr)
             />

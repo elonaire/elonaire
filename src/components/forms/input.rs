@@ -1,7 +1,9 @@
 use icondata as IconData;
+use icondata::Icon as IconId;
 use leptos::ev;
 use leptos::html::*;
 use leptos::prelude::*;
+use leptos_icons::Icon;
 
 use crate::components::general::button::BasicButton;
 
@@ -46,9 +48,6 @@ pub fn InputField(
     #[prop(default = false)] readonly: bool,
     #[prop(default = false)] required: bool,
     #[prop(into, optional)] placeholder: String,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
-    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
-    #[prop(optional, default = Callback::new(|_| {}))] onclick: Callback<ev::MouseEvent>,
     #[prop(into, optional)] ext_wrapper_styles: String,
     #[prop(into, optional)] ext_label_styles: String,
     #[prop(into, optional)] ext_input_styles: String,
@@ -56,6 +55,10 @@ pub fn InputField(
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] accept: String,
     #[prop(into, optional)] multiple: bool,
+    #[prop(optional, default = None)] icon: Option<IconId>,
+    #[prop(optional, default = true)] icon_is_leading: bool,
+    #[prop(optional, default = Callback::new(|_| {}))] onfocus: Callback<ev::FocusEvent>,
+    #[prop(optional, default = Callback::new(|_| {}))] onblur: Callback<ev::FocusEvent>,
 ) -> impl IntoView {
     let input_field_type_str = match field_type {
         InputFieldType::Text => "text",
@@ -92,27 +95,44 @@ pub fn InputField(
                     <span class="text-danger ml-1">*</span>
                 })}
             </label>
-            <input
-                class={format!(
-                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow {}",
+            <div
+            class=move || format!(
+                    "h-[45px] flex items-center border border-mid-gray rounded-[5px]
+                     shadow appearance-none
+                     focus-within:ring-2 focus-within:ring-secondary
+                     focus-within:border-transparent
+                     {} {}",
+                    if icon_is_leading { "" } else { "flex-row-reverse" },
                     ext_input_styles
-                )}
-                type=input_field_type_str
-                prop:value=initial_value
-                name=name
-                node_ref=input_node_ref
-                readonly=readonly
-                on:input={move |ev| oninput.run(ev)}
-                placeholder=placeholder
-                autocomplete=autocomplete
-                id=id_attr.clone()
-                on:click={move |ev| onclick.run(ev)}
-                required=required
-                on:change={move |ev| onchange.run(ev)}
-                accept=accept
-                multiple=multiple
-                step=step
-            />
+                )
+                >
+                {
+                    icon.map(|icon_id| view!{
+                        <div class=format!("h-full flex items-center px-3 justify-center")>
+                            <Icon icon=icon_id width="1rem" height="1rem" />
+                        </div>
+                    })
+                }
+                <input
+                    class=format!(
+                        "w-full h-full py-2 px-3 text-gray leading-tight flex-grow focus:outline-none"
+                    )
+                    type=input_field_type_str
+                    prop:value=initial_value
+                    name=name
+                    node_ref=input_node_ref
+                    readonly=readonly
+                    placeholder=placeholder
+                    autocomplete=autocomplete
+                    id=id_attr.clone()
+                    required=required
+                    accept=accept
+                    multiple=multiple
+                    step=step
+                    on:focus=move |e| onfocus.run(e)
+                    on:blur=move |e| onblur.run(e)
+                />
+            </div>
         </div>
     }
 }
@@ -124,7 +144,6 @@ pub fn CustomFileInput(
     #[prop(default = false, optional)] required: bool,
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] ext_label_styles: String,
-    #[prop(optional, default = Callback::new(|_| {}))] onchange: Callback<ev::Event>,
     #[prop(optional)] input_node_ref: NodeRef<Input>,
     #[prop(into, optional)] multiple: bool,
     #[prop(into, optional)] accept: String,
@@ -138,7 +157,6 @@ pub fn CustomFileInput(
                 field_type=InputFieldType::File
                 ext_input_styles="absolute inset-y-0 left-0 w-full opacity-0"
                 id_attr=id_attr.clone()
-                onchange=onchange
                 input_node_ref=input_node_ref
                 multiple=multiple
                 accept=accept

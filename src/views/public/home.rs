@@ -62,31 +62,31 @@ pub fn Home() -> impl IntoView {
 
     let ethics = vec![
         (
-            "bg-[url('http://localhost:3001/view/8b7e9d5d-cb9a-455f-b133-c9f25d1cc3df')]",
+            "bg-[url('https://api.techietenka.com/files/view/a7641914-73a2-4747-9728-8fd74177259c?width=800')]",
             "Commitment to Quality",
             "I never compromise on delivering exceptional results",
             "md:row-span-1 md:col-span-2", // ethic1: spans 2 cols, 1 row
         ),
         (
-            "bg-[url('http://localhost:3001/view/c836cd82-7df4-43e2-a8c4-31c4295e1aa6')]",
+            "bg-[url('https://api.techietenka.com/files/view/6162cb5a-62b6-43e4-9eab-1f2df0204140?width=800')]",
             "Timely Delivery",
             "Meeting deadlines is not negotiable",
             "md:row-span-1 md:col-span-2", // ethic2: spans 2 cols, 1 row
         ),
         (
-            "bg-[url('http://localhost:3001/view/94483479-7c83-4916-ba74-6847055019cb')]",
+            "bg-[url('https://api.techietenka.com/files/view/29eb4743-b4fe-4e74-b2a6-f74592829e85?width=800')]",
             "Clear Communication",
             "Transparency at every step of the process",
             "md:row-span-2 md:col-span-2", // ethic3: spans 2 cols, 2 rows
         ),
         (
-            "bg-[url('http://localhost:3001/view/fa6a9083-c92f-4532-af25-950323c888e0')]",
+            "bg-[url('https://api.techietenka.com/files/view/a6b4ac55-c487-4f82-bac8-fb1e4920869f?width=800')]",
             "Continuous Learning",
             "Always staying ahead with latest technologies",
             "md:row-span-2 md:col-span-2", // ethic4: spans 2 cols, 2 rows
         ),
         (
-            "bg-[url('http://localhost:3001/view/e4091015-af88-41d6-aaa1-461ad6d1d432')]",
+            "bg-[url('https://api.techietenka.com/files/view/8671a04d-8fbe-4b17-a75d-7e79217e3188?width=800')]",
             "Client-Focused",
             "Your success is my priority",
             "md:row-span-1 md:col-span-2", // ethic5: spans 2 cols, 1 row
@@ -316,7 +316,7 @@ pub fn Home() -> impl IntoView {
                             {/* Background image — full width */}
                             <div
                                 class="absolute inset-0 bg-cover bg-center"
-                                style="background-image: url('http://localhost:3001/view/e932cec5-3e8a-4b79-9f4a-0ec3af066d50');"
+                                style="background-image: url('http://localhost:3001/view/e932cec5-3e8a-4b79-9f4a-0ec3af066d50?width=1500');"
                             />
 
                             {/* Primary color — left half with diagonal right edge */}

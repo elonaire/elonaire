@@ -23,7 +23,6 @@ pub fn ToggleSwitch(
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] label: String,
     #[prop(default = false)] required: bool,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
 ) -> impl IntoView {
     let checkbox_ref = NodeRef::new();
     let initial_value = RwSignal::new(String::from("false"));
@@ -47,7 +46,7 @@ pub fn ToggleSwitch(
 
     view! {
         <div class="flex flex-col cursor-pointer relative">
-            <CheckboxInputField input_node_ref=checkbox_ref oninput=oninput initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required />
+            <CheckboxInputField input_node_ref=checkbox_ref initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required />
             <div class="flex items-center">
                 <div on:click=handle_toggle class="relative">
                     <div

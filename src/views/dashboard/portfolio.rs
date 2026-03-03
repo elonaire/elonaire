@@ -190,7 +190,7 @@ pub fn CreatePortfolio() -> impl IntoView {
     let portfolio_categories = RwSignal::new(
         UserPortfolioCategory::variants_slice()
             .iter()
-            .map(|category| SelectOption::new(category, category))
+            .map(|category| SelectOption::new(&format!("{category:?}"), &category.to_string()))
             .collect::<Vec<SelectOption>>(),
     );
 

@@ -179,13 +179,15 @@ pub fn CreateSkill() -> impl IntoView {
     let user_skill_levels = RwSignal::new(
         UserSkillLevel::variants_slice()
             .iter()
-            .map(|level| SelectOption::new(level, level))
+            .map(|level| SelectOption::new(&format!("{level:?}"), &level.to_string()))
             .collect::<Vec<SelectOption>>(),
     );
     let user_skill_types = RwSignal::new(
         UserSkillType::variants_slice()
             .iter()
-            .map(|skill_type| SelectOption::new(skill_type, skill_type))
+            .map(|skill_type| {
+                SelectOption::new(&format!("{skill_type:?}"), &skill_type.to_string())
+            })
             .collect::<Vec<SelectOption>>(),
     );
 
