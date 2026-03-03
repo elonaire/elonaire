@@ -6,6 +6,7 @@ use leptos_icons::Icon;
 use leptos_meta::*;
 use web_sys::{HtmlDivElement, MouseEvent};
 
+use crate::utils::custom_traits::EnumerableEnum;
 use crate::{
     components::{
         forms::{
@@ -38,7 +39,10 @@ use crate::{
             general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
             graphql::{
                 acl::FetchSingleUserVars,
-                shared::{BlogPost, BlogStatus, FetchBlogPostsQueryFilters, FetchBlogPostsVars},
+                shared::{
+                    BlogCategory, BlogPost, BlogStatus, FetchBlogPostsQueryFilters,
+                    FetchBlogPostsVars,
+                },
             },
         },
     },
@@ -228,7 +232,10 @@ pub fn BlogHome() -> impl IntoView {
     let handle_blur = Callback::new(move |_| {
         // Small delay so clicks on results register first
         set_timeout(
-            move || set_show_overlay.set(false),
+            move || {
+                set_show_overlay.set(false);
+                current_state.show_mobile_search().set(false);
+            },
             Duration::from_millis(150),
         );
     });
@@ -332,6 +339,87 @@ pub fn BlogHome() -> impl IntoView {
                         </div>
                     </div>
                 </div>
+                // Mobile search overlay
+                {move || current_state.show_mobile_search().get().then(|| view! {
+                    <div class="fixed inset-0 z-50 bg-black/50 md:hidden"
+                        on:mousedown=move |_| {
+                            current_state.show_mobile_search().set(false);
+                        }
+                    >
+                        <div class="bg-white w-full px-4 py-3 flex items-center gap-3 shadow-lg"
+                            on:mousedown=move |e: MouseEvent| e.stop_propagation()
+                        >
+                            // Back/close button
+                            <button
+                                class="text-gray-600 shrink-0"
+                                on:click=move |_| {
+                                    current_state.show_mobile_search().set(false);
+                                }
+                            >
+                                <Icon icon=IconId::BsArrowLeft width="1.2rem" height="1.2rem" />
+                            </button>
+
+                            <div class="flex-1 relative">
+                                <InputField
+                                    field_type=InputFieldType::Text
+                                    icon=IconId::BsSearch
+                                    id_attr="mobile-search-input"
+                                    placeholder="Search articles..."
+                                    on:input=move |e| {
+                                        set_query.set(event_target_value(&e));
+                                    }
+                                    onblur=handle_blur
+                                />
+                                // Results dropdown
+                                {move || {
+                                    let results = search_results.get();
+                                    let q = query.get();
+                                    (!q.is_empty()).then(|| view! {
+                                        <div class="absolute top-full mt-2 w-full bg-white rounded-[5px] shadow-2xl max-h-[60svh] overflow-y-auto z-50">
+                                            {move || is_loading.get().then(|| view! {
+                                                <div class="flex items-center justify-center py-8 text-gray-400 text-sm">
+                                                    <span>"Searching..."</span>
+                                                </div>
+                                            })}
+                                            {move || {
+                                                let results = search_results.get();
+                                                (!results.is_empty()).then(|| view! {
+                                                    <ul class="py-2 list-none">
+                                                        {results.into_iter().map(|article| view! {
+                                                            <li>
+                                                                <a
+                                                                    href=format!("/blog/read/{}", article.link.unwrap_or("".into()))
+                                                                    class="flex flex-col px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer group"
+                                                                >
+                                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary line-clamp-1">
+                                                                        {article.title.unwrap_or("".into())}
+                                                                    </span>
+                                                                    <span class="text-xs text-gray-400 mt-0.5">
+                                                                        {article.category.unwrap().to_string()}
+                                                                    </span>
+                                                                </a>
+                                                            </li>
+                                                        }).collect_view()}
+                                                    </ul>
+                                                })
+                                            }}
+                                            {move || {
+                                                let q = query.get();
+                                                let results = search_results.get();
+                                                (!q.is_empty() && results.is_empty() && !is_loading.get()).then(|| view! {
+                                                    <div class="py-8 text-center text-sm text-gray-400">
+                                                        "No articles found for "
+                                                        <span class="font-medium text-gray-600">{q}</span>
+                                                    </div>
+                                                })
+                                            }}
+                                        </div>
+                                    })
+                                }}
+                            </div>
+                        </div>
+                    </div>
+                })}
                 <div class="display-constraints flex flex-col gap-[40px] md:flex-row">
                     <div class="flex flex-col gap-[20px] md:basis-3/4">
                         <div class="flex items-center gap-[10px]">
@@ -383,16 +471,16 @@ pub fn BlogHome() -> impl IntoView {
                         <div class="flex flex-col gap-[20px]">
                             <BlogSection title="Categories"/>
                             <div class="flex gap-[16px] flex-wrap">
-                                <Chip label="Technology" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Design" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Development" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Marketing" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Business" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Art" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Culture" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Science" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Health" color=ColorTemperature::Gray removable=false />
-                                <Chip label="Fitness" color=ColorTemperature::Gray removable=false />
+                                {
+                                    BlogCategory::variants_slice()
+                                        .iter()
+                                        .map(|category| {
+                                            view! {
+                                                <Chip label=category.to_string() color=ColorTemperature::Gray removable=false />
+                                            }
+                                        })
+                                        .collect::<Vec<_>>()
+                                }
                             </div>
                         </div>
                     </div>

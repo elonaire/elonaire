@@ -3,9 +3,11 @@ use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::hooks::use_location;
+use reactive_stores::Store;
 
 use leptos_router::components::A;
 
+use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::views::dashboard::layout::MenuItem;
 
 #[component]
@@ -37,6 +39,8 @@ pub fn Nav(
             MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
         ]
     });
+
+    let current_state = expect_context::<Store<AppStateContext>>();
 
     view! {
         <>
@@ -88,7 +92,9 @@ pub fn Nav(
                             if is_dashboard.get() || is_blog.get() {
                                 Some(view! {
                                     <>
-                                        <span class="md:hidden"><Icon width="24" height="24" icon=IconId::IoSearchOutline /></span>
+                                        <span class="md:hidden" on:click=move |_| {
+                                            *current_state.show_mobile_search().write() = true;
+                                        }><Icon width="24" height="24" icon=IconId::IoSearchOutline /></span>
                                         <img src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="size-[27px] object-cover rounded-full" alt="dp" />
                                     </>
                                 })

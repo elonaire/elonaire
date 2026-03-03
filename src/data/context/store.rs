@@ -29,4 +29,5 @@ pub struct AppStateContext {
     currencies: Vec<Currency>,
     ratecards: Vec<Ratecard>,
     service_requests: Vec<ServiceRequest>,
+    show_mobile_search: bool,
 }

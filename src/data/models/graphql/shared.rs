@@ -396,7 +396,7 @@ pub enum BlogCategory {
     IoT,
     UpCloseAndCandid,
     Commentary,
-    Security,
+    CyberSecurity,
     Programming,
 }
 
@@ -414,7 +414,7 @@ impl EnumerableEnum for BlogCategory {
             Self::IoT,
             Self::UpCloseAndCandid,
             Self::Commentary,
-            Self::Security,
+            Self::CyberSecurity,
             Self::Programming,
         ]
     }
@@ -428,6 +428,7 @@ impl Display for BlogCategory {
             Self::MobileDevelopment => write!(f, "Mobile Development"),
             Self::EmbeddedSystems => write!(f, "Embedded Systems"),
             Self::UpCloseAndCandid => write!(f, "Up Close and Candid"),
+            Self::CyberSecurity => write!(f, "Cyber Security"),
             any_other => write!(f, "{any_other:?}"),
         }
     }
