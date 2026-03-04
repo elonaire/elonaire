@@ -65,7 +65,7 @@ pub async fn fetch_services(
                 .as_ref()
                 .unwrap()
                 .to_vec();
-            *current_state.services().write() = owned_data;
+            current_state.services().set(owned_data);
 
             Ok(())
         }
@@ -116,7 +116,7 @@ pub async fn fetch_professions(
                 .as_ref()
                 .unwrap()
                 .to_vec();
-            *current_state.professions().write() = owned_data;
+            current_state.professions().set(owned_data);
 
             Ok(())
         }
@@ -173,7 +173,7 @@ pub async fn fetch_resume(
                 .as_ref()
                 .unwrap()
                 .to_vec();
-            *current_state.resume().write() = owned_data;
+            current_state.resume().set(owned_data);
 
             Ok(())
         }
@@ -226,7 +226,7 @@ pub async fn fetch_skills(
                 .as_ref()
                 .unwrap()
                 .to_vec();
-            *current_state.skills().write() = owned_data;
+            current_state.skills().set(owned_data);
 
             Ok(())
         }
@@ -280,7 +280,7 @@ pub async fn fetch_portfolio(
                 .as_ref()
                 .unwrap()
                 .to_vec();
-            *current_state.portfolio().write() = owned_data;
+            current_state.portfolio().set(owned_data);
 
             Ok(())
         }
@@ -449,7 +449,7 @@ pub async fn fetch_departments(
     match fetch_departments_response.get_data() {
         Some(data) => {
             let owned_data = data.fetch_departments.as_ref().unwrap().get_data().to_vec();
-            *current_state.departments().write() = owned_data;
+            current_state.departments().set(owned_data);
 
             Ok(())
         }
@@ -494,7 +494,7 @@ pub async fn fetch_organizations(
                 .unwrap()
                 .get_data()
                 .to_vec();
-            *current_state.organizations().write() = owned_data;
+            current_state.organizations().set(owned_data);
 
             Ok(())
         }
@@ -542,7 +542,7 @@ pub async fn fetch_permissions(
                 .unwrap()
                 .get_data()
                 .to_vec();
-            *current_state.permissions().write() = owned_data;
+            current_state.permissions().set(owned_data);
 
             Ok(())
         }
@@ -581,7 +581,7 @@ pub async fn fetch_resources(
     match fetch_resources_response.get_data() {
         Some(data) => {
             let owned_data = data.fetch_resources.as_ref().unwrap().get_data().to_vec();
-            *current_state.resources().write() = owned_data;
+            current_state.resources().set(owned_data);
 
             Ok(())
         }
@@ -626,7 +626,7 @@ pub async fn fetch_roles(
                 .unwrap()
                 .get_data()
                 .to_vec();
-            *current_state.roles().write() = owned_data;
+            current_state.roles().set(owned_data);
 
             Ok(())
         }
@@ -718,7 +718,7 @@ pub async fn fetch_ratecards(
         Some(data) => {
             let owned_data = data.fetch_ratecards.as_ref().unwrap().get_data().to_vec();
 
-            *current_state.ratecards().write() = owned_data;
+            current_state.ratecards().set(owned_data);
 
             Ok(())
         }
@@ -814,7 +814,7 @@ pub async fn fetch_service_rates(
                 .get_data()
                 .to_vec();
 
-            *current_state.service_rates().write() = owned_data;
+            current_state.service_rates().set(owned_data);
 
             Ok(())
         }
@@ -857,7 +857,7 @@ pub async fn fetch_currencies(
         Some(data) => {
             let owned_data = data.fetch_currencies.as_ref().unwrap().get_data().to_vec();
 
-            *current_state.currencies().write() = owned_data;
+            current_state.currencies().set(owned_data);
 
             Ok(())
         }
@@ -908,7 +908,7 @@ pub async fn fetch_service_requests(
                 .get_data()
                 .to_vec();
 
-            *current_state.service_requests().write() = owned_data;
+            current_state.service_requests().set(owned_data);
 
             Ok(())
         }

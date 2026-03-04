@@ -45,11 +45,12 @@ pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
 
                 match check_auth {
                     Ok(auth) => {
-                        *current_state.user().auth_info().token().write() = auth
-                            .new_access_token
-                            .as_ref()
-                            .unwrap_or(&String::new())
-                            .to_owned();
+                        current_state.user().auth_info().token().set(
+                            auth.new_access_token
+                                .as_ref()
+                                .unwrap_or(&String::new())
+                                .to_owned(),
+                        );
                     }
                     Err(_) => {
                         // User is not authenticated, and server failed to verify session.

@@ -65,8 +65,11 @@ pub fn SignIn() -> impl IntoView {
                         .unwrap();
 
                     if let Ok(auth_status) = response.json::<AuthDetails>().await {
-                        *current_state.user().auth_info().token().write() =
-                            auth_status.token.unwrap();
+                        current_state
+                            .user()
+                            .auth_info()
+                            .token()
+                            .set(auth_status.token.unwrap_or("".into()));
                         set_is_loading.set(false);
                     };
                 });
@@ -215,13 +218,14 @@ pub fn SignIn() -> impl IntoView {
                                             }
                                             set_is_loading.set(false);
 
-                                            *current_state.user().auth_info().token().write() =
+                                            current_state.user().auth_info().token().set(
                                                 auth_details
                                                     .get_data()
                                                     .token
                                                     .as_ref()
-                                                    .unwrap()
-                                                    .to_owned();
+                                                    .unwrap_or(&"".into())
+                                                    .to_owned(),
+                                            );
                                         }
                                         None => {
                                             set_is_loading.set(false);

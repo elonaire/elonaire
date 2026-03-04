@@ -60,7 +60,7 @@ pub async fn fetch_site_owner_info(
                 .unwrap()
                 .get_data()
                 .to_owned();
-            *current_state.site_owner_info().write() = owned_data;
+            current_state.site_owner_info().set(owned_data);
 
             Ok(())
         }

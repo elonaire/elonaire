@@ -18,6 +18,7 @@ pub fn Nav(
 
     let is_dashboard = Memo::new(move |_| location.pathname.get().contains("/dashboard"));
     let is_blog = Memo::new(move |_| location.pathname.get().contains("/blog"));
+    let is_blog_home = Memo::new(move |_| location.pathname.get() == "/blog");
 
     let menu_items = Memo::new(move |_| {
         vec![
@@ -89,13 +90,12 @@ pub fn Nav(
                             }
                         }
                         { move ||
-                            if is_dashboard.get() || is_blog.get() {
+                            if is_blog_home.get() {
                                 Some(view! {
                                     <>
                                         <span class="md:hidden" on:click=move |_| {
-                                            *current_state.show_mobile_search().write() = true;
+                                            current_state.show_mobile_search().set(true);
                                         }><Icon width="24" height="24" icon=IconId::IoSearchOutline /></span>
-                                        <img src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="size-[27px] object-cover rounded-full" alt="dp" />
                                     </>
                                 })
                             } else {
@@ -111,6 +111,7 @@ pub fn Nav(
                                 None
                             }
                         }
+                        <img src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="size-[27px] object-cover rounded-full" alt="dp" />
                     </div>
                 </div>
             </div>

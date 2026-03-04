@@ -368,7 +368,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                 label: skill.name.as_ref().unwrap().clone(),
             };
 
-            skills_select_options.write().push(skill_option);
+            skills_select_options.update(|prev| prev.push(skill_option));
         });
     });
 
