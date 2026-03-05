@@ -573,12 +573,14 @@ pub fn DataTable(
                                                                     {if props.get().editable {
                                                                         Some(view! {
                                                                             <BasicButton
-                                                                                style_ext="text-gray px-0"
-                                                                                children_style_ext="justify-between gap-0"
-                                                                                button_text="Edit"
-                                                                                onclick=on_click_action_handler((row_data_edit.clone(), "edit".into()))
-                                                                                icon=Some(IconId::BsPencil)
-                                                                            />
+                                                                                style_ext="text-gray px-0 hover:bg-primary hover:text-contrast-white"
+                                                                                onclick=on_click_action_handler((row_data.clone(), "edit".into()))
+                                                                                >
+                                                                                <span class="flex items-center justify-between">
+                                                                                    <span>Edit</span>
+                                                                                    <Icon icon=IconId::BsPencil />
+                                                                                </span>
+                                                                            </BasicButton>
                                                                         })
                                                                     } else {
                                                                         None
@@ -586,12 +588,14 @@ pub fn DataTable(
                                                                     {if props.get().deletable {
                                                                         Some(view! {
                                                                             <BasicButton
-                                                                                style_ext="text-danger px-0"
-                                                                                children_style_ext="justify-between gap-0"
-                                                                                button_text="Delete"
+                                                                                style_ext="text-danger px-0 hover:bg-danger hover:text-contrast-white"
                                                                                 onclick=on_click_action_handler((row_data.clone(), "delete".into()))
-                                                                                icon=Some(IconId::BsTrash)
-                                                                            />
+                                                                                >
+                                                                                <span class="flex items-center justify-between">
+                                                                                    <span>Delete</span>
+                                                                                    <Icon icon=IconId::BsTrash />
+                                                                                </span>
+                                                                            </BasicButton>
                                                                         })
                                                                     } else {
                                                                         None
