@@ -3,7 +3,7 @@ use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::components::A;
 
-use crate::components::{general::button::BasicButton, molecules::blog::author_info::AuthorInfo};
+use crate::components::molecules::blog::author_info::AuthorInfo;
 
 #[component]
 pub fn FeaturedPost(

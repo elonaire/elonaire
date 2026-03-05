@@ -559,7 +559,6 @@ pub fn DataTable(
                                                 </For>
                                                 // Action columns
                                                 {if props.get().editable || props.get().deletable {
-                                                    let row_data_edit = row_data.clone();
                                                     let showing = RwSignal::new(false);
 
                                                     Some(view! {

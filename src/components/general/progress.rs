@@ -1,6 +1,7 @@
 use leptos::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[allow(dead_code)]
 pub enum ProgressComponentSize {
     Sm,
     Md,

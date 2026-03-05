@@ -22,9 +22,7 @@ use crate::{
         },
         molecules::{
             blog::{
-                blog_post::BlogPostPreview,
-                blog_section::BlogSection,
-                featured_post::{FeaturedPost, FeaturedPostProps},
+                blog_post::BlogPostPreview, blog_section::BlogSection, featured_post::FeaturedPost,
             },
             footer::Footer,
         },
@@ -35,14 +33,10 @@ use crate::{
             shared::{fetch_author_info, fetch_blog_posts},
             store::{AppStateContext, AppStateContextStoreFields},
         },
-        models::{
-            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-            graphql::{
-                acl::FetchSingleUserVars,
-                shared::{
-                    BlogCategory, BlogPost, BlogStatus, FetchBlogPostsQueryFilters,
-                    FetchBlogPostsVars,
-                },
+        models::graphql::{
+            acl::FetchSingleUserVars,
+            shared::{
+                BlogCategory, BlogPost, BlogStatus, FetchBlogPostsQueryFilters, FetchBlogPostsVars,
             },
         },
     },
