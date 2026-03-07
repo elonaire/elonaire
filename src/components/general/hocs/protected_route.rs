@@ -2,10 +2,13 @@ use std::collections::HashMap;
 
 use crate::data::{
     context::{
-        shared::check_auth,
+        shared::{check_auth, fetch_single_user},
         store::{AppStateContext, AppStateContextStoreFields},
     },
-    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+    models::{
+        general::acl::{AuthInfo, AuthInfoStoreFields, UserInfoStoreFields},
+        graphql::acl::FetchSingleUserVars,
+    },
 };
 use leptos::{prelude::*, task::spawn_local};
 use leptos_router::hooks::use_navigate;
@@ -20,45 +23,84 @@ use reactive_stores::Store;
 #[component]
 pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
-    let user = move || current_state.user(); // Should return ReadSignal<UserInfo>
     let navigate = use_navigate();
-
-    let is_authenticated = Memo::new(move |_| !user().auth_info().token().get().is_empty());
+    let (is_authenticated, set_is_authenticated) = signal(false);
 
     // Effect to handle navigation based on auth status
     Effect::new(move |_| {
-        if !is_authenticated.get() {
-            // User is not authenticated, try checking if they have an active session
-            let navigate = navigate.clone();
-            let current_state = current_state.clone();
-            spawn_local(async move {
-                let mut headers = HashMap::new() as HashMap<String, String>;
-                headers.insert(
-                    "Authorization".into(),
-                    format!(
-                        "Bearer {}",
-                        current_state.user().auth_info().token().get_untracked()
-                    ),
-                );
+        let navigate = navigate.clone();
+        let current_state = current_state.clone();
+        spawn_local(async move {
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
 
-                let check_auth = check_auth(Some(&headers)).await;
+            let check_auth = check_auth(Some(&headers)).await;
 
-                match check_auth {
-                    Ok(auth) => {
-                        current_state.user().auth_info().token().set(
-                            auth.new_access_token
-                                .as_ref()
-                                .unwrap_or(&String::new())
-                                .to_owned(),
-                        );
-                    }
-                    Err(_) => {
-                        // User is not authenticated, and server failed to verify session.
-                        navigate("/sign-in", Default::default());
-                    }
+            match check_auth {
+                Ok(auth) => {
+                    set_is_authenticated.set(true);
+                    current_state.user().auth_info().set(AuthInfo {
+                        token: auth
+                            .new_access_token
+                            .as_ref()
+                            .unwrap_or(&String::new())
+                            .to_owned(),
+                        current_role: auth.current_role.clone(),
+                    });
+                    let user_id_vars = FetchSingleUserVars {
+                        user_id: auth.sub.clone(),
+                    };
+
+                    let fetch_user_info_query = r#"
+                        query FetchSingleUser($userId: String!) {
+                            fetchSingleUser(userId: $userId) {
+                                data {
+                                    firstName
+                                    middleName
+                                    lastName
+                                    gender
+                                    dob
+                                    email
+                                    country
+                                    phone
+                                    createdAt
+                                    updatedAt
+                                    oauthClient
+                                    oauthUserId
+                                    profilePicture
+                                    bio
+                                    website
+                                    address
+                                    id
+                                    fullName
+                                    age
+                                }
+                                metadata {
+                                    requestId
+                                    newAccessToken
+                                }
+                            }
+                        }
+                       "#;
+
+                    if let Ok(user_profile) =
+                        fetch_single_user(&user_id_vars, None, fetch_user_info_query).await
+                    {
+                        current_state.user().user_profile().set(user_profile);
+                    };
                 }
-            });
-        }
+                Err(_) => {
+                    // User is not authenticated, and server failed to verify session.
+                    navigate("/sign-in", Default::default());
+                }
+            }
+        });
     });
 
     view! {

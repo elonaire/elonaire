@@ -13,5 +13,6 @@ pub mod roles;
 pub mod service_rates;
 pub mod service_requests;
 pub mod skills;
+pub mod user_profile;
 pub mod user_services;
 pub mod users;

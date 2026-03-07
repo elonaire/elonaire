@@ -415,3 +415,9 @@ pub struct CheckAuthResponse {
     #[serde(rename = "checkAuth")]
     pub check_auth: Option<ApiResponse<AuthStatus>>, // this is the return type expected from the API on success
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct SignOutResponse {
+    #[serde(rename = "signOut")]
+    pub sign_out: Option<ApiResponse<bool>>, // this is the return type expected from the API on success
+}

@@ -82,8 +82,13 @@ pub fn Popover(
         }
     });
 
-    let _resize_listener = window_event_listener(ev::resize, move |_| {
+    let window_resize_listener = window_event_listener(ev::resize, move |_| {
         recalculate.get_value()();
+    });
+
+    // Ensure removal when component goes out of scope
+    on_cleanup(move || {
+        window_resize_listener.remove(); // Explicitly detach
     });
 
     view! {

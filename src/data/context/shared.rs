@@ -634,33 +634,16 @@ pub async fn fetch_roles(
     }
 }
 
-pub async fn fetch_author_info(
+pub async fn fetch_single_user(
     vars: &FetchSingleUserVars,
     headers: Option<&HashMap<String, String>>,
+    query: &str,
 ) -> Result<User, Vec<GraphQLErrorMessage>> {
-    let fetch_author_info_query = r#"
-        query FetchSingleUser($userId: String!) {
-            fetchSingleUser(userId: $userId) {
-                data {
-                    profilePicture
-                    bio
-                    id
-                    fullName
-                    email
-                }
-                metadata {
-                    requestId
-                    newAccessToken
-                }
-            }
-        }
-       "#;
-
     let fetch_auth_info_response =
         perform_mutation_or_query_with_vars::<FetchSingleUserResponse, FetchSingleUserVars>(
             headers,
             "http://localhost:8080/api/acl",
-            fetch_author_info_query,
+            query,
             vars.to_owned(),
         )
         .await;

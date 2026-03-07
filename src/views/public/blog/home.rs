@@ -30,7 +30,7 @@ use crate::{
     },
     data::{
         context::{
-            shared::{fetch_author_info, fetch_blog_posts},
+            shared::{fetch_blog_posts, fetch_single_user},
             store::{AppStateContext, AppStateContextStoreFields},
         },
         models::graphql::{
@@ -107,7 +107,27 @@ pub fn BlogHome() -> impl IntoView {
                     let user_id_vars = FetchSingleUserVars {
                         user_id: featured_post.author.as_ref().unwrap().to_owned(),
                     };
-                    let author_details = fetch_author_info(&user_id_vars, None).await;
+
+                    let fetch_user_info_query = r#"
+                        query FetchSingleUser($userId: String!) {
+                            fetchSingleUser(userId: $userId) {
+                                data {
+                                    profilePicture
+                                    bio
+                                    id
+                                    fullName
+                                    email
+                                }
+                                metadata {
+                                    requestId
+                                    newAccessToken
+                                }
+                            }
+                        }
+                       "#;
+
+                    let author_details =
+                        fetch_single_user(&user_id_vars, None, fetch_user_info_query).await;
 
                     if let Ok(author_details) = author_details {
                         featured_post.full_author_details = Some(author_details);

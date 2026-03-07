@@ -29,6 +29,7 @@ use crate::{
             service_rates::{CreateServiceRate, ServiceRates, ServiceRatesList},
             service_requests::{ServiceRequests, ServiceRequestsList},
             skills::{CreateSkill, Skills, SkillsList},
+            user_profile::ProfilePage,
             user_services::{CreateUserService, UserService, UserServicesList},
             users::{CreateUser, Users, UsersList},
         },
@@ -136,6 +137,7 @@ pub fn App() -> impl IntoView {
                             <Route path=path!("") view=DepartmentsList />
                             <Route path=path!("create") view=CreateDepartment />
                         </ParentRoute>
+                        <Route path=path!("/user/profile") view=ProfilePage />
                         <Route path=path!("") view=DashboardHome />
                     </ParentRoute>
                     <ParentRoute path=path!("/blog") view=BlogLayout >

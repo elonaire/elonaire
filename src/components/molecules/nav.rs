@@ -1,13 +1,24 @@
+use std::collections::HashMap;
+
 use icondata as IconId;
 use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
+use leptos_router::NavigateOptions;
 use leptos_router::hooks::use_location;
+use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
 
 use leptos_router::components::A;
+use wasm_bindgen_futures::spawn_local;
 
-use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
+use crate::components::general::button::BasicButton;
+use crate::components::general::popover::Popover;
+use crate::data::context::users::sign_out;
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+};
 use crate::views::dashboard::layout::MenuItem;
 
 #[component]
@@ -15,6 +26,7 @@ pub fn Nav(
     #[prop(optional, default = Callback::new(|_| {}))] onmenuclick: Callback<ev::MouseEvent>,
 ) -> impl IntoView {
     let location = use_location();
+    let showing_user_popover = RwSignal::new(false);
 
     let is_dashboard = Memo::new(move |_| location.pathname.get().contains("/dashboard"));
     let is_blog = Memo::new(move |_| location.pathname.get().contains("/blog"));
@@ -42,6 +54,34 @@ pub fn Nav(
     });
 
     let current_state = expect_context::<Store<AppStateContext>>();
+    let user_profile = current_state.user().user_profile();
+    let navigate = use_navigate();
+
+    let handle_sign_out = Callback::new(move |_| {
+        let navigate = navigate.clone();
+        let mut headers = HashMap::new() as HashMap<String, String>;
+        headers.insert(
+            "Authorization".into(),
+            format!(
+                "Bearer {}",
+                current_state.user().auth_info().token().get_untracked()
+            ),
+        );
+
+        spawn_local(async move {
+            if let Ok(_) = sign_out(Some(&headers)).await {
+                current_state.user().set(Default::default());
+                navigate(
+                    "/sign-in",
+                    NavigateOptions {
+                        resolve: false,
+                        replace: true,
+                        ..Default::default()
+                    },
+                );
+            };
+        });
+    });
 
     view! {
         <>
@@ -111,7 +151,42 @@ pub fn Nav(
                                 None
                             }
                         }
-                        <img src="http://localhost:3001/view/e564672d-04ef-4be8-84b7-067f98494f1e" class="size-[27px] object-cover rounded-full" alt="dp" />
+                        { move ||
+                            {
+                                let profile_pic = user_profile.get().profile_picture.unwrap_or_default();
+                                if is_dashboard.get() || is_blog.get() {
+                                    Some(view! {
+                                        <Popover showing=showing_user_popover display_item={
+                                                        let profile_pic = profile_pic.clone(); // clone before moving into ViewFn
+                                                        leptos::logging::log!("profile_pic: {profile_pic}");
+                                                        move || view!{
+                                                            <img src=format!("{}?width=300", profile_pic) class="size-[27px] object-cover rounded-full cursor-pointer" alt="dp" />
+                                                        }
+                                                    }>
+                                            <div class="flex flex-col gap-2">
+                                                <A attr:class="py-2 px-4 text-gray px-0 hover:bg-primary hover:text-contrast-white cursor-pointer rounded-[5px] font-bold" href="/dashboard/user/profile">
+                                                    <span class="flex items-center justify-between">
+                                                        <span>Profile</span>
+                                                        <Icon icon=IconId::MdiCardAccountDetailsOutline />
+                                                    </span>
+                                                </A>
+                                                <BasicButton
+                                                    style_ext="text-danger px-0 hover:bg-danger hover:text-contrast-white"
+                                                    onclick=handle_sign_out
+                                                    >
+                                                    <span class="flex items-center justify-between">
+                                                        <span>Logout</span>
+                                                        <Icon icon=IconId::BsPower />
+                                                    </span>
+                                                </BasicButton>
+                                            </div>
+                                        </Popover>
+                                    })
+                                } else {
+                                    None
+                                }
+                            }
+                        }
                     </div>
                 </div>
             </div>

@@ -25,7 +25,7 @@ use crate::components::{
         footer::Footer,
     },
 };
-use crate::data::context::shared::{fetch_author_info, fetch_single_blog_post};
+use crate::data::context::shared::{fetch_single_blog_post, fetch_single_user};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::models::graphql::shared::{
     BlogComment, BlogCommentInput, BlogPost, BookmarkBlogPostResponse, BookmarkBlogPostVars,
@@ -123,6 +123,23 @@ pub fn BlogPostDetail() -> impl IntoView {
 
             spawn_local(async move {
                 let blog_post = fetch_single_blog_post(Some(&headers), vars).await;
+                let fetch_user_info_query = r#"
+                    query FetchSingleUser($userId: String!) {
+                        fetchSingleUser(userId: $userId) {
+                            data {
+                                profilePicture
+                                bio
+                                id
+                                fullName
+                                email
+                            }
+                            metadata {
+                                requestId
+                                newAccessToken
+                            }
+                        }
+                    }
+                   "#;
 
                 if let Ok(mut blog_post) = blog_post {
                     if let Some(comments) = &mut blog_post.comments {
@@ -130,7 +147,9 @@ pub fn BlogPostDetail() -> impl IntoView {
                             let user_id_vars = FetchSingleUserVars {
                                 user_id: comment.author.as_ref().unwrap().to_owned(),
                             };
-                            let author_details = fetch_author_info(&user_id_vars, None).await;
+
+                            let author_details =
+                                fetch_single_user(&user_id_vars, None, fetch_user_info_query).await;
 
                             if let Ok(author_details) = author_details {
                                 comment.full_author_details = Some(author_details);
@@ -141,7 +160,9 @@ pub fn BlogPostDetail() -> impl IntoView {
                     let user_id_vars = FetchSingleUserVars {
                         user_id: blog_post.author.as_ref().unwrap().to_owned(),
                     };
-                    let author_details = fetch_author_info(&user_id_vars, None).await;
+
+                    let author_details =
+                        fetch_single_user(&user_id_vars, None, fetch_user_info_query).await;
 
                     if let Ok(author_details) = author_details {
                         blog_post.full_author_details = Some(author_details);
@@ -234,7 +255,27 @@ pub fn BlogPostDetail() -> impl IntoView {
                             let user_id_vars = FetchSingleUserVars {
                                 user_id: new_comment.author.as_ref().unwrap().to_owned(),
                             };
-                            let author_details = fetch_author_info(&user_id_vars, None).await;
+
+                            let fetch_user_info_query = r#"
+                                query FetchSingleUser($userId: String!) {
+                                    fetchSingleUser(userId: $userId) {
+                                        data {
+                                            profilePicture
+                                            bio
+                                            id
+                                            fullName
+                                            email
+                                        }
+                                        metadata {
+                                            requestId
+                                            newAccessToken
+                                        }
+                                    }
+                                }
+                               "#;
+
+                            let author_details =
+                                fetch_single_user(&user_id_vars, None, fetch_user_info_query).await;
 
                             if let Ok(author_details) = author_details {
                                 new_comment.full_author_details = Some(author_details);

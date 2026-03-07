@@ -28,6 +28,7 @@ pub struct UserInfo {
 #[derive(Clone, Debug, Default, Store, PartialEq, Eq)]
 pub struct AuthInfo {
     pub token: String,
+    pub current_role: String,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]

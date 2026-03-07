@@ -6,7 +6,7 @@ use leptos::prelude::*;
 use crate::{
     data::{
         context::store::{AppStateContext, AppStateContextStoreFields},
-        models::graphql::acl::FetchSiteOwnerResponse,
+        models::graphql::acl::{FetchSiteOwnerResponse, SignOutResponse},
     },
     utils::graphql_client::perform_query_without_vars,
 };
@@ -65,5 +65,33 @@ pub async fn fetch_site_owner_info(
             Ok(())
         }
         None => Err(fetch_site_owner_response.get_error().to_vec()),
+    }
+}
+
+pub async fn sign_out(
+    headers: Option<&HashMap<String, String>>,
+) -> Result<(), Vec<GraphQLErrorMessage>> {
+    let query = r#"
+        mutation SignOut {
+            signOut {
+                data
+                metadata {
+                    requestId
+                    newAccessToken
+                }
+            }
+        }
+       "#;
+
+    let sign_out_response = perform_query_without_vars::<SignOutResponse>(
+        headers,
+        "http://localhost:8080/api/acl",
+        query,
+    )
+    .await;
+
+    match sign_out_response.get_data() {
+        Some(_data) => Ok(()),
+        None => Err(sign_out_response.get_error().to_vec()),
     }
 }
