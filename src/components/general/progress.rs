@@ -17,14 +17,14 @@ pub enum ProgressComponentSize {
 /// ```
 /// <ProgressBar
 ///     indeterminate=true
-///     color="bg-blue-500"
+///     color="bg-primary"
 ///     size="md"
 /// />
 /// ```
 #[component]
 pub fn ProgressBar(
     #[prop(into, default = RwSignal::new(0.0))] progress: RwSignal<f64>,
-    #[prop(into, optional, default = "bg-blue-500".to_string())] color: String,
+    #[prop(into, optional, default = "bg-primary".to_string())] color: String,
     #[prop(into, optional, default = ProgressComponentSize::Md)] size: ProgressComponentSize,
     #[prop(default = false)] show_percentage: bool,
     #[prop(default = false)] indeterminate: bool,
