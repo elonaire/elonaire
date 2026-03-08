@@ -59,11 +59,11 @@ pub async fn fetch_services(
             let owned_data = data
                 .fetch_site_resources
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .services
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .to_vec();
             current_state.services().set(owned_data);
 
@@ -110,11 +110,11 @@ pub async fn fetch_professions(
             let owned_data = data
                 .fetch_site_resources
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .professional_info
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .to_vec();
             current_state.professions().set(owned_data);
 
@@ -167,11 +167,11 @@ pub async fn fetch_resume(
             let owned_data = data
                 .fetch_site_resources
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .resume
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .to_vec();
             current_state.resume().set(owned_data);
 
@@ -220,11 +220,11 @@ pub async fn fetch_skills(
             let owned_data = data
                 .fetch_site_resources
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .skills
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .to_vec();
             current_state.skills().set(owned_data);
 
@@ -274,11 +274,11 @@ pub async fn fetch_portfolio(
             let owned_data = data
                 .fetch_site_resources
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .portfolio
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .to_vec();
             current_state.portfolio().set(owned_data);
 
@@ -303,7 +303,12 @@ pub async fn fetch_blog_posts(
 
     match fetch_blog_posts_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_blog_posts.as_ref().unwrap().get_data().to_vec();
+            let owned_data = data
+                .fetch_blog_posts
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data()
+                .to_vec();
 
             Ok(owned_data)
         }
@@ -372,7 +377,11 @@ pub async fn fetch_single_blog_post(
 
     match response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_single_blog_post.as_ref().unwrap().get_data();
+            let owned_data = data
+                .fetch_single_blog_post
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data();
 
             Ok(owned_data)
         }
@@ -409,7 +418,11 @@ pub async fn check_auth(
 
     match check_auth_response.get_data() {
         Some(data) => {
-            let owned_data = data.check_auth.as_ref().unwrap().get_data();
+            let owned_data = data
+                .check_auth
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data();
 
             Ok(owned_data)
         }
@@ -448,7 +461,12 @@ pub async fn fetch_departments(
 
     match fetch_departments_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_departments.as_ref().unwrap().get_data().to_vec();
+            let owned_data = data
+                .fetch_departments
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data()
+                .to_vec();
             current_state.departments().set(owned_data);
 
             Ok(())
@@ -491,7 +509,7 @@ pub async fn fetch_organizations(
             let owned_data = data
                 .fetch_organizations
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
             current_state.organizations().set(owned_data);
@@ -539,7 +557,7 @@ pub async fn fetch_permissions(
             let owned_data = data
                 .fetch_current_role_permissions
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
             current_state.permissions().set(owned_data);
@@ -580,7 +598,12 @@ pub async fn fetch_resources(
 
     match fetch_resources_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_resources.as_ref().unwrap().get_data().to_vec();
+            let owned_data = data
+                .fetch_resources
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data()
+                .to_vec();
             current_state.resources().set(owned_data);
 
             Ok(())
@@ -623,7 +646,7 @@ pub async fn fetch_roles(
             let owned_data = data
                 .fetch_system_roles
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
             current_state.roles().set(owned_data);
@@ -653,7 +676,7 @@ pub async fn fetch_single_user(
             let owned_data = data
                 .fetch_single_user
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_owned();
 
@@ -699,7 +722,12 @@ pub async fn fetch_ratecards(
 
     match fetch_ratecards_response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_ratecards.as_ref().unwrap().get_data().to_vec();
+            let owned_data = data
+                .fetch_ratecards
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data()
+                .to_vec();
 
             current_state.ratecards().set(owned_data);
 
@@ -739,7 +767,7 @@ pub async fn fetch_billing_rate(
             let owned_data = data
                 .fetch_billing_rate
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_owned();
 
@@ -793,7 +821,7 @@ pub async fn fetch_service_rates(
             let owned_data = data
                 .fetch_service_rates
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
 
@@ -838,7 +866,12 @@ pub async fn fetch_currencies(
 
     match response.get_data() {
         Some(data) => {
-            let owned_data = data.fetch_currencies.as_ref().unwrap().get_data().to_vec();
+            let owned_data = data
+                .fetch_currencies
+                .as_ref()
+                .unwrap_or(&Default::default())
+                .get_data()
+                .to_vec();
 
             current_state.currencies().set(owned_data);
 
@@ -887,7 +920,7 @@ pub async fn fetch_service_requests(
             let owned_data = data
                 .fetch_service_requests
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
 

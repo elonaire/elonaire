@@ -57,7 +57,7 @@ pub async fn fetch_site_owner_info(
             let owned_data = data
                 .fetch_site_owner_info
                 .as_ref()
-                .unwrap()
+                .unwrap_or(&Default::default())
                 .get_data()
                 .to_owned();
             current_state.site_owner_info().set(owned_data);

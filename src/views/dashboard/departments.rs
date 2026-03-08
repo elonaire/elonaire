@@ -72,17 +72,35 @@ pub fn DepartmentsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(department.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        department
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Name".to_string(),
-                    TableCellData::String(department.dep_name.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        department
+                            .dep_name
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Date of Creation".to_string(),
-                    TableCellData::DateTime(department.created_at.as_ref().unwrap().to_owned()),
+                    TableCellData::DateTime(
+                        department
+                            .created_at
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
                 hash_map_data
             })
@@ -288,7 +306,10 @@ pub fn CreateDepartment() -> impl IntoView {
                 .get()
                 .iter()
                 .map(|dep| {
-                    SelectOption::new(dep.id.as_ref().unwrap(), dep.dep_name.as_ref().unwrap())
+                    SelectOption::new(
+                        dep.id.as_ref().unwrap_or(&Default::default()),
+                        dep.dep_name.as_ref().unwrap_or(&Default::default()),
+                    )
                 })
                 .collect(),
         );
@@ -299,8 +320,11 @@ pub fn CreateDepartment() -> impl IntoView {
                 .iter()
                 .map(|org| {
                     SelectOption::new(
-                        org.id.as_ref().unwrap().as_str(),
-                        org.org_name.as_ref().unwrap().as_str(),
+                        org.id.as_ref().unwrap_or(&Default::default()).as_str(),
+                        org.org_name
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .as_str(),
                     )
                 })
                 .collect(),

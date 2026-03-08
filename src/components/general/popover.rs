@@ -50,24 +50,29 @@ pub fn Popover(
     let recalculate = StoredValue::new(move || {
         if let Some(trigger) = trigger_ref.get_untracked() {
             let rect = trigger.get_bounding_client_rect();
-            let window = web_sys::window().unwrap();
-            let vw = window.inner_width().unwrap().as_f64().unwrap_or(375.0);
+            if let Some(window) = web_sys::window() {
+                let vw = window
+                    .inner_width()
+                    .unwrap_or_default()
+                    .as_f64()
+                    .unwrap_or(375.0);
 
-            let (popover_align, arrow_align) = if rect.left() < vw / 3.0 {
-                // Near left edge — align popover left, arrow near left
-                ("left-0".to_string(), "left-4 translate-x-0".to_string())
-            } else if rect.right() > (vw * 2.0 / 3.0) {
-                // Near right edge — align popover right, arrow near right
-                ("right-0".to_string(), "right-4 translate-x-0".to_string())
-            } else {
-                // Center
-                (
-                    "left-1/2 -translate-x-1/2".to_string(),
-                    "left-1/2 -translate-x-1/2".to_string(),
-                )
+                let (popover_align, arrow_align) = if rect.left() < vw / 3.0 {
+                    // Near left edge — align popover left, arrow near left
+                    ("left-0".to_string(), "left-4 translate-x-0".to_string())
+                } else if rect.right() > (vw * 2.0 / 3.0) {
+                    // Near right edge — align popover right, arrow near right
+                    ("right-0".to_string(), "right-4 translate-x-0".to_string())
+                } else {
+                    // Center
+                    (
+                        "left-1/2 -translate-x-1/2".to_string(),
+                        "left-1/2 -translate-x-1/2".to_string(),
+                    )
+                };
+
+                align.set((popover_align, arrow_align));
             };
-
-            align.set((popover_align, arrow_align));
         }
     });
 

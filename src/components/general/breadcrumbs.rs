@@ -42,7 +42,7 @@ pub fn Breadcrumbs(
                     custom_route_names
                         .0
                         .get(route_name_index)
-                        .unwrap()
+                        .unwrap_or(&String::new())
                         .to_owned()
                 } else {
                     segment.clone()

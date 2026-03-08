@@ -72,18 +72,34 @@ pub fn ServiceRequestsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".into(),
-                    TableCellData::String(service_request.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        service_request
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Description".into(),
-                    TableCellData::String(service_request.description.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        service_request
+                            .description
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Start Date".into(),
                     TableCellData::DateTime(
-                        service_request.start_date.as_ref().unwrap().to_owned(),
+                        service_request
+                            .start_date
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
                     ),
                 );
                 hash_map_data

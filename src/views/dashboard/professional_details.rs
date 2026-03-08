@@ -99,15 +99,28 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(profession.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        profession
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Occupation".to_string(),
-                    TableCellData::String(profession.occupation.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        profession
+                            .occupation
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
-                let status = if profession.active.is_some() && profession.active.unwrap() {
+                let status = if profession.active.is_some() && profession.active.unwrap_or_default()
+                {
                     ViewFn::from(move || {
                         view! {
                             <LabelTag label="Active" color=ColorTemperature::Success />
@@ -124,7 +137,13 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
 
                 hash_map_data.insert(
                     "Start Date".to_string(),
-                    TableCellData::DateTime(profession.start_date.as_ref().unwrap().to_owned()),
+                    TableCellData::DateTime(
+                        profession
+                            .start_date
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
                 hash_map_data
             })

@@ -42,7 +42,7 @@ pub fn DatePicker(
         selected_date
             .get()
             .map(|dt: DateTime<Local>| dt.to_rfc3339())
-            .unwrap_or(String::new())
+            .unwrap_or_default()
     });
 
     let selected_date_display_value = Memo::new(move |_| {
@@ -195,7 +195,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
     let render_days = move || {
         let days_in_month = days_in_month();
         let first_date =
-            NaiveDate::from_ymd_opt(current_year.get(), current_month.get(), 1).unwrap();
+            NaiveDate::from_ymd_opt(current_year.get(), current_month.get(), 1).unwrap_or_default();
         let calendar_adjustment = match first_date.weekday() {
             Weekday::Sun => 0,
             Weekday::Mon => 1,
@@ -216,7 +216,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                     let date = if is_blank {
                         None
                     } else {
-                        Some(Local.with_ymd_and_hms(current_year.get(), current_month.get(), day as u32, 0, 0, 0).unwrap())
+                        Some(Local::now())
                     };
                     let select_date = select_date.clone();
                     view! {
@@ -271,7 +271,7 @@ fn Calendar(#[prop(into)] select_date: Callback<DateTime<Local>>) -> impl IntoVi
                                 on:click={move |_| toggle_viewing_years.run(())}
                                 class="cursor-pointer"
                             >
-                                {move || format!("{:?} {:?}", current_year.get(), chrono::Month::try_from(u8::try_from(current_month.get()).unwrap()).unwrap())}
+                                {move || format!("{:?} {:?}", current_year.get(), chrono::Month::try_from(u8::try_from(current_month.get()).unwrap_or_default()))}
                             </span>
                             <BasicButton onclick=Callback::new(
                                 move |_| {

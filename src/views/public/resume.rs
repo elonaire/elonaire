@@ -15,7 +15,9 @@ use crate::{
             shared::{fetch_resume, fetch_skills},
             store::{AppStateContext, AppStateContextStoreFields},
         },
-        models::graphql::shared::{UserResume, UserResumeSection, UserSkill, UserSkillType},
+        models::graphql::shared::{
+            UserResume, UserResumeSection, UserSkill, UserSkillLevel, UserSkillType,
+        },
     },
     utils::time::convert_date_to_human_readable_format,
 };
@@ -117,7 +119,9 @@ pub fn Resume() -> impl IntoView {
 
 /// utility function to generate resume timeline items
 fn generate_timeline_item(resume: &UserResume) -> TimelineItem {
-    let start_date = convert_date_to_human_readable_format(resume.start_date.as_ref().unwrap());
+    let start_date = convert_date_to_human_readable_format(
+        resume.start_date.as_ref().unwrap_or(&Default::default()),
+    );
     let end_date = match resume.end_date.as_ref() {
         Some(date) => convert_date_to_human_readable_format(date),
         None => "Present".into(),
@@ -131,19 +135,29 @@ fn generate_timeline_item(resume: &UserResume) -> TimelineItem {
         None => "".to_string(),
     };
 
-    let achievements = resume.achievements.as_ref().unwrap().to_vec();
+    let achievements = resume.achievements.as_ref().unwrap_or(&vec![]).to_vec();
 
     TimelineItem {
         time_info: format!("{start_date} - {end_date} ({years_of_experience})"),
-        title: resume.title.as_ref().unwrap().to_owned(),
-        more_info: Some(resume.more_info.as_ref().unwrap_or(&"".into()).to_owned()),
+        title: resume
+            .title
+            .as_ref()
+            .unwrap_or(&Default::default())
+            .to_owned(),
+        more_info: Some(
+            resume
+                .more_info
+                .as_ref()
+                .unwrap_or(&String::new())
+                .to_owned(),
+        ),
         status: TimelineStatus::Success,
         content: ViewFn::from(move || {
             view! {
                 <ul class="list-disc list-inside">
                     {
                         achievements.iter().map(|achievement| {
-                            view! { <li>{achievement.description.as_ref().unwrap().to_owned()}</li> }
+                            view! { <li>{achievement.description.clone()}</li> }
                         }).collect::<Vec<_>>()
                     }
                 </ul>
@@ -162,19 +176,23 @@ fn generate_panel_info(skill: &UserSkill) -> PanelInfo {
 
     PanelInfo {
         title: ViewFn::from(move || {
-            let level = title_skill.level.as_ref().unwrap().clone();
+            let level = title_skill
+                .level
+                .as_ref()
+                .unwrap_or(&UserSkillLevel::Beginner)
+                .clone();
 
             view! {
                 <div class="flex-1 flex flex-row items-center justify-between">
-                    <img src={title_skill.thumbnail.as_ref().unwrap().clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
-                    <p class="font-bold">{title_skill.name.as_ref().unwrap().clone()}</p>
+                    <img src={title_skill.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
+                    <p class="font-bold">{title_skill.name.as_ref().unwrap_or(&Default::default()).clone()}</p>
                     <p class="text-xs text-primary">{format!("{:?}", level)}</p>
                 </div>
             }
         }),
         children: ViewFn::from(move || {
             view! {
-                <p>{children_skill.description.as_ref().unwrap().clone()}</p>
+                <p>{children_skill.description.as_ref().unwrap_or(&Default::default()).clone()}</p>
             }
         }),
         ..Default::default()

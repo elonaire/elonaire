@@ -145,7 +145,11 @@ pub fn BlogPostDetail() -> impl IntoView {
                     if let Some(comments) = &mut blog_post.comments {
                         for comment in comments {
                             let user_id_vars = FetchSingleUserVars {
-                                user_id: comment.author.as_ref().unwrap().to_owned(),
+                                user_id: comment
+                                    .author
+                                    .as_ref()
+                                    .unwrap_or(&Default::default())
+                                    .to_owned(),
                             };
 
                             let author_details =
@@ -158,7 +162,11 @@ pub fn BlogPostDetail() -> impl IntoView {
                     };
 
                     let user_id_vars = FetchSingleUserVars {
-                        user_id: blog_post.author.as_ref().unwrap().to_owned(),
+                        user_id: blog_post
+                            .author
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
                     };
 
                     let author_details =
@@ -196,7 +204,11 @@ pub fn BlogPostDetail() -> impl IntoView {
 
                     let input_vars = CreateBlogCommentVars {
                         blog_comment: deserialized_main_form_data,
-                        blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+                        blog_post_id: blog_post
+                            .get_untracked()
+                            .unwrap_or_default()
+                            .id
+                            .unwrap_or_default(),
                     };
 
                     let query = r#"
@@ -249,11 +261,18 @@ pub fn BlogPostDetail() -> impl IntoView {
                             } else {
                             }
 
-                            let mut new_comment =
-                                data.add_comment_to_blog_post.as_ref().unwrap().get_data();
+                            let mut new_comment = data
+                                .add_comment_to_blog_post
+                                .as_ref()
+                                .unwrap_or(&Default::default())
+                                .get_data();
 
                             let user_id_vars = FetchSingleUserVars {
-                                user_id: new_comment.author.as_ref().unwrap().to_owned(),
+                                user_id: new_comment
+                                    .author
+                                    .as_ref()
+                                    .unwrap_or(&Default::default())
+                                    .to_owned(),
                             };
 
                             let fetch_user_info_query = r#"
@@ -329,7 +348,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 .unchecked_ref(),
                 1000,
             )
-            .unwrap();
+            .unwrap_or_default();
         hover_timer.set_value(Some(id));
     };
 
@@ -348,7 +367,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 .unchecked_ref(),
                 1000,
             )
-            .unwrap();
+            .unwrap_or_default();
         hover_timer.set_value(Some(id));
     };
 
@@ -361,7 +380,11 @@ pub fn BlogPostDetail() -> impl IntoView {
         spawn_local(async move {
             let input_vars = ReactToBlogPostVars {
                 reaction: ReactionInput { r#type: reaction },
-                blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+                blog_post_id: blog_post
+                    .get_untracked()
+                    .unwrap_or_default()
+                    .id
+                    .unwrap_or_default(),
             };
 
             let query = r#"
@@ -408,8 +431,12 @@ pub fn BlogPostDetail() -> impl IntoView {
                                 prev.reaction_count = prev.reaction_count.map(|val| val + 1);
                             }
 
-                            prev.current_user_reaction =
-                                Some(data.react_to_blog_post.as_ref().unwrap().get_data());
+                            prev.current_user_reaction = Some(
+                                data.react_to_blog_post
+                                    .as_ref()
+                                    .unwrap_or(&Default::default())
+                                    .get_data(),
+                            );
                         };
                     });
                     set_is_loading.set(false);
@@ -472,7 +499,11 @@ pub fn BlogPostDetail() -> impl IntoView {
                         if let Some(prev) = prev {
                             if let Some(comments) = prev.comments.as_mut() {
                                 comments.iter_mut().for_each(|comment| {
-                                    if comment.id.as_ref().unwrap().to_owned()
+                                    if comment
+                                        .id
+                                        .as_ref()
+                                        .unwrap_or(&Default::default())
+                                        .to_owned()
                                         == reaction.comment_id
                                     {
                                         comment.current_user_reaction = data
@@ -519,7 +550,11 @@ pub fn BlogPostDetail() -> impl IntoView {
                     Ok(_) => {
                         // User accepted the share sheet — count this
                         let input_vars = UpdateBlogPostShareCountVars {
-                            blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+                            blog_post_id: blog_post
+                                .get_untracked()
+                                .unwrap_or_default()
+                                .id
+                                .unwrap_or_default(),
                         };
 
                         let query = r#"
@@ -562,7 +597,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                         prev.shares_count = Some(
                                             data.update_blog_post_share_count
                                                 .as_ref()
-                                                .unwrap()
+                                                .unwrap_or(&Default::default())
                                                 .get_data(),
                                         );
                                     };
@@ -596,7 +631,11 @@ pub fn BlogPostDetail() -> impl IntoView {
     let handle_bookmark = Callback::new(move |_| {
         spawn_local(async move {
             let input_vars = BookmarkBlogPostVars {
-                blog_post_id: blog_post.get_untracked().unwrap().id.unwrap(),
+                blog_post_id: blog_post
+                    .get_untracked()
+                    .unwrap_or_default()
+                    .id
+                    .unwrap_or_default(),
             };
 
             let query = r#"
@@ -637,15 +676,19 @@ pub fn BlogPostDetail() -> impl IntoView {
                     set_blog_post.update(|prev| {
                         if let Some(prev) = prev {
                             if prev.current_user_bookmarked.is_some()
-                                && !prev.current_user_bookmarked.unwrap()
+                                && !prev.current_user_bookmarked.unwrap_or_default()
                             {
                                 prev.bookmarks_count = prev.bookmarks_count.map(|val| val + 1);
                             } else {
                                 prev.bookmarks_count = prev.bookmarks_count.map(|val| val - 1);
                             }
 
-                            prev.current_user_bookmarked =
-                                Some(data.bookmark_blog_post.as_ref().unwrap().get_data());
+                            prev.current_user_bookmarked = Some(
+                                data.bookmark_blog_post
+                                    .as_ref()
+                                    .unwrap_or(&Default::default())
+                                    .get_data(),
+                            );
                         };
                     });
                     set_is_loading.set(false);
@@ -700,14 +743,14 @@ pub fn BlogPostDetail() -> impl IntoView {
                             Some(
                                 view! {
                                     <article class="flex flex-col gap-[20px] display-constraints blog-display-constraints">
-                                        <h1>{blog_post.title.as_ref().unwrap().to_owned()}</h1>
+                                        <h1>{blog_post.title.as_ref().unwrap_or(&Default::default()).to_owned()}</h1>
                                         <div class="flex items-center">
                                             {
                                                 match &blog_post.full_author_details {
                                                     Some(author_details) => {
                                                         Some(
                                                             view! {
-                                                                <BlogDetailMetadata date_of_creation={blog_post.created_at.as_ref().unwrap().to_owned()} read_time={blog_post.read_time.as_ref().unwrap().to_owned()} author_profile_pic={author_details.profile_picture.as_ref().unwrap().to_owned()} author_name={author_details.full_name.as_ref().unwrap().to_owned()} />
+                                                                <BlogDetailMetadata date_of_creation={blog_post.created_at.as_ref().unwrap_or(&Default::default()).to_owned()} read_time={blog_post.read_time.as_ref().unwrap_or(&Default::default()).to_owned()} author_profile_pic={author_details.profile_picture.as_ref().unwrap_or(&Default::default()).to_owned()} author_name={author_details.full_name.as_ref().unwrap_or(&Default::default()).to_owned()} />
                                                             }
                                                         )
                                                     }
@@ -715,9 +758,9 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 }
                                             }
                                         </div>
-                                        <img src={blog_post.thumbnail.as_ref().unwrap().to_owned()} alt="Blog Post Image" class="w-full h-auto rounded-[5px] object-cover" />
+                                        <img src={blog_post.thumbnail.as_ref().unwrap_or(&Default::default()).to_owned()} alt="Blog Post Image" class="w-full h-auto rounded-[5px] object-cover" />
                                         // Blog post content goes here
-                                        <div class="flex flex-col gap-[20px] leading-relaxed text-base"  inner_html={blog_post.content.as_ref().unwrap().to_owned()} />
+                                        <div class="flex flex-col gap-[20px] leading-relaxed text-base"  inner_html={blog_post.content.as_ref().unwrap_or(&Default::default()).to_owned()} />
                                     </article>
 
                                     // floating reaction menu
@@ -773,8 +816,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 />
                                             </div>
                                         </div>
-                                        <BasicButton button_text=blog_post.bookmarks_count.unwrap_or_default().to_string() icon=Some(IconId::BiBookmarkRegular) onclick=handle_bookmark icon_before=true style_ext=format!("{}", if blog_post.current_user_bookmarked.is_some() && blog_post.current_user_bookmarked.unwrap() { "text-primary" } else { "" }) />
-                                        <BasicButton button_text=format!("{}", blog_comments_ref.as_ref().unwrap().len()) icon=Some(IconId::FaCommentRegular) onclick=handle_scroll_to_comments icon_before=true />
+                                        <BasicButton button_text=blog_post.bookmarks_count.unwrap_or_default().to_string() icon=Some(IconId::BiBookmarkRegular) onclick=handle_bookmark icon_before=true style_ext=format!("{}", if blog_post.current_user_bookmarked.is_some() && blog_post.current_user_bookmarked.unwrap_or_default() { "text-primary" } else { "" }) />
+                                        <BasicButton button_text=format!("{}", blog_comments_ref.as_ref().unwrap_or(&&vec![]).len()) icon=Some(IconId::FaCommentRegular) onclick=handle_scroll_to_comments icon_before=true />
                                         <BasicButton button_text=blog_post.shares_count.unwrap_or_default().to_string() icon=Some(IconId::BiShareAltRegular) icon_before=true onclick=handle_share />
                                     </div>
 
@@ -806,7 +849,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                             comments.into_iter()
                                                             .map(|comment| {
                                                                 view! {
-                                                                    <BlogComment comment_id=comment.id.as_ref().unwrap_or(&String::new()).to_owned() content=comment.content.as_ref().unwrap_or(&String::new()).to_owned() date_of_creation=comment.created_at.as_ref().unwrap_or(&String::new()).to_owned() author_name=comment.full_author_details.as_ref().unwrap().full_name.as_ref().unwrap().to_owned() author_avatar=comment.full_author_details.as_ref().unwrap().profile_picture.as_ref().unwrap().to_owned() reply_count=comment.reply_count.as_ref().unwrap_or(&0).to_owned() reaction_count=comment.reaction_count.as_ref().unwrap_or(&0).to_owned() current_user_reaction=comment.current_user_reaction.as_ref().map(|r| r.r#type) on_reaction=handle_comment_reaction_click />
+                                                                    <BlogComment comment_id=comment.id.as_ref().unwrap_or(&String::new()).to_owned() content=comment.content.as_ref().unwrap_or(&String::new()).to_owned() date_of_creation=comment.created_at.as_ref().unwrap_or(&String::new()).to_owned() author_name=comment.full_author_details.as_ref().unwrap_or(&Default::default()).full_name.as_ref().unwrap_or(&Default::default()).to_owned() author_avatar=comment.full_author_details.as_ref().unwrap_or(&Default::default()).profile_picture.as_ref().unwrap_or(&Default::default()).to_owned() reply_count=comment.reply_count.as_ref().unwrap_or(&0).to_owned() reaction_count=comment.reaction_count.as_ref().unwrap_or(&0).to_owned() current_user_reaction=comment.current_user_reaction.as_ref().map(|r| r.r#type) on_reaction=handle_comment_reaction_click />
                                                                 }
                                                             })
                                                             .collect_view()
@@ -840,10 +883,10 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                     Some(
                                                         view! {
                                                             <div class="flex py-[20px] gap-[20px] border-y border-light-gray">
-                                                                <img src={author_details.profile_picture.as_ref().unwrap().to_owned()} alt="Author Image" class="w-[100px] h-[100px] rounded-full" />
+                                                                <img src={author_details.profile_picture.as_ref().unwrap_or(&Default::default()).to_owned()} alt="Author Image" class="w-[100px] h-[100px] rounded-full" />
                                                                 <div class="flex flex-col gap-[15px]">
-                                                                    <p class="font-bold">{author_details.full_name.as_ref().unwrap().to_owned()}</p>
-                                                                    <p>{author_details.bio.as_ref().unwrap().to_owned()}</p>
+                                                                    <p class="font-bold">{author_details.full_name.as_ref().unwrap_or(&Default::default()).to_owned()}</p>
+                                                                    <p>{author_details.bio.as_ref().unwrap_or(&Default::default()).to_owned()}</p>
                                                                     // Socials
                                                                     <div class="flex gap-[15px]">
                                                                         <A href="#" target="_blank">

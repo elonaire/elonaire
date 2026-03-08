@@ -212,211 +212,170 @@ pub fn RatecardComponent(
                     }
 
                     spawn_local(async move {
-                        match gloo_net::http::Request::post(
-                            "http://localhost:8080/api/files/upload",
-                        )
-                        .header(
-                            "Authorization",
-                            format!(
-                                "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
-                            )
-                            .as_str(),
-                        )
-                        .body(files_form_data)
-                        .unwrap()
-                        .send()
-                        .await
-                        {
-                            Ok(response) => {
-                                match response.json::<Vec<UploadedFileResponse>>().await {
-                                    Ok(uploaded_files) => {
-                                        if let Some(service_request_form_data) =
-                                            get_form_data_from_form_ref(&service_request_form_ref)
-                                        {
-                                            if let Some(request_metadata_form_data) =
-                                                get_form_data_from_form_ref(
-                                                    &service_request_metadata_form_ref,
-                                                )
-                                            {
-                                                if let Some(services_form_data) =
-                                                    get_form_data_from_form_ref(&services_form_ref)
-                                                {
-                                                    uploaded_files.iter().for_each(
-                                                        |uploaded_file| {
-                                                            // Implement logic to handle form data
-                                                            if let Err(_) =
-                                                                request_metadata_form_data
-                                                                    .append_with_str(
-                                                                        "supporting_docs_file_ids",
-                                                                        &uploaded_file.file_id,
-                                                                    )
-                                                            {
-                                                                return;
-                                                            };
-                                                        },
-                                                    );
+                        let Ok(request) =
+                            gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                                .header(
+                                    "Authorization",
+                                    format!(
+                                        "Bearer {}",
+                                        current_state.user().auth_info().token().get_untracked()
+                                    )
+                                    .as_str(),
+                                )
+                                .body(files_form_data)
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
 
-                                                    let deserialized_services_form_data =
-                                                        deserialize_form_data_to_struct::<
-                                                            ServiceIdsForm,
-                                                        >(
-                                                            &services_form_data,
-                                                            false,
-                                                            Some(&["service_ids"]),
-                                                        );
-
-                                                    if deserialized_services_form_data.is_none() {
-                                                        return;
-                                                    };
-
-                                                    let deserialized_services_form_data =
-                                                        deserialized_services_form_data.unwrap();
-
-                                                    deserialized_services_form_data
-                                                        .service_ids
-                                                        .iter()
-                                                        .for_each(|service_id| {
-                                                            if let Err(_) =
-                                                                request_metadata_form_data
-                                                                    .append_with_str(
-                                                                        "service_ids",
-                                                                        service_id,
-                                                                    )
-                                                            {
-                                                                return;
-                                                            };
-                                                        });
-
-                                                    let deserialized_service_request_form_data =
-                                                        deserialize_form_data_to_struct::<
-                                                            ServiceRequestInput,
-                                                        >(
-                                                            &service_request_form_data, false, None
-                                                        );
-                                                    let deserialized_service_request_metadata_form_data =
-                                                        deserialize_form_data_to_struct::<
-                                                            ServiceRequestInputMetadata,
-                                                        >(
-                                                            &request_metadata_form_data,
-                                                            false,
-                                                            Some(&[
-                                                                "service_ids",
-                                                                "supporting_docs_file_ids",
-                                                            ]),
-                                                        );
-
-                                                    if deserialized_service_request_form_data.is_none() || deserialized_service_request_metadata_form_data.is_none() {
-                                                        set_is_loading.set(false);
-                                                        return;
-                                                    }
-
-                                                    let deserialized_service_request_form_data =
-                                                        deserialized_service_request_form_data
-                                                            .unwrap();
-                                                    let deserialized_service_request_metadata_form_data =
-                                                        deserialized_service_request_metadata_form_data
-                                                            .unwrap();
-
-                                                    let input_vars = CreateServiceRequestVars {
-                                                    service_request_input: deserialized_service_request_form_data,
-                                                    service_request_input_metadata: deserialized_service_request_metadata_form_data
-                                                };
-
-                                                    let query = r#"
-                                                    mutation CreateServiceRequest(
-                                                        $serviceRequestInput: ServiceRequestInput,
-                                                        $serviceRequestInputMetadata: ServiceRequestInputMetadata
-                                                    ) {
-                                                        createServiceRequest(
-                                                            serviceRequestInput: $serviceRequestInput,
-                                                            serviceRequestInputMetadata: $serviceRequestInputMetadata
-                                                        ) {
-                                                            description
-                                                            startDate
-                                                            endDate
-                                                            createdAt
-                                                            updatedAt
-                                                            id
-                                                            supportingDocs {
-                                                                id
-                                                                fileId
-                                                            }
-                                                        }
-                                                    }
-                                                "#;
-
-                                                    let mut headers =
-                                                        HashMap::new() as HashMap<String, String>;
-                                                    headers.insert(
-                                                        "Authorization".into(),
-                                                        format!(
-                                                            "Bearer {}",
-                                                            current_state
-                                                                .user()
-                                                                .auth_info()
-                                                                .token()
-                                                                .get_untracked()
-                                                        ),
-                                                    );
-
-                                                    let response =
-                                                        perform_mutation_or_query_with_vars::<
-                                                            CreateServiceRequestResponse,
-                                                            CreateServiceRequestVars,
-                                                        >(
-                                                            Some(&headers),
-                                                            "http://localhost:8080/api/shared",
-                                                            query,
-                                                            input_vars,
-                                                        )
-                                                        .await;
-
-                                                    match response.get_data() {
-                                                        Some(_data) => {
-                                                            if let Some(form) = service_request_form_ref
-                                                                .get_untracked()
-                                                                .and_then(|el| {
-                                                                    el.dyn_into::<HtmlFormElement>()
-                                                                        .ok()
-                                                                })
-                                                            {
-                                                                form.reset();
-                                                                set_service_request_form_is_valid
-                                                                    .set(false);
-
-                                                            } else {
-
-                                                            }
-                                                            set_is_loading.set(false);
-
-                                                            success_modal_is_open
-                                                                .update(|status| *status = true);
-                                                            service_request_modal_is_open
-                                                                .update(|status| *status = false);
-                                                        }
-                                                        None => {
-                                                            set_is_loading.set(false);
-                                                        }
-                                                    };
-                                                };
-                                            };
-                                        };
-                                    }
-                                    Err(err) => {
-                                        leptos::logging::error!(
-                                            "Failed to parse uploaded file response: {:?}",
-                                            err
-                                        );
-                                        set_is_loading.set(false);
-                                    }
-                                };
-                            }
+                        let response = match request.send().await {
+                            Ok(r) => r,
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
                                 set_is_loading.set(false);
+                                return;
                             }
                         };
+
+                        let uploaded_files =
+                            match response.json::<Vec<UploadedFileResponse>>().await {
+                                Ok(f) => f,
+                                Err(err) => {
+                                    leptos::logging::error!(
+                                        "Failed to parse uploaded file response: {:?}",
+                                        err
+                                    );
+                                    set_is_loading.set(false);
+                                    return;
+                                }
+                            };
+
+                        let (
+                            Some(service_request_form_data),
+                            Some(request_metadata_form_data),
+                            Some(services_form_data),
+                        ) = (
+                            get_form_data_from_form_ref(&service_request_form_ref),
+                            get_form_data_from_form_ref(&service_request_metadata_form_ref),
+                            get_form_data_from_form_ref(&services_form_ref),
+                        )
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        uploaded_files.iter().for_each(|uploaded_file| {
+                            request_metadata_form_data
+                                .append_with_str("supporting_docs_file_ids", &uploaded_file.file_id)
+                                .ok();
+                        });
+
+                        let Some(deserialized_services_form_data) =
+                            deserialize_form_data_to_struct::<ServiceIdsForm>(
+                                &services_form_data,
+                                false,
+                                Some(&["service_ids"]),
+                            )
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        deserialized_services_form_data
+                            .service_ids
+                            .iter()
+                            .for_each(|service_id| {
+                                request_metadata_form_data
+                                    .append_with_str("service_ids", service_id)
+                                    .ok();
+                            });
+
+                        let (
+                            Some(deserialized_service_request_form_data),
+                            Some(deserialized_service_request_metadata_form_data),
+                        ) = (
+                            deserialize_form_data_to_struct::<ServiceRequestInput>(
+                                &service_request_form_data,
+                                false,
+                                None,
+                            ),
+                            deserialize_form_data_to_struct::<ServiceRequestInputMetadata>(
+                                &request_metadata_form_data,
+                                false,
+                                Some(&["service_ids", "supporting_docs_file_ids"]),
+                            ),
+                        )
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        let input_vars = CreateServiceRequestVars {
+                            service_request_input: deserialized_service_request_form_data,
+                            service_request_input_metadata:
+                                deserialized_service_request_metadata_form_data,
+                        };
+
+                        let query = r#"
+                            mutation CreateServiceRequest(
+                                $serviceRequestInput: ServiceRequestInput,
+                                $serviceRequestInputMetadata: ServiceRequestInputMetadata
+                            ) {
+                                createServiceRequest(
+                                    serviceRequestInput: $serviceRequestInput,
+                                    serviceRequestInputMetadata: $serviceRequestInputMetadata
+                                ) {
+                                    description
+                                    startDate
+                                    endDate
+                                    createdAt
+                                    updatedAt
+                                    id
+                                    supportingDocs {
+                                        id
+                                        fileId
+                                    }
+                                }
+                            }
+                        "#;
+
+                        let mut headers = HashMap::new() as HashMap<String, String>;
+                        headers.insert(
+                            "Authorization".into(),
+                            format!(
+                                "Bearer {}",
+                                current_state.user().auth_info().token().get_untracked()
+                            ),
+                        );
+
+                        let response = perform_mutation_or_query_with_vars::<
+                            CreateServiceRequestResponse,
+                            CreateServiceRequestVars,
+                        >(
+                            Some(&headers),
+                            "http://localhost:8080/api/shared",
+                            query,
+                            input_vars,
+                        )
+                        .await;
+
+                        match response.get_data() {
+                            Some(_data) => {
+                                if let Some(form) = service_request_form_ref
+                                    .get_untracked()
+                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                                {
+                                    form.reset();
+                                    set_service_request_form_is_valid.set(false);
+                                }
+                                set_is_loading.set(false);
+                                success_modal_is_open.update(|status| *status = true);
+                                service_request_modal_is_open.update(|status| *status = false);
+                            }
+                            None => {
+                                set_is_loading.set(false);
+                            }
+                        }
                     });
                 };
             };
@@ -502,10 +461,10 @@ pub fn RatecardComponent(
                 <div class="p-[10px] flex flex-col gap-[10px] text-light-gray text-md">
                     <For
                         each=move || services.get()
-                        key=|service| service.id.as_ref().unwrap().clone()
+                        key=|service| service.id.as_ref().unwrap_or(&String::new()).clone()
                             children=move |service| {
                             view! {
-                                <CheckboxInputField initial_value=RwSignal::new(service.id.as_ref().unwrap().clone()) label=service.title.as_ref().unwrap().clone() id_attr=format!("service-{}", service.id.as_ref().unwrap().clone()) name="service_ids" />
+                                <CheckboxInputField initial_value=RwSignal::new(service.id.as_ref().unwrap_or(&String::new()).clone()) label=service.title.as_ref().unwrap_or(&String::new()).clone() id_attr=format!("service-{}", service.id.as_ref().unwrap_or(&String::new()).clone()) name="service_ids" />
                             }
                         }
                     />

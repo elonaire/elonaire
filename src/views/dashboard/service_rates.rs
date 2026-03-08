@@ -91,7 +91,13 @@ pub fn ServiceRatesList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".into(),
-                    TableCellData::String(service_rate.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        service_rate
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
@@ -100,10 +106,10 @@ pub fn ServiceRatesList() -> impl IntoView {
                         service_rate
                             .service
                             .as_ref()
-                            .unwrap()
+                            .unwrap_or(&Default::default())
                             .title
                             .as_ref()
-                            .unwrap()
+                            .unwrap_or(&Default::default())
                             .to_owned(),
                     ),
                 );
@@ -112,7 +118,10 @@ pub fn ServiceRatesList() -> impl IntoView {
                     "Base Rate".into(),
                     TableCellData::String(format!(
                         "{:.2}",
-                        service_rate.base_rate.as_ref().unwrap()
+                        service_rate
+                            .base_rate
+                            .as_ref()
+                            .unwrap_or(&Default::default())
                     )),
                 );
                 hash_map_data.insert("Currency".into(), TableCellData::String("N/A".into()));
@@ -291,8 +300,8 @@ pub fn CreateServiceRate() -> impl IntoView {
                 .iter()
                 .map(|service| {
                     SelectOption::new(
-                        service.id.as_ref().unwrap(),
-                        service.title.as_ref().unwrap(),
+                        service.id.as_ref().unwrap_or(&Default::default()),
+                        service.title.as_ref().unwrap_or(&Default::default()),
                     )
                 })
                 .collect(),
@@ -304,8 +313,8 @@ pub fn CreateServiceRate() -> impl IntoView {
                 .iter()
                 .map(|currency| {
                     SelectOption::new(
-                        currency.id.as_ref().unwrap(),
-                        currency.name.as_ref().unwrap(),
+                        currency.id.as_ref().unwrap_or(&Default::default()),
+                        currency.name.as_ref().unwrap_or(&Default::default()),
                     )
                 })
                 .collect(),

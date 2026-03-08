@@ -44,7 +44,7 @@ impl<T> GraphQLResponse<T> {
 ///        }
 ///    "#;
 /// ```
-pub async fn perform_query_without_vars<Res: for<'de> Deserialize<'de>>(
+pub async fn perform_query_without_vars<Res: for<'de> Deserialize<'de> + Default>(
     headers: Option<&HashMap<String, String>>,
     endpoint: &str,
     query: &str,
@@ -57,7 +57,7 @@ pub async fn perform_query_without_vars<Res: for<'de> Deserialize<'de>>(
     let response = client.query::<Res>(query).await;
 
     match response {
-        Ok(data) => GraphQLResponse::Data(data.unwrap()),
+        Ok(data) => GraphQLResponse::Data(data.unwrap_or_default()),
         Err(err) => {
             let errors = match err.json() {
                 Some(errors) => errors,
@@ -87,7 +87,7 @@ pub async fn perform_query_without_vars<Res: for<'de> Deserialize<'de>>(
 /// "#;
 /// ```
 pub async fn perform_mutation_or_query_with_vars<
-    Res: for<'de> Deserialize<'de> + Serialize,
+    Res: for<'de> Deserialize<'de> + Serialize + Default,
     Var: for<'de> Deserialize<'de> + Serialize,
 >(
     headers: Option<&HashMap<String, String>>,
@@ -103,7 +103,7 @@ pub async fn perform_mutation_or_query_with_vars<
     let response = client.query_with_vars::<Res, Var>(query, vars).await;
 
     match response {
-        Ok(data) => GraphQLResponse::Data(data.unwrap()),
+        Ok(data) => GraphQLResponse::Data(data.unwrap_or_default()),
         Err(err) => {
             leptos::logging::error!("{:?}", err);
             let errors = match err.json() {

@@ -96,32 +96,42 @@ pub fn RolesList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(role.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        role.id.as_ref().unwrap_or(&Default::default()).to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Role Name".to_string(),
-                    TableCellData::String(role.role_name.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        role.role_name
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
-                let privilege = if role.is_admin.is_some() && role.is_admin.unwrap() {
-                    ViewFn::from(move || {
-                        view! {
-                            <LabelTag label="Admin" color=ColorTemperature::Warning />
-                        }
-                    })
-                } else if role.is_super_admin.is_some() && role.is_super_admin.unwrap() {
-                    ViewFn::from(move || {
-                        view! {
-                            <LabelTag label="Super Admin" color=ColorTemperature::Danger />
-                        }
-                    })
-                } else {
-                    ViewFn::from(move || {
-                        view! {
-                            <LabelTag label="None" />
-                        }
-                    })
-                };
+                let privilege =
+                    if role.is_admin.is_some() && role.is_admin.unwrap_or(Default::default()) {
+                        ViewFn::from(move || {
+                            view! {
+                                <LabelTag label="Admin" color=ColorTemperature::Warning />
+                            }
+                        })
+                    } else if role.is_super_admin.is_some()
+                        && role.is_super_admin.unwrap_or(Default::default())
+                    {
+                        ViewFn::from(move || {
+                            view! {
+                                <LabelTag label="Super Admin" color=ColorTemperature::Danger />
+                            }
+                        })
+                    } else {
+                        ViewFn::from(move || {
+                            view! {
+                                <LabelTag label="None" />
+                            }
+                        })
+                    };
                 hash_map_data.insert("Privilege".to_string(), TableCellData::Html(privilege));
                 hash_map_data
             })
@@ -218,9 +228,10 @@ pub fn CreateRole() -> impl IntoView {
                             return;
                         }
 
-                        let deserialized_main_form_data = deserialized_main_form_data.unwrap();
+                        let deserialized_main_form_data =
+                            deserialized_main_form_data.unwrap_or_default();
                         let deserialized_metadata_form_data =
-                            deserialized_metadata_form_data.unwrap();
+                            deserialized_metadata_form_data.unwrap_or_default();
 
                         let input_vars = CreateSystemRoleVars {
                             role_input: deserialized_main_form_data,
@@ -328,7 +339,10 @@ pub fn CreateRole() -> impl IntoView {
                 .get()
                 .iter()
                 .map(|org| {
-                    SelectOption::new(org.id.as_ref().unwrap(), org.org_name.as_ref().unwrap())
+                    SelectOption::new(
+                        org.id.as_ref().unwrap_or(&Default::default()),
+                        org.org_name.as_ref().unwrap_or(&Default::default()),
+                    )
                 })
                 .collect(),
         );
@@ -338,7 +352,10 @@ pub fn CreateRole() -> impl IntoView {
                 .get()
                 .iter()
                 .map(|dep| {
-                    SelectOption::new(dep.id.as_ref().unwrap(), dep.dep_name.as_ref().unwrap())
+                    SelectOption::new(
+                        dep.id.as_ref().unwrap_or(&Default::default()),
+                        dep.dep_name.as_ref().unwrap_or(&Default::default()),
+                    )
                 })
                 .collect(),
         );
@@ -349,8 +366,8 @@ pub fn CreateRole() -> impl IntoView {
                 .iter()
                 .map(|permission| {
                     CheckboxOption::new(
-                        permission.id.as_ref().unwrap(),
-                        permission.name.as_ref().unwrap(),
+                        permission.id.as_ref().unwrap_or(&Default::default()),
+                        permission.name.as_ref().unwrap_or(&Default::default()),
                         None,
                     )
                 })

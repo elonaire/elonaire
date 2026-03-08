@@ -1,4 +1,7 @@
-use std::fmt::{self, Display};
+use std::{
+    default,
+    fmt::{self, Display},
+};
 
 use reactive_stores::Store;
 use serde::{Deserialize, Serialize};
@@ -9,14 +12,14 @@ use crate::{
 };
 
 /* This is the beginning of UserPortfolio GraphQL schema */
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct CreatePortfolioItemResponse {
     #[serde(rename = "createPortfolioItem")]
     pub create_portfolio_item: Option<ApiResponse<UserPortfolio>>, // this is the return type expected from the API on success, the key is the resolver name
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct UserPortfolio {
     pub id: Option<String>,
@@ -86,7 +89,7 @@ impl Display for UserPortfolioCategory {
 }
 
 /* This is the beginning of UserProfessionalInfo GraphQL schema */
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[allow(dead_code)]
 pub struct CreateProfessionalDetailsResponse {
     #[serde(rename = "createProfessionalDetails")]
@@ -108,7 +111,7 @@ pub struct UserProfessionalInfoInput {
     pub start_date: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct UserProfessionalInfo {
     pub id: Option<String>,
@@ -122,7 +125,7 @@ pub struct UserProfessionalInfo {
 }
 
 /* This is the beginning of UserService GraphQL schema */
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct CreateUserServiceResponse {
     #[serde(rename = "createUserService")]
@@ -143,7 +146,7 @@ pub struct UserServiceInput {
     pub thumbnail: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Store)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Store, Default)]
 #[allow(dead_code)]
 pub struct UserService {
     pub id: Option<String>,
@@ -153,7 +156,7 @@ pub struct UserService {
 }
 
 /* This is the beginning of Resume GraphQL schema */
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct CreateResumeItemResponse {
     #[serde(rename = "createResumeItem")]
@@ -220,7 +223,7 @@ impl Display for UserResumeSection {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct UserResume {
     pub id: Option<String>,
@@ -238,7 +241,7 @@ pub struct UserResume {
     pub achievements: Option<Vec<ResumeAchievement>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct ResumeAchievement {
     pub id: Option<String>,
@@ -246,7 +249,7 @@ pub struct ResumeAchievement {
 }
 
 /* This is the beginning of UserSkill GraphQL schema */
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct CreateUserSkillResponse {
     #[serde(rename = "createSkill")]
@@ -271,7 +274,7 @@ pub struct UserSkillInput {
     pub thumbnail: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[allow(dead_code)]
 pub struct UserSkill {
     pub id: Option<String>,
@@ -335,7 +338,7 @@ impl Display for UserSkillType {
 }
 
 /* This is the beginning of Blog GraphQL schema */
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct CreateBlogPostResponse {
     #[serde(rename = "createBlogPost")]
     pub create_blog_post: Option<ApiResponse<BlogPost>>, // this is the return type expected from the API on success
@@ -434,7 +437,7 @@ impl Display for BlogCategory {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[allow(dead_code)]
 pub struct BlogPost {
     pub id: Option<String>,
@@ -476,7 +479,7 @@ pub struct BlogPost {
     pub current_user_bookmarked: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[allow(dead_code)]
 pub struct BlogComment {
     pub content: Option<String>,
@@ -497,13 +500,13 @@ pub struct BlogComment {
 }
 
 /* This is a Query for UserResources */
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct FetchSiteResourcesResponse {
     #[serde(rename = "fetchSiteResources")]
     pub fetch_site_resources: Option<ApiResponse<PublicSiteResources>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct PublicSiteResources {
     #[serde(rename = "blogPosts")]
     pub blog_posts: Option<Vec<BlogPost>>,
@@ -515,13 +518,13 @@ pub struct PublicSiteResources {
     pub services: Option<Vec<UserService>>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchRatecardsResponse {
     #[serde(rename = "fetchRatecards")]
     pub fetch_ratecards: Option<ApiResponse<Vec<Ratecard>>>, // this is the return type expected from the API on success
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Store)]
+#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Store, Default)]
 pub struct Ratecard {
     pub id: Option<String>,
     pub name: Option<String>,
@@ -551,13 +554,13 @@ pub struct CreateRatecardVars {
     pub ratecard_input_metadata: RatecardInputMetadata,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct CreateRatecardResponse {
     #[serde(rename = "createRatecard")]
     pub create_ratecard: Option<ApiResponse<Ratecard>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchBillingRateResponse {
     #[serde(rename = "fetchBillingRate")]
     pub fetch_billing_rate: Option<ApiResponse<String>>, // this is the return type expected from the API on success
@@ -651,13 +654,13 @@ pub struct CreateServiceRequestVars {
     pub service_request_input_metadata: ServiceRequestInputMetadata,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct CreateServiceRequestResponse {
     #[serde(rename = "createServiceRequest")]
     pub create_service_request: Option<ApiResponse<ServiceRequest>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchServiceRequestsResponse {
     #[serde(rename = "fetchServiceRequests")]
     pub fetch_service_requests: Option<ApiResponse<Vec<ServiceRequest>>>, // this is the return type expected from the API on success
@@ -710,13 +713,13 @@ pub struct CreateServiceRateVars {
     pub service_rate_input_metadata: ServiceRateInputMetadata,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct CreateServiceRateResponse {
     #[serde(rename = "createServiceRate")]
     pub create_service_rate: Option<ApiResponse<ServiceRate>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchServiceRatesResponse {
     #[serde(rename = "fetchServiceRates")]
     pub fetch_service_rates: Option<ApiResponse<Vec<ServiceRate>>>, // this is the return type expected from the API on success
@@ -735,19 +738,19 @@ pub struct Currency {
     pub updated_at: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchCurrenciesResponse {
     #[serde(rename = "fetchCurrencies")]
     pub fetch_currencies: Option<ApiResponse<Vec<Currency>>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchBlogPostsResponse {
     #[serde(rename = "fetchBlogPosts")]
     pub fetch_blog_posts: Option<ApiResponse<Vec<BlogPost>>>, // this is the return type expected from the API on success
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 pub struct FetchSingleBlogPostResponse {
     #[serde(rename = "fetchSingleBlogPost")]
     pub fetch_single_blog_post: Option<ApiResponse<BlogPost>>, // this is the return type expected from the API on success
@@ -801,15 +804,16 @@ pub struct ReactionInput {
     pub r#type: ReactionType,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct Reaction {
     pub id: String,
     pub r#type: ReactionType,
 }
 
 // enum for ReactionType
-#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq, Default)]
 pub enum ReactionType {
+    #[default]
     Like,
     Dislike,
     Love,
@@ -832,7 +836,7 @@ pub struct CreateBlogCommentVars {
     pub blog_post_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateBlogCommentResponse {
     #[serde(rename = "addCommentToBlogPost")]
     pub add_comment_to_blog_post: Option<ApiResponse<BlogComment>>,
@@ -845,7 +849,7 @@ pub struct ReactToBlogPostVars {
     pub blog_post_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReactToBlogPostResponse {
     #[serde(rename = "reactToBlogPost")]
     pub react_to_blog_post: Option<ApiResponse<Reaction>>,
@@ -857,7 +861,7 @@ pub struct BookmarkBlogPostVars {
     pub blog_post_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BookmarkBlogPostResponse {
     #[serde(rename = "bookmarkBlogPost")]
     pub bookmark_blog_post: Option<ApiResponse<bool>>,
@@ -869,7 +873,7 @@ pub struct UpdateBlogPostShareCountVars {
     pub blog_post_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateBlogPostShareCountResponse {
     #[serde(rename = "updateBlogPostShareCount")]
     pub update_blog_post_share_count: Option<ApiResponse<u32>>,
@@ -882,7 +886,7 @@ pub struct ReactToBlogCommentVars {
     pub comment_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReactToBlogCommentResponse {
     #[serde(rename = "reactToBlogComment")]
     pub react_to_blog_comment: Option<ApiResponse<Reaction>>,

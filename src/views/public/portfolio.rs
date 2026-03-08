@@ -125,7 +125,7 @@ pub fn Portfolio() -> impl IntoView {
                                 {
                                     move || javascript_projects.get().iter().map(|project| {
                                         view!{
-                                            <FlipCard title={project.title.as_ref().unwrap().clone()} image_url={project.thumbnail.as_ref().unwrap().clone()} description={project.description.as_ref().unwrap().clone()} />
+                                            <FlipCard title={project.title.as_ref().unwrap_or(&Default::default()).clone()} image_url={project.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} description={project.description.as_ref().unwrap_or(&Default::default()).clone()} />
                                         }
                                     }).collect::<Vec<_>>()
                                 }
@@ -136,7 +136,7 @@ pub fn Portfolio() -> impl IntoView {
                                 {
                                     move || rust_projects.get().iter().map(|project| {
                                         view!{
-                                            <FlipCard title={project.title.as_ref().unwrap().clone()} image_url={project.thumbnail.as_ref().unwrap().clone()} description={project.description.as_ref().unwrap().clone()} />
+                                            <FlipCard title={project.title.as_ref().unwrap_or(&Default::default()).clone()} image_url={project.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} description={project.description.as_ref().unwrap_or(&Default::default()).clone()} />
                                         }
                                     }).collect::<Vec<_>>()
                                 }
@@ -147,7 +147,7 @@ pub fn Portfolio() -> impl IntoView {
                                 {
                                     move || database_projects.get().iter().map(|project| {
                                         view!{
-                                            <FlipCard title={project.title.as_ref().unwrap().clone()} image_url={project.thumbnail.as_ref().unwrap().clone()} description={project.description.as_ref().unwrap().clone()} />
+                                            <FlipCard title={project.title.as_ref().unwrap_or(&Default::default()).clone()} image_url={project.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} description={project.description.as_ref().unwrap_or(&Default::default()).clone()} />
                                         }
                                     }).collect::<Vec<_>>()
                                 }
@@ -158,7 +158,7 @@ pub fn Portfolio() -> impl IntoView {
                                 {
                                     move || devops_projects.get().iter().map(|project| {
                                         view!{
-                                            <FlipCard title={project.title.as_ref().unwrap().clone()} image_url={project.thumbnail.as_ref().unwrap().clone()} description={project.description.as_ref().unwrap().clone()} />
+                                            <FlipCard title={project.title.as_ref().unwrap_or(&Default::default()).clone()} image_url={project.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} description={project.description.as_ref().unwrap_or(&Default::default()).clone()} />
                                         }
                                     }).collect::<Vec<_>>()
                                 }
@@ -169,7 +169,7 @@ pub fn Portfolio() -> impl IntoView {
                                 {
                                     move || cloud_projects.get().iter().map(|project| {
                                         view!{
-                                            <FlipCard title={project.title.as_ref().unwrap().clone()} image_url={project.thumbnail.as_ref().unwrap().clone()} description={project.description.as_ref().unwrap().clone()} />
+                                            <FlipCard title={project.title.as_ref().unwrap_or(&Default::default()).clone()} image_url={project.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} description={project.description.as_ref().unwrap_or(&Default::default()).clone()} />
                                         }
                                     }).collect::<Vec<_>>()
                                 }
@@ -180,7 +180,7 @@ pub fn Portfolio() -> impl IntoView {
                                 {
                                     move || mobile_projects.get().iter().map(|project| {
                                         view!{
-                                            <FlipCard title={project.title.as_ref().unwrap().clone()} image_url={project.thumbnail.as_ref().unwrap().clone()} description={project.description.as_ref().unwrap().clone()} />
+                                            <FlipCard title={project.title.as_ref().unwrap_or(&Default::default()).clone()} image_url={project.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} description={project.description.as_ref().unwrap_or(&Default::default()).clone()} />
                                         }
                                     }).collect::<Vec<_>>()
                                 }

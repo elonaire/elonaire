@@ -57,20 +57,20 @@ pub fn SignIn() -> impl IntoView {
                         auth_code: Some(auth_code),
                     };
 
-                    let response = reqwest::Client::new()
+                    if let Ok(response) = reqwest::Client::new()
                         .post("http://localhost:8080/api/acl/social-sign-in")
                         .json(&auth_code_body)
                         .send()
                         .await
-                        .unwrap();
-
-                    if let Ok(auth_status) = response.json::<AuthDetails>().await {
-                        current_state
-                            .user()
-                            .auth_info()
-                            .token()
-                            .set(auth_status.token.unwrap_or("".into()));
-                        set_is_loading.set(false);
+                    {
+                        if let Ok(auth_status) = response.json::<AuthDetails>().await {
+                            current_state
+                                .user()
+                                .auth_info()
+                                .token()
+                                .set(auth_status.token.unwrap_or_default());
+                            set_is_loading.set(false);
+                        };
                     };
                 });
             }
@@ -131,7 +131,14 @@ pub fn SignIn() -> impl IntoView {
                     Some(data) => {
                         match &data.sign_in {
                             Some(auth_details) => {
-                                navigate(auth_details.get_data().url.as_ref().unwrap().as_str());
+                                navigate(
+                                    auth_details
+                                        .get_data()
+                                        .url
+                                        .as_ref()
+                                        .unwrap_or(&"/sign-in".into())
+                                        .as_str(),
+                                );
                             }
                             None => {
                                 set_is_loading.set(false);
@@ -223,7 +230,7 @@ pub fn SignIn() -> impl IntoView {
                                                     .get_data()
                                                     .token
                                                     .as_ref()
-                                                    .unwrap_or(&"".into())
+                                                    .unwrap_or(&String::new())
                                                     .to_owned(),
                                             );
                                         }

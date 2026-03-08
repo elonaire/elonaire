@@ -7,6 +7,7 @@ use leptos_meta::*;
 use web_sys::{HtmlDivElement, MouseEvent};
 
 use crate::utils::custom_traits::EnumerableEnum;
+use crate::utils::formatters::PipeOption;
 use crate::{
     components::{
         forms::{
@@ -105,7 +106,11 @@ pub fn BlogHome() -> impl IntoView {
             if let Ok(mut featured_posts) = featured_posts {
                 for featured_post in &mut featured_posts {
                     let user_id_vars = FetchSingleUserVars {
-                        user_id: featured_post.author.as_ref().unwrap().to_owned(),
+                        user_id: featured_post
+                            .author
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
                     };
 
                     let fetch_user_info_query = r#"
@@ -274,8 +279,8 @@ pub fn BlogHome() -> impl IntoView {
                                                             thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned()
                                                             title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned()
                                                             short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned()
-                                                            author_profile_pic=blog_post.full_author_details.as_ref().unwrap().profile_picture.as_ref().unwrap_or(&String::new()).to_owned()
-                                                            author_name=blog_post.full_author_details.as_ref().unwrap().full_name.as_ref().unwrap_or(&String::new()).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned()
+                                                            author_profile_pic=blog_post.full_author_details.as_ref().unwrap_or(&Default::default()).profile_picture.as_ref().unwrap_or(&String::new()).to_owned()
+                                                            author_name=blog_post.full_author_details.as_ref().unwrap_or(&Default::default()).full_name.as_ref().unwrap_or(&String::new()).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned()
                                                         />
                                                     }
                                                 })
@@ -317,17 +322,17 @@ pub fn BlogHome() -> impl IntoView {
                                                         <li>
                                                         <a
 
-                                                                href=format!("/blog/read/{}", article.link.unwrap_or("".into()))
+                                                                href=format!("/blog/read/{}", article.link.unwrap_or_default())
                                                                 class="flex flex-col px-4 py-3 hover:bg-primary/10 \
                                                                        transition-colors cursor-pointer group"
                                                             >
                                                                 <span class="text-sm font-medium text-gray-900 \
                                                                              group-hover:text-primary line-clamp-1">
-                                                                    {article.title.unwrap_or("".into())}
+                                                                    {article.title.unwrap_or_default()}
                                                                 </span>
                                                                 // Optional: subtitle/category
                                                                 <span class="text-xs text-gray-400 mt-0.5">
-                                                                    {article.category.unwrap().to_string()}
+                                                                    {article.category.text(None)}
                                                                 </span>
                                                             </a>
                                                         </li>
@@ -402,14 +407,14 @@ pub fn BlogHome() -> impl IntoView {
                                                         {results.into_iter().map(|article| view! {
                                                             <li>
                                                                 <a
-                                                                    href=format!("/blog/read/{}", article.link.unwrap_or("".into()))
+                                                                    href=format!("/blog/read/{}", article.link.unwrap_or_default())
                                                                     class="flex flex-col px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer group"
                                                                 >
                                                                     <span class="text-sm font-medium text-gray-900 group-hover:text-primary line-clamp-1">
-                                                                        {article.title.unwrap_or("".into())}
+                                                                        {article.title.unwrap_or_default()}
                                                                     </span>
                                                                     <span class="text-xs text-gray-400 mt-0.5">
-                                                                        {article.category.unwrap().to_string()}
+                                                                        {article.category.text(None)}
                                                                     </span>
                                                                 </a>
                                                             </li>
@@ -452,7 +457,7 @@ pub fn BlogHome() -> impl IntoView {
                                     .iter()
                                     .map(|blog_post| {
                                         view! {
-                                            <BlogPostPreview thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned() title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned() short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned() category=blog_post.category.unwrap().to_owned() read_time=blog_post.read_time.as_ref().unwrap_or(&0).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned() />
+                                            <BlogPostPreview thumbnail=blog_post.thumbnail.as_ref().unwrap_or(&String::new()).to_owned() title=blog_post.title.as_ref().unwrap_or(&String::new()).to_owned() short_description=blog_post.short_description.as_ref().unwrap_or(&String::new()).to_owned() category=blog_post.category.unwrap_or(BlogCategory::Technology).to_owned() read_time=blog_post.read_time.as_ref().unwrap_or(&0).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned() />
                                         }
                                     })
                                     .collect_view()

@@ -244,6 +244,14 @@ pub fn RichTextEditor(
             return;
         }
 
+        // ===== INLINE CODE =====
+        if let Some(code) = current_inline_code() {
+            ev.prevent_default();
+            handle_inline_code_enter(&code);
+            update_button_states();
+            return;
+        }
+
         // ===== LIST ITEM =====
         if let Some((list, li)) = current_list_item() {
             ev.prevent_default();
@@ -253,13 +261,10 @@ pub fn RichTextEditor(
         }
 
         // ===== DEFAULT =====
-        // DO NOT prevent default here.
-        // Let browser handle <h1>, <p>, etc.
+        // Let browser handle paragraphs, headings, etc.
 
-        // Optional: run state update async after DOM mutation
-        let _ = window()
-            .unwrap()
-            .set_timeout_with_callback_and_timeout_and_arguments_0(
+        if let Some(window) = window() {
+            let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
                 Closure::once_into_js(move || {
                     update_button_states();
                 })
@@ -267,6 +272,7 @@ pub fn RichTextEditor(
                 .unchecked_ref(),
                 0,
             );
+        }
     };
 
     // Update button states on selection change
@@ -325,67 +331,68 @@ pub fn RichTextEditor(
                 }
 
                 spawn_local(async move {
-                    match gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
-                        .header(
-                            "Authorization",
-                            format!(
-                                "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                    if let Ok(request) =
+                        gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                            .header(
+                                "Authorization",
+                                format!(
+                                    "Bearer {}",
+                                    current_state.user().auth_info().token().get_untracked()
+                                )
+                                .as_str(),
                             )
-                            .as_str(),
-                        )
-                        .body(files_form_data)
-                        .unwrap()
-                        .send()
-                        .await
+                            .body(files_form_data)
                     {
-                        Ok(response) => {
-                            match response.json::<Vec<UploadedFileResponse>>().await {
-                                Ok(uploaded_files) => {
-                                    if let Some(doc) = window().and_then(|w| w.document()) {
-                                        if let Ok(Some(selection)) = doc.get_selection() {
-                                            if let Ok(range) = selection.get_range_at(0) {
-                                                let img = doc.create_element("img").unwrap();
-                                                img.set_attribute(
-                                                    "src",
-                                                    &format!(
-                                                        "http://localhost:3001/view/{}",
-                                                        uploaded_files[0].file_name
-                                                    ),
-                                                )
-                                                .unwrap();
-                                                img.set_attribute(
-                                                    "style",
-                                                    "max-width: 100%; height: auto;",
-                                                )
-                                                .unwrap();
+                        match request.send().await {
+                            Ok(response) => {
+                                match response.json::<Vec<UploadedFileResponse>>().await {
+                                    Ok(uploaded_files) => {
+                                        if let Some(doc) = window().and_then(|w| w.document()) {
+                                            if let Ok(Some(selection)) = doc.get_selection() {
+                                                if let Ok(range) = selection.get_range_at(0) {
+                                                    if let Ok(img) = doc.create_element("img") {
+                                                        img.set_attribute(
+                                                            "src",
+                                                            &format!(
+                                                                "http://localhost:3001/view/{}",
+                                                                uploaded_files[0].file_name
+                                                            ),
+                                                        )
+                                                        .unwrap_or_default();
+                                                        img.set_attribute(
+                                                            "style",
+                                                            "max-width: 100%; height: auto;",
+                                                        )
+                                                        .unwrap_or_default();
 
-                                                range.delete_contents().ok();
-                                                range.insert_node(&img).ok();
+                                                        range.delete_contents().ok();
+                                                        range.insert_node(&img).ok();
 
-                                                // Move cursor after the image
-                                                if let Ok(new_range) = doc.create_range() {
-                                                    new_range.set_start_after(&img).ok();
-                                                    new_range.set_end_after(&img).ok();
-                                                    selection.remove_all_ranges().ok();
-                                                    selection.add_range(&new_range).ok();
+                                                        // Move cursor after the image
+                                                        if let Ok(new_range) = doc.create_range() {
+                                                            new_range.set_start_after(&img).ok();
+                                                            new_range.set_end_after(&img).ok();
+                                                            selection.remove_all_ranges().ok();
+                                                            selection.add_range(&new_range).ok();
+                                                        }
+                                                    };
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                Err(err) => {
-                                    leptos::logging::error!(
-                                        "Failed to parse uploaded file response: {:?}",
-                                        err
-                                    );
-                                }
-                            };
-                        }
-                        Err(err) => {
-                            leptos::logging::error!("Failed to upload files: {:?}", err);
-                        }
-                    };
+                                    Err(err) => {
+                                        leptos::logging::error!(
+                                            "Failed to parse uploaded file response: {:?}",
+                                            err
+                                        );
+                                    }
+                                };
+                            }
+                            Err(err) => {
+                                leptos::logging::error!("Failed to upload files: {:?}", err);
+                            }
+                        };
+                    }
                 });
             };
         };
@@ -397,11 +404,12 @@ pub fn RichTextEditor(
             if let Some(doc) = window().and_then(|w| w.document()) {
                 if let Ok(Some(selection)) = doc.get_selection() {
                     if let Some(p) = editor.first_element_child() {
-                        let range = doc.create_range().unwrap();
-                        range.set_start(&p, 0).ok();
-                        range.set_end(&p, 0).ok();
-                        selection.remove_all_ranges().ok();
-                        selection.add_range(&range).ok();
+                        if let Ok(range) = doc.create_range() {
+                            range.set_start(&p, 0).ok();
+                            range.set_end(&p, 0).ok();
+                            selection.remove_all_ranges().ok();
+                            selection.add_range(&range).ok();
+                        };
                     }
                 }
             }
@@ -414,35 +422,40 @@ pub fn RichTextEditor(
             if let Some(doc) = window().and_then(|w| w.document()) {
                 if let Ok(Some(selection)) = doc.get_selection() {
                     if let Ok(range) = selection.get_range_at(0) {
-                        let mut node = range.start_container().unwrap();
-                        let editor_node: &Node = editor.as_ref();
-                        loop {
-                            if let Some(el) = node.dyn_ref::<Element>() {
-                                if let Some(parent) = el.parent_element() {
-                                    if parent.is_same_node(Some(editor_node)) {
-                                        if ["p", "h1", "h2", "h3", "h4", "h5", "h6"]
-                                            .contains(&el.tag_name().to_lowercase().as_str())
-                                        {
-                                            let new_el = doc.create_element(&tag).unwrap();
-                                            while let Some(child) = el.first_child() {
-                                                new_el.append_child(&child).ok();
+                        if let Ok(mut node) = range.start_container() {
+                            let editor_node: &Node = editor.as_ref();
+                            loop {
+                                if let Some(el) = node.dyn_ref::<Element>() {
+                                    if let Some(parent) = el.parent_element() {
+                                        if parent.is_same_node(Some(editor_node)) {
+                                            if ["p", "h1", "h2", "h3", "h4", "h5", "h6"]
+                                                .contains(&el.tag_name().to_lowercase().as_str())
+                                            {
+                                                // let new_el =
+                                                //     doc.create_element(&tag).unwrap_or_default();
+                                                if let (Ok(new_el), Ok(new_range)) =
+                                                    (doc.create_element(&tag), doc.create_range())
+                                                {
+                                                    while let Some(child) = el.first_child() {
+                                                        new_el.append_child(&child).ok();
+                                                    }
+                                                    parent.replace_child(&new_el, el).ok();
+                                                    new_range.select_node_contents(&new_el).ok();
+                                                    new_range.collapse();
+                                                    selection.remove_all_ranges().ok();
+                                                    selection.add_range(&new_range).ok();
+                                                    break;
+                                                };
                                             }
-                                            parent.replace_child(&new_el, el).ok();
-                                            let new_range = doc.create_range().unwrap();
-                                            new_range.select_node_contents(&new_el).ok();
-                                            new_range.collapse();
-                                            selection.remove_all_ranges().ok();
-                                            selection.add_range(&new_range).ok();
-                                            break;
                                         }
                                     }
                                 }
+                                match node.parent_node() {
+                                    Some(p) => node = p,
+                                    None => break,
+                                }
                             }
-                            match node.parent_node() {
-                                Some(p) => node = p,
-                                None => break,
-                            }
-                        }
+                        };
                     }
                 }
             }
@@ -682,45 +695,41 @@ fn cursor_inside(tag: &str) -> Option<Element> {
 }
 
 fn exit_code_block(pre: &Element) {
-    let doc = window().unwrap().document().unwrap();
-    let sel = doc.get_selection().unwrap().unwrap();
-
-    let p = doc.create_element("p").unwrap();
-    let br = doc.create_element("br").unwrap();
-    p.append_child(&br).ok();
-
-    pre.after_with_node_1(&p).ok();
-
-    let new_range = doc.create_range().unwrap();
-    new_range.set_start(&p, 0).ok();
-    new_range.set_end(&p, 0).ok();
-
-    sel.remove_all_ranges().ok();
-    sel.add_range(&new_range).ok();
+    if let (Some(doc),) = (window().and_then(|w| w.document()),) {
+        if let (Ok(p), Ok(br), Ok(new_range), Ok(Some(sel))) = (
+            doc.create_element("p"),
+            doc.create_element("br"),
+            doc.create_range(),
+            doc.get_selection(),
+        ) {
+            p.append_child(&br).ok();
+            pre.after_with_node_1(&p).ok();
+            new_range.set_start(&p, 0).ok();
+            new_range.set_end(&p, 0).ok();
+            sel.remove_all_ranges().ok();
+            sel.add_range(&new_range).ok();
+        }
+    }
 }
 
 fn insert_code_block() {
     if let Some(doc) = window().and_then(|w| w.document()) {
-        if let Ok(Some(selection)) = doc.get_selection() {
+        if let (Ok(Some(selection)), Ok(pre), Ok(code), Ok(new_range)) = (
+            doc.get_selection(),
+            doc.create_element("pre"),
+            doc.create_element("code"),
+            doc.create_range(),
+        ) {
             if let Ok(range) = selection.get_range_at(0) {
-                let pre = doc.create_element("pre").unwrap();
-                pre.set_attribute("data-block", "code").ok();
-
-                let code = doc.create_element("code").unwrap();
-                code.set_attribute("class", "language-plaintext").ok();
-
                 let text = doc.create_text_node("\n");
+                pre.set_attribute("data-block", "code").ok();
+                code.set_attribute("class", "language-plaintext").ok();
                 code.append_child(&text).ok();
                 pre.append_child(&code).ok();
-
                 range.delete_contents().ok();
                 range.insert_node(&pre).ok();
-
-                // Move cursor inside code
-                let new_range = doc.create_range().unwrap();
                 new_range.set_start(&text, 1).ok();
                 new_range.set_end(&text, 1).ok();
-
                 selection.remove_all_ranges().ok();
                 selection.add_range(&new_range).ok();
             }
@@ -788,14 +797,25 @@ fn is_current_line_empty(code: &Element) -> bool {
 }
 
 fn handle_code_enter(pre: &Element, code: &Element, last_enter_empty: &RwSignal<bool>) {
-    let doc = window().unwrap().document().unwrap();
-    let sel = match doc.get_selection().unwrap() {
-        Some(s) if s.range_count() > 0 => s,
-        _ => return,
+    let Some(doc) = window().and_then(|w| w.document()) else {
+        return;
     };
 
-    let range = sel.get_range_at(0).unwrap();
-    let container = range.start_container().unwrap();
+    let Ok(Some(sel)) = doc.get_selection() else {
+        return;
+    };
+
+    if sel.range_count() == 0 {
+        return;
+    }
+
+    let Ok(range) = sel.get_range_at(0) else {
+        return;
+    };
+
+    let Ok(container) = range.start_container() else {
+        return;
+    };
 
     if !code.contains(Some(&container)) {
         return;
@@ -803,28 +823,41 @@ fn handle_code_enter(pre: &Element, code: &Element, last_enter_empty: &RwSignal<
 
     let empty = is_current_line_empty(code);
 
-    // Exit code block on double empty enter
-    if empty && last_enter_empty.get_untracked() {
+    // -------- Empty line logic --------
+    if empty {
+        if last_enter_empty.get() {
+            // Second empty line -> exit code block
+            last_enter_empty.set(false);
+
+            if let (Ok(p), Ok(br), Ok(new_range)) = (
+                doc.create_element("p"),
+                doc.create_element("br"),
+                doc.create_range(),
+            ) {
+                p.append_child(&br).ok();
+
+                // Append paragraph AFTER the code block
+                pre.after_with_node_1(&p).ok();
+
+                // Move cursor into the new paragraph
+                new_range.set_start(&p, 0).ok();
+                new_range.set_end(&p, 0).ok();
+
+                sel.remove_all_ranges().ok();
+                sel.add_range(&new_range).ok();
+            }
+
+            return;
+        } else {
+            // Allow first empty line
+            last_enter_empty.set(true);
+        }
+    } else {
+        // Reset state if line has content
         last_enter_empty.set(false);
-
-        let p = doc.create_element("p").unwrap();
-        let br = doc.create_element("br").unwrap();
-        p.append_child(&br).ok();
-
-        pre.after_with_node_1(&p).ok();
-        pre.remove();
-
-        let new_range = doc.create_range().unwrap();
-        new_range.set_start(&p, 0).ok();
-        new_range.set_end(&p, 0).ok();
-
-        sel.remove_all_ranges().ok();
-        sel.add_range(&new_range).ok();
-        return;
     }
 
-    last_enter_empty.set(empty);
-
+    // Delete selection if not collapsed
     if !range.collapsed() {
         range.delete_contents().ok();
     }
@@ -832,57 +865,132 @@ fn handle_code_enter(pre: &Element, code: &Element, last_enter_empty: &RwSignal<
     match container.node_type() {
         Node::TEXT_NODE => {
             let text_node: web_sys::Text = container.unchecked_into();
-            let offset = range.start_offset().unwrap() as usize;
-            let value = text_node.data();
 
+            let Ok(offset) = range.start_offset() else {
+                return;
+            };
+
+            let offset = offset as usize;
+            let value = text_node.data();
             let offset = offset.min(value.len());
+
             let (before, after) = value.split_at(offset);
 
-            text_node.set_data(&format!("{before}\n{after}"));
+            let new_data = if after.is_empty() {
+                format!("{before}\n\u{200B}")
+            } else {
+                format!("{before}\n{after}")
+            };
 
-            let new_range = doc.create_range().unwrap();
-            new_range.set_start(&text_node, (offset + 1) as u32).ok();
-            new_range.set_end(&text_node, (offset + 1) as u32).ok();
+            text_node.set_data(&new_data);
 
-            sel.remove_all_ranges().ok();
-            sel.add_range(&new_range).ok();
+            if let Ok(new_range) = doc.create_range() {
+                new_range.set_start(&text_node, (offset + 1) as u32).ok();
+                new_range.set_end(&text_node, (offset + 1) as u32).ok();
+
+                sel.remove_all_ranges().ok();
+                sel.add_range(&new_range).ok();
+            }
         }
 
         Node::ELEMENT_NODE => {
-            let text = doc.create_text_node("\n");
-            range.insert_node(&text).ok();
+            let new_text = doc.create_text_node("\n\u{200B}");
+            range.insert_node(&new_text).ok();
 
-            let new_range = doc.create_range().unwrap();
-            new_range.set_start_after(&text).ok();
-            new_range.set_end_after(&text).ok();
+            if let Ok(new_range) = doc.create_range() {
+                new_range.set_start(&new_text, 1).ok();
+                new_range.set_end(&new_text, 1).ok();
 
-            sel.remove_all_ranges().ok();
-            sel.add_range(&new_range).ok();
+                sel.remove_all_ranges().ok();
+                sel.add_range(&new_range).ok();
+            }
         }
 
         _ => {}
     }
 }
 
+fn current_inline_code() -> Option<Element> {
+    let doc = window()?.document()?;
+    let sel = doc.get_selection().ok()??;
+
+    if sel.range_count() == 0 {
+        return None;
+    }
+
+    let range = sel.get_range_at(0).ok()?;
+    let container = range.start_container().ok()?;
+
+    let element = match container.node_type() {
+        Node::ELEMENT_NODE => container.unchecked_into::<Element>(),
+        _ => container.parent_element()?,
+    };
+
+    let code = element.closest("code").ok()??;
+
+    // Reject <pre><code>
+    if code.closest("pre").ok()?.is_some() {
+        return None;
+    }
+
+    Some(code)
+}
+
+fn handle_inline_code_enter(code: &Element) {
+    let Some(doc) = window().and_then(|w| w.document()) else {
+        return;
+    };
+
+    let Ok(Some(sel)) = doc.get_selection() else {
+        return;
+    };
+
+    let Some(parent_p) = code.closest("p").ok().flatten() else {
+        return;
+    };
+
+    let Ok(p) = doc.create_element("p") else {
+        return;
+    };
+
+    let Ok(br) = doc.create_element("br") else {
+        return;
+    };
+
+    p.append_child(&br).ok();
+
+    parent_p.after_with_node_1(&p).ok();
+
+    if let Ok(range) = doc.create_range() {
+        range.set_start(&p, 0).ok();
+        range.set_end(&p, 0).ok();
+
+        sel.remove_all_ranges().ok();
+        sel.add_range(&range).ok();
+    }
+}
+
 fn insert_list(editor: &HtmlDivElement, list_type: &str) {
-    let doc = window().and_then(|w| w.document()).unwrap();
-    let selection = doc.get_selection().unwrap().unwrap();
-    let range = selection.get_range_at(0).unwrap();
+    let Some(doc) = window().and_then(|w| w.document()) else {
+        return;
+    };
+    let Ok(Some(selection)) = doc.get_selection() else {
+        return;
+    };
+    let Ok(range) = selection.get_range_at(0) else {
+        return;
+    };
+    let Ok(list) = doc.create_element(list_type) else {
+        return;
+    };
 
-    // Create the list structure
-    let list = doc.create_element(list_type).unwrap();
-
-    // Check if there's selected content
     let has_selection = !range.collapsed();
 
     if has_selection {
-        // Get the selected content
         if let Ok(contents) = range.clone_contents() {
-            // Use first_child() and next_sibling() to iterate through children
             let mut has_blocks = false;
             let mut current_child = contents.first_child();
 
-            // First pass: check if we have block elements
             while let Some(node) = current_child {
                 if let Some(el) = node.dyn_ref::<Element>() {
                     let tag = el.tag_name().to_lowercase();
@@ -895,7 +1003,6 @@ fn insert_list(editor: &HtmlDivElement, list_type: &str) {
             }
 
             if has_blocks {
-                // Convert each block element to a list item
                 current_child = contents.first_child();
 
                 while let Some(node) = current_child {
@@ -905,28 +1012,27 @@ fn insert_list(editor: &HtmlDivElement, list_type: &str) {
                         let tag = el.tag_name().to_lowercase();
                         if ["p", "h1", "h2", "h3", "h4", "h5", "h6", "div"].contains(&tag.as_str())
                         {
-                            let li = doc.create_element("li").unwrap();
-
-                            // Move all children of the block into the li
-                            while let Some(child) = el.first_child() {
-                                li.append_child(&child).ok();
+                            if let Ok(li) = doc.create_element("li") {
+                                while let Some(child) = el.first_child() {
+                                    li.append_child(&child).ok();
+                                }
+                                if li.first_child().is_none() {
+                                    if let Ok(br) = doc.create_element("br") {
+                                        li.append_child(&br).ok();
+                                    }
+                                }
+                                list.append_child(&li).ok();
                             }
-
-                            // If li is empty, add a br
-                            if li.first_child().is_none() {
-                                let br = doc.create_element("br").unwrap();
-                                li.append_child(&br).ok();
-                            }
-
-                            list.append_child(&li).ok();
                         }
                     } else if node.node_type() == 3 {
-                        // Text node - only add if it's not just whitespace
                         if let Some(text) = node.text_content() {
                             if !text.trim().is_empty() {
-                                let li = doc.create_element("li").unwrap();
-                                li.append_child(&node.clone_node().unwrap()).ok();
-                                list.append_child(&li).ok();
+                                if let (Ok(li), Ok(cloned)) =
+                                    (doc.create_element("li"), node.clone_node())
+                                {
+                                    li.append_child(&cloned).ok();
+                                    list.append_child(&li).ok();
+                                }
                             }
                         }
                     }
@@ -934,37 +1040,34 @@ fn insert_list(editor: &HtmlDivElement, list_type: &str) {
                     current_child = next;
                 }
             } else {
-                // No blocks, just wrap everything in a single li
-                let li = doc.create_element("li").unwrap();
-                li.append_child(&contents).ok();
-                list.append_child(&li).ok();
+                if let Ok(li) = doc.create_element("li") {
+                    li.append_child(&contents).ok();
+                    list.append_child(&li).ok();
+                }
             }
         }
     } else {
-        // No selection, just add an empty li
-        let li = doc.create_element("li").unwrap();
-        let br = doc.create_element("br").unwrap();
-        li.append_child(&br).ok();
-        list.append_child(&li).ok();
+        if let (Ok(li), Ok(br)) = (doc.create_element("li"), doc.create_element("br")) {
+            li.append_child(&br).ok();
+            list.append_child(&li).ok();
+        }
     }
 
-    // Find the current block element
-    let mut node = range.start_container().unwrap();
+    let Ok(mut node) = range.start_container() else {
+        return;
+    };
     let editor_as_node: &web_sys::Node = editor.as_ref();
 
     loop {
         if let Some(el) = node.dyn_ref::<web_sys::Element>() {
-            if ["p", "h1", "h2", "h3", "h4", "h5", "h6"]
-                .contains(&el.tag_name().to_lowercase().as_str())
-            {
+            let tag = el.tag_name().to_lowercase();
+            if ["p", "h1", "h2", "h3", "h4", "h5", "h6"].contains(&tag.as_str()) {
                 if let Some(parent) = el.parent_element() {
                     if parent.is_same_node(Some(editor_as_node)) {
-                        // Replace the current block with the list
-                        parent.replace_child(&list, el).ok();
-
-                        // Move cursor to the first li
-                        if let Some(first_li) = list.first_element_child() {
-                            let new_range = doc.create_range().unwrap();
+                        el.after_with_node_1(&list).ok();
+                        if let (Some(first_li), Ok(new_range)) =
+                            (list.first_element_child(), doc.create_range())
+                        {
                             new_range.select_node_contents(&first_li).ok();
                             new_range.collapse_with_to_start(false);
                             selection.remove_all_ranges().ok();
@@ -983,8 +1086,7 @@ fn insert_list(editor: &HtmlDivElement, list_type: &str) {
 
     // Fallback: append to editor if no block found
     editor.append_child(&list).ok();
-    if let Some(first_li) = list.first_element_child() {
-        let new_range = doc.create_range().unwrap();
+    if let (Some(first_li), Ok(new_range)) = (list.first_element_child(), doc.create_range()) {
         new_range.select_node_contents(&first_li).ok();
         new_range.collapse_with_to_start(false);
         selection.remove_all_ranges().ok();
@@ -1015,72 +1117,76 @@ fn current_list_item() -> Option<(web_sys::Element, web_sys::Element)> {
 }
 
 fn handle_list_enter(list: &Element, li: &Element) {
-    let doc = window().unwrap().document().unwrap();
-    let sel = doc.get_selection().unwrap().unwrap();
+    let Some(doc) = window().and_then(|w| w.document()) else {
+        return;
+    };
+    let Ok(Some(sel)) = doc.get_selection() else {
+        return;
+    };
 
-    // Check if current li is empty
-    let is_empty = li.text_content().unwrap_or_default().trim().is_empty();
+    let is_empty = li
+        .text_content()
+        .map(|t| t.trim().is_empty())
+        .unwrap_or(true);
 
     if is_empty {
-        // Exit the list - create a new paragraph after the list
-        let p = doc.create_element("p").unwrap();
-        let br = doc.create_element("br").unwrap();
-        p.append_child(&br).ok();
-
-        list.after_with_node_1(&p).ok();
-
-        // Remove the empty li
-        li.remove();
-
-        // If the list is now empty, remove it too
-        if list.children().length() == 0 {
-            list.remove();
+        if let (Ok(p), Ok(br), Ok(new_range)) = (
+            doc.create_element("p"),
+            doc.create_element("br"),
+            doc.create_range(),
+        ) {
+            p.append_child(&br).ok();
+            list.after_with_node_1(&p).ok();
+            li.remove();
+            if list.children().length() == 0 {
+                list.remove();
+            }
+            new_range.set_start(&p, 0).ok();
+            new_range.set_end(&p, 0).ok();
+            sel.remove_all_ranges().ok();
+            sel.add_range(&new_range).ok();
         }
-
-        // Move cursor to the new paragraph
-        let new_range = doc.create_range().unwrap();
-        new_range.set_start(&p, 0).ok();
-        new_range.set_end(&p, 0).ok();
-        sel.remove_all_ranges().ok();
-        sel.add_range(&new_range).ok();
     } else {
-        // Create a new list item
-        let new_li = doc.create_element("li").unwrap();
-        let br = doc.create_element("br").unwrap();
-        new_li.append_child(&br).ok();
-
-        // Insert after current li
-        if let Some(next_sibling) = li.next_sibling() {
-            list.insert_before(&new_li, Some(&next_sibling)).ok();
-        } else {
-            list.append_child(&new_li).ok();
+        if let (Ok(new_li), Ok(br), Ok(new_range)) = (
+            doc.create_element("li"),
+            doc.create_element("br"),
+            doc.create_range(),
+        ) {
+            new_li.append_child(&br).ok();
+            match li.next_sibling() {
+                Some(next_sibling) => {
+                    list.insert_before(&new_li, Some(&next_sibling)).ok();
+                }
+                None => {
+                    list.append_child(&new_li).ok();
+                }
+            }
+            new_range.set_start(&new_li, 0).ok();
+            new_range.set_end(&new_li, 0).ok();
+            sel.remove_all_ranges().ok();
+            sel.add_range(&new_range).ok();
         }
-
-        // Move cursor to the new li
-        let new_range = doc.create_range().unwrap();
-        new_range.set_start(&new_li, 0).ok();
-        new_range.set_end(&new_li, 0).ok();
-        sel.remove_all_ranges().ok();
-        sel.add_range(&new_range).ok();
     }
 }
 
 fn exit_list(editor: &HtmlDivElement, list: &Element) {
-    let doc = window().unwrap().document().unwrap();
-    let sel = doc.get_selection().unwrap().unwrap();
+    let Some(doc) = window().and_then(|w| w.document()) else {
+        return;
+    };
+    let Ok(Some(sel)) = doc.get_selection() else {
+        return;
+    };
 
-    // Create a new paragraph after the list
-    let p = doc.create_element("p").unwrap();
-    let br = doc.create_element("br").unwrap();
-    p.append_child(&br).ok();
-
-    // Insert the paragraph after the list (don't replace it)
-    list.after_with_node_1(&p).ok();
-
-    // Move cursor to the new paragraph
-    let new_range = doc.create_range().unwrap();
-    new_range.set_start(&p, 0).ok();
-    new_range.set_end(&p, 0).ok();
-    sel.remove_all_ranges().ok();
-    sel.add_range(&new_range).ok();
+    if let (Ok(p), Ok(br), Ok(new_range)) = (
+        doc.create_element("p"),
+        doc.create_element("br"),
+        doc.create_range(),
+    ) {
+        p.append_child(&br).ok();
+        list.after_with_node_1(&p).ok();
+        new_range.set_start(&p, 0).ok();
+        new_range.set_end(&p, 0).ok();
+        sel.remove_all_ranges().ok();
+        sel.add_range(&new_range).ok();
+    }
 }

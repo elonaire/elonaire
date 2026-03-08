@@ -50,8 +50,8 @@ pub fn Ratecard() -> impl IntoView {
                         children=move |ratecard| {
                             view! {
                                 <RatecardComponent
-                                    name=RwSignal::new(ratecard.name.as_ref().unwrap().clone())
-                                    services=RwSignal::new(ratecard.services.as_ref().unwrap().to_vec())
+                                    name=RwSignal::new(ratecard.name.as_ref().unwrap_or(&Default::default()).clone())
+                                    services=RwSignal::new(ratecard.services.as_ref().unwrap_or(&Default::default()).to_vec())
                                 />
                             }
                         }

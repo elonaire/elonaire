@@ -77,7 +77,7 @@ pub fn BlogComment(
                 .unchecked_ref(),
                 1000,
             )
-            .unwrap();
+            .unwrap_or_default();
         hover_timer.set_value(Some(id));
     };
 
@@ -96,7 +96,7 @@ pub fn BlogComment(
                 .unchecked_ref(),
                 1000,
             )
-            .unwrap();
+            .unwrap_or_default();
         hover_timer.set_value(Some(id));
     };
 

@@ -80,17 +80,35 @@ pub fn UserServicesList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(service.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        service
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Title".to_string(),
-                    TableCellData::String(service.title.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        service
+                            .title
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Description".to_string(),
-                    TableCellData::String(service.description.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        service
+                            .description
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data
@@ -167,138 +185,125 @@ pub fn CreateUserService() -> impl IntoView {
                     }
 
                     spawn_local(async move {
-                        match gloo_net::http::Request::post(
-                            "http://localhost:8080/api/files/upload",
-                        )
-                        .header(
-                            "Authorization",
-                            format!(
-                                "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
-                            )
-                            .as_str(),
-                        )
-                        .body(files_form_data)
-                        .unwrap()
-                        .send()
-                        .await
-                        {
-                            Ok(response) => {
-                                match response.json::<Vec<UploadedFileResponse>>().await {
-                                    Ok(uploaded_files) => {
-                                        if let Some(form_data) =
-                                            get_form_data_from_form_ref(&form_ref)
-                                        {
-                                            // Implement logic to handle form data
-                                            if let Ok(_) = form_data.append_with_str(
-                                                "thumbnail",
-                                                format!(
-                                                    "http://localhost:3001/view/{}",
-                                                    uploaded_files[0].file_name
-                                                )
-                                                .as_str(),
-                                            ) {
-                                                let deserialized_form_data =
-                                                    deserialize_form_data_to_struct::<
-                                                        UserServiceInput,
-                                                    >(
-                                                        &form_data, false, None
-                                                    );
+                        let Ok(request) =
+                            gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                                .header(
+                                    "Authorization",
+                                    format!(
+                                        "Bearer {}",
+                                        current_state.user().auth_info().token().get_untracked()
+                                    )
+                                    .as_str(),
+                                )
+                                .body(files_form_data)
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
 
-                                                if deserialized_form_data.is_none() {
-                                                    set_is_loading.set(false);
-                                                    return;
-                                                }
-
-                                                let deserialized_form_data =
-                                                    deserialized_form_data.unwrap();
-
-                                                let input_vars = UserServiceInputVars {
-                                                    user_service: deserialized_form_data,
-                                                };
-
-                                                let query = r#"
-                                                       mutation CreateUserService($userService: UserServiceInput!) {
-                                                            createUserService(userService: $userService) {
-                                                                data {
-                                                                    title
-                                                                    description
-                                                                    thumbnail
-                                                                    id
-                                                                }
-                                                                metadata {
-                                                                    newAccessToken
-                                                                    requestId
-                                                                }
-                                                            }
-                                                       }
-                                                   "#;
-
-                                                let mut headers =
-                                                    HashMap::new() as HashMap<String, String>;
-                                                headers.insert(
-                                                    "Authorization".into(),
-                                                    format!(
-                                                        "Bearer {}",
-                                                        current_state
-                                                            .user()
-                                                            .auth_info()
-                                                            .token()
-                                                            .get_untracked()
-                                                    ),
-                                                );
-
-                                                let response =
-                                                    perform_mutation_or_query_with_vars::<
-                                                        CreateUserServiceResponse,
-                                                        UserServiceInputVars,
-                                                    >(
-                                                        Some(&headers),
-                                                        "http://localhost:8080/api/shared",
-                                                        query,
-                                                        input_vars,
-                                                    )
-                                                    .await;
-
-                                                match response.get_data() {
-                                                    Some(_data) => {
-                                                        if let Some(form) = form_ref
-                                                            .get_untracked()
-                                                            .and_then(|el| {
-                                                                el.dyn_into::<HtmlFormElement>()
-                                                                    .ok()
-                                                            })
-                                                        {
-                                                            form.reset();
-                                                            set_form_is_valid.set(false);
-                                                        } else {
-                                                        }
-                                                        set_is_loading.set(false);
-
-                                                        success_modal_is_open
-                                                            .update(|status| *status = true);
-                                                    }
-                                                    None => {
-                                                        set_is_loading.set(false);
-                                                    }
-                                                };
-                                            };
-                                        };
-                                    }
-                                    Err(err) => {
-                                        leptos::logging::error!(
-                                            "Failed to parse uploaded file response: {:?}",
-                                            err
-                                        );
-                                        set_is_loading.set(false);
-                                    }
-                                };
-                            }
+                        let response = match request.send().await {
+                            Ok(r) => r,
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
                                 set_is_loading.set(false);
+                                return;
                             }
                         };
+
+                        let uploaded_files =
+                            match response.json::<Vec<UploadedFileResponse>>().await {
+                                Ok(f) => f,
+                                Err(err) => {
+                                    leptos::logging::error!(
+                                        "Failed to parse uploaded file response: {:?}",
+                                        err
+                                    );
+                                    set_is_loading.set(false);
+                                    return;
+                                }
+                            };
+
+                        let Some(form_data) = get_form_data_from_form_ref(&form_ref) else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        if let Err(e) = form_data.append_with_str(
+                            "thumbnail",
+                            format!("http://localhost:3001/view/{}", uploaded_files[0].file_name)
+                                .as_str(),
+                        ) {
+                            leptos::logging::log!("Error appending thumbnail: {:?}", e);
+                            set_is_loading.set(false);
+                            return;
+                        }
+
+                        let Some(deserialized_form_data) =
+                            deserialize_form_data_to_struct::<UserServiceInput>(
+                                &form_data, false, None,
+                            )
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        let input_vars = UserServiceInputVars {
+                            user_service: deserialized_form_data,
+                        };
+
+                        let query = r#"
+                            mutation CreateUserService($userService: UserServiceInput!) {
+                                createUserService(userService: $userService) {
+                                    data {
+                                        title
+                                        description
+                                        thumbnail
+                                        id
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
+                                    }
+                                }
+                            }
+                        "#;
+
+                        let mut headers = HashMap::new() as HashMap<String, String>;
+                        headers.insert(
+                            "Authorization".into(),
+                            format!(
+                                "Bearer {}",
+                                current_state.user().auth_info().token().get_untracked()
+                            ),
+                        );
+
+                        let response = perform_mutation_or_query_with_vars::<
+                            CreateUserServiceResponse,
+                            UserServiceInputVars,
+                        >(
+                            Some(&headers),
+                            "http://localhost:8080/api/shared",
+                            query,
+                            input_vars,
+                        )
+                        .await;
+
+                        match response.get_data() {
+                            Some(_data) => {
+                                if let Some(form) = form_ref
+                                    .get_untracked()
+                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                                {
+                                    form.reset();
+                                    set_form_is_valid.set(false);
+                                }
+                                set_is_loading.set(false);
+                                success_modal_is_open.update(|status| *status = true);
+                            }
+                            None => {
+                                set_is_loading.set(false);
+                            }
+                        }
                     });
                 };
             };

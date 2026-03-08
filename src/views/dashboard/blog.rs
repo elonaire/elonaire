@@ -145,154 +145,141 @@ pub fn CreateBlog() -> impl IntoView {
                     }
 
                     spawn_local(async move {
-                        match gloo_net::http::Request::post(
-                            "http://localhost:8080/api/files/upload",
-                        )
-                        .header(
-                            "Authorization",
-                            format!(
-                                "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
-                            )
-                            .as_str(),
-                        )
-                        .body(files_form_data)
-                        .unwrap()
-                        .send()
-                        .await
-                        {
-                            Ok(response) => {
-                                match response.json::<Vec<UploadedFileResponse>>().await {
-                                    Ok(uploaded_files) => {
-                                        if let Some(form_data) =
-                                            get_form_data_from_form_ref(&form_ref)
-                                        {
-                                            let thumbnail = uploaded_files
-                                                .iter()
-                                                .find(|file| file.field_name == "thumbnail");
-                                            // Implement logic to handle form data
-                                            if let Err(e) = form_data.append_with_str(
-                                                "thumbnail",
-                                                format!(
-                                                    "http://localhost:3001/view/{}",
-                                                    thumbnail.unwrap().file_name
-                                                )
-                                                .as_str(),
-                                            ) {
-                                                leptos::logging::log!(
-                                                    "Error appending thumbnail: {:?}",
-                                                    e
-                                                );
-                                                return;
-                                            };
+                        let Ok(request) =
+                            gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                                .header(
+                                    "Authorization",
+                                    format!(
+                                        "Bearer {}",
+                                        current_state.user().auth_info().token().get_untracked()
+                                    )
+                                    .as_str(),
+                                )
+                                .body(files_form_data)
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
 
-                                            let deserialized_form_data =
-                                                deserialize_form_data_to_struct::<BlogPostInput>(
-                                                    &form_data, true, None,
-                                                );
-
-                                            if deserialized_form_data.is_none() {
-                                                set_is_loading.set(false);
-                                                return;
-                                            }
-
-                                            let deserialized_form_data =
-                                                deserialized_form_data.unwrap();
-
-                                            leptos::logging::log!(
-                                                "html_output after serialization: {}",
-                                                deserialized_form_data
-                                                    .content
-                                                    .matches('\n')
-                                                    .count()
-                                            );
-
-                                            let input_vars = CreateBlogPostVars {
-                                                blog_post: deserialized_form_data,
-                                            };
-
-                                            let query = r#"
-                                                   mutation CreateBlogPost($blogPost: BlogPostInput!) {
-                                                        createBlogPost(blogPost: $blogPost) {
-                                                            data {
-                                                                id
-                                                                shortDescription
-                                                                title
-                                                                status
-                                                                category
-                                                                link
-                                                                thumbnail
-                                                                publishedDate
-                                                            }
-                                                            metadata {
-                                                                newAccessToken
-                                                                requestId
-                                                            }
-                                                        }
-                                                   }
-                                               "#;
-
-                                            let mut headers =
-                                                HashMap::new() as HashMap<String, String>;
-                                            headers.insert(
-                                                "Authorization".into(),
-                                                format!(
-                                                    "Bearer {}",
-                                                    current_state
-                                                        .user()
-                                                        .auth_info()
-                                                        .token()
-                                                        .get_untracked()
-                                                ),
-                                            );
-
-                                            let response = perform_mutation_or_query_with_vars::<
-                                                CreateBlogPostResponse,
-                                                CreateBlogPostVars,
-                                            >(
-                                                Some(&headers),
-                                                "http://localhost:8080/api/shared",
-                                                query,
-                                                input_vars,
-                                            )
-                                            .await;
-
-                                            match response.get_data() {
-                                                Some(_data) => {
-                                                    if let Some(form) =
-                                                        form_ref.get_untracked().and_then(|el| {
-                                                            el.dyn_into::<HtmlFormElement>().ok()
-                                                        })
-                                                    {
-                                                        form.reset();
-                                                        set_form_is_valid.set(false);
-                                                    } else {
-                                                    }
-                                                    set_is_loading.set(false);
-
-                                                    success_modal_is_open
-                                                        .update(|status| *status = true);
-                                                }
-                                                None => {
-                                                    set_is_loading.set(false);
-                                                }
-                                            };
-                                        };
-                                    }
-                                    Err(err) => {
-                                        leptos::logging::error!(
-                                            "Failed to parse uploaded file response: {:?}",
-                                            err
-                                        );
-                                        set_is_loading.set(false);
-                                    }
-                                };
-                            }
+                        let response = match request.send().await {
+                            Ok(r) => r,
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
                                 set_is_loading.set(false);
+                                return;
                             }
                         };
+
+                        let uploaded_files =
+                            match response.json::<Vec<UploadedFileResponse>>().await {
+                                Ok(f) => f,
+                                Err(err) => {
+                                    leptos::logging::error!(
+                                        "Failed to parse uploaded file response: {:?}",
+                                        err
+                                    );
+                                    set_is_loading.set(false);
+                                    return;
+                                }
+                            };
+
+                        let Some(form_data) = get_form_data_from_form_ref(&form_ref) else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        let Some(thumbnail) = uploaded_files
+                            .iter()
+                            .find(|file| file.field_name == "thumbnail")
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        if let Err(e) = form_data.append_with_str(
+                            "thumbnail",
+                            format!("http://localhost:3001/view/{}", thumbnail.file_name).as_str(),
+                        ) {
+                            leptos::logging::log!("Error appending thumbnail: {:?}", e);
+                            set_is_loading.set(false);
+                            return;
+                        }
+
+                        let Some(deserialized_form_data) =
+                            deserialize_form_data_to_struct::<BlogPostInput>(
+                                &form_data, true, None,
+                            )
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        leptos::logging::log!(
+                            "html_output after serialization: {}",
+                            deserialized_form_data.content.matches('\n').count()
+                        );
+
+                        let input_vars = CreateBlogPostVars {
+                            blog_post: deserialized_form_data,
+                        };
+
+                        let query = r#"
+                            mutation CreateBlogPost($blogPost: BlogPostInput!) {
+                                createBlogPost(blogPost: $blogPost) {
+                                    data {
+                                        id
+                                        shortDescription
+                                        title
+                                        status
+                                        category
+                                        link
+                                        thumbnail
+                                        publishedDate
+                                    }
+                                    metadata {
+                                        newAccessToken
+                                        requestId
+                                    }
+                                }
+                            }
+                        "#;
+
+                        let mut headers = HashMap::new() as HashMap<String, String>;
+                        headers.insert(
+                            "Authorization".into(),
+                            format!(
+                                "Bearer {}",
+                                current_state.user().auth_info().token().get_untracked()
+                            ),
+                        );
+
+                        let response = perform_mutation_or_query_with_vars::<
+                            CreateBlogPostResponse,
+                            CreateBlogPostVars,
+                        >(
+                            Some(&headers),
+                            "http://localhost:8080/api/shared",
+                            query,
+                            input_vars,
+                        )
+                        .await;
+
+                        match response.get_data() {
+                            Some(_data) => {
+                                if let Some(form) = form_ref
+                                    .get_untracked()
+                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                                {
+                                    form.reset();
+                                    set_form_is_valid.set(false);
+                                }
+                                set_is_loading.set(false);
+                                success_modal_is_open.update(|status| *status = true);
+                            }
+                            None => {
+                                set_is_loading.set(false);
+                            }
+                        }
                     });
                 };
             };

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use icondata as IconData;
+use leptos::attr::default;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -95,12 +96,24 @@ pub fn PermissionsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(permission.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        permission
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Name".to_string(),
-                    TableCellData::String(permission.name.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        permission
+                            .name
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
                 hash_map_data.insert(
                     "Resource".to_string(),
@@ -108,33 +121,35 @@ pub fn PermissionsList() -> impl IntoView {
                         permission
                             .resource
                             .as_ref()
-                            .unwrap()
+                            .unwrap_or(&Default::default())
                             .name
                             .as_ref()
-                            .unwrap()
+                            .unwrap_or(&Default::default())
                             .to_owned(),
                     ),
                 );
-                let privilege = if permission.is_admin.is_some() && permission.is_admin.unwrap() {
-                    ViewFn::from(move || {
-                        view! {
-                            <LabelTag label="Admin" color=ColorTemperature::Warning />
-                        }
-                    })
-                } else if permission.is_super_admin.is_some() && permission.is_super_admin.unwrap()
-                {
-                    ViewFn::from(move || {
-                        view! {
-                            <LabelTag label="Super Admin" color=ColorTemperature::Danger />
-                        }
-                    })
-                } else {
-                    ViewFn::from(move || {
-                        view! {
-                            <LabelTag label="None" />
-                        }
-                    })
-                };
+                let privilege =
+                    if permission.is_admin.is_some() && permission.is_admin.unwrap_or_default() {
+                        ViewFn::from(move || {
+                            view! {
+                                <LabelTag label="Admin" color=ColorTemperature::Warning />
+                            }
+                        })
+                    } else if permission.is_super_admin.is_some()
+                        && permission.is_super_admin.unwrap_or_default()
+                    {
+                        ViewFn::from(move || {
+                            view! {
+                                <LabelTag label="Super Admin" color=ColorTemperature::Danger />
+                            }
+                        })
+                    } else {
+                        ViewFn::from(move || {
+                            view! {
+                                <LabelTag label="None" />
+                            }
+                        })
+                    };
                 hash_map_data.insert("Privilege".to_string(), TableCellData::Html(privilege));
                 hash_map_data
             })
@@ -333,8 +348,8 @@ pub fn CreatePermission() -> impl IntoView {
                 .iter()
                 .map(|resources| {
                     SelectOption::new(
-                        resources.id.as_ref().unwrap(),
-                        resources.name.as_ref().unwrap(),
+                        resources.id.as_ref().unwrap_or(&Default::default()),
+                        resources.name.as_ref().unwrap_or(&Default::default()),
                     )
                 })
                 .collect(),

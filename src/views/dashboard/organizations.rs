@@ -89,17 +89,35 @@ pub fn OrganizationsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(organization.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        organization
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Name".to_string(),
-                    TableCellData::String(organization.org_name.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        organization
+                            .org_name
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Date of Creation".to_string(),
-                    TableCellData::DateTime(organization.created_at.as_ref().unwrap().to_owned()),
+                    TableCellData::DateTime(
+                        organization
+                            .created_at
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
                 hash_map_data
             })

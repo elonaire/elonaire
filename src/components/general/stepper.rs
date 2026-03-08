@@ -80,8 +80,8 @@ impl StepInfo {
 ///        <p>"Third step"</p>
 ///        { move || {
 ///            if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
-///                let form_data = get_form_data_from_form_ref(first_form_ref).unwrap();
-///                let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap();
+///                let form_data = get_form_data_from_form_ref(first_form_ref).unwrap_or_default();
+///                let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap_or_default();
 ///                Some(view! {
 ///                    <h2 class="text-lg">"First Step Verification"</h2>
 ///                    <p><strong>"Username: "</strong>{data.user_name}</p>
@@ -149,7 +149,7 @@ pub fn Stepper(
             .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
 
         if let Some(form) = target {
-            // let form_data = FormData::new_with_form(&form).unwrap();
+            // let form_data = FormData::new_with_form(&form).unwrap_or_default();
             let is_valid = form.check_validity();
             set_step_form_is_valid.set(is_valid);
         }
@@ -159,10 +159,10 @@ pub fn Stepper(
 
     // A workaround for updating the next step's form's validity state when navigating to the next step or previous step
     Effect::new(move || {
-        let form_ref = form_refs.get().get(current_step.get()).unwrap().to_owned();
-
-        if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
-            fire_bubbled_and_cancelable_event("submit", true, true, &form);
+        if let Some(form_ref) = form_refs.get().get(current_step.get()) {
+            if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
+                fire_bubbled_and_cancelable_event("submit", true, true, &form);
+            }
         }
     });
 
@@ -211,8 +211,8 @@ pub fn Stepper(
                                             }
                                         }
                                         {
-                                            if step_label.icon.is_some() {
-                                                Some(view!{ <Icon icon={step_label.icon.unwrap()} /> })
+                                            if let Some(icon) = step_label.icon {
+                                                Some(view!{ <Icon icon=icon /> })
                                             } else {
                                                 None
                                             }
@@ -243,14 +243,18 @@ pub fn Stepper(
                             .into_iter()
                             .enumerate()
                             .map(|(i, child)| {
-                                let form_ref = form_refs.get().get(i).unwrap().to_owned();
-                                let dynamic_class = move || if current == i { "block" } else { "hidden" };
+                                if let Some(form_ref) = form_refs.get().get(i) {
+                                    let dynamic_class = move || if current == i { "block" } else { "hidden" };
 
-                                view! {
-                                    <ReactiveForm form_ref=form_ref ext_styles=dynamic_class()>
-                                        { child.into_view() }
-                                    </ReactiveForm>
+                                    Some(view! {
+                                        <ReactiveForm form_ref=form_ref.to_owned() ext_styles=dynamic_class()>
+                                            { child.into_view() }
+                                        </ReactiveForm>
+                                    })
+                                } else {
+                                    None
                                 }
+
                             }).collect_view()
                     }
                 }

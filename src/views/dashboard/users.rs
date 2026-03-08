@@ -105,7 +105,7 @@ pub fn UsersList() -> impl IntoView {
                     let users: Vec<HashMap<String, TableCellData>> = data
                         .fetch_users
                         .as_ref()
-                        .unwrap()
+                        .unwrap_or(&Default::default())
                         .get_data()
                         .to_vec()
                         .iter()
@@ -116,7 +116,7 @@ pub fn UsersList() -> impl IntoView {
                             // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                             hash_map_data.insert(
                                 "id".to_string(),
-                                TableCellData::String(user.id.as_ref().unwrap().to_owned()),
+                                TableCellData::String(user.id.as_ref().unwrap_or(&Default::default()).to_owned()),
                             );
 
                             hash_map_data.insert(
@@ -139,7 +139,7 @@ pub fn UsersList() -> impl IntoView {
                                     oauth_client,
                                 ),
                             );
-                            let status = match user.status.as_ref().unwrap() {
+                            let status = match user.status.as_ref().unwrap_or(&AccountStatus::Inactive) {
                                 AccountStatus::Active => ViewFn::from(move || view! {
                                     <LabelTag label="Active" color=ColorTemperature::Success />
                                 }),
@@ -227,7 +227,7 @@ pub fn CreateUser() -> impl IntoView {
                         return;
                     }
 
-                    let deserialized_form_data = deserialized_form_data.unwrap();
+                    let deserialized_form_data = deserialized_form_data.unwrap_or_default();
 
                     let input_vars = SignUpVars {
                         user: deserialized_form_data,

@@ -90,17 +90,35 @@ pub fn RatecardsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".into(),
-                    TableCellData::String(ratecard.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        ratecard
+                            .id
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Name".into(),
-                    TableCellData::String(ratecard.name.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        ratecard
+                            .name
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Date of Creation".into(),
-                    TableCellData::DateTime(ratecard.created_at.as_ref().unwrap().to_owned()),
+                    TableCellData::DateTime(
+                        ratecard
+                            .created_at
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
                 hash_map_data
             })
@@ -273,8 +291,8 @@ pub fn CreateRatecard() -> impl IntoView {
                 .iter()
                 .map(|service| {
                     SelectOption::new(
-                        service.id.as_ref().unwrap(),
-                        service.title.as_ref().unwrap(),
+                        service.id.as_ref().unwrap_or(&Default::default()),
+                        service.title.as_ref().unwrap_or(&Default::default()),
                     )
                 })
                 .collect(),

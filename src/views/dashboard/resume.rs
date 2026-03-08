@@ -77,29 +77,53 @@ pub fn ResumeItemsList() -> impl IntoView {
                 // *Note:* The id is a MUST for the table to function properly. You might be forced to generate a unique id for each row if your data does not have a unique identifier.
                 hash_map_data.insert(
                     "id".to_string(),
-                    TableCellData::String(resume.id.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        resume.id.as_ref().unwrap_or(&Default::default()).to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Title".to_string(),
-                    TableCellData::String(resume.title.as_ref().unwrap().to_owned()),
+                    TableCellData::String(
+                        resume
+                            .title
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "YOE".to_string(),
-                    TableCellData::Usize(resume.years_of_experience.as_ref().unwrap().to_owned()),
+                    TableCellData::Usize(
+                        resume
+                            .years_of_experience
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Start Date".to_string(),
-                    TableCellData::DateTime(resume.start_date.as_ref().unwrap().to_owned()),
+                    TableCellData::DateTime(
+                        resume
+                            .start_date
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .to_owned(),
+                    ),
                 );
 
                 hash_map_data.insert(
                     "Section".to_string(),
                     TableCellData::String(format!(
                         "{:?}",
-                        resume.section.as_ref().unwrap().to_owned()
+                        resume
+                            .section
+                            .as_ref()
+                            .unwrap_or(&UserResumeSection::Experience)
+                            .to_owned()
                     )),
                 );
                 hash_map_data

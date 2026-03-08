@@ -20,55 +20,58 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
     deserialize_bool: bool,
     vec_fields: Option<&[&str]>,
 ) -> Option<T> {
-    let entries = js_sys::try_iter(form_data).ok()?.unwrap();
-    let mut map = Map::new();
+    if let Some(entries) = js_sys::try_iter(form_data).ok()? {
+        let mut map = Map::new();
 
-    for entry in entries {
-        let pair = entry.ok()?;
-        let arr = Array::from(&pair);
-        let key = arr.get(0).as_string()?;
-        let value = arr.get(1);
+        for entry in entries {
+            let pair = entry.ok()?;
+            let arr = Array::from(&pair);
+            let key = arr.get(0).as_string()?;
+            let value = arr.get(1);
 
-        let is_vec_field = vec_fields
-            .map(|fields| fields.contains(&key.as_str()))
-            .unwrap_or(false);
+            let is_vec_field = vec_fields
+                .map(|fields| fields.contains(&key.as_str()))
+                .unwrap_or(false);
 
-        if let Some(s) = value.as_string() {
-            // Convert to bool, null, or string
-            let val = if s.is_empty() {
-                Value::Null
-            } else if deserialize_bool && (s == "true" || s == "false") {
-                Value::Bool(s.parse::<bool>().unwrap())
-            } else {
-                Value::String(s)
-            };
+            if let Some(s) = value.as_string() {
+                // Convert to bool, null, or string
+                let val = if s.is_empty() {
+                    Value::Null
+                } else if deserialize_bool && (s == "true" || s == "false") {
+                    Value::Bool(s.parse::<bool>().unwrap_or_default())
+                } else {
+                    Value::String(s)
+                };
 
-            // Merge into existing entry if present
-            match map.get_mut(&key) {
-                Some(existing) => match existing {
-                    Value::Array(arr) => {
-                        arr.push(val);
-                    }
-                    prev => {
-                        // Convert single previous value into array
-                        let new_arr = vec![prev.clone(), val];
-                        *prev = Value::Array(new_arr);
-                    }
-                },
-                None => {
-                    if is_vec_field {
-                        // Always store as array for defined checkbox fields
-                        map.insert(key, Value::Array(vec![val]));
-                    } else {
-                        map.insert(key, val);
+                // Merge into existing entry if present
+                match map.get_mut(&key) {
+                    Some(existing) => match existing {
+                        Value::Array(arr) => {
+                            arr.push(val);
+                        }
+                        prev => {
+                            // Convert single previous value into array
+                            let new_arr = vec![prev.clone(), val];
+                            *prev = Value::Array(new_arr);
+                        }
+                    },
+                    None => {
+                        if is_vec_field {
+                            // Always store as array for defined checkbox fields
+                            map.insert(key, Value::Array(vec![val]));
+                        } else {
+                            map.insert(key, val);
+                        }
                     }
                 }
             }
         }
-    }
 
-    let value = Value::Object(map);
-    serde_json::from_value(value).ok()
+        let value = Value::Object(map);
+        serde_json::from_value(value).ok()
+    } else {
+        None
+    }
 }
 
 pub fn fire_bubbled_and_cancelable_event<T>(
@@ -86,7 +89,7 @@ where
 
     let _event = match Event::new_with_event_init_dict(event_type, &init) {
         Ok(ev) => {
-            element.as_ref().dispatch_event(&ev).unwrap();
+            element.as_ref().dispatch_event(&ev).unwrap_or_default();
         }
         Err(_e) => {}
     };
@@ -107,7 +110,7 @@ where
 
     let _event = match CustomEvent::new_with_event_init_dict(event_type, &init) {
         Ok(ev) => {
-            element.as_ref().dispatch_event(&ev).unwrap();
+            element.as_ref().dispatch_event(&ev).unwrap_or_default();
         }
         Err(_e) => {}
     };

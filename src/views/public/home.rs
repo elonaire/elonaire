@@ -141,11 +141,11 @@ pub fn Home() -> impl IntoView {
                     let professions = data
                         .fetch_site_resources
                         .as_ref()
-                        .unwrap()
+                        .unwrap_or(&Default::default())
                         .get_data()
                         .professional_info
                         .as_ref()
-                        .unwrap()
+                        .unwrap_or(&Default::default())
                         .to_vec();
 
                     if let Some(first) = &professions.first() {
