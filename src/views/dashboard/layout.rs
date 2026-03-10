@@ -124,7 +124,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                         let(child)
                                     >
                                         <div class="flex rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
-                                            <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
+                                            <A attr:class="flex-1 h-full flex items-center gap-[10px]" href=child.path>
                                                 <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
                                                 <span class="flex-1">{child.label}</span>
                                             </A>

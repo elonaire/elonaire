@@ -315,7 +315,7 @@ pub fn Home() -> impl IntoView {
                         <div class="flex-1 relative overflow-hidden min-h-[400px] border-b-[1px] border-contrast-white display-constraints">
                             {/* Background image — full width */}
                             <div
-                                class="absolute inset-0 bg-cover bg-center"
+                                class="absolute inset-0 bg-cover bg-center rounded-[5px]"
                                 style="background-image: url('http://localhost:3001/view/e932cec5-3e8a-4b79-9f4a-0ec3af066d50?width=1500');"
                             />
 

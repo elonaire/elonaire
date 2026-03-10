@@ -760,7 +760,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                         </div>
                                         <img src={blog_post.thumbnail.as_ref().unwrap_or(&Default::default()).to_owned()} alt="Blog Post Image" class="w-full h-auto rounded-[5px] object-cover" />
                                         // Blog post content goes here
-                                        <div class="flex flex-col gap-[20px] leading-relaxed text-base"  inner_html={blog_post.content.as_ref().unwrap_or(&Default::default()).to_owned()} />
+                                        <div class="flex flex-col gap-[20px] leading-relaxed text-lg"  inner_html={blog_post.content.as_ref().unwrap_or(&Default::default()).to_owned()} />
                                     </article>
 
                                     // floating reaction menu

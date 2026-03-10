@@ -13,8 +13,14 @@ use reactive_stores::Store;
 use crate::{
     components::molecules::nav::Nav,
     data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+        context::{
+            shared::{check_auth, fetch_single_user},
+            store::{AppStateContext, AppStateContextStoreFields},
+        },
+        models::{
+            general::acl::{AuthInfo, AuthInfoStoreFields, UserInfoStoreFields},
+            graphql::acl::FetchSingleUserVars,
+        },
     },
     views::dashboard::layout::MenuItem,
 };
@@ -37,12 +43,27 @@ pub fn BlogLayout() -> impl IntoView {
             MenuItem::new("About", IconId::BsInfoCircle, "/blog/about"),
             // MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
             // MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
-            MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
+            // MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
         ]
     });
 
-    Effect::new(move || {
-        set_is_loading.set(true);
+    // Effect::new(move || {
+    //     set_is_loading.set(true);
+    //     spawn_local(async move {
+    //         let mut headers = HashMap::new() as HashMap<String, String>;
+    //         headers.insert(
+    //             "Authorization".into(),
+    //             format!(
+    //                 "Bearer {}",
+    //                 current_state.user().auth_info().token().get_untracked()
+    //             ),
+    //         );
+    //     });
+    // });
+
+    // Effect to refresh user auth status
+    Effect::new(move |_| {
+        let current_state = current_state.clone();
         spawn_local(async move {
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
@@ -52,6 +73,63 @@ pub fn BlogLayout() -> impl IntoView {
                     current_state.user().auth_info().token().get_untracked()
                 ),
             );
+
+            let check_auth = check_auth(Some(&headers)).await;
+
+            match check_auth {
+                Ok(auth) => {
+                    current_state.user().auth_info().set(AuthInfo {
+                        token: auth
+                            .new_access_token
+                            .as_ref()
+                            .unwrap_or(&String::new())
+                            .to_owned(),
+                        current_role: auth.current_role.clone(),
+                    });
+                    let user_id_vars = FetchSingleUserVars {
+                        user_id: auth.sub.clone(),
+                    };
+
+                    let fetch_user_info_query = r#"
+                        query FetchSingleUser($userId: String!) {
+                            fetchSingleUser(userId: $userId) {
+                                data {
+                                    firstName
+                                    middleName
+                                    lastName
+                                    gender
+                                    dob
+                                    email
+                                    country
+                                    phone
+                                    createdAt
+                                    updatedAt
+                                    oauthClient
+                                    oauthUserId
+                                    profilePicture
+                                    bio
+                                    website
+                                    address
+                                    id
+                                    fullName
+                                    age
+                                }
+                                metadata {
+                                    requestId
+                                    newAccessToken
+                                }
+                            }
+                        }
+                       "#;
+
+                    if let Ok(user_profile) =
+                        fetch_single_user(&user_id_vars, None, fetch_user_info_query).await
+                    {
+                        current_state.user().user_profile().set(user_profile);
+                    };
+                }
+                Err(_) => {}
+            }
         });
     });
 
@@ -89,7 +167,7 @@ pub fn BlogLayout() -> impl IntoView {
                                             let is_active = current_path.get() == child.path;
                                             view! {
                                                 <div class=format!("flex rounded-[5px] hover:bg-light-gray h-[40px] my-[5px] {}", if is_active { "bg-primary text-contrast-white" } else { "" }) on:click=move |_| set_collapsed.set(false)>
-                                                    <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
+                                                    <A attr:class="flex-1 h-full flex items-center gap-[10px]" href=child.path>
                                                         <span class=format!("{}", if is_active { "text-contrast-white" } else { "text-mid-gray" })><Icon width="24" height="24" icon=child.icon /></span>
                                                         <span class="flex-1">{child.label}</span>
                                                     </A>

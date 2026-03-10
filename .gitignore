@@ -3,3 +3,4 @@ tailwindcss
 /schemas
 /dist
 notes.txt
+.env

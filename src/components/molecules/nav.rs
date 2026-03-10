@@ -49,7 +49,7 @@ pub fn Nav(
             MenuItem::new("About", IconId::BsInfoCircle, "/blog/about"),
             // MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
             // MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
-            MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
+            // MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
         ]
     });
 

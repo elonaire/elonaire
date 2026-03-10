@@ -1,13 +1,21 @@
 use std::time::Duration;
 
 use icondata as IconId;
+use leptos::wasm_bindgen::JsCast;
 use leptos::{prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
-use web_sys::{HtmlDivElement, MouseEvent};
+use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent, SubmitEvent};
 
+use crate::components::general::modal::modal::{BasicModal, UseCase};
+use crate::data::models::graphql::email::{
+    CreateSubscriptionResponse, CreateSubscriptionVars, SubscriberInput, SubscriptionInput,
+    SubscriptionInputMetadata,
+};
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::formatters::PipeOption;
+use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -44,6 +52,8 @@ use crate::{
 };
 use reactive_stores::Store;
 
+const NEWSLETTER_MAILING_LIST_ID: Option<&str> = option_env!("NEWSLETTER_MAILING_LIST_ID");
+
 #[island]
 pub fn BlogHome() -> impl IntoView {
     let subscription_form_ref = NodeRef::new();
@@ -61,6 +71,9 @@ pub fn BlogHome() -> impl IntoView {
     let (show_overlay, set_show_overlay) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
     let (search_results, set_search_results) = signal(vec![] as Vec<BlogPost>);
+    let (form_is_valid, set_form_is_valid) = signal(false);
+    let subscribe_button_is_disabled = Memo::new(move |_| !form_is_valid.get());
+    let success_modal_is_open = RwSignal::new(false);
 
     Effect::new(move || {
         set_is_loading.set(true);
@@ -259,8 +272,119 @@ pub fn BlogHome() -> impl IntoView {
         );
     });
 
+    let create_subscription = move || {
+        if form_is_valid.get() {
+            set_is_loading.set(true);
+            spawn_local(async move {
+                let Some(form_data) = get_form_data_from_form_ref(&subscription_form_ref) else {
+                    set_is_loading.set(false);
+                    return;
+                };
+
+                let Some(deserialized_form_data) =
+                    deserialize_form_data_to_struct::<SubscriberInput>(&form_data, false, None)
+                else {
+                    set_is_loading.set(false);
+                    return;
+                };
+
+                let Some(newsletter_mailing_list_id) = NEWSLETTER_MAILING_LIST_ID else {
+                    return;
+                };
+
+                let input_vars = CreateSubscriptionVars {
+                    subscription_input: SubscriptionInput {
+                        subscriber: deserialized_form_data,
+                        subscription_input_metadata: SubscriptionInputMetadata {
+                            mailing_list_id: newsletter_mailing_list_id.into(),
+                        },
+                    },
+                };
+
+                let query = r#"
+                    mutation SubscribeToMailingList($subscriptionInput: SubscriptionInput!) {
+                        subscribeToMailingList(subscriptionInput: $subscriptionInput) {
+                            data {
+                                createdAt
+                                id
+                                mailingList {
+                                    name
+                                    description
+                                    createdAt
+                                    id
+                                }
+                                subscriber {
+                                    email
+                                    firstName
+                                    lastName
+                                    status
+                                    createdAt
+                                    updatedAt
+                                    id
+                                }
+                            }
+                            metadata {
+                                requestId
+                                newAccessToken
+                            }
+                        }
+                    }
+                "#;
+
+                let response = perform_mutation_or_query_with_vars::<
+                    CreateSubscriptionResponse,
+                    CreateSubscriptionVars,
+                >(
+                    None, "http://localhost:8080/api/email", query, input_vars
+                )
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = subscription_form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_form_is_valid.set(false);
+                        }
+                        set_is_loading.set(false);
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
+                }
+            });
+        }
+    };
+
+    let handle_subscribe_form_submit = move |ev: SubmitEvent| {
+        ev.prevent_default();
+        ev.stop_propagation();
+
+        // Implement logic to show form validity
+        let target = ev
+            .target()
+            .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
+
+        if let Some(form) = target {
+            set_form_is_valid.set(form.check_validity());
+
+            if let Some(_submitter) = ev.submitter() {
+                // confirm_modal_is_open.update(|status| *status = true);
+                create_subscription();
+            }
+        }
+    };
+
     view! {
         <Title text="Blog Home"/>
+        <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
+            <div class="p-[10px]">
+                <p>"You have successfully subscribed to our newsletter! We guarantee that you will only receive updates when there are new publications."</p>
+            </div>
+        </BasicModal>
         <main>
             <div class="min-h-svh flex flex-col gap-[40px] bg-contrast-white">
                 <div class="display-constraints">
@@ -443,7 +567,7 @@ pub fn BlogHome() -> impl IntoView {
                     <div class="flex flex-col gap-[20px] md:basis-3/4">
                         <div class="flex items-center gap-[10px]">
                             <div class="flex-1">
-                                <BlogSection title="Latest Posts"/>
+                                <BlogSection title="More Posts"/>
                             </div>
                             <div class="flex items-center gap-[5px]">
                                 <Icon icon=IconId::VsSettings width="1rem" height="1rem" />
@@ -473,7 +597,7 @@ pub fn BlogHome() -> impl IntoView {
                             <BlogSection title="Stay Updated"/>
                             <div class="flex flex-col gap-[20px]">
                                 <p>"Receive Notifications whenever new posts are published. No promotional emails will be sent to your inbox."</p>
-                                <ReactiveForm form_ref=subscription_form_ref>
+                                <ReactiveForm form_ref=subscription_form_ref on:submit=handle_subscribe_form_submit>
                                     <div class="flex flex-col gap-[20px]">
                                         <InputField field_type=InputFieldType::Email label="Email" placeholder="Enter your email" required=true id_attr="email" name="email" />
 
@@ -481,7 +605,7 @@ pub fn BlogHome() -> impl IntoView {
                                             button_text="Subscribe"
                                             style_ext="bg-primary text-contrast-white"
                                             button_type=ButtonType::Submit
-                                            // disabled=submit_is_disabled
+                                            disabled=subscribe_button_is_disabled
                                         />
                                     </div>
                                 </ReactiveForm>
