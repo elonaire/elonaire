@@ -40,7 +40,9 @@ use crate::{
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
-#[island]
+const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
+
+#[component]
 pub fn Users() -> impl IntoView {
     view! {
         <>
@@ -49,7 +51,7 @@ pub fn Users() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn UsersList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (is_loading, set_is_loading) = signal(false);
@@ -93,9 +95,13 @@ pub fn UsersList() -> impl IntoView {
                 ),
             );
 
+            let Some(acl_service_api) = ACL_SERVICE_API else {
+                return;
+            };
+
             let fetch_users_response = perform_query_without_vars::<FetchUsersResponse>(
                 Some(&headers),
-                "http://localhost:8080/api/acl",
+                acl_service_api,
                 fetch_users_query,
             )
             .await;
@@ -204,7 +210,7 @@ pub fn UsersList() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn CreateUser() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
@@ -260,10 +266,14 @@ pub fn CreateUser() -> impl IntoView {
                         ),
                     );
 
+                    let Some(acl_service_api) = ACL_SERVICE_API else {
+                        return;
+                    };
+
                     let response =
                         perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
                             Some(&headers),
-                            "http://localhost:8080/api/acl",
+                            acl_service_api,
                             query,
                             input_vars,
                         )

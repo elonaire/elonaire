@@ -1,14 +1,17 @@
 use reactive_stores::Store;
 
-use crate::data::models::{
-    general::acl::UserInfo,
-    graphql::{
-        acl::{Department, Organization, Permission, Resource, SystemRole, User},
-        shared::{
-            Currency, Ratecard, ServiceRate, ServiceRequest, UserPortfolio, UserProfessionalInfo,
-            UserResume, UserService, UserSkill,
+use crate::{
+    data::models::{
+        general::acl::UserInfo,
+        graphql::{
+            acl::{Department, Organization, Permission, Resource, SystemRole, User},
+            shared::{
+                Currency, Ratecard, ServiceRate, ServiceRequest, UserPortfolio,
+                UserProfessionalInfo, UserResume, UserService, UserSkill,
+            },
         },
     },
+    utils::graphql_client::LocalGraphQLErrorMessage,
 };
 
 #[derive(Clone, Debug, Default, Store, PartialEq, Eq)]
@@ -30,4 +33,6 @@ pub struct AppStateContext {
     ratecards: Vec<Ratecard>,
     service_requests: Vec<ServiceRequest>,
     show_mobile_search: bool,
+    error: Option<LocalGraphQLErrorMessage>,
+    redirect_to: Option<String>,
 }

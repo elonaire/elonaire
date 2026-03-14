@@ -16,7 +16,7 @@ use crate::{
     data::models::graphql::shared::UserPortfolioCategory,
 };
 
-#[island]
+#[component]
 pub fn Portfolio() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let portfolio = move || current_state.portfolio();

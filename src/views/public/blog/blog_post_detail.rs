@@ -8,7 +8,7 @@ use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
 use leptos_meta::*;
 use leptos_router::components::A;
-use leptos_router::hooks::use_params_map;
+use leptos_router::hooks::{use_location, use_params_map};
 use reactive_stores::Store;
 use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent};
 
@@ -39,9 +39,11 @@ use crate::data::{
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
+use crate::utils::graphql_client::{LocalGraphQLErrorMessage, perform_mutation_or_query_with_vars};
 
-#[island]
+const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
+
+#[component]
 pub fn BlogPostDetail() -> impl IntoView {
     let menu_visible = RwSignal::new(true);
     let comments_ref = NodeRef::new();
@@ -56,6 +58,7 @@ pub fn BlogPostDetail() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let (show_reactions, set_show_reactions) = signal(false);
     let hover_timer: StoredValue<Option<i32>> = StoredValue::new(None);
+    let location = use_location();
     // let (selected_reaction, set_selected_reaction) = signal::<Option<ReactionType>>(None);
     let selected_reaction = Memo::new(move |_| {
         blog_post
@@ -239,14 +242,15 @@ pub fn BlogPostDetail() -> impl IntoView {
                         ),
                     );
 
+                    let Some(shared_service_api) = SHARED_SERVICE_API else {
+                        return;
+                    };
+
                     let response = perform_mutation_or_query_with_vars::<
                         CreateBlogCommentResponse,
                         CreateBlogCommentVars,
                     >(
-                        Some(&headers),
-                        "http://localhost:8080/api/shared",
-                        query,
-                        input_vars,
+                        Some(&headers), shared_service_api, query, input_vars
                     )
                     .await;
 
@@ -377,74 +381,93 @@ pub fn BlogPostDetail() -> impl IntoView {
     };
 
     let handle_reaction_click = move |reaction: ReactionType| {
-        spawn_local(async move {
-            let input_vars = ReactToBlogPostVars {
-                reaction: ReactionInput { r#type: reaction },
-                blog_post_id: blog_post
-                    .get_untracked()
-                    .unwrap_or_default()
-                    .id
-                    .unwrap_or_default(),
-            };
+        spawn_local({
+            let redirect_to = location.pathname.get();
+            async move {
+                let input_vars = ReactToBlogPostVars {
+                    reaction: ReactionInput { r#type: reaction },
+                    blog_post_id: blog_post
+                        .get_untracked()
+                        .unwrap_or_default()
+                        .id
+                        .unwrap_or_default(),
+                };
 
-            let query = r#"
-                mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
-                    reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
-                        data {
-                            type
-                            id
-                        }
-                        metadata {
-                            requestId
-                            newAccessToken
+                let query = r#"
+                    mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
+                        reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
+                            data {
+                                type
+                                id
+                            }
+                            metadata {
+                                requestId
+                                newAccessToken
+                            }
                         }
                     }
-                }
-               "#;
+                   "#;
 
-            let mut headers = HashMap::new() as HashMap<String, String>;
-            headers.insert(
-                "Authorization".into(),
-                format!(
-                    "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
-                ),
-            );
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        current_state.user().auth_info().token().get_untracked()
+                    ),
+                );
 
-            let response = perform_mutation_or_query_with_vars::<
-                ReactToBlogPostResponse,
-                ReactToBlogPostVars,
-            >(
-                Some(&headers),
-                "http://localhost:8080/api/shared",
-                query,
-                input_vars,
-            )
-            .await;
+                let Some(shared_service_api) = SHARED_SERVICE_API else {
+                    return;
+                };
 
-            match response.get_data() {
-                Some(data) => {
-                    // increment reaction count in blog_post
-                    set_blog_post.update(|prev| {
-                        if let Some(prev) = prev {
-                            if prev.current_user_reaction.is_none() {
-                                prev.reaction_count = prev.reaction_count.map(|val| val + 1);
-                            }
+                let response =
+                    perform_mutation_or_query_with_vars::<
+                        ReactToBlogPostResponse,
+                        ReactToBlogPostVars,
+                    >(Some(&headers), shared_service_api, query, input_vars)
+                    .await;
 
-                            prev.current_user_reaction = Some(
-                                data.react_to_blog_post
-                                    .as_ref()
-                                    .unwrap_or(&Default::default())
-                                    .get_data(),
-                            );
-                        };
-                    });
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
+                match response.get_data() {
+                    Some(data) => {
+                        // increment reaction count in blog_post
+                        set_blog_post.update(|prev| {
+                            if let Some(prev) = prev {
+                                if prev.current_user_reaction.is_none() {
+                                    prev.reaction_count = prev.reaction_count.map(|val| val + 1);
+                                }
+
+                                prev.current_user_reaction = Some(
+                                    data.react_to_blog_post
+                                        .as_ref()
+                                        .unwrap_or(&Default::default())
+                                        .get_data(),
+                                );
+                            };
+                        });
+                        set_is_loading.set(false);
+                    }
+                    None => {
+                        let errors = response.get_error();
+                        errors.iter().for_each(|e| {
+                            // The problem is e: &GraphQLErrorMessage is from an external crate(gql_client), all fields are private and implements only Deserialize trait
+                            if let Ok(value) = serde_json::to_value(e) {
+                                if let Ok(err) = serde_json::from_value(value)
+                                    as Result<LocalGraphQLErrorMessage, _>
+                                {
+                                    current_state.redirect_to().set(Some(redirect_to.clone()));
+                                    current_state.error().set(Some(err));
+                                } else {
+                                    leptos::logging::log!("Failed to parse error: {:?}", e);
+                                };
+                            } else {
+                                leptos::logging::log!("Failed to serialize error: {:?}", e);
+                            };
+                        });
+                        set_is_loading.set(false);
+                    }
+                };
+            }
         });
     };
 
@@ -481,15 +504,14 @@ pub fn BlogPostDetail() -> impl IntoView {
                 ),
             );
 
+            let Some(shared_service_api) = SHARED_SERVICE_API else {
+                return;
+            };
+
             let response = perform_mutation_or_query_with_vars::<
                 ReactToBlogCommentResponse,
                 ReactToBlogCommentVars,
-            >(
-                Some(&headers),
-                "http://localhost:8080/api/shared",
-                query,
-                input_vars,
-            )
+            >(Some(&headers), shared_service_api, query, input_vars)
             .await;
 
             match response.get_data() {
@@ -578,14 +600,15 @@ pub fn BlogPostDetail() -> impl IntoView {
                             ),
                         );
 
+                        let Some(shared_service_api) = SHARED_SERVICE_API else {
+                            return;
+                        };
+
                         let response = perform_mutation_or_query_with_vars::<
                             UpdateBlogPostShareCountResponse,
                             UpdateBlogPostShareCountVars,
                         >(
-                            Some(&headers),
-                            "http://localhost:8080/api/shared",
-                            query,
-                            input_vars,
+                            Some(&headers), shared_service_api, query, input_vars
                         )
                         .await;
 
@@ -659,15 +682,14 @@ pub fn BlogPostDetail() -> impl IntoView {
                 ),
             );
 
+            let Some(shared_service_api) = SHARED_SERVICE_API else {
+                return;
+            };
+
             let response = perform_mutation_or_query_with_vars::<
                 BookmarkBlogPostResponse,
                 BookmarkBlogPostVars,
-            >(
-                Some(&headers),
-                "http://localhost:8080/api/shared",
-                query,
-                input_vars,
-            )
+            >(Some(&headers), shared_service_api, query, input_vars)
             .await;
 
             match response.get_data() {

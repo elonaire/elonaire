@@ -32,12 +32,31 @@ pub fn Textarea(
 
     view! {
         <div>
-            <label class="block text-mid-gray text-sm font-bold" for=id_attr.clone()>
-                {label}
-                {move || required.then_some(view! {
-                    <span class="text-danger ml-1">*</span>
-                })}
-            </label>
+            // <label class="block text-mid-gray text-sm font-bold" for=id_attr.clone()>
+            //     {label}
+            //     {move || required.then_some(view! {
+            //         <span class="text-danger ml-1">*</span>
+            //     })}
+            // </label>
+            {
+                if label.is_empty() {
+                    None
+                } else {
+                    Some(
+                        view! {
+                            <label
+                                class={format!("block text-mid-gray text-sm font-bold")}
+                                for=id_attr.clone()
+                            >
+                                {label}
+                                {move || required.then_some(view! {
+                                    <span class="text-danger ml-1">*</span>
+                                })}
+                            </label>
+                        }
+                    )
+                }
+            }
             <textarea
                 class=move || format!(
                     "form-input ring-0 shadow appearance-none border border-mid-gray rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow bg-transparent {}",

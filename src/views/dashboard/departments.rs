@@ -38,7 +38,9 @@ use crate::{
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
-#[island]
+const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
+
+#[component]
 pub fn Departments() -> impl IntoView {
     view! {
         <>
@@ -47,7 +49,7 @@ pub fn Departments() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn DepartmentsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let departments = move || current_state.departments();
@@ -159,7 +161,7 @@ pub fn DepartmentsList() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn CreateDepartment() -> impl IntoView {
     let form_ref = NodeRef::new();
     let metadata_form_ref = NodeRef::new();
@@ -236,14 +238,15 @@ pub fn CreateDepartment() -> impl IntoView {
                             ),
                         );
 
+                        let Some(acl_service_api) = ACL_SERVICE_API else {
+                            return;
+                        };
+
                         let response = perform_mutation_or_query_with_vars::<
                             CreateDepartmentResponse,
                             CreateDepartmentVars,
                         >(
-                            Some(&headers),
-                            "http://localhost:8080/api/acl",
-                            query,
-                            input_vars,
+                            Some(&headers), acl_service_api, query, input_vars
                         )
                         .await;
 

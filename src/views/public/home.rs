@@ -26,7 +26,9 @@ use crate::{
     views::dashboard::layout::MenuItem,
 };
 
-#[island]
+const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
+
+#[component]
 pub fn Home() -> impl IntoView {
     // track collapsed state
     let current_state = expect_context::<Store<AppStateContext>>();
@@ -126,10 +128,14 @@ pub fn Home() -> impl IntoView {
                 ),
             );
 
+            let Some(shared_service_api) = SHARED_SERVICE_API else {
+                return;
+            };
+
             let fetch_professions_response =
                 perform_query_without_vars::<FetchSiteResourcesResponse>(
                     None,
-                    "http://localhost:8080/api/shared",
+                    shared_service_api,
                     fetch_professions_query,
                 )
                 .await;
@@ -316,7 +322,7 @@ pub fn Home() -> impl IntoView {
                             {/* Background image — full width */}
                             <div
                                 class="absolute inset-0 bg-cover bg-center rounded-[5px]"
-                                style="background-image: url('http://localhost:3001/view/e932cec5-3e8a-4b79-9f4a-0ec3af066d50?width=1500');"
+                                style="background-image: url('https://api.techietenka.com/files/view/be829ce6-1c68-4c88-8491-9e0df8817967?width=1500');"
                             />
 
                             {/* Primary color — left half with diagonal right edge */}

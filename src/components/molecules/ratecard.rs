@@ -33,6 +33,9 @@ use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
+const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
+const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
+
 #[component]
 pub fn RatecardComponent(
     #[prop(into)] name: RwSignal<String>,
@@ -211,9 +214,13 @@ pub fn RatecardComponent(
                         }
                     }
 
+                    let Some(files_service_api) = FILES_SERVICE_API else {
+                        return;
+                    };
+
                     spawn_local(async move {
                         let Ok(request) =
-                            gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                            gloo_net::http::Request::post(&format!("{files_service_api}upload"))
                                 .header(
                                     "Authorization",
                                     format!(
@@ -348,14 +355,15 @@ pub fn RatecardComponent(
                             ),
                         );
 
+                        let Some(shared_service_api) = SHARED_SERVICE_API else {
+                            return;
+                        };
+
                         let response = perform_mutation_or_query_with_vars::<
                             CreateServiceRequestResponse,
                             CreateServiceRequestVars,
                         >(
-                            Some(&headers),
-                            "http://localhost:8080/api/shared",
-                            query,
-                            input_vars,
+                            Some(&headers), shared_service_api, query, input_vars
                         )
                         .await;
 

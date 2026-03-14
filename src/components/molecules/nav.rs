@@ -74,7 +74,6 @@ pub fn Nav(
                 navigate(
                     "/sign-in",
                     NavigateOptions {
-                        resolve: false,
                         replace: true,
                         ..Default::default()
                     },
@@ -93,7 +92,7 @@ pub fn Nav(
                     >
                         <Icon width="24" height="24" icon=IconId::IoMenu />
                     </button>
-                    <img src="http://localhost:3001/view/114aa7a5-66a5-4e72-aa10-6c316b05a001" class="w-[47px] object-cover" alt="Logo" />
+                    <img src="https://api.techietenka.com/files/view/47a6c9dd-6d87-42ff-a041-9d2a7896c47f" class="w-[47px] object-cover" alt="Logo" />
                     <div class="flex items-center justify-end gap-[20px]">
                         { move ||
                             if !is_dashboard.get() && !is_blog.get() {
@@ -153,35 +152,62 @@ pub fn Nav(
                         }
                         { move ||
                             {
-                                let profile_pic = user_profile.get().profile_picture.unwrap_or_default();
+                                let profile_pic = user_profile.get().profile_picture;
                                 if is_dashboard.get() || is_blog.get() {
-                                    Some(view! {
-                                        <Popover showing=showing_user_popover display_item={
-                                                        let profile_pic = profile_pic.clone(); // clone before moving into ViewFn
-                                                        leptos::logging::log!("profile_pic: {profile_pic}");
-                                                        move || view!{
-                                                            <img src=format!("{}?width=300", profile_pic) class="size-[27px] object-cover rounded-full cursor-pointer" alt="dp" />
-                                                        }
-                                                    }>
-                                            <div class="flex flex-col gap-2">
-                                                <A attr:class="py-2 px-4 text-gray px-0 hover:bg-primary hover:text-contrast-white cursor-pointer rounded-[5px] font-bold" href="/dashboard/user/profile">
-                                                    <span class="flex items-center justify-between">
-                                                        <span>Profile</span>
-                                                        <Icon icon=IconId::MdiCardAccountDetailsOutline />
-                                                    </span>
-                                                </A>
-                                                <BasicButton
-                                                    style_ext="text-danger px-0 hover:bg-danger hover:text-contrast-white"
-                                                    onclick=handle_sign_out
-                                                    >
-                                                    <span class="flex items-center justify-between">
-                                                        <span>Logout</span>
-                                                        <Icon icon=IconId::BsPower />
-                                                    </span>
-                                                </BasicButton>
-                                            </div>
-                                        </Popover>
-                                    })
+                                    Some(
+                                        match profile_pic {
+                                            Some(profile_pic) => Some(
+                                                view! {
+                                                <Popover showing=showing_user_popover display_item={
+                                                                let profile_pic = profile_pic.clone(); // clone before moving into ViewFn
+                                                                leptos::logging::log!("profile_pic: {profile_pic}");
+                                                                move || view!{
+                                                                    <img src=format!("{}?width=300", profile_pic) class="size-[27px] object-cover rounded-full cursor-pointer" alt="dp" />
+                                                                }
+                                                            }>
+                                                    <div class="flex flex-col gap-2">
+                                                        <A attr:class="py-2 px-4 text-gray px-0 hover:bg-primary hover:text-contrast-white cursor-pointer rounded-[5px] font-bold" href="/dashboard/user/profile">
+                                                            <span class="flex items-center justify-between">
+                                                                <span>Profile</span>
+                                                                <Icon icon=IconId::MdiCardAccountDetailsOutline />
+                                                            </span>
+                                                        </A>
+                                                        <BasicButton
+                                                            style_ext="text-danger px-0 hover:bg-danger hover:text-contrast-white"
+                                                            onclick=handle_sign_out
+                                                            >
+                                                            <span class="flex items-center justify-between">
+                                                                <span>Logout</span>
+                                                                <Icon icon=IconId::BsPower />
+                                                            </span>
+                                                        </BasicButton>
+                                                    </div>
+                                                </Popover>
+                                            }
+                                            ),
+                                            None => None
+                                        }
+                                        )
+                                } else {
+                                    None
+                                }
+                            }
+                        }
+                        { move ||
+                            {
+
+                                let profile_pic = user_profile.get().profile_picture;
+                                if is_dashboard.get() || is_blog.get() {
+                                    Some(
+                                        match profile_pic {
+                                            Some(_profile_pic) => None,
+                                            None => Some(
+                                                view! {
+                                                    <A attr:class="py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold" href="/sign-in">"Sign In"</A>
+                                                }
+                                            )
+                                        }
+                                    )
                                 } else {
                                     None
                                 }

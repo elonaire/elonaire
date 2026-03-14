@@ -10,7 +10,7 @@ use crate::data::context::shared::fetch_services;
 use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::data::context::users::fetch_site_owner_info;
 
-#[island]
+#[component]
 pub fn About() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let site_owner_info = move || current_state.site_owner_info();
@@ -36,8 +36,8 @@ pub fn About() -> impl IntoView {
                 <Headline title="About Me" description="Who Am I?" />
                 <div class="flex flex-col md:flex-row md:justify-center md:gap-[20px] display-constraints text-light-gray">
                     <div class="max-w-[400px] h-[479px] relative md:basis-1/2">
-                        <img src="http://localhost:3001/view/e8d382ad-a79b-423d-a304-7e74c42c9cfc" alt="gallery-pic" class="rounded-[5px] w-[299px] h-[429px] object-cover"/>
-                        <img src="http://localhost:3001/view/f069333b-361f-4402-9383-63c3e4c58cf5" alt="gallery-pic" class="rounded-[5px] w-[196px] h-[218px] absolute bottom-0 right-0 object-cover"/>
+                        <img src="https://api.techietenka.com/files/view/ba183079-0126-4fc5-b870-de2ffdbe3bca?width=800" alt="gallery-pic" class="rounded-[5px] w-[299px] h-[429px] object-cover"/>
+                        <img src="https://api.techietenka.com/files/view/a92c140b-9871-419c-adef-96d44d8f49c0?width=800" alt="gallery-pic" class="rounded-[5px] w-[196px] h-[218px] absolute bottom-0 right-0 object-cover"/>
                     </div>
                     <div class="max-w-[400px] flex flex-col gap-[20px] md:basis-1/2">
                         <div class="flex flex-col gap-[20px]">

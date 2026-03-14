@@ -40,10 +40,16 @@ use crate::{
                 about::About as AboutBlog, blog_post_detail::BlogPostDetail, home::BlogHome,
                 layout::BlogLayout,
             },
+            contact::Contact,
+            error_handler::ErrorHandler,
+            faqs::Faqs,
             home::Home,
+            marketplace::waitlist::{Marketplace, WaitList},
             portfolio::Portfolio as PublicPortfolio,
+            privacy::PrivacyPolicy,
             ratecard::Ratecard as PublicRatecard,
             resume::Resume as PublicResume,
+            tos::TermsOfService,
         },
     },
 };
@@ -80,6 +86,10 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("/resume") view=PublicResume />
                     <Route path=StaticSegment("/portfolio") view=PublicPortfolio />
                     <Route path=StaticSegment("/ratecard") view=PublicRatecard />
+                    <Route path=StaticSegment("/faq") view=Faqs />
+                    <Route path=StaticSegment("/terms") view=TermsOfService />
+                    <Route path=StaticSegment("/privacy") view=PrivacyPolicy />
+                    <Route path=StaticSegment("/contact") view=Contact />
                     <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />
@@ -147,6 +157,9 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("") view=BlogHome />
                         <Route path=path!("/read/:slug") view=BlogPostDetail />
                         <Route path=path!("/about") view=AboutBlog />
+                    </ParentRoute>
+                    <ParentRoute path=path!("/marketplace") view=Marketplace>
+                        <Route path=path!("") view=WaitList />
                     </ParentRoute>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>
                 </Routes>

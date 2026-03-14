@@ -11,7 +11,7 @@ use crate::data::{
 use crate::utils::formatters::Pipe;
 use crate::utils::formatters::PipeOption;
 
-#[island]
+#[component]
 pub fn ProfilePage() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let user_profile = current_state.user().user_profile();

@@ -38,7 +38,9 @@ use crate::{
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
-#[island]
+const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
+
+#[component]
 pub fn ServiceRates() -> impl IntoView {
     view! {
         <>
@@ -47,7 +49,7 @@ pub fn ServiceRates() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn ServiceRatesList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let service_rates = move || current_state.service_rates();
@@ -164,7 +166,7 @@ pub fn ServiceRatesList() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn CreateServiceRate() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
@@ -240,14 +242,15 @@ pub fn CreateServiceRate() -> impl IntoView {
                         ),
                     );
 
+                    let Some(shared_service_api) = SHARED_SERVICE_API else {
+                        return;
+                    };
+
                     let response = perform_mutation_or_query_with_vars::<
                         CreateServiceRateResponse,
                         CreateServiceRateVars,
                     >(
-                        Some(&headers),
-                        "http://localhost:8080/api/shared",
-                        query,
-                        input_vars,
+                        Some(&headers), shared_service_api, query, input_vars
                     )
                     .await;
 

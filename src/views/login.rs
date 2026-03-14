@@ -34,13 +34,17 @@ use crate::data::{
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
-#[island]
+const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
+
+#[component]
 pub fn SignIn() -> impl IntoView {
     let login_form_ref = NodeRef::new();
     let current_state = expect_context::<Store<AppStateContext>>();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
     let (is_loading, set_is_loading) = signal(false);
+    let is_authenticated = RwSignal::new(false);
+    let navigate = use_navigate();
 
     let query = use_query::<AuthCode>();
     Effect::new(move || {
@@ -57,8 +61,12 @@ pub fn SignIn() -> impl IntoView {
                         auth_code: Some(auth_code),
                     };
 
+                    let Some(acl_service_api) = ACL_SERVICE_API else {
+                        return;
+                    };
+
                     if let Ok(response) = reqwest::Client::new()
-                        .post("http://localhost:8080/api/acl/social-sign-in")
+                        .post(&format!("{acl_service_api}/social-sign-in"))
                         .json(&auth_code_body)
                         .send()
                         .await
@@ -69,6 +77,7 @@ pub fn SignIn() -> impl IntoView {
                                 .auth_info()
                                 .token()
                                 .set(auth_status.token.unwrap_or_default());
+                            is_authenticated.set(true);
                             set_is_loading.set(false);
                         };
                     };
@@ -79,15 +88,19 @@ pub fn SignIn() -> impl IntoView {
     });
 
     Effect::new(move || {
-        let leptos_navigate = use_navigate();
-
-        if !current_state.user().get().auth_info.token.is_empty() {
-            // User is authenticated, redirect to dashboard
-            leptos_navigate("/dashboard", Default::default());
+        let redirect_to = current_state.redirect_to().get();
+        // User is authenticated, redirect to the previous page or dashboard
+        if is_authenticated.get() {
+            if let Some(redirect_to) = redirect_to {
+                current_state.error().set(None);
+                navigate(&redirect_to, Default::default());
+            } else {
+                navigate("/dashboard", Default::default());
+            }
         }
     });
 
-    let navigate = |url: &str| {
+    let open_url = |url: &str| {
         if let Some(window) = window() {
             let _ = window.open_with_url_and_target(url, "_self");
         }
@@ -117,11 +130,15 @@ pub fn SignIn() -> impl IntoView {
                    }
                "#;
 
+            let Some(acl_service_api) = ACL_SERVICE_API else {
+                return;
+            };
+
             set_is_loading.set(true);
             spawn_local(async move {
                 let login_res = perform_mutation_or_query_with_vars::<SignInResponse, SignInVars>(
                     None,
-                    "http://localhost:8080/api/acl",
+                    acl_service_api,
                     query,
                     user_logins,
                 )
@@ -131,7 +148,7 @@ pub fn SignIn() -> impl IntoView {
                     Some(data) => {
                         match &data.sign_in {
                             Some(auth_details) => {
-                                navigate(
+                                open_url(
                                     auth_details
                                         .get_data()
                                         .url
@@ -201,14 +218,17 @@ pub fn SignIn() -> impl IntoView {
                                    }
                                "#;
 
-                            let login_res =
-                                perform_mutation_or_query_with_vars::<SignInResponse, SignInVars>(
-                                    None,
-                                    "http://localhost:8080/api/acl",
-                                    query,
-                                    user_logins,
-                                )
-                                .await;
+                            let Some(acl_service_api) = ACL_SERVICE_API else {
+                                return;
+                            };
+
+                            let login_res = perform_mutation_or_query_with_vars::<
+                                SignInResponse,
+                                SignInVars,
+                            >(
+                                None, acl_service_api, query, user_logins
+                            )
+                            .await;
 
                             match login_res.get_data() {
                                 Some(data) => {
@@ -223,6 +243,7 @@ pub fn SignIn() -> impl IntoView {
                                                 set_form_is_valid.set(false);
                                             } else {
                                             }
+                                            is_authenticated.set(true);
                                             set_is_loading.set(false);
 
                                             current_state.user().auth_info().token().set(

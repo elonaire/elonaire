@@ -86,15 +86,25 @@ pub fn InputField(
 
     view! {
         <div class=move || format!("{}", ext_wrapper_styles)>
-            <label
-                class={format!("block text-mid-gray text-sm font-bold {}", ext_label_styles)}
-                for=id_attr.clone()
-            >
-                {label}
-                {move || required.then_some(view! {
-                    <span class="text-danger ml-1">*</span>
-                })}
-            </label>
+            {
+                if label.is_empty() {
+                    None
+                } else {
+                    Some(
+                        view! {
+                            <label
+                                class={format!("block text-mid-gray text-sm font-bold {}", ext_label_styles)}
+                                for=id_attr.clone()
+                            >
+                                {label}
+                                {move || required.then_some(view! {
+                                    <span class="text-danger ml-1">*</span>
+                                })}
+                            </label>
+                        }
+                    )
+                }
+            }
             <div
             class=move || format!(
                     "h-[45px] flex items-center border border-mid-gray rounded-[5px]

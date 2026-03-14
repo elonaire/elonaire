@@ -49,7 +49,10 @@ use crate::{
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
-#[island]
+const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
+const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
+
+#[component]
 pub fn Skills() -> impl IntoView {
     view! {
         <>
@@ -58,7 +61,7 @@ pub fn Skills() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn SkillsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let skills = move || current_state.skills();
@@ -193,7 +196,7 @@ pub fn SkillsList() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn CreateSkill() -> impl IntoView {
     let form_ref = NodeRef::new();
     let file_input_ref = NodeRef::new();
@@ -234,9 +237,13 @@ pub fn CreateSkill() -> impl IntoView {
                         }
                     }
 
+                    let Some(files_service_api) = FILES_SERVICE_API else {
+                        return;
+                    };
+
                     spawn_local(async move {
                         let Ok(request) =
-                            gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                            gloo_net::http::Request::post(&format!("{files_service_api}upload"))
                                 .header(
                                     "Authorization",
                                     format!(
@@ -278,9 +285,13 @@ pub fn CreateSkill() -> impl IntoView {
                             return;
                         };
 
+                        let Some(files_service_api) = FILES_SERVICE_API else {
+                            return;
+                        };
+
                         if let Err(e) = form_data.append_with_str(
                             "thumbnail",
-                            format!("http://localhost:3001/view/{}", uploaded_files[0].file_name)
+                            format!("{files_service_api}/view/{}", uploaded_files[0].file_name)
                                 .as_str(),
                         ) {
                             leptos::logging::log!("Error appending thumbnail: {:?}", e);
@@ -330,14 +341,15 @@ pub fn CreateSkill() -> impl IntoView {
                             ),
                         );
 
+                        let Some(shared_service_api) = SHARED_SERVICE_API else {
+                            return;
+                        };
+
                         let response = perform_mutation_or_query_with_vars::<
                             CreateUserSkillResponse,
                             CreateUserSkillVars,
                         >(
-                            Some(&headers),
-                            "http://localhost:8080/api/shared",
-                            query,
-                            input_vars,
+                            Some(&headers), shared_service_api, query, input_vars
                         )
                         .await;
 

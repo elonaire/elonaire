@@ -24,6 +24,10 @@ use crate::{
 };
 use reactive_stores::Store;
 
+const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
+const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
+const PAYMENTS_SERVICE_API: Option<&str> = option_env!("PAYMENTS_SERVICE_API");
+
 pub async fn fetch_services(
     current_state: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
@@ -47,9 +51,13 @@ pub async fn fetch_services(
            }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_services_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_services_query,
     )
     .await;
@@ -98,9 +106,13 @@ pub async fn fetch_professions(
            }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_professions_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_professions_query,
     )
     .await;
@@ -155,9 +167,13 @@ pub async fn fetch_resume(
            }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_resume_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_resume_query,
     )
     .await;
@@ -208,9 +224,13 @@ pub async fn fetch_skills(
            }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_skills_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_skills_query,
     )
     .await;
@@ -262,9 +282,13 @@ pub async fn fetch_portfolio(
            }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_portfolio_response = perform_query_without_vars::<FetchSiteResourcesResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_portfolio_query,
     )
     .await;
@@ -293,12 +317,14 @@ pub async fn fetch_blog_posts(
     filters: FetchBlogPostsVars,
     query: &str,
 ) -> Result<Vec<BlogPost>, Vec<GraphQLErrorMessage>> {
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_blog_posts_response = perform_mutation_or_query_with_vars::<
         FetchBlogPostsResponse,
         FetchBlogPostsVars,
-    >(
-        headers, "http://localhost:8080/api/shared", query, filters
-    )
+    >(headers, shared_service_api, query, filters)
     .await;
 
     match fetch_blog_posts_response.get_data() {
@@ -369,10 +395,14 @@ pub async fn fetch_single_blog_post(
         }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let response = perform_mutation_or_query_with_vars::<
         FetchSingleBlogPostResponse,
         FetchSingleBlogPostVars,
-    >(headers, "http://localhost:8080/api/shared", query, vars)
+    >(headers, shared_service_api, query, vars)
     .await;
 
     match response.get_data() {
@@ -409,12 +439,13 @@ pub async fn check_auth(
         }
        "#;
 
-    let check_auth_response = perform_query_without_vars::<CheckAuthResponse>(
-        headers,
-        "http://localhost:8080/api/acl",
-        check_auth_query,
-    )
-    .await;
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
+    let check_auth_response =
+        perform_query_without_vars::<CheckAuthResponse>(headers, acl_service_api, check_auth_query)
+            .await;
 
     match check_auth_response.get_data() {
         Some(data) => {
@@ -452,9 +483,13 @@ pub async fn fetch_departments(
            }
        "#;
 
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_departments_response = perform_query_without_vars::<FetchDepartmentsResponse>(
         headers,
-        "http://localhost:8080/api/acl",
+        acl_service_api,
         fetch_departments_query,
     )
     .await;
@@ -497,9 +532,13 @@ pub async fn fetch_organizations(
            }
        "#;
 
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_orgs_response = perform_query_without_vars::<FetchOrganizationsResponse>(
         headers,
-        "http://localhost:8080/api/acl",
+        acl_service_api,
         fetch_orgs_query,
     )
     .await;
@@ -545,9 +584,13 @@ pub async fn fetch_permissions(
            }
        "#;
 
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_permissions_response = perform_query_without_vars::<FetchPermissionsResponse>(
         headers,
-        "http://localhost:8080/api/acl",
+        acl_service_api,
         fetch_permissions_query,
     )
     .await;
@@ -589,9 +632,13 @@ pub async fn fetch_resources(
            }
        "#;
 
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_resources_response = perform_query_without_vars::<FetchResourcesResponse>(
         headers,
-        "http://localhost:8080/api/acl",
+        acl_service_api,
         fetch_resources_query,
     )
     .await;
@@ -634,9 +681,13 @@ pub async fn fetch_roles(
            }
        "#;
 
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_roles_response = perform_query_without_vars::<FetchSystemRolesResponse>(
         headers,
-        "http://localhost:8080/api/acl",
+        acl_service_api,
         fetch_roles_query,
     )
     .await;
@@ -662,14 +713,15 @@ pub async fn fetch_single_user(
     headers: Option<&HashMap<String, String>>,
     query: &str,
 ) -> Result<User, Vec<GraphQLErrorMessage>> {
-    let fetch_auth_info_response =
-        perform_mutation_or_query_with_vars::<FetchSingleUserResponse, FetchSingleUserVars>(
-            headers,
-            "http://localhost:8080/api/acl",
-            query,
-            vars.to_owned(),
-        )
-        .await;
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
+    let fetch_auth_info_response = perform_mutation_or_query_with_vars::<
+        FetchSingleUserResponse,
+        FetchSingleUserVars,
+    >(headers, acl_service_api, query, vars.to_owned())
+    .await;
 
     match fetch_auth_info_response.get_data() {
         Some(data) => {
@@ -713,9 +765,13 @@ pub async fn fetch_ratecards(
         }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_ratecards_response = perform_query_without_vars::<FetchRatecardsResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_ratecards_query,
     )
     .await;
@@ -753,14 +809,17 @@ pub async fn fetch_billing_rate(
         }
        "#;
 
-    let fetch_billing_rate_response =
-        perform_mutation_or_query_with_vars::<FetchBillingRateResponse, FetchBillingRateVars>(
-            headers,
-            "http://localhost:8080/api/shared",
-            fetch_billing_rate_query,
-            vars,
-        )
-        .await;
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
+    let fetch_billing_rate_response = perform_mutation_or_query_with_vars::<
+        FetchBillingRateResponse,
+        FetchBillingRateVars,
+    >(
+        headers, shared_service_api, fetch_billing_rate_query, vars
+    )
+    .await;
 
     match fetch_billing_rate_response.get_data() {
         Some(data) => {
@@ -809,9 +868,13 @@ pub async fn fetch_service_rates(
         }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_service_rates_response = perform_query_without_vars::<FetchServiceRatesResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         fetch_service_rates_query,
     )
     .await;
@@ -857,12 +920,13 @@ pub async fn fetch_currencies(
         }
        "#;
 
-    let response = perform_query_without_vars::<FetchCurrenciesResponse>(
-        headers,
-        "http://localhost:8080/api/payments",
-        query,
-    )
-    .await;
+    let Some(payments_service_api) = PAYMENTS_SERVICE_API else {
+        return Err(vec![]);
+    };
+
+    let response =
+        perform_query_without_vars::<FetchCurrenciesResponse>(headers, payments_service_api, query)
+            .await;
 
     match response.get_data() {
         Some(data) => {
@@ -908,9 +972,13 @@ pub async fn fetch_service_requests(
         }
        "#;
 
+    let Some(shared_service_api) = SHARED_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let response = perform_query_without_vars::<FetchServiceRequestsResponse>(
         headers,
-        "http://localhost:8080/api/shared",
+        shared_service_api,
         query,
     )
     .await;

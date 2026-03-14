@@ -53,8 +53,9 @@ use crate::{
 use reactive_stores::Store;
 
 const NEWSLETTER_MAILING_LIST_ID: Option<&str> = option_env!("NEWSLETTER_MAILING_LIST_ID");
+const EMAIL_SERVICE_API: Option<&str> = option_env!("EMAIL_SERVICE_API");
 
-#[island]
+#[component]
 pub fn BlogHome() -> impl IntoView {
     let subscription_form_ref = NodeRef::new();
     let (is_loading, set_is_loading) = signal(false);
@@ -331,12 +332,14 @@ pub fn BlogHome() -> impl IntoView {
                     }
                 "#;
 
+                let Some(email_service_api) = EMAIL_SERVICE_API else {
+                    return;
+                };
+
                 let response = perform_mutation_or_query_with_vars::<
                     CreateSubscriptionResponse,
                     CreateSubscriptionVars,
-                >(
-                    None, "http://localhost:8080/api/email", query, input_vars
-                )
+                >(None, email_service_api, query, input_vars)
                 .await;
 
                 match response.get_data() {

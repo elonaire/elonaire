@@ -22,10 +22,10 @@ use crate::{
             graphql::acl::FetchSingleUserVars,
         },
     },
-    views::dashboard::layout::MenuItem,
+    views::{dashboard::layout::MenuItem, public::error_handler::ErrorHandler},
 };
 
-#[island]
+#[component]
 pub fn BlogLayout() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     // track collapsed state
@@ -136,6 +136,7 @@ pub fn BlogLayout() -> impl IntoView {
     view! {
         <Title text="Techie Tenka"/>
         <main>
+            <ErrorHandler />
             <div class="relative min-h-svh bg-contrast-white">
                 {/* Sidebar overlay */}
                 <div

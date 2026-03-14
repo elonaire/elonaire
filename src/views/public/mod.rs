@@ -1,6 +1,12 @@
 pub mod about;
 pub mod blog;
+pub mod contact;
+pub mod error_handler;
+pub mod faqs;
 pub mod home;
+pub mod marketplace;
 pub mod portfolio;
+pub mod privacy;
 pub mod ratecard;
 pub mod resume;
+pub mod tos;

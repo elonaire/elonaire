@@ -20,7 +20,7 @@ use crate::{
     },
 };
 
-#[island]
+#[component]
 pub fn ServiceRequests() -> impl IntoView {
     view! {
         <>
@@ -29,7 +29,7 @@ pub fn ServiceRequests() -> impl IntoView {
     }
 }
 
-#[island]
+#[component]
 pub fn ServiceRequestsList() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let service_requests = move || current_state.service_requests();

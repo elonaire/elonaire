@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     default,
     fmt::{self, Display},
 };
@@ -890,4 +891,47 @@ pub struct ReactToBlogCommentVars {
 pub struct ReactToBlogCommentResponse {
     #[serde(rename = "reactToBlogComment")]
     pub react_to_blog_comment: Option<ApiResponse<Reaction>>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MessageInput {
+    pub subject: Subject,
+    pub body: String,
+    #[serde(rename = "senderName", alias = "sender_name")]
+    pub sender_name: String,
+    #[serde(rename = "senderEmail", alias = "sender_email")]
+    pub sender_email: String,
+}
+#[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]
+pub enum Subject {
+    JobOffer,
+    Consultation,
+    Feedback,
+    Complaint,
+    Enquiry,
+    Suggestion,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Message {
+    pub id: Option<String>,
+    pub subject: Option<Subject>,
+    pub body: Option<String>,
+    #[serde(rename = "senderName")]
+    pub sender_name: Option<String>,
+    #[serde(rename = "senderEmail")]
+    pub sender_email: Option<String>,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SendMessageVars {
+    pub message: MessageInput,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SendMessageResponse {
+    #[serde(rename = "sendMessage")]
+    pub send_message: Option<ApiResponse<Message>>,
 }

@@ -12,6 +12,8 @@ use crate::{
 };
 use reactive_stores::Store;
 
+const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
+
 pub async fn fetch_site_owner_info(
     current_state: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
@@ -45,9 +47,13 @@ pub async fn fetch_site_owner_info(
            }
        "#;
 
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
     let fetch_site_owner_response = perform_query_without_vars::<FetchSiteOwnerResponse>(
         headers,
-        "http://localhost:8080/api/acl",
+        acl_service_api,
         fetch_site_owner_query,
     )
     .await;
@@ -83,12 +89,12 @@ pub async fn sign_out(
         }
        "#;
 
-    let sign_out_response = perform_query_without_vars::<SignOutResponse>(
-        headers,
-        "http://localhost:8080/api/acl",
-        query,
-    )
-    .await;
+    let Some(acl_service_api) = ACL_SERVICE_API else {
+        return Err(vec![]);
+    };
+
+    let sign_out_response =
+        perform_query_without_vars::<SignOutResponse>(headers, acl_service_api, query).await;
 
     match sign_out_response.get_data() {
         Some(_data) => Ok(()),

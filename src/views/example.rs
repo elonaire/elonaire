@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos_meta::*;
 
-#[island]
+#[component]
 pub fn Example() -> impl IntoView {
     view! {}
 }

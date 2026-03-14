@@ -15,7 +15,7 @@ use crate::{
     },
 };
 
-#[island]
+#[component]
 pub fn Ratecard() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let ratecards = move || current_state.ratecards();

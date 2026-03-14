@@ -67,17 +67,25 @@ pub fn SelectInput(
 
     view! {
         <div>
-            <label for=id_attr.clone() class="block text-mid-gray text-sm font-bold">
-                {label.clone()}
-                { if !label.clone().is_empty() && required {
-                    Some(view! {
-                        <span class="text-danger ml-1">*</span>
-                    })
-                } else {
+            {
+                if label.is_empty() {
                     None
+                } else {
+                    Some(
+                        view! {
+                            <label
+                                class={format!("block text-mid-gray text-sm font-bold")}
+                                for=id_attr.clone()
+                            >
+                                {label}
+                                {move || required.then_some(view! {
+                                    <span class="text-danger ml-1">*</span>
+                                })}
+                            </label>
+                        }
+                    )
                 }
-                }
-            </label>
+            }
             <select
                 node_ref=input_node_ref
                 name=name

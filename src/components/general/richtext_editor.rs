@@ -27,6 +27,8 @@ pub enum ExtraFormatingOption {
     Lists,
 }
 
+const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
+
 #[component]
 pub fn RichTextEditor(
     #[prop(optional, default = Callback::new(|_| {}))] on_input: Callback<String>,
@@ -331,8 +333,12 @@ pub fn RichTextEditor(
                 }
 
                 spawn_local(async move {
+                    let Some(files_service_api) = FILES_SERVICE_API else {
+                        return;
+                    };
+
                     if let Ok(request) =
-                        gloo_net::http::Request::post("http://localhost:8080/api/files/upload")
+                        gloo_net::http::Request::post(&format!("{files_service_api}upload"))
                             .header(
                                 "Authorization",
                                 format!(
@@ -354,7 +360,7 @@ pub fn RichTextEditor(
                                                         img.set_attribute(
                                                             "src",
                                                             &format!(
-                                                                "http://localhost:3001/view/{}",
+                                                                "{files_service_api}/view/{}",
                                                                 uploaded_files[0].file_name
                                                             ),
                                                         )

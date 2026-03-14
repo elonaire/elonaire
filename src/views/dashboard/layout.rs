@@ -19,7 +19,7 @@ impl<'a> MenuItem<'a> {
     }
 }
 
-#[island]
+#[component]
 pub fn DashboardLayout() -> impl IntoView {
     // track collapsed state
     let (collapsed, set_collapsed) = signal(false);

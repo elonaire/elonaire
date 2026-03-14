@@ -10,7 +10,7 @@ use crate::components::{
     molecules::{quick_action::QuickAction, stats_card::StatsCard},
 };
 
-#[island]
+#[component]
 pub fn DashboardHome() -> impl IntoView {
     let timeline_items = RwSignal::new(vec![TimelineItem {
         time_info: "3 mins ago".into(),

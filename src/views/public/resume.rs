@@ -22,7 +22,7 @@ use crate::{
     utils::time::convert_date_to_human_readable_format,
 };
 
-#[island]
+#[component]
 pub fn Resume() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
     let resume = move || current_state.resume();
