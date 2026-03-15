@@ -73,12 +73,15 @@ pub fn SignIn() -> impl IntoView {
                     {
                         if let Ok(auth_status) = response.json::<AuthDetails>().await {
                             let token = auth_status.token.unwrap_or_default();
-                            leptos::logging::log!("Google Token: {}", token);
                             current_state.user().auth_info().token().set(token);
 
                             is_authenticated.set(true);
                             set_is_loading.set(false);
+                        } else {
+                            set_is_loading.set(false);
                         };
+                    } else {
+                        set_is_loading.set(false);
                     };
                 });
             }

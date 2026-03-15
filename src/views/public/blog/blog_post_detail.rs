@@ -28,7 +28,7 @@ use crate::components::{
 use crate::data::context::shared::{fetch_single_blog_post, fetch_single_user};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::models::graphql::shared::{
-    BlogComment, BlogCommentInput, BlogPost, BookmarkBlogPostResponse, BookmarkBlogPostVars,
+    BlogCommentInput, BlogPost, BookmarkBlogPostResponse, BookmarkBlogPostVars,
     CreateBlogCommentResponse, CreateBlogCommentVars, FetchSingleBlogPostVars,
     ReactToBlogCommentResponse, ReactToBlogCommentVars, ReactToBlogPostResponse,
     ReactToBlogPostVars, ReactionInput, ReactionType, UpdateBlogPostShareCountResponse,
@@ -40,7 +40,7 @@ use crate::data::{
 };
 use crate::utils::errors::handle_graphql_errors;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
-use crate::utils::graphql_client::{LocalGraphQLErrorMessage, perform_mutation_or_query_with_vars};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 

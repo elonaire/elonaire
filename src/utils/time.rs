@@ -54,10 +54,7 @@ pub fn get_elapsed_time(start: &str, end: &DateTime<Utc>) -> String {
                 val => format!("{val} {}", if val == 1 { "year" } else { "years" }),
             }
         }
-        Err(e) => {
-            leptos::logging::error!("Error parsing date: {}", e);
-            "Invalid Date".to_string()
-        }
+        Err(_e) => "Invalid Date".to_string(),
     }
 }
 

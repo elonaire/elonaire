@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use icondata as IconData;
-use leptos::attr::default;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;

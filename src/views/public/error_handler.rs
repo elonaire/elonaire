@@ -1,8 +1,5 @@
 use leptos::prelude::*;
-use leptos_router::{
-    NavigateOptions,
-    hooks::{use_location, use_navigate},
-};
+use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
 
 use crate::{

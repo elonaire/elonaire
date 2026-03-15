@@ -13,9 +13,7 @@ use crate::components::forms::textarea::Textarea;
 use crate::components::general::button::{BasicButton, ButtonType};
 use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::components::molecules::nav::Nav;
-use crate::data::models::graphql::shared::{
-    MessageInput, SendMessageResponse, SendMessageVars, Subject,
-};
+use crate::data::models::graphql::shared::{MessageInput, SendMessageResponse, SendMessageVars};
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 

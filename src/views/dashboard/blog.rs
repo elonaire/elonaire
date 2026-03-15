@@ -207,11 +207,10 @@ pub fn CreateBlog() -> impl IntoView {
                             return;
                         };
 
-                        if let Err(e) = form_data.append_with_str(
+                        if let Err(_e) = form_data.append_with_str(
                             "thumbnail",
                             format!("{files_service_api}/view/{}", thumbnail.file_name).as_str(),
                         ) {
-                            leptos::logging::log!("Error appending thumbnail: {:?}", e);
                             set_is_loading.set(false);
                             return;
                         }
@@ -224,11 +223,6 @@ pub fn CreateBlog() -> impl IntoView {
                             set_is_loading.set(false);
                             return;
                         };
-
-                        leptos::logging::log!(
-                            "html_output after serialization: {}",
-                            deserialized_form_data.content.matches('\n').count()
-                        );
 
                         let input_vars = CreateBlogPostVars {
                             blog_post: deserialized_form_data,

@@ -160,7 +160,7 @@ pub fn Nav(
                                                 view! {
                                                 <Popover showing=showing_user_popover display_item={
                                                                 let profile_pic = profile_pic.clone(); // clone before moving into ViewFn
-                                                                leptos::logging::log!("profile_pic: {profile_pic}");
+
                                                                 move || view!{
                                                                     <img src=format!("{}?width=300", profile_pic) class="size-[27px] object-cover rounded-full cursor-pointer" alt="dp" />
                                                                 }

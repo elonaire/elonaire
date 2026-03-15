@@ -20,9 +20,7 @@ use crate::data::{
     models::{general::files::UploadedFileResponse, graphql::shared::UserServiceInput},
 };
 
-use crate::utils::graphql_client::{
-    perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
         forms::{
@@ -38,10 +36,7 @@ use crate::{
     },
     data::{
         context::store::{AppStateContext, AppStateContextStoreFields},
-        models::{
-            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-            graphql::shared::UserServiceStoreFields,
-        },
+        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
@@ -239,12 +234,11 @@ pub fn CreateUserService() -> impl IntoView {
                             return;
                         };
 
-                        if let Err(e) = form_data.append_with_str(
+                        if let Err(_e) = form_data.append_with_str(
                             "thumbnail",
                             format!("{files_service_api}/view/{}", uploaded_files[0].file_name)
                                 .as_str(),
                         ) {
-                            leptos::logging::log!("Error appending thumbnail: {:?}", e);
                             set_is_loading.set(false);
                             return;
                         }
