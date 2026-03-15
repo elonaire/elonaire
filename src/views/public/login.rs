@@ -72,11 +72,10 @@ pub fn SignIn() -> impl IntoView {
                         .await
                     {
                         if let Ok(auth_status) = response.json::<AuthDetails>().await {
-                            current_state
-                                .user()
-                                .auth_info()
-                                .token()
-                                .set(auth_status.token.unwrap_or_default());
+                            let token = auth_status.token.unwrap_or_default();
+                            leptos::logging::log!("Google Token: {}", token);
+                            current_state.user().auth_info().token().set(token);
+
                             is_authenticated.set(true);
                             set_is_loading.set(false);
                         };
@@ -282,17 +281,17 @@ pub fn SignIn() -> impl IntoView {
         <div class="flex flex-col items-center justify-center p-8 bg-contrast-white min-h-svh">
             // <Breadcrumbs custom_route_names=["Home", "Sign In"] />
                         <h1 class="text-4xl font-bold my-4">{"Sign In"}</h1>
-                        <div class="w-full max-w-md flex flex-col items-center gap-2 md:flex-row md:justify-between my-4">
+                        <div class="w-full max-w-md flex flex-col items-center gap-2 my-4">
                                                 <BasicButton
-                                                    button_text="Sign in with Google"
-                                                    style_ext="bg-danger hover:bg-danger transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-contrast-white w-full"
+                                                    button_text="Continue with Google"
+                                                    style_ext="border-[1px] border-danger hover:bg-danger transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white text-danger w-full"
                                                     onclick=onsocial_sign_in(OauthClientName::Google)
                                                     icon=Some(IconId::AiGoogleOutlined) // Assuming you have icons for Google
                                                     icon_before=true
                                                 />
                                                 <BasicButton
-                                                    button_text="Sign in with GitHub"
-                                                    style_ext="bg-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 text-contrast-white w-full"
+                                                    button_text="Continue with GitHub"
+                                                    style_ext="border-[1px] border-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white text-gray w-full"
                                                     onclick=onsocial_sign_in(OauthClientName::Github)
                                                     icon=Some(IconId::AiGithubOutlined) // Assuming you have icons for GitHub
                                                     icon_before=true
@@ -340,7 +339,7 @@ pub fn SignIn() -> impl IntoView {
                                 disabled=submit_is_disabled
                             />
                             <div class="flex items-center justify-center mt-6 text-sm text-secondary hover:text-secondary">
-                                <A href="/signup">"Don't have an account? Sign up"</A>
+                                <A href="/sign-up">"Don't have an account? Sign up"</A>
                             </div>
                         </ReactiveForm>
         </div>

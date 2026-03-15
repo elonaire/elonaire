@@ -33,7 +33,6 @@ use crate::{
             user_services::{CreateUserService, UserService, UserServicesList},
             users::{CreateUser, Users, UsersList},
         },
-        login::SignIn,
         public::{
             about::About,
             blog::{
@@ -44,11 +43,13 @@ use crate::{
             error_handler::ErrorHandler,
             faqs::Faqs,
             home::Home,
+            login::SignIn,
             marketplace::waitlist::{Marketplace, WaitList},
             portfolio::Portfolio as PublicPortfolio,
             privacy::PrivacyPolicy,
             ratecard::Ratecard as PublicRatecard,
             resume::Resume as PublicResume,
+            sign_up::SignUp,
             tos::TermsOfService,
         },
     },
@@ -162,6 +163,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("") view=WaitList />
                     </ParentRoute>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>
+                    <Route path=StaticSegment("/sign-up") view=SignUp/>
                 </Routes>
             </Router>
         </ErrorBoundary>

@@ -38,6 +38,7 @@ use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
+use crate::utils::errors::handle_graphql_errors;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::{LocalGraphQLErrorMessage, perform_mutation_or_query_with_vars};
 
@@ -188,6 +189,7 @@ pub fn BlogPostDetail() -> impl IntoView {
     });
 
     let onprimary_handler = Callback::new(move |_| {
+        let redirect_to = location.pathname.get();
         if comment_form_is_valid.get() && blog_post.get().is_some() {
             set_is_loading.set(true);
             spawn_local(async move {
@@ -320,6 +322,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                             success_modal_is_open.update(|status| *status = true);
                         }
                         None => {
+                            let _handle_errors =
+                                handle_graphql_errors(&response, &current_state, &redirect_to);
                             set_is_loading.set(false);
                         }
                     };
@@ -381,97 +385,81 @@ pub fn BlogPostDetail() -> impl IntoView {
     };
 
     let handle_reaction_click = move |reaction: ReactionType| {
-        spawn_local({
-            let redirect_to = location.pathname.get();
-            async move {
-                let input_vars = ReactToBlogPostVars {
-                    reaction: ReactionInput { r#type: reaction },
-                    blog_post_id: blog_post
-                        .get_untracked()
-                        .unwrap_or_default()
-                        .id
-                        .unwrap_or_default(),
-                };
+        let redirect_to = location.pathname.get();
+        spawn_local(async move {
+            let input_vars = ReactToBlogPostVars {
+                reaction: ReactionInput { r#type: reaction },
+                blog_post_id: blog_post
+                    .get_untracked()
+                    .unwrap_or_default()
+                    .id
+                    .unwrap_or_default(),
+            };
 
-                let query = r#"
-                    mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
-                        reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
-                            data {
-                                type
-                                id
-                            }
-                            metadata {
-                                requestId
-                                newAccessToken
-                            }
+            let query = r#"
+                mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
+                    reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
+                        data {
+                            type
+                            id
+                        }
+                        metadata {
+                            requestId
+                            newAccessToken
                         }
                     }
-                   "#;
+                }
+               "#;
 
-                let mut headers = HashMap::new() as HashMap<String, String>;
-                headers.insert(
-                    "Authorization".into(),
-                    format!(
-                        "Bearer {}",
-                        current_state.user().auth_info().token().get_untracked()
-                    ),
-                );
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    current_state.user().auth_info().token().get_untracked()
+                ),
+            );
 
-                let Some(shared_service_api) = SHARED_SERVICE_API else {
-                    return;
-                };
+            let Some(shared_service_api) = SHARED_SERVICE_API else {
+                return;
+            };
 
-                let response =
-                    perform_mutation_or_query_with_vars::<
-                        ReactToBlogPostResponse,
-                        ReactToBlogPostVars,
-                    >(Some(&headers), shared_service_api, query, input_vars)
-                    .await;
+            let response = perform_mutation_or_query_with_vars::<
+                ReactToBlogPostResponse,
+                ReactToBlogPostVars,
+            >(Some(&headers), shared_service_api, query, input_vars)
+            .await;
 
-                match response.get_data() {
-                    Some(data) => {
-                        // increment reaction count in blog_post
-                        set_blog_post.update(|prev| {
-                            if let Some(prev) = prev {
-                                if prev.current_user_reaction.is_none() {
-                                    prev.reaction_count = prev.reaction_count.map(|val| val + 1);
-                                }
+            match response.get_data() {
+                Some(data) => {
+                    // increment reaction count in blog_post
+                    set_blog_post.update(|prev| {
+                        if let Some(prev) = prev {
+                            if prev.current_user_reaction.is_none() {
+                                prev.reaction_count = prev.reaction_count.map(|val| val + 1);
+                            }
 
-                                prev.current_user_reaction = Some(
-                                    data.react_to_blog_post
-                                        .as_ref()
-                                        .unwrap_or(&Default::default())
-                                        .get_data(),
-                                );
-                            };
-                        });
-                        set_is_loading.set(false);
-                    }
-                    None => {
-                        let errors = response.get_error();
-                        errors.iter().for_each(|e| {
-                            // The problem is e: &GraphQLErrorMessage is from an external crate(gql_client), all fields are private and implements only Deserialize trait
-                            if let Ok(value) = serde_json::to_value(e) {
-                                if let Ok(err) = serde_json::from_value(value)
-                                    as Result<LocalGraphQLErrorMessage, _>
-                                {
-                                    current_state.redirect_to().set(Some(redirect_to.clone()));
-                                    current_state.error().set(Some(err));
-                                } else {
-                                    leptos::logging::log!("Failed to parse error: {:?}", e);
-                                };
-                            } else {
-                                leptos::logging::log!("Failed to serialize error: {:?}", e);
-                            };
-                        });
-                        set_is_loading.set(false);
-                    }
-                };
-            }
+                            prev.current_user_reaction = Some(
+                                data.react_to_blog_post
+                                    .as_ref()
+                                    .unwrap_or(&Default::default())
+                                    .get_data(),
+                            );
+                        };
+                    });
+                    set_is_loading.set(false);
+                }
+                None => {
+                    let _handle_errors =
+                        handle_graphql_errors(&response, &current_state, &redirect_to);
+                    set_is_loading.set(false);
+                }
+            };
         });
     };
 
     let handle_comment_reaction_click = Callback::new(move |reaction: CommentReactionDetails| {
+        let redirect_to = location.pathname.get();
         spawn_local(async move {
             let input_vars = ReactToBlogCommentVars {
                 reaction: ReactionInput {
@@ -545,6 +533,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                     set_is_loading.set(false);
                 }
                 None => {
+                    let _handle_errors =
+                        handle_graphql_errors(&response, &current_state, &redirect_to);
                     set_is_loading.set(false);
                 }
             };
@@ -652,6 +642,7 @@ pub fn BlogPostDetail() -> impl IntoView {
     });
 
     let handle_bookmark = Callback::new(move |_| {
+        let redirect_to = location.pathname.get();
         spawn_local(async move {
             let input_vars = BookmarkBlogPostVars {
                 blog_post_id: blog_post
@@ -716,6 +707,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                     set_is_loading.set(false);
                 }
                 None => {
+                    let _handle_errors =
+                        handle_graphql_errors(&response, &current_state, &redirect_to);
                     set_is_loading.set(false);
                 }
             };

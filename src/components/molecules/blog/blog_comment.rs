@@ -24,7 +24,7 @@ pub fn BlogComment(
     #[prop(into)] content: String,
     #[prop(into)] comment_id: String,
     #[prop(into)] reply_count: u32,
-    #[prop(into)] reaction_count: u32,
+    #[prop(into)] reaction_count: Signal<u32>,
     #[prop(into)] current_user_reaction: Option<ReactionType>,
     #[prop(optional, default = Callback::new(|_| {}))] on_reaction: Callback<
         CommentReactionDetails,
@@ -167,13 +167,20 @@ pub fn BlogComment(
                                 reaction_type: ReactionType::Like
                             })
                         }>
-                            <BasicButton
-                                button_text=reaction_count.to_string()
-                                icon=Some(selected_reaction_icon)
-                                icon_before=true
-                                style_ext=format!("{}", if current_user_reaction.is_some() { "text-primary" } else { "" })
-                                children_style_ext="text-xs"
-                            />
+                            {
+                                move || {
+                                    let reaction_count = reaction_count.get();
+                                    view! {
+                                        <BasicButton
+                                            button_text=reaction_count.to_string()
+                                            icon=Some(selected_reaction_icon)
+                                            icon_before=true
+                                            style_ext=format!("{}", if current_user_reaction.is_some() { "text-primary" } else { "" })
+                                            children_style_ext="text-xs"
+                                        />
+                                    }
+                                }
+                            }
                         </div>
                     </div>
                     <BasicButton icon=Some(IconId::IoStatsChart) button_text="0" icon_before=true children_style_ext="text-xs" />

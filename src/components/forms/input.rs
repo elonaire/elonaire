@@ -78,6 +78,7 @@ pub fn InputField(
         InputFieldType::Time => "time",
         InputFieldType::Week => "week",
     };
+    let (show_password, set_show_password) = signal(false);
 
     let step = match field_type {
         InputFieldType::Number => Some("any"),
@@ -127,7 +128,7 @@ pub fn InputField(
                     class=format!(
                         "w-full h-full py-2 px-3 text-gray leading-tight flex-grow focus:outline-none"
                     )
-                    type=input_field_type_str
+                    type=move || if show_password.get() { "text" } else { input_field_type_str }
                     prop:value=initial_value
                     name=name
                     node_ref=input_node_ref
@@ -142,6 +143,23 @@ pub fn InputField(
                     on:focus=move |e| onfocus.run(e)
                     on:blur=move |e| onblur.run(e)
                 />
+                {move ||
+                    {
+                        let show_password_val = show_password.get();
+
+                        if field_type == InputFieldType::Password {
+                            Some(
+                                view!{
+                                    <div on:click=move |_e| set_show_password.set(!show_password.get()) class=format!("h-full flex items-center px-3 justify-center cursor-pointer")>
+                                        <Icon icon={if show_password_val { IconData::BsEyeSlash } else { IconData::BsEye }} width="1rem" height="1rem" />
+                                    </div>
+                                }
+                            )
+                        } else {
+                            None
+                        }
+                    }
+                }
             </div>
         </div>
     }
