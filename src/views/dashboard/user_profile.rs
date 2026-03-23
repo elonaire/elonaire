@@ -14,16 +14,16 @@ use crate::utils::formatters::PipeOption;
 #[component]
 pub fn ProfilePage() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
-    let user_profile = current_state.user().user_profile();
-    let auth_status = current_state.user().auth_info();
+    // let user_profile = current_state.user().user_profile();
+    // let auth_status = current_state.user().auth_info();
 
     view! {
         <div class="min-h-svh bg-contrast-white flex flex-col gap-[40px] display-constraints">
 
             {
                 move || {
-                    let user = user_profile.get();
-                    let auth_status = auth_status.get();
+                    let user = current_state.user().user_profile().get();
+                    let auth_status = current_state.user().auth_info().get();
                     view! {
                         // Avatar card
                         <div class="bg-white rounded-[5px] shadow-sm p-6 mb-4 flex items-center gap-5">

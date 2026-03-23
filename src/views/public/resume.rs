@@ -151,7 +151,7 @@ fn generate_timeline_item(resume: &UserResume) -> TimelineItem {
                 .unwrap_or(&String::new())
                 .to_owned(),
         ),
-        status: TimelineStatus::Success,
+        status: TimelineStatus::Neutral,
         content: ViewFn::from(move || {
             view! {
                 <ul class="list-disc list-inside">

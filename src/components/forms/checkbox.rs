@@ -61,11 +61,11 @@ pub fn CheckboxInputField(
     view! {
         <div class=format!("{}", ext_wrapper_styles)>
             <label
-                class="inline-flex items-center gap-2"
+                class="inline-flex items-start gap-2"
                 for=id_attr.clone()
             >
                 <input
-                    class=format!("leading-tight size-5 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
+                    class=format!("leading-tight size-5 shrink-0 rounded-[5px] border-2 border-mid-gray text-secondary shadow-sm
                                focus:outline-none focus:ring-0 bg-transparent focus:border-secondary
                                checked:bg-secondary checked:border-secondary
                                accent-secondary {}", ext_input_styles)

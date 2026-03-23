@@ -9,7 +9,7 @@ use web_sys::{FormData, HtmlFormElement, HtmlInputElement, HtmlSelectElement, Su
 
 use crate::components::forms::checkbox::CheckboxInputField;
 use crate::components::forms::datepicker::DatePicker;
-use crate::components::forms::input::CustomFileInput;
+use crate::components::forms::input::{CustomFileInput, InputField, InputFieldType};
 use crate::components::forms::reactive_form::ReactiveForm;
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::modal::modal::{BasicModal, UseCase};
@@ -334,7 +334,7 @@ pub fn RatecardComponent(
                                 ) {
                                     description
                                     startDate
-                                    endDate
+                                    engagementLength
                                     createdAt
                                     updatedAt
                                     id
@@ -401,7 +401,7 @@ pub fn RatecardComponent(
                     <div class="p-[10px] flex flex-col gap-[20px]">
                         <Textarea label="Description" required=true id_attr="description" name="description" />
                         <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                        <DatePicker label="End Date" required=true id_attr="end_date" initial_value=init_date name="end_date" />
+                        <InputField label="Engagement Length" min="1" field_type=InputFieldType::Number required=true id_attr="engagement_length" name="engagement_length" />
                     </div>
                 </ReactiveForm>
                 <ReactiveForm on:submit=handle_service_request_metadata_form_submit form_ref=service_request_metadata_form_ref>
@@ -454,6 +454,7 @@ pub fn RatecardComponent(
                                         "Hourly" => "hr",
                                         "Weekly" => "wk",
                                         "Annual" => "yr",
+                                        "Milestone" => "mi",
                                         _ => "_ _",
                                     };
                                     set_selected_billing_interval.set(short_name);
@@ -479,7 +480,7 @@ pub fn RatecardComponent(
                 </div>
             </ReactiveForm>
             <div class="p-[10px] mt-auto">
-                <BasicButton button_text="Request Service" icon=Some(IconId::BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
+                // <BasicButton button_text="Request Service" icon=Some(IconId::BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
             </div>
         </div>
     }

@@ -13,6 +13,8 @@ use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
 
 use crate::components::general::button::BasicButton;
+use crate::components::general::hocs::permission_guard::PermissionGuard;
+use crate::components::general::hocs::permission_guard::PermissionMatch;
 use crate::components::general::popover::Popover;
 use crate::data::context::users::sign_out;
 use crate::data::{
@@ -34,19 +36,19 @@ pub fn Nav(
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("About", IconId::BsInfoCircle, "/about"),
-            MenuItem::new("Resume", IconId::MdiCertificateOutline, "/resume"),
-            MenuItem::new("Portfolio", IconId::MdiTrophyAward, "/portfolio"),
-            MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace"),
-            MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog"),
+            MenuItem::new("About", IconId::BsInfoCircle, "/about", vec![]),
+            MenuItem::new("Resume", IconId::MdiCertificateOutline, "/resume", vec![]),
+            MenuItem::new("Portfolio", IconId::MdiTrophyAward, "/portfolio", vec![]),
+            MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace", vec![]),
+            MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog", vec![]),
         ]
     });
 
     let blog_menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("Home", IconId::AiHomeOutlined, "/"),
-            MenuItem::new("Blog Feed", IconId::BsRss, "/blog"),
-            MenuItem::new("About", IconId::BsInfoCircle, "/blog/about"),
+            // MenuItem::new("Home", IconId::AiHomeOutlined, ""),
+            MenuItem::new("Blog Feed", IconId::BsRss, "/blog", vec![]),
+            MenuItem::new("About", IconId::BsInfoCircle, "/blog/about", vec![]),
             // MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
             // MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
             // MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
@@ -92,7 +94,10 @@ pub fn Nav(
                     >
                         <Icon width="24" height="24" icon=IconId::IoMenu />
                     </button>
-                    <img src="https://api.techietenka.com/files/view/47a6c9dd-6d87-42ff-a041-9d2a7896c47f" class="w-[47px] object-cover" alt="Logo" />
+                    <A href="/" attr:class="flex items-center">
+                        <img src="https://api.techietenka.com/files/view/47a6c9dd-6d87-42ff-a041-9d2a7896c47f" class="h-full w-auto object-cover" alt="Logo" />
+                    </A>
+
                     <div class="flex items-center justify-end gap-[20px]">
                         { move ||
                             if !is_dashboard.get() && !is_blog.get() {
@@ -172,6 +177,14 @@ pub fn Nav(
                                                                 <Icon icon=IconId::MdiCardAccountDetailsOutline />
                                                             </span>
                                                         </A>
+                                                        <PermissionGuard match_mode=PermissionMatch::Any permissions=vec!["read:stats".into(), "write:portfolio".into(), "write:blog_post".into(), "write:media".into()]>
+                                                            <A attr:class="py-2 px-4 text-gray px-0 hover:bg-primary hover:text-contrast-white cursor-pointer rounded-[5px] font-bold" href="/dashboard">
+                                                                <span class="flex items-center justify-between">
+                                                                    <span>Dashboard</span>
+                                                                    <Icon icon=IconId::MdiTabletDashboard />
+                                                                </span>
+                                                            </A>
+                                                        </PermissionGuard>
                                                         <BasicButton
                                                             style_ext="text-danger px-0 hover:bg-danger hover:text-contrast-white"
                                                             onclick=handle_sign_out

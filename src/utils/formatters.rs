@@ -1,13 +1,13 @@
 /// For Plain T
 pub trait Pipe {
-    fn text(self, fallback: Option<&str>) -> Option<String>;
-    fn float(self, precision: Option<usize>, fallback: Option<&str>) -> Option<String>;
+    fn text(&self, fallback: Option<&str>) -> Option<String>;
+    fn float(&self, precision: Option<usize>, fallback: Option<&str>) -> Option<String>;
 }
 
 /// For Option<T>
 pub trait PipeOption {
-    fn text(self, fallback: Option<&str>) -> Option<String>;
-    fn float(self, precision: Option<usize>, fallback: Option<&str>) -> Option<String>;
+    fn text(&self, fallback: Option<&str>) -> Option<String>;
+    fn float(&self, precision: Option<usize>, fallback: Option<&str>) -> Option<String>;
 }
 
 /// For Option<T>
@@ -17,8 +17,8 @@ impl<T: std::fmt::Display> PipeOption for Option<T> {
     /// Handles Option<String>, Option<&str>, Option<i32>, Option<u32>, etc.
     ///
     /// Falls back to provided default or "N/A" if None or empty.
-    fn text(self, fallback: Option<&str>) -> Option<String> {
-        match self {
+    fn text(&self, fallback: Option<&str>) -> Option<String> {
+        match &self {
             Some(v) => {
                 let s = v.to_string();
                 if s.trim().is_empty() {
@@ -36,8 +36,8 @@ impl<T: std::fmt::Display> PipeOption for Option<T> {
     /// Optional precision controls decimal places.
     ///
     /// Falls back to provided default or "N/A" if None, empty, or unparseable.
-    fn float(self, precision: Option<usize>, fallback: Option<&str>) -> Option<String> {
-        match self {
+    fn float(&self, precision: Option<usize>, fallback: Option<&str>) -> Option<String> {
+        match &self {
             Some(v) => match v.to_string().trim().parse::<f64>() {
                 Ok(f) => Some(match precision {
                     Some(p) => format!("{:.prec$}", f, prec = p),
@@ -63,8 +63,8 @@ impl<T: std::fmt::Display> Pipe for T {
     /// Handles Option<String>, Option<&str>, Option<i32>, Option<u32>, etc.
     ///
     /// Falls back to provided default or "N/A" if None or empty.
-    fn text(self, fallback: Option<&str>) -> Option<String> {
-        Some(self).text(fallback)
+    fn text(&self, fallback: Option<&str>) -> Option<String> {
+        Some(&self).text(fallback)
     }
 
     /// Formats a float value from anything parseable as f64 (including strings from APIs).
@@ -72,7 +72,7 @@ impl<T: std::fmt::Display> Pipe for T {
     /// Optional precision controls decimal places.
     ///
     /// Falls back to provided default or "N/A" if None, empty, or unparseable.
-    fn float(self, precision: Option<usize>, fallback: Option<&str>) -> Option<String> {
-        Some(self).float(precision, fallback)
+    fn float(&self, precision: Option<usize>, fallback: Option<&str>) -> Option<String> {
+        Some(&self).float(precision, fallback)
     }
 }

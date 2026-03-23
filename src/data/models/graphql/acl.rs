@@ -41,6 +41,14 @@ pub struct AuthStatus {
     pub current_role: String,
     #[serde(rename = "newAccessToken")]
     pub new_access_token: Option<String>,
+    #[serde(rename = "currentRolePermissions")]
+    pub current_role_permissions: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Default, Eq, PartialEq)]
+pub struct UserSocial {
+    pub name: String,
+    pub url: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Store, PartialEq, Eq)]
@@ -75,6 +83,7 @@ pub struct User {
     pub bio: Option<String>,
     pub website: Option<String>,
     pub address: Option<String>,
+    pub socials: Option<Vec<UserSocial>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Copy, Eq, PartialEq)]

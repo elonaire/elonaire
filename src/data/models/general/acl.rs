@@ -29,6 +29,7 @@ pub struct UserInfo {
 pub struct AuthInfo {
     pub token: String,
     pub current_role: String,
+    pub current_role_permissions: Vec<String>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]

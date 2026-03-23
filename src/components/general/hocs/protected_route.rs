@@ -52,6 +52,7 @@ pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
                             .unwrap_or(&String::new())
                             .to_owned(),
                         current_role: auth.current_role.clone(),
+                        current_role_permissions: auth.current_role_permissions,
                     });
                     let user_id_vars = FetchSingleUserVars {
                         user_id: auth.sub.clone(),

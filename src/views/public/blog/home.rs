@@ -390,7 +390,7 @@ pub fn BlogHome() -> impl IntoView {
         </BasicModal>
         <main>
             <div class="min-h-svh flex flex-col gap-[40px] bg-contrast-white">
-                <div class="display-constraints">
+                <div class="display-constraints h-[310px] md:h-[499px]">
                     {
                         move || {
                             let featured_posts_val = featured_posts.get();

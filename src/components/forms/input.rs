@@ -57,6 +57,8 @@ pub fn InputField(
     #[prop(into, optional)] multiple: bool,
     #[prop(optional, default = None)] icon: Option<IconId>,
     #[prop(optional, default = true)] icon_is_leading: bool,
+    #[prop(into, optional)] min: String,
+    #[prop(into, optional)] max: String,
     #[prop(optional, default = Callback::new(|_| {}))] onfocus: Callback<ev::FocusEvent>,
     #[prop(optional, default = Callback::new(|_| {}))] onblur: Callback<ev::FocusEvent>,
 ) -> impl IntoView {
@@ -142,6 +144,8 @@ pub fn InputField(
                     step=step
                     on:focus=move |e| onfocus.run(e)
                     on:blur=move |e| onblur.run(e)
+                    min=min
+                    max=max
                 />
                 {move ||
                     {

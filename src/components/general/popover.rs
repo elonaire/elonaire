@@ -1,4 +1,5 @@
 use leptos::{ev, html::*, prelude::*};
+use leptos_router::hooks::use_location;
 
 #[derive(Clone, PartialEq)]
 #[allow(dead_code)]
@@ -30,6 +31,7 @@ pub fn Popover(
         "left-1/2 -translate-x-1/2".to_string(),
         "left-1/2 -translate-x-1/2".to_string(),
     ));
+    let location = use_location();
 
     let onclick_toggle_handler = move |_| {
         showing.update(|val| *val = !*val);
@@ -46,6 +48,12 @@ pub fn Popover(
     });
 
     let style_ext = StoredValue::new(style_ext);
+
+    Effect::new(move |_| {
+        // any time the pathname changes, close the popover
+        let _ = location.pathname.get();
+        showing.set(false);
+    });
 
     let recalculate = StoredValue::new(move || {
         if let Some(trigger) = trigger_ref.get_untracked() {
@@ -111,7 +119,7 @@ pub fn Popover(
                         "absolute {} {} z-30
                          w-max min-w-32 max-w-[calc(100vw-1rem)]
                          bg-contrast-white border border-light-gray
-                         shadow-lg text-sm rounded {}",
+                         shadow-lg text-sm rounded-[5px] {}",
                         align.get().0,
                         position_class.get_value(),
                         style_ext.get_value()
@@ -126,7 +134,7 @@ pub fn Popover(
                     >
                         <div class="w-[20px] h-[20px] bg-contrast-white border-l border-t border-light-gray rotate-45"></div>
                     </div>
-                    <div class="relative z-10 bg-contrast-white rounded">
+                    <div class="relative z-10 bg-contrast-white rounded-[5px]">
                         {move || children.get().map(|child| child())}
                     </div>
                 </div>

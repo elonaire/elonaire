@@ -76,29 +76,24 @@ pub fn DatePicker(
             <InputField
                 initial_value=selected_date_value
                 name=name
-                label=label
                 field_type=InputFieldType::Text
                 required=required
                 ext_wrapper_styles="sr-only"
                 id_attr=id_attr.clone()
                 input_node_ref=date_input_ref
             />
-            <div class="relative">
-                <InputField
-                    readonly=true
-                    on:click=move |ev: ev::MouseEvent| toggle_calendar.run(ev)
-                    initial_value=selected_date_display_value
-                    field_type=InputFieldType::Text
-                    id_attr=format!("{id_attr}-display")
-                    onblur=Callback::new(move |_| set_show_calendar.set(false))
-                />
-                <div
-                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                    on:click=move |ev| toggle_calendar.run(ev)
-                >
-                    <span class="text-mid-gray"><Icon icon=IconId::BsCalendar2Date /></span>
-                </div>
-            </div>
+            <InputField
+                readonly=true
+                required=required
+                label=label
+                on:click=move |ev: ev::MouseEvent| toggle_calendar.run(ev)
+                initial_value=selected_date_display_value
+                field_type=InputFieldType::Text
+                id_attr=format!("{id_attr}-display")
+                onblur=Callback::new(move |_| set_show_calendar.set(false))
+                icon=IconId::BsCalendar2Date
+                icon_is_leading=false
+            />
             {move || show_calendar.get().then(|| view! {
                 <div on:mousedown=|e: ev::MouseEvent| e.prevent_default() class="absolute bg-slate-50 rounded shadow-lg z-10 w-[300px] max-h-[400px] overflow-auto">
                     // Pass the currently selected date here

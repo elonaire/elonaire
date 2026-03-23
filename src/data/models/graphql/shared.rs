@@ -569,11 +569,18 @@ pub enum BillingInterval {
     Weekly,
     Monthly,
     Annual,
+    Milestone,
 }
 
 impl EnumerableEnum for BillingInterval {
     fn variants_slice() -> Vec<Self> {
-        vec![Self::Hourly, Self::Weekly, Self::Monthly, Self::Annual]
+        vec![
+            Self::Hourly,
+            Self::Weekly,
+            Self::Monthly,
+            Self::Annual,
+            Self::Milestone,
+        ]
     }
 }
 
@@ -608,8 +615,8 @@ pub struct ServiceRequestInput {
     pub description: String,
     #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
-    #[serde(rename = "endDate", alias = "end_date")]
-    pub end_date: String,
+    #[serde(rename = "engagementLength", alias = "engagement_length")]
+    pub engagement_length: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -635,8 +642,8 @@ pub struct ServiceRequest {
     pub supporting_docs: Option<Vec<UploadedFileId>>,
     #[serde(rename = "startDate")]
     pub start_date: Option<String>,
-    #[serde(rename = "endDate")]
-    pub end_date: Option<String>,
+    #[serde(rename = "engagementLength")]
+    pub engagement_length: Option<String>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
     #[serde(rename = "updatedAt")]

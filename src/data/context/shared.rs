@@ -430,6 +430,7 @@ pub async fn check_auth(
                     sub
                     currentRole
                     newAccessToken
+                    currentRolePermissions
                 }
                 metadata {
                     requestId

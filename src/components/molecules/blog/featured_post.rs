@@ -19,7 +19,7 @@ pub fn FeaturedPost(
             {/* Image */}
             <img
                 src=thumbnail
-                class="w-full h-[252px] object-cover rounded-[5px] md:h-full md:flex-1 md:rounded-l-none"
+                class="w-full h-[252px] object-cover rounded-[5px] md:h-full md:w-1/2 md:rounded-l-none"
             />
 
             {/* Featured Badge */}
@@ -29,9 +29,9 @@ pub fn FeaturedPost(
             </div>
 
             {/* Content Card */}
-            <div class="absolute top-[105px] left-[20px] flex flex-col gap-[10px] px-[18px] w-[333px] h-[205px] bg-primary/95 rounded-[5px] text-contrast-white md:relative md:top-0 md:left-0 md:flex-1 md:h-auto md:w-auto md:bg-contrast-white md:px-0 md:gap-[20px] md:text-gray md:justify-center">
+            <div class="absolute top-[105px] left-[20px] flex flex-col gap-[10px] px-[18px] w-[333px] h-[205px] bg-primary/95 rounded-[5px] text-contrast-white md:relative md:top-0 md:left-0 md:w-1/2 md:h-full md:bg-contrast-white md:px-0 md:gap-[20px] md:text-gray md:justify-center">
                 <A href={format!("/blog/read/{}", link)}>
-                    <h1 class="line-clamp-2 md:line-clamp-3">{title}</h1>
+                    <h1 class="text-contrast-white line-clamp-2 md:line-clamp-3 md:text-gray">{title}</h1>
                 </A>
                 <p class="line-clamp-2 md:line-clamp-3">{short_description}</p>
                 <AuthorInfo profile_pic=author_profile_pic author_name=author_name />

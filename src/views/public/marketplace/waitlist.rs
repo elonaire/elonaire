@@ -174,7 +174,7 @@ pub fn WaitList() -> impl IntoView {
                 // <div class="w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
                 <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                     <div class="p-[10px]">
-                        <p>"You have successfully subscribed to our newsletter!"</p>
+                        <p>"You have successfully subscribed to our marketplace launch update!"</p>
                         <p>"We guarantee that you will only receive updates when the marketplace is launched."</p>
                     </div>
                 </BasicModal>

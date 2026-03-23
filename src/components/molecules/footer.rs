@@ -10,7 +10,7 @@ pub fn Footer() -> impl IntoView {
                 <div class="flex flex-col gap-[20px] md:flex-row md:gap-[40px]">
                     <div class="flex flex-col gap-[20px] items-center md:items-start max-w-[319px]">
                         <img src="https://api.techietenka.com/files/view/5e8cfbe8-8380-49e1-814e-581dea3dde8b" class="brightness-300 w-[192px]" alt="Techie Tenka Logo" />
-                        <p class="md:text-left">"Welcome to my personal blog that majorly covers topics in Software Engineering and also a space where I can speak my mind out on anything and everything."</p>
+                        <p class="md:text-left">"Welcome to my personal website, portfolio and blog. My Blog majorly covers topics in Software Engineering and also a space where I can speak my mind out on anything and everything."</p>
                     </div>
                     <div class="flex flex-col gap-[10px]">
                         <h5 class="text-contrast-white">"Support"</h5>

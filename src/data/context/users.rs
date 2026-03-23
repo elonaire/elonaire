@@ -38,6 +38,10 @@ pub async fn fetch_site_owner_info(
                         id
                         fullName
                         age
+                        socials {
+                            name
+                            url
+                        }
                     }
                     metadata {
                         newAccessToken

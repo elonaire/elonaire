@@ -75,15 +75,23 @@ pub fn About() -> impl IntoView {
                                         </div>
                                         // Social links
                                         <div class="flex gap-[15px] text-mid-gray">
-                                            <A href="#" target="_blank">
-                                                <Icon width="1.5rem" height="1.5rem" icon=IconId::BsLinkedin />
-                                            </A>
-                                            <A href="#" target="_blank">
-                                                <Icon width="1.5rem" height="1.5rem" icon=IconId::BsTwitterX />
-                                            </A>
-                                            <A href="#" target="_blank">
-                                                <Icon width="1.5rem" height="1.5rem" icon=IconId::BsGithub />
-                                            </A>
+                                        {
+                                                site_owner_info.socials.as_ref().map(|socials| {
+                                                    socials.iter().map(|social| {
+                                                        let (icon, url) = match social.name.to_lowercase().as_str() {
+                                                            "github" => (IconId::BsGithub, social.url.clone()),
+                                                            "linkedin" => (IconId::BsLinkedin, social.url.clone()),
+                                                            "x" | "twitter" => (IconId::BsTwitterX, social.url.clone()),
+                                                            _ => (IconId::MdiWeb, social.url.clone()),
+                                                        };
+                                                        view! {
+                                                            <A href=url target="_blank">
+                                                                <Icon width="1.5rem" height="1.5rem" icon=icon />
+                                                            </A>
+                                                        }
+                                                    }).collect::<Vec<_>>()
+                                                })
+                                            }
                                         </div>
                                     }
                                 }
@@ -110,14 +118,13 @@ pub fn About() -> impl IntoView {
                         </p>
 
                         <p class="text-lg leading-relaxed text-gray mb-10">
-                            "You'll find articles on software engineering, systems design, the Internet of Things, lifestyle, and whatever else has captured my attention this week. I try to write things I'd want to read: precise, honest, and occasionally opinionated."
+                            "You'll find articles on software engineering, systems design, the Internet of Things (IoT), lifestyle, and whatever else has captured my attention this week. I try to write things I'd want to read: precise, honest, and occasionally opinionated."
                         </p>
 
                         // Divider
-                        <div class="flex items-center gap-4 mb-10">
-                            <div class="flex-1 h-px bg-light-gray"></div>
-                            <span class="text-primary text-lg">"✦"</span>
-                            <div class="flex-1 h-px bg-light-gray"></div>
+                        <div class="flex flex-col gap-[5px] mb-10">
+                            <div class="h-px bg-light-gray"></div>
+                            <div class="h-px bg-light-gray"></div>
                         </div>
 
                         // What to expect section
@@ -125,10 +132,10 @@ pub fn About() -> impl IntoView {
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-0 mb-10">
                             {[
-                                ("Engineering", "Deep dives into software, architecture, and the craft of building."),
-                                ("Essays", "Long-form thinking on technology, culture, and everything between."),
-                                ("Tutorials", "Practical guides from hard-won experience in the trenches."),
-                                ("Notes", "Short observations, links, and things worth remembering."),
+                                ("Engineering", "Deep dives into software, architecture, the Internet of Things, and the craft of building lean and performant software."),
+                                ("Scholarly Articles", "Well-researched and cited articles that can be used by scholars for their academic work."),
+                                ("Tutorials", "Practical guides from hard-won experience in the trenches of building and deploying real software."),
+                                ("My Opinion", "Finally, you might come across my fresh unfiltered thoughts and I will be honest enough to tell you when I am stating opinions and not facts."),
                             ].into_iter().map(|(title, desc)| view! {
                                 <div class="border-t border-light-gray py-5 pr-6">
                                     <h3 class="text-sm font-bold tracking-wide text-mid-gray mb-1 uppercase">{title}</h3>
@@ -138,10 +145,9 @@ pub fn About() -> impl IntoView {
                         </div>
 
                         // Divider
-                        <div class="flex items-center gap-4 mb-10">
-                            <div class="flex-1 h-px bg-light-gray"></div>
-                            <span class="text-primary text-lg">"✦"</span>
-                            <div class="flex-1 h-px bg-light-gray"></div>
+                        <div class="flex flex-col gap-[5px] mb-10">
+                            <div class="h-px bg-light-gray"></div>
+                            <div class="h-px bg-light-gray"></div>
                         </div>
 
                         // Contact
@@ -161,9 +167,9 @@ pub fn About() -> impl IntoView {
                 // Bottom stats strip
                 <div class="border-t-2 border-mid-gray pt-8 grid grid-cols-2 md:grid-cols-4 gap-8">
                     {[
-                        ("48+", "Articles Published"),
+                        ("N/A", "Articles Published"),
                         ("2024", "Year Founded"),
-                        ("12k+", "Monthly Readers"),
+                        ("N/A", "Monthly Readers"),
                         ("Weekly", "Publishing Cadence"),
                     ].into_iter().map(|(stat, label)| view! {
                         <div>

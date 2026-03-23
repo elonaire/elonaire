@@ -1,13 +1,18 @@
 use icondata as IconData;
 use leptos::prelude::*;
 use leptos_meta::*;
+use leptos_router::hooks::use_navigate;
 
-use crate::components::{
-    general::{
-        breadcrumbs::Breadcrumbs,
-        timeline::{Timeline, TimelineItem, TimelineStatus},
+use crate::{
+    components::{
+        general::{
+            breadcrumbs::Breadcrumbs,
+            hocs::permission_guard::PermissionMatch,
+            timeline::{Timeline, TimelineItem, TimelineStatus},
+        },
+        molecules::{quick_action::QuickAction, stats_card::StatsCard},
     },
-    molecules::{quick_action::QuickAction, stats_card::StatsCard},
+    utils::hooks::use_permissions::use_permission,
 };
 
 #[component]
@@ -20,6 +25,18 @@ pub fn DashboardHome() -> impl IntoView {
         content: ViewFn::from(|| view! { <p>"Project created with Leptos!"</p> }),
         ..Default::default()
     }]);
+    let navigate = use_navigate();
+
+    let can_view = use_permission(
+        &vec!["read:stats".to_string(), "write:portfolio".to_string()],
+        PermissionMatch::Any,
+    );
+
+    Effect::new(move |_| {
+        if !can_view.get() {
+            navigate("/dashboard/user/profile", Default::default());
+        }
+    });
 
     view! {
         <>

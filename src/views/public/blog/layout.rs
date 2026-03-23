@@ -38,9 +38,9 @@ pub fn BlogLayout() -> impl IntoView {
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("Home", IconId::AiHomeOutlined, "/"),
-            MenuItem::new("Blog Feed", IconId::BsRss, "/blog"),
-            MenuItem::new("About", IconId::BsInfoCircle, "/blog/about"),
+            MenuItem::new("Home", IconId::AiHomeOutlined, "/", vec![]),
+            MenuItem::new("Blog Feed", IconId::BsRss, "/blog", vec![]),
+            MenuItem::new("About", IconId::BsInfoCircle, "/blog/about", vec![]),
             // MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
             // MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
             // MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
@@ -85,6 +85,7 @@ pub fn BlogLayout() -> impl IntoView {
                             .unwrap_or(&String::new())
                             .to_owned(),
                         current_role: auth.current_role.clone(),
+                        current_role_permissions: auth.current_role_permissions,
                     });
                     let user_id_vars = FetchSingleUserVars {
                         user_id: auth.sub.clone(),

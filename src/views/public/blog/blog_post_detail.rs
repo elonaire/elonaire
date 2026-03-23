@@ -39,6 +39,7 @@ use crate::data::{
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
 use crate::utils::errors::handle_graphql_errors;
+use crate::utils::formatters::PipeOption;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
@@ -136,6 +137,10 @@ pub fn BlogPostDetail() -> impl IntoView {
                                 id
                                 fullName
                                 email
+                                socials {
+                                    name
+                                    url
+                                }
                             }
                             metadata {
                                 requestId
@@ -900,19 +905,27 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                             <div class="flex py-[20px] gap-[20px] border-y border-light-gray">
                                                                 <img src={author_details.profile_picture.as_ref().unwrap_or(&Default::default()).to_owned()} alt="Author Image" class="w-[100px] h-[100px] rounded-full" />
                                                                 <div class="flex flex-col gap-[15px]">
-                                                                    <p class="font-bold">{author_details.full_name.as_ref().unwrap_or(&Default::default()).to_owned()}</p>
-                                                                    <p>{author_details.bio.as_ref().unwrap_or(&Default::default()).to_owned()}</p>
+                                                                    <p class="font-bold">{author_details.full_name.text(None)}</p>
+                                                                    <p>{author_details.bio.text(None)}</p>
                                                                     // Socials
                                                                     <div class="flex gap-[15px]">
-                                                                        <A href="#" target="_blank">
-                                                                            <Icon icon=IconId::BsLinkedin />
-                                                                        </A>
-                                                                        <A href="#" target="_blank">
-                                                                            <Icon icon=IconId::BsTwitterX />
-                                                                        </A>
-                                                                        <A href="#" target="_blank">
-                                                                            <Icon icon=IconId::BsGithub />
-                                                                        </A>
+                                                                    {
+                                                                            author_details.socials.as_ref().map(|socials| {
+                                                                                socials.iter().map(|social| {
+                                                                                    let (icon, url) = match social.name.to_lowercase().as_str() {
+                                                                                        "github" => (IconId::BsGithub, social.url.clone()),
+                                                                                        "linkedin" => (IconId::BsLinkedin, social.url.clone()),
+                                                                                        "x" | "twitter" => (IconId::BsTwitterX, social.url.clone()),
+                                                                                        _ => (IconId::MdiWeb, social.url.clone()),
+                                                                                    };
+                                                                                    view! {
+                                                                                        <A href=url attr:class="hover:text-primary transition-colors" target="_blank">
+                                                                                            <Icon icon=icon />
+                                                                                        </A>
+                                                                                    }
+                                                                                }).collect::<Vec<_>>()
+                                                                            })
+                                                                        }
                                                                     </div>
                                                                 </div>
                                                             </div>

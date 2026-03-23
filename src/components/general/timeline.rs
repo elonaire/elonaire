@@ -10,6 +10,7 @@ pub enum TimelineStatus {
     Danger,
     #[default]
     Success,
+    Neutral,
 }
 
 #[derive(Clone)]
@@ -158,6 +159,7 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                         TimelineStatus::Info => "bg-info/20 text-info",
                         TimelineStatus::Success => "bg-success/20 text-success",
                         TimelineStatus::Danger => "bg-danger/20 text-danger",
+                        TimelineStatus::Neutral => "bg-primary/20 text-primary",
                     };
 
                     view! {
@@ -166,9 +168,9 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                 {
                                     if let Some(icon_head) = &item.icon_head {
                                         Some(view!{
-                                            <span class="relative flex size-8 cursor-pointer">
+                                            <span class="relative flex size-6 cursor-pointer">
                                                 <span class=format!("absolute inline-flex h-full w-full rounded-full {} {}", if item.display_ping { "animate-ping" } else { "" }, bg_status_classes)></span>
-                                                <span class=format!("relative inline-flex items-center justify-center size-8 rounded-full {}", bg_status_classes)>
+                                                <span class=format!("relative inline-flex items-center justify-center size-6 rounded-full {}", bg_status_classes)>
                                                     <Icon width="50%" height="50%" icon=icon_head.to_owned() />
                                                 </span>
                                             </span>
@@ -180,9 +182,9 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                 {
                                     if let Some(image_head) = &item.image_head {
                                         Some(view!{
-                                            <span class="relative flex size-8 cursor-pointer">
+                                            <span class="relative flex size-6 cursor-pointer">
                                                 <span class=format!("absolute inline-flex h-full w-full rounded-full {} {}", if item.display_ping { "animate-ping" } else { "" }, bg_status_classes)></span>
-                                                <span class=format!("relative inline-flex items-center justify-center size-8 rounded-full {}", bg_status_classes)>
+                                                <span class=format!("relative inline-flex items-center justify-center size-6 rounded-full {}", bg_status_classes)>
                                                     <img alt="timeline-head" src=image_head.to_owned() class="w-full h-full rounded-full object-contain saturate-200" />
                                                 </span>
                                             </span>
@@ -194,9 +196,9 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                                 {
                                     if item.image_head.is_none() && item.icon_head.is_none() {
                                         Some(view!{
-                                            <span class="relative flex size-8 cursor-pointer">
+                                            <span class="relative flex size-6 cursor-pointer">
                                                 <span class=format!("absolute inline-flex h-full w-full rounded-full {} {}", if item.display_ping { "animate-ping" } else { "" }, bg_status_classes)></span>
-                                                <span class=format!("relative inline-flex size-8 rounded-full {}", bg_status_classes)></span>
+                                                <span class=format!("relative inline-flex size-6 rounded-full {}", bg_status_classes)></span>
                                             </span>
                                         })
                                     } else {

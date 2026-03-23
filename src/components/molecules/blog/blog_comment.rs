@@ -107,7 +107,7 @@ pub fn BlogComment(
 
     view! {
         <div class="flex gap-[13px]">
-            <img src=author_avatar alt="Avatar" class="w-[63px] h-[63px] rounded-full" />
+            <img src=author_avatar alt="Avatar" class="size-8 rounded-full" />
             <div class="flex flex-col gap-[10px]">
                 <div class="flex items-center gap-[8px] text-xs">
                     <p class="font-bold">{author_name}</p>

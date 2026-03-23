@@ -6,7 +6,7 @@ pub fn AuthorInfo(
     #[prop(into)] author_name: String,
 ) -> impl IntoView {
     view! {
-        <div class="flex items-center gap-[10px] text-light-gray">
+        <div class="flex items-center gap-[10px] text-light-gray md:text-mid-gray">
             <img src=profile_pic alt="Author Avatar" class="rounded-full size-6" />
             <p class="text-xs">{author_name}</p>
         </div>

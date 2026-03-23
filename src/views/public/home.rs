@@ -54,11 +54,11 @@ pub fn Home() -> impl IntoView {
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("About", IconId::BsInfoCircle, "/about"),
-            MenuItem::new("Resume", IconId::MdiCertificateOutline, "/resume"),
-            MenuItem::new("Portfolio", IconId::MdiTrophyAward, "/portfolio"),
-            MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace"),
-            MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog"),
+            MenuItem::new("About", IconId::BsInfoCircle, "/about", vec![]),
+            MenuItem::new("Resume", IconId::MdiCertificateOutline, "/resume", vec![]),
+            MenuItem::new("Portfolio", IconId::MdiTrophyAward, "/portfolio", vec![]),
+            MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace", vec![]),
+            MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog", vec![]),
         ]
     });
 
@@ -202,7 +202,7 @@ pub fn Home() -> impl IntoView {
                                         let(child)
                                     >
                                         <div class="flex rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
-                                            <A attr:class="h-full flex items-center gap-[10px]" href=child.path>
+                                            <A attr:class="flex-1 h-full flex items-center gap-[10px]" href=child.path>
                                                 <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
                                                 <span class="flex-1">{child.label}</span>
                                             </A>
@@ -278,14 +278,22 @@ pub fn Home() -> impl IntoView {
                                 <p class="min-h-[90px] max-w-[600px] text-base">
                                     {current_description}
                                 </p>
-                                <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-contrast-white md:w-[292px]" />
+                                // <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-contrast-white md:w-[292px]" />
+                                <A attr:class="font-bold py-2 px-4 cursor-pointer rounded-[5px] bg-primary text-contrast-white md:w-[292px] flex items-center justify-center gap-2" href={move || site_owner_info().get()
+                                        .socials
+                                        .as_ref()
+                                        .and_then(|socials| socials.iter().find(|s| s.name.to_lowercase() == "github"))
+                                        .and_then(|social| Some(social.url.clone())).unwrap_or_default()} target="_blank">
+                                    <span>"Checkout my GitHub"</span>
+                                    <span><Icon width="24" height="24" icon=IconId::BsGithub /></span>
+                                </A>
                             </div>
-                            <img alt="dp" src={{move || site_owner_info().get().profile_picture}} class="object-cover rounded-[5px] hidden md:block w-[50%] h-auto bg-contrast-white mix-blend-multiply" />
+                            <img alt="dp" src={move || site_owner_info().get().profile_picture} class="object-cover rounded-[5px] hidden md:block w-[50%] h-auto bg-contrast-white mix-blend-multiply" />
                         </div>
 
                         {/* Scroll button */}
                         <BasicButton style_ext="hidden absolute bottom-8 left-1/2 -translate-x-1/2 md:flex flex-col items-center gap-2 text-sm opacity-60 hover:opacity-100 transition-opacity duration-300 cursor-pointer animate-bounce text-secondary">
-                            <span class="text-xs tracking-widest uppercase">"More"</span>
+                            <span class="text-xs tracking-widest uppercase">"Scroll"</span>
                             <Icon icon=IconId::BsChevronDoubleDown width="2rem" height="2rem" />
                         </BasicButton>
                     </div>
