@@ -66,6 +66,13 @@ jobs:
         name: dist
     - name: Unpack the artifact
       run: tar -xvf dist.tar
+
+    - name: Prepare
+      run: |
+        platform=${{ matrix.platform }}
+        echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+        echo "FRONTEND_REGISTRY_IMAGE=registry.techietenka.com/tt-frontend" >> $GITHUB_ENV
+
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
@@ -101,9 +108,6 @@ jobs:
           # context: .
           # push: true
           tags: ${{ env.FRONTEND_REGISTRY_IMAGE }}
-          build-args: |
-            SERVICE_NAME=tt-frontend
-            PORT=8080
           platforms: ${{ matrix.platform }}
           provenance: true # enables --provenance=mode=max
           sbom: true
