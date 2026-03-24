@@ -1,4 +1,4 @@
-use leptos::{html::Form, prelude::*};
+use leptos::{ev, html::Form, prelude::*};
 
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 
@@ -19,10 +19,10 @@ use crate::utils::forms::fire_bubbled_and_cancelable_event;
 ///
 ///    if let Some(form) = target {
 ///        set_form_is_valid.set(form.check_validity());
-///        if let Some(form_data) = FormData::new_with_form(&form) {
+///        if let Ok(form_data) = FormData::new_with_form(&form) {
 ///            // Implement logic to handle form data
 ///            // e.g. you can deserialize the form data into a struct
-///            let deserialized_form_data = deserialize_form_data_to_struct::<MyFormStruct>();
+///            let deserialized_form_data = deserialize_form_data_to_struct::<MyFormStruct>(&form_data);
 ///            // Do something with the data e.g. serialize to JSON and send to the server
 ///        };
 ///    }
@@ -37,6 +37,7 @@ use crate::utils::forms::fire_bubbled_and_cancelable_event;
 pub fn ReactiveForm(
     form_ref: NodeRef<Form>,
     #[prop(into, optional)] ext_styles: String,
+    #[prop(default = Callback::new(|_| {}))] onreset: Callback<ev::Event>,
     children: Children,
 ) -> impl IntoView {
     view! {
@@ -46,17 +47,18 @@ pub fn ReactiveForm(
             on:input=move |_| {
                 if let Some(form) = form_ref.get() {
                     if form.check_validity() {
-                        fire_bubbled_and_cancelable_event("submit", true, true, form);
+                        fire_bubbled_and_cancelable_event("submit", true, true, &form);
                     }
                 }
             }
             on:change=move |_| {
                 if let Some(form) = form_ref.get() {
                     if form.check_validity() {
-                        fire_bubbled_and_cancelable_event("submit", true, true, form);
+                        fire_bubbled_and_cancelable_event("submit", true, true, &form);
                     }
                 }
             }
+            on:reset=move |ev| onreset.run(ev)
         >
             {children()}
         </form>

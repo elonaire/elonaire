@@ -2,12 +2,59 @@ use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::{
     StaticSegment,
-    components::{Route, Router, Routes},
+    components::{ParentRoute, Route, Router, Routes},
+    path,
 };
 use reactive_stores::Store;
 
-use crate::views::home::Home;
-use crate::{schemas::general::acl::AppStateContext, views::login::SignIn};
+use crate::{
+    components::general::hocs::protected_route::ProtectedRoute,
+    data::context::store::AppStateContext,
+    views::{
+        dashboard::{
+            blog::{Blog, BlogList, CreateBlog},
+            departments::{CreateDepartment, Departments, DepartmentsList},
+            home::DashboardHome,
+            layout::DashboardLayout,
+            organizations::{CreateOrganization, Organizations, OrganizationsList},
+            permissions::{CreatePermission, Permissions, PermissionsList},
+            portfolio::{CreatePortfolio, Portfolio, PortfolioList},
+            professional_details::{
+                CreateProfessionalDetail, ProfessionalDetails, ProfessionalDetailsList,
+            },
+            ratecards::{CreateRatecard, Ratecards, RatecardsList},
+            resources::{CreateResource, Resources, ResourcesList},
+            resume::{CreateResumeItem, Resume, ResumeItemsList},
+            roles::{CreateRole, Roles, RolesList},
+            service_rates::{CreateServiceRate, ServiceRates, ServiceRatesList},
+            service_requests::{ServiceRequests, ServiceRequestsList},
+            skills::{CreateSkill, Skills, SkillsList},
+            user_profile::ProfilePage,
+            user_services::{CreateUserService, UserService, UserServicesList},
+            users::{CreateUser, Users, UsersList},
+        },
+        public::{
+            about::About,
+            attributions::Attributions,
+            blog::{
+                about::About as AboutBlog, blog_post_detail::BlogPostDetail, home::BlogHome,
+                layout::BlogLayout,
+            },
+            contact::Contact,
+            error_handler::ErrorHandler,
+            faqs::Faqs,
+            home::Home,
+            login::SignIn,
+            marketplace::waitlist::{Marketplace, WaitList},
+            portfolio::Portfolio as PublicPortfolio,
+            privacy::PrivacyPolicy,
+            ratecard::Ratecard as PublicRatecard,
+            resume::Resume as PublicResume,
+            sign_up::SignUp,
+            tos::TermsOfService,
+        },
+    },
+};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -36,9 +83,89 @@ pub fn App() -> impl IntoView {
                     >
             <Router>
                 <Routes fallback=|| "Page not found.">
-                    // <Route path=StaticSegment("") view=|| view! { <ProtectedRoute><Home /></ProtectedRoute> } />
                     <Route path=StaticSegment("") view=Home />
+                    <Route path=StaticSegment("/about") view=About />
+                    <Route path=StaticSegment("/resume") view=PublicResume />
+                    <Route path=StaticSegment("/portfolio") view=PublicPortfolio />
+                    <Route path=StaticSegment("/ratecard") view=PublicRatecard />
+                    <Route path=StaticSegment("/faq") view=Faqs />
+                    <Route path=StaticSegment("/terms") view=TermsOfService />
+                    <Route path=StaticSegment("/privacy") view=PrivacyPolicy />
+                    <Route path=StaticSegment("/contact") view=Contact />
+                    <Route path=StaticSegment("/attributions") view=Attributions />
+                    <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
+                        <ParentRoute path=path!("/portfolio") view=Portfolio>
+                            <Route path=path!("") view=PortfolioList />
+                            <Route path=path!("create") view=CreatePortfolio />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/professional-details") view=ProfessionalDetails>
+                            <Route path=path!("") view=ProfessionalDetailsList />
+                            <Route path=path!("create") view=CreateProfessionalDetail />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/services") view=UserService>
+                            <Route path=path!("") view=UserServicesList />
+                            <Route path=path!("create") view=CreateUserService />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/service-rates") view=ServiceRates>
+                            <Route path=path!("") view=ServiceRatesList />
+                            <Route path=path!("create") view=CreateServiceRate />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/service-requests") view=ServiceRequests>
+                            <Route path=path!("") view=ServiceRequestsList />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/ratecards") view=Ratecards>
+                            <Route path=path!("") view=RatecardsList />
+                            <Route path=path!("create") view=CreateRatecard />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/resume") view=Resume>
+                            <Route path=path!("") view=ResumeItemsList />
+                            <Route path=path!("create") view=CreateResumeItem />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/skills") view=Skills>
+                            <Route path=path!("") view=SkillsList />
+                            <Route path=path!("create") view=CreateSkill />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/blog") view=Blog>
+                            <Route path=path!("") view=BlogList />
+                            <Route path=path!("create") view=CreateBlog />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/users") view=Users>
+                            <Route path=path!("") view=UsersList />
+                            <Route path=path!("create") view=CreateUser />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/roles") view=Roles>
+                            <Route path=path!("") view=RolesList />
+                            <Route path=path!("create") view=CreateRole />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/permissions") view=Permissions>
+                            <Route path=path!("") view=PermissionsList />
+                            <Route path=path!("create") view=CreatePermission />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/resources") view=Resources>
+                            <Route path=path!("") view=ResourcesList />
+                            <Route path=path!("create") view=CreateResource />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/organizations") view=Organizations>
+                            <Route path=path!("") view=OrganizationsList />
+                            <Route path=path!("create") view=CreateOrganization />
+                        </ParentRoute>
+                        <ParentRoute path=path!("/departments") view=Departments>
+                            <Route path=path!("") view=DepartmentsList />
+                            <Route path=path!("create") view=CreateDepartment />
+                        </ParentRoute>
+                        <Route path=path!("/user/profile") view=ProfilePage />
+                        <Route path=path!("") view=DashboardHome />
+                    </ParentRoute>
+                    <ParentRoute path=path!("/blog") view=BlogLayout >
+                        <Route path=path!("") view=BlogHome />
+                        <Route path=path!("/read/:slug") view=BlogPostDetail />
+                        <Route path=path!("/about") view=AboutBlog />
+                    </ParentRoute>
+                    <ParentRoute path=path!("/marketplace") view=Marketplace>
+                        <Route path=path!("") view=WaitList />
+                    </ParentRoute>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>
+                    <Route path=StaticSegment("/sign-up") view=SignUp/>
                 </Routes>
             </Router>
         </ErrorBoundary>

@@ -80,8 +80,8 @@ impl StepInfo {
 ///        <p>"Third step"</p>
 ///        { move || {
 ///            if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
-///                let form_data = get_form_data_from_form_ref(first_form_ref).unwrap();
-///                let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap();
+///                let form_data = get_form_data_from_form_ref(first_form_ref).unwrap_or_default();
+///                let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap_or_default();
 ///                Some(view! {
 ///                    <h2 class="text-lg">"First Step Verification"</h2>
 ///                    <p><strong>"Username: "</strong>{data.user_name}</p>
@@ -149,7 +149,7 @@ pub fn Stepper(
             .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
 
         if let Some(form) = target {
-            // let form_data = FormData::new_with_form(&form).unwrap();
+            // let form_data = FormData::new_with_form(&form).unwrap_or_default();
             let is_valid = form.check_validity();
             set_step_form_is_valid.set(is_valid);
         }
@@ -159,10 +159,10 @@ pub fn Stepper(
 
     // A workaround for updating the next step's form's validity state when navigating to the next step or previous step
     Effect::new(move || {
-        let form_ref = form_refs.get().get(current_step.get()).unwrap().to_owned();
-
-        if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
-            fire_bubbled_and_cancelable_event("submit", true, true, form);
+        if let Some(form_ref) = form_refs.get().get(current_step.get()) {
+            if let Some(form) = form_ref.get() as Option<HtmlFormElement> {
+                fire_bubbled_and_cancelable_event("submit", true, true, &form);
+            }
         }
     });
 
@@ -171,7 +171,7 @@ pub fn Stepper(
             <div class="relative flex items-center w-full mb-4">
                 // Line between steps (md+ screens only)
                 <div class="hidden md:flex justify-center w-full absolute top-4">
-                    <div class="w-full border-t border-gray-300 absolute z-0" />
+                    <div class="w-full border-t border-mid-gray absolute z-0" />
                 </div>
                 <div class="relative flex flex-wrap md:flex-nowrap justify-center md:justify-between w-full md:space-x-2">
                     <For
@@ -189,7 +189,7 @@ pub fn Stepper(
                                     set_current_step.update(|step| *step = index);
                                 } class=move || {
                                     format!(
-                                        "relative flex items-center cursor-pointer bg-white space-x-2 px-4 mb-2 z-9 {}",
+                                        "relative flex items-center cursor-pointer bg-contrast-white space-x-2 px-4 mb-2 z-9 {}",
                                         if !is_current() { "hidden md:flex" } else { "" }
                                     )
                                 }>
@@ -197,9 +197,9 @@ pub fn Stepper(
                                         format!(
                                             "w-8 h-8 flex items-center justify-center rounded-full text-sm {}",
                                             if is_current() {
-                                                "bg-primary text-white"
+                                                "bg-primary text-contrast-white"
                                             } else {
-                                                "bg-gray-200 text-gray-800"
+                                                "bg-light-gray"
                                             }
                                         )
                                     }>
@@ -211,8 +211,8 @@ pub fn Stepper(
                                             }
                                         }
                                         {
-                                            if step_label.icon.is_some() {
-                                                Some(view!{ <Icon icon={step_label.icon.unwrap()} /> })
+                                            if let Some(icon) = step_label.icon {
+                                                Some(view!{ <Icon icon=icon /> })
                                             } else {
                                                 None
                                             }
@@ -223,7 +223,7 @@ pub fn Stepper(
                                         if is_current() {
                                             "font-bold text-primary"
                                         } else {
-                                            "text-gray-800"
+                                            ""
                                         }
                                     )}>
                                         { step_label.label.clone() }
@@ -234,7 +234,7 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div on:submit=handle_step_form_submit class=format!("mb-4 p-4 border border-gray-300 rounded w-full {}", ext_wrapper_styles)>
+            <div on:submit=handle_step_form_submit class=format!("mb-4 p-4 border border-mid-gray rounded w-full {}", ext_wrapper_styles)>
             {
                     move || {
                         let current = current_step.get();
@@ -243,14 +243,18 @@ pub fn Stepper(
                             .into_iter()
                             .enumerate()
                             .map(|(i, child)| {
-                                let form_ref = form_refs.get().get(i).unwrap().to_owned();
-                                let dynamic_class = move || if current == i { "block" } else { "hidden" };
+                                if let Some(form_ref) = form_refs.get().get(i) {
+                                    let dynamic_class = move || if current == i { "block" } else { "hidden" };
 
-                                view! {
-                                    <ReactiveForm form_ref=form_ref ext_styles=dynamic_class()>
-                                        { child.into_view() }
-                                    </ReactiveForm>
+                                    Some(view! {
+                                        <ReactiveForm form_ref=form_ref.to_owned() ext_styles=dynamic_class()>
+                                            { child.into_view() }
+                                        </ReactiveForm>
+                                    })
+                                } else {
+                                    None
                                 }
+
                             }).collect_view()
                     }
                 }

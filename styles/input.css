@@ -1,0 +1,206 @@
+/*@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital@0;1&display=swap");*/
+
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary: #32B089;
+    --color-secondary: #3298B0;
+    --color-warning: #E7C318;
+    --color-success: #32B04A;
+    --color-info: #1D9AE2;
+    --color-danger: #E74C3C;
+    --color-light-gray: #D2D2D2;
+    --color-mid-gray: #8D8D8D;
+    --color-gray: #4D4D4D;
+    --color-navy: #000E1E;
+    --color-editor-dark: #0C1117;
+    --color-contrast-white: #F0F0F0;
+    --font-primary: "Inter", sans-serif;
+}
+
+/* Custom styles for the toggle switch dot */
+.dot {
+    @apply bg-slate-50 shadow-md;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: theme(--color-mid-gray);
+}
+
+::-webkit-scrollbar-thumb {
+    background: theme(--color-primary);
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: theme(--color-secondary);
+}
+
+/* input.css */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    h1 {
+        @apply text-3xl md:text-4xl font-bold leading-tight text-gray dark:text-light-gray;
+    }
+
+    h2 {
+        @apply text-2xl md:text-3xl font-semibold leading-snug text-gray dark:text-light-gray;
+    }
+
+    h3 {
+        @apply text-xl md:text-2xl font-semibold text-gray dark:text-light-gray;
+    }
+
+    h4 {
+        @apply text-lg md:text-xl font-medium text-gray dark:text-light-gray;
+    }
+
+    h5 {
+        @apply text-base md:text-lg font-medium text-gray dark:text-light-gray;
+    }
+
+    h6 {
+        @apply text-sm md:text-base font-medium uppercase tracking-wide text-gray dark:text-light-gray;
+    }
+
+    .text-body {
+        @apply text-sm md:text-base font-normal leading-normal text-gray dark:text-mid-gray;
+    }
+
+    .text-caption {
+        @apply text-xs md:text-sm font-light leading-loose text-gray dark:text-mid-gray;
+    }
+
+    .text-small {
+        @apply text-xs md:text-sm font-normal leading-normal text-gray dark:text-mid-gray;
+    }
+
+    .text-salutation {
+        @apply text-xl md:text-2xl font-normal leading-normal text-gray dark:text-mid-gray;
+    }
+
+    .text-owner-name {
+        @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-gray dark:text-mid-gray;
+    }
+
+    ul {
+        @apply list-disc list-inside;
+    }
+
+    ol {
+        @apply list-decimal list-inside;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    article pre {
+        white-space: pre;
+        overflow-x: auto;
+        background-color: theme(--color-editor-dark);
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    article code {
+        white-space: pre;
+    }
+
+    .display-constraints {
+        @apply max-w-7xl mx-[5%] xl:mx-auto xl:w-full;
+    }
+
+    .blog-display-constraints {
+        @apply max-w-2xl md:mx-auto md:w-full;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active,
+    input:-webkit-autofill:not(:focus),
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+        -webkit-text-fill-color: theme(--color-gray);
+        caret-color: theme(--color-gray);
+
+        border-radius: inherit;
+        -webkit-background-clip: padding-box;
+
+        transition: background-color 5000s ease-in-out 0s;
+    }
+}
+
+/* ───── 3-D Flip Card Utilities ───── */
+@layer utilities {
+    .preserve-3d {
+        transform-style: preserve-3d;
+    }
+
+    .backface-hidden {
+        backface-visibility: hidden;
+    }
+
+    .rotate-y-180 {
+        transform: rotateY(180deg);
+    }
+
+    /* Smooth flip on hover */
+    .group:hover .flip-back {
+        transform: rotateY(0deg);
+    }
+
+    .flip-back {
+        transition: transform 0.7s ease;
+    }
+
+    @keyframes fade-in-up {
+        0% {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 1s ease-out forwards;
+    }
+
+    @keyframes progress-indeterminate {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    .animate-progress-indeterminate {
+        animation: progress-indeterminate 1.5s ease-in-out infinite;
+        width: 30%;
+    }
+}

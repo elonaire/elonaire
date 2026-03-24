@@ -1,10 +1,15 @@
 pub mod badge;
 pub mod breadcrumbs;
 pub mod button;
+pub mod carousel;
+pub mod chip;
 pub mod collapse;
 pub mod hocs;
 pub mod modal;
 pub mod popover;
+pub mod progress;
+pub mod richtext_editor;
+pub mod spinner;
 pub mod stepper;
 pub mod table;
 pub mod tabs;

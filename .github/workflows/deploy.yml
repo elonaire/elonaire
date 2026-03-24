@@ -1,0 +1,202 @@
+name: pr_check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: install toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: wasm32-unknown-unknown
+        override: true
+        profile: minimal
+    - name: Install trunk
+      uses: jetli/trunk-action@v0.5.1
+      with:
+        version: 'latest'
+    - name: Build
+      run: |
+        touch .env
+        echo "NEWSLETTER_MAILING_LIST_ID=${{ secrets.NEWSLETTER_MAILING_LIST_ID }}" >> .env
+        echo "FILES_SERVICE_API=${{ secrets.FILES_SERVICE_API }}" >> .env
+        echo "ACL_SERVICE_API=${{ secrets.ACL_SERVICE_API }}" >> .env
+        echo "SHARED_SERVICE_API=${{ secrets.SHARED_SERVICE_API }}" >> .env
+        echo "PAYMENTS_SERVICE_API=${{ secrets.PAYMENTS_SERVICE_API }}" >> .env
+        echo "EMAIL_SERVICE_API=${{ secrets.EMAIL_SERVICE_API }}" >> .env
+        echo "MARKETPLACE_WAITLIST_MAILING_LIST_ID=${{ secrets.MARKETPLACE_WAITLIST_MAILING_LIST_ID }}" >> .env
+
+        export $(cat .env | xargs) && trunk build --release
+    - name: 'Tar files'
+      run: tar -cvf dist.tar dist/
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: dist
+        path: dist.tar
+
+  push_docker_image:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          # - linux/arm64
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Download a single artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: dist
+    - name: Unpack the artifact
+      run: tar -xvf dist.tar
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.FRONTEND_REGISTRY_IMAGE }}
+
+    - uses: actions/checkout@v6
+
+    - name: Log in to Docker Registry
+      uses: docker/login-action@v3
+      with:
+        registry: registry.techietenka.com
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: ${{ matrix.platform }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      # with:
+      #   version: "lab:latest"
+      #   driver: cloud
+      #   endpoint: "elonaire/elonaire-builder"
+
+
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v6
+      with:
+          # context: .
+          # push: true
+          tags: ${{ env.FRONTEND_REGISTRY_IMAGE }}
+          build-args: |
+            SERVICE_NAME=tt-frontend
+            PORT=8080
+          platforms: ${{ matrix.platform }}
+          provenance: true # enables --provenance=mode=max
+          sbom: true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Export digest
+      run: |
+        mkdir -p ${{ runner.temp }}/digests
+        digest="${{ steps.build.outputs.digest }}"
+        touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+    - name: Upload digest
+      uses: actions/upload-artifact@v7
+      with:
+        name: digests-tt-frontend-${{ env.PLATFORM_PAIR }}
+        path: ${{ runner.temp }}/digests/*
+        if-no-files-found: error
+        retention-days: 1
+
+    - name: Download digests
+      uses: actions/download-artifact@v8
+      with:
+        path: ${{ runner.temp }}/digests
+        pattern: digests-tt-frontend-*
+        merge-multiple: true
+
+    - name: Docker meta
+      id: meta-tag
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.FRONTEND_REGISTRY_IMAGE }}
+        tags: |
+            type=raw,value=latest
+
+    - name: Create manifest list and push
+      working-directory: ${{ runner.temp }}/digests
+      run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.FRONTEND_REGISTRY_IMAGE }}@sha256:%s ' *)
+
+  deploy_to_server:
+    runs-on: ubuntu-latest
+    needs: [push_docker_image]
+    if: |
+      always() && needs.push_docker_image.result != 'failure'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+            ssh-private-key: ${{ secrets.VM_SSH_KEY }}
+
+      - name: Add VM to known hosts
+        run: ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy manifests and configs
+        run: |
+              scp -r k3s ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/${{ secrets.VM_USER }}/
+
+
+      - name: Deploy on VM
+        run: |
+              ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<'EOF'
+                    set -e
+
+                    cd /home/${{ secrets.VM_USER }}
+
+                    # Make .sh scripts executable
+                    chmod +x k3s/configs.sh
+
+                    # Run script(s)
+                    ./k3s/configs.sh
+
+                    # Apply manifests after scripts (if needed)
+                    kubectl apply -f ./k3s/manifests -R
+              EOF
+
+  automerge:
+    runs-on: ubuntu-latest
+
+    needs: [build, push_docker_image, deploy_to_server]
+    if: |
+      always() &&
+      (needs.build.result == 'success' && needs.push_docker_image.result == 'success' && needs.deploy_to_server.result == 'success')
+
+    steps:
+      - id: automerge
+        name: automerge
+        uses: 'pascalgn/automerge-action@v0.16.4'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          MERGE_LABELS: ''

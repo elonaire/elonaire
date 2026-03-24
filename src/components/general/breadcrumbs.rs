@@ -1,5 +1,6 @@
 use crate::components::schemas::props::StringVec;
-use icondata as IconId;
+use icondata::BiChevronRightRegular;
+
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::{components::A, hooks::use_location};
@@ -42,7 +43,7 @@ pub fn Breadcrumbs(
                     custom_route_names
                         .0
                         .get(route_name_index)
-                        .unwrap()
+                        .unwrap_or(&String::new())
                         .to_owned()
                 } else {
                     segment.clone()
@@ -71,7 +72,7 @@ pub fn Breadcrumbs(
     });
 
     view! {
-        <nav class="p-3 rounded">
+        <nav class="rounded">
             <ul class="flex items-center space-x-2">
                 {move || {
                     breadcrumbs
@@ -87,7 +88,7 @@ pub fn Breadcrumbs(
                                     {if i < breadcrumbs.get().len() - 1 {
                                         Some(view! {
                                             <span class="text-xs mx-2">
-                                                <Icon icon=IconId::BiChevronRightRegular />
+                                                <Icon icon=BiChevronRightRegular />
                                             </span>
                                         })
                                     } else {

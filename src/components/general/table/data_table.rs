@@ -1,16 +1,18 @@
+use icondata::{BsFilter, BsPencil, BsSortDown, BsSortUp, BsThreeDots, BsTrash, ImDrawer2};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::hash::Hasher;
 
 use chrono::DateTime;
 use chrono::Utc;
-use icondata as IconId;
+
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
 use super::pagination::Pagination;
 use crate::components::general::button::BasicButton;
+use crate::components::general::popover::Popover;
 use crate::utils::time::get_elapsed_time;
 
 #[derive(Clone)]
@@ -46,11 +48,11 @@ impl Column {
             name: name.to_string(),
             sortable,
             sort_order: Default::default(),
-            sort_icon: (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> })
-                .into(),
+            sort_icon: (|| view! { <Icon width="0.8em" height="0.8em" icon=BsFilter /> }).into(),
         }
     }
 
+    /// This method toggles the sort order of the column.
     pub fn toggle_sort(&mut self) -> &mut Self {
         self.sort_order = match self.sort_order {
             SortOrder::Default => SortOrder::Ascending,
@@ -60,16 +62,17 @@ impl Column {
         self
     }
 
+    /// This method toggles the sort icon of the column.
     pub fn toggle_sort_icon(&mut self) -> &mut Self {
         self.sort_icon = match self.sort_order {
             SortOrder::Default => {
-                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> }).into()
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=BsFilter /> }).into()
             }
             SortOrder::Ascending => {
-                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortUp /> }).into()
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=BsSortUp /> }).into()
             }
             SortOrder::Descending => {
-                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortDown /> }).into()
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=BsSortDown /> }).into()
             }
         };
         self
@@ -86,17 +89,31 @@ impl PartialEq for Column {
 #[derive(Clone)]
 #[allow(dead_code)]
 pub enum TableCellData {
+    /// This handles String data type
     String(String),
+    /// This handles i32 data type
     Int32(i32),
+    /// This handles i64 data type
     Int64(i64),
+    /// This handles RSX which is a ViewFn that returns HTML content
     Html(ViewFn), // Simplified for Leptos; assumes HTML as ViewFn
+    /// This handles f32 data type
     Float32(f32),
+    /// This handles f64 data type
     Float64(f64),
+    /// This handles usize data type
+    Usize(usize),
+    /// This handles u32 data type
     UInt32(u32),
+    /// This handles u64 data type
     UInt64(u64),
+    /// This handles u128 data type
     UInt128(u128),
+    /// This handles bool data type
     Bool(bool),
+    /// This handles DateTime data and takes an RFC3339 formatted string
     DateTime(String),
+    /// This handles time duration and takes an RFC3339 formatted string which is the start date. End date is assumed to be the current date.
     Duration(String),
 }
 
@@ -109,6 +126,7 @@ impl std::fmt::Debug for TableCellData {
             TableCellData::Html(_) => f.debug_tuple("Html").field(&"<Html content>").finish(),
             TableCellData::Float32(f32) => f.debug_tuple("Float32").field(f32).finish(),
             TableCellData::Float64(f64) => f.debug_tuple("Float64").field(f64).finish(),
+            TableCellData::Usize(u) => f.debug_tuple("Usize").field(u).finish(),
             TableCellData::UInt32(u) => f.debug_tuple("UInt32").field(u).finish(),
             TableCellData::UInt64(u) => f.debug_tuple("UInt64").field(u).finish(),
             TableCellData::UInt128(u) => f.debug_tuple("UInt128").field(u).finish(),
@@ -208,8 +226,7 @@ pub struct TableProps {
     pub data: Vec<HashMap<String, TableCellData>>,
     pub page_size: usize,
     pub on_row_click: Callback<HashMap<String, TableCellData>>,
-    pub on_row_edit: Callback<HashMap<String, TableCellData>>,
-    pub on_row_delete: Callback<HashMap<String, TableCellData>>,
+    pub on_row_action: Callback<(HashMap<String, TableCellData>, String)>,
     pub editable: bool,
     pub deletable: bool,
 }
@@ -227,6 +244,7 @@ impl PartialEq for TableProps {
 }
 
 impl TableProps {
+    /// This method paginates the table data based on the current page and page size.
     pub fn paginate(
         &mut self,
         current_page: usize,
@@ -242,6 +260,7 @@ impl TableProps {
         (current_page, total_pages, current_data)
     }
 
+    /// This method sorts the table data based on the specified column. This is triggered when the user clicks on a column header.
     pub fn sort(&mut self, column: &Column) -> Vec<HashMap<String, TableCellData>> {
         match column.sort_order {
             SortOrder::Ascending => {
@@ -326,7 +345,7 @@ impl TableProps {
 ///    Column::new("Date", true),
 ///  ];
 ///
-/// // Assume that transactions variable is a vector of Transaction structs probably deserialized from a backend API JSON response
+/// // Assuming that transactions variable is a vector of Transaction structs probably deserialized from a backend API JSON response
 /// // Use the TableCellData enum to format table cell values to the variants you want.
 /// let transactions = transactions
 ///    .iter()
@@ -363,12 +382,13 @@ pub fn DataTable(
     #[prop(optional, default = Callback::new(|_| {}))] on_row_click: Callback<
         HashMap<String, TableCellData>,
     >,
-    #[prop(optional, default = Callback::new(|_| {}))] on_row_edit: Callback<
+    #[prop(optional, default = Callback::new(|_| {}))] on_row_action: Callback<(
         HashMap<String, TableCellData>,
-    >,
-    #[prop(optional, default = Callback::new(|_| {}))] on_row_delete: Callback<
-        HashMap<String, TableCellData>,
-    >,
+        String,
+    )>,
+    // #[prop(optional, default = Callback::new(|_| {}))] on_row_delete: Callback<
+    //     HashMap<String, TableCellData>,
+    // >,
     #[prop(default = false, optional)] editable: bool,
     #[prop(default = false, optional)] deletable: bool,
 ) -> impl IntoView {
@@ -377,8 +397,7 @@ pub fn DataTable(
         data: data.get().1,
         page_size,
         on_row_click,
-        on_row_edit,
-        on_row_delete,
+        on_row_action,
         editable,
         deletable,
     });
@@ -388,6 +407,10 @@ pub fn DataTable(
 
     // Derived signal for paginated data
     let pagination_state = Memo::new(move |_| props.get().paginate(current_page.get()));
+    let current_page_total_pages = Memo::new(move |_| {
+        let derived_state = pagination_state.get();
+        (derived_state.0, derived_state.1)
+    });
 
     let offset_rows = Memo::new(move |_| {
         let no_of_rows = pagination_state.get().2.len();
@@ -419,26 +442,24 @@ pub fn DataTable(
         data.set((updated_columns, sorted_data));
     });
 
-    let on_click_edit_handler = move |row_data: HashMap<String, TableCellData>| {
-        Callback::new(move |_| {
-            props.get().on_row_edit.run(row_data.clone());
-        })
-    };
-
     let on_click_row_handler = move |row_data: HashMap<String, TableCellData>| {
         props.get().on_row_click.run(row_data);
     };
 
-    let on_click_delete_handler = move |row_data: HashMap<String, TableCellData>| {
-        Callback::new(move |_| {
-            props.get().on_row_delete.run(row_data.clone());
-        })
-    };
+    let on_click_action_handler =
+        move |(row_data, action_type): (HashMap<String, TableCellData>, String)| {
+            Callback::new(move |_| {
+                let action_type = action_type.clone();
+                let row_data = row_data.clone();
+
+                props.get().on_row_action.run((row_data, action_type));
+            })
+        };
 
     view! {
         <div class="w-full flex flex-col justify-between">
             <div class="overflow-x-auto">
-                <table class="table-fixed border-collapse border rounded table-fixed min-w-full h-full text-gray-500 mt-4 mb-4 text-md">
+                <table class="table-fixed border-separate border border-light-gray rounded-[5px] table-fixed min-w-full h-full mt-4 mb-4 text-md">
                     <thead>
                         <tr class="p-2">
                             <For
@@ -447,7 +468,7 @@ pub fn DataTable(
                                 let (column)
                             >
                                 <th
-                                    class="border-b p-2 border-gray-200 text-nowrap font-bold text-gray-800 text-left cursor-pointer min-w-[150px]"
+                                    class="border-b p-2 border-light-gray text-nowrap font-bold text-left cursor-pointer min-w-[150px]"
                                     on:click=move |_| on_click_sort.run(column.clone())
                                 >
                                     <span class="flex flex-row items-center">
@@ -466,7 +487,7 @@ pub fn DataTable(
                             </For>
                             {move || if props.get().editable || props.get().deletable {
                                 Some(view! {
-                                    <th class="border-b p-2 border-gray-200 text-wrap font-bold text-gray-800 text-left">
+                                    <th class="border-b p-2 border-light-gray text-wrap font-bold text-left">
                                         "Actions"
                                     </th>
                                 })
@@ -490,7 +511,7 @@ pub fn DataTable(
 
                                 view! {
                                     <tr
-                                        class="border-b border-gray-200 p-2"
+                                        class="border-b border-light-gray p-2"
                                         on:click=move |_| on_click_row_handler(row_data_row_click.clone())
                                     >
                                         // Computed row columns
@@ -513,6 +534,7 @@ pub fn DataTable(
                                                             Some(TableCellData::String(s)) => s.clone().into_any().into_view(),
                                                             Some(TableCellData::Int32(i)) => i.to_string().into_any().into_view(),
                                                             Some(TableCellData::Int64(i)) => i.to_string().into_any().into_view(),
+                                                            Some(TableCellData::Usize(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt32(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt64(u)) => u.to_string().into_any().into_view(),
                                                             Some(TableCellData::UInt128(u)) => u.to_string().into_any().into_view(),
@@ -537,31 +559,48 @@ pub fn DataTable(
                                                 </For>
                                                 // Action columns
                                                 {if props.get().editable || props.get().deletable {
-                                                    let row_data_edit = row_data.clone();
+                                                    let showing = RwSignal::new(false);
 
                                                     Some(view! {
                                                         <td class="flex flex-row items-center gap-2 h-full py-2">
-                                                            {if props.get().editable {
-                                                                Some(view! {
-                                                                    <BasicButton
-                                                                                    onclick=on_click_edit_handler(row_data_edit.clone())
-                                                                                    icon=Some(IconId::BsPencil)
-                                                                                />
-                                                                })
-                                                            } else {
-                                                                None
-                                                            }}
-                                                            {if props.get().deletable {
-                                                                Some(view! {
-                                                                    <BasicButton
-                                                                    style_ext="text-danger".to_string()
-                                                                                    onclick=on_click_delete_handler(row_data.clone())
-                                                                                    icon=Some(IconId::BsTrash)
-                                                                                />
-                                                                })
-                                                            } else {
-                                                                None
-                                                            }}
+                                                            <Popover showing=showing display_item=|| view!{
+                                                                <BasicButton
+                                                                                icon=Some(BsThreeDots)
+                                                                            />
+                                                                }>
+                                                                <div class="flex flex-col gap-2">
+                                                                    {if props.get().editable {
+                                                                        Some(view! {
+                                                                            <BasicButton
+                                                                                style_ext="px-0 hover:bg-primary hover:text-contrast-white"
+                                                                                onclick=on_click_action_handler((row_data.clone(), "edit".into()))
+                                                                                >
+                                                                                <span class="flex items-center justify-between">
+                                                                                    <span>Edit</span>
+                                                                                    <Icon icon=BsPencil />
+                                                                                </span>
+                                                                            </BasicButton>
+                                                                        })
+                                                                    } else {
+                                                                        None
+                                                                    }}
+                                                                    {if props.get().deletable {
+                                                                        Some(view! {
+                                                                            <BasicButton
+                                                                                style_ext="text-danger px-0 hover:bg-danger hover:text-contrast-white"
+                                                                                onclick=on_click_action_handler((row_data.clone(), "delete".into()))
+                                                                                >
+                                                                                <span class="flex items-center justify-between">
+                                                                                    <span>Delete</span>
+                                                                                    <Icon icon=BsTrash />
+                                                                                </span>
+                                                                            </BasicButton>
+                                                                        })
+                                                                    } else {
+                                                                        None
+                                                                    }}
+                                                                </div>
+                                                            </Popover>
                                                         </td>
                                                     })
                                                 } else {
@@ -587,7 +626,7 @@ pub fn DataTable(
                                         >
                                             {
                                                 view! {
-                                                    <tr class="border-b border-gray-200">
+                                                    <tr class="border-b border-light-gray">
                                                         <td class="p-[24px]" colspan={props.get().columns.len()}>""</td>
                                                     </tr>
                                                 }
@@ -602,16 +641,14 @@ pub fn DataTable(
                         {move || if pagination_state.get().2.is_empty() {
                             Some(view! {
                                 <tr>
-                                    <td colspan={props.get().columns.len()}>
-                                        <div class="py-2">"No Content"</div>
+                                    <td colspan={props.get().columns.len() + 1}>
+                                        <div class="py-2 flex items-center justify-center">
+                                            <div class="flex-1 flex flex-col items-center justify-center">
+                                                <Icon width="2em" height="2em" icon=ImDrawer2 />
+                                                <p>"No Content"</p>
+                                            </div>
+                                        </div>
                                     </td>
-                                    {if props.get().deletable || props.get().editable {
-                                        Some(view! {
-                                            <td></td>
-                                        })
-                                    } else {
-                                        None
-                                    }}
                                 </tr>
                             })
                         } else {
@@ -621,7 +658,7 @@ pub fn DataTable(
                 </table>
             </div>
             <Pagination
-                pagination_state={pagination_state}
+                pagination_state={current_page_total_pages}
                 on_page_change={on_page_change}
             />
         </div>

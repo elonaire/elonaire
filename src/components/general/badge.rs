@@ -38,7 +38,7 @@ pub fn Badge(
         <div class=format!("relative {}", parent_class)>
             {children()}
             <span class=format!(
-                "inline-flex items-center justify-center rounded-full text-xs font-medium text-white absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 {} {} {}",
+                "inline-flex items-center justify-center rounded-full text-xs font-medium text-contrast-white absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 {} {} {}",
                 color_classes(),
                 width_classes(),
                 badge_position

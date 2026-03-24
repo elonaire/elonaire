@@ -11,45 +11,39 @@ use leptos::prelude::*;
 ///    active=RwSignal::new(true)
 ///    label_active="Enabled"
 ///    label_inactive="Disabled"
-///    name="status".into()
+///    name="status"
 /// />
 /// ```
 #[component]
 pub fn ToggleSwitch(
-    #[prop(into)] name: String,
-    #[prop(into)] active: RwSignal<bool>,
+    #[prop(into, optional)] name: String,
+    #[prop(into, optional, default = Signal::derive(move || false))] active: Signal<bool>,
     #[prop(into, default = "On".into())] label_active: String,
     #[prop(into, default = "Off".into())] label_inactive: String,
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] label: String,
     #[prop(default = false)] required: bool,
-    #[prop(optional, default = Callback::new(|_| {}))] oninput: Callback<ev::Event>,
 ) -> impl IntoView {
     let checkbox_ref = NodeRef::new();
+    let initial_value = RwSignal::new(String::from("false"));
 
     let handle_toggle = move |ev: ev::MouseEvent| {
         ev.stop_propagation();
-        active.set(!active.get());
 
-        // Fire a bubbling Change event so that the form can capture changes
         if let Some(input_el) = checkbox_ref.get() {
-            fire_bubbled_and_cancelable_event("change", true, true, input_el);
+            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
         }
     };
 
-    let current_value = Memo::new(move |_| active.get().to_string());
-
     view! {
-        <div class="flex flex-col cursor-pointer mb-2">
-            <div>
-                <CheckboxInputField input_node_ref=checkbox_ref oninput=oninput initial_value=current_value label=label name=name id_attr=id_attr checked=active ext_input_styles="sr-only" required=required />
-            </div>
+        <div class="flex flex-col cursor-pointer relative">
+            <CheckboxInputField input_node_ref=checkbox_ref initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required />
             <div class="flex items-center">
                 <div on:click=handle_toggle class="relative">
                     <div
                         class=move || format!(
                             "block w-14 h-8 rounded-full {}",
-                            if active.get() { "bg-blue-950" } else { "bg-gray-300" }
+                            if active.get() { "bg-secondary" } else { "bg-mid-gray" }
                         )
                     ></div>
                     <div
@@ -59,7 +53,7 @@ pub fn ToggleSwitch(
                         )
                     ></div>
                 </div>
-                <div class="flex items-center ml-3 text-gray-700 font-medium">
+                <div class="flex items-center ml-3 font-medium">
                     <p>{
                         move || {
                             if active.get() {
