@@ -64,6 +64,7 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: dist
+        path: .
     - name: Unpack the artifact
       run: tar -xvf dist.tar
 
