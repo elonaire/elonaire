@@ -4,3 +4,4 @@ tailwindcss
 /dist
 notes.txt
 .env
+prod.env
