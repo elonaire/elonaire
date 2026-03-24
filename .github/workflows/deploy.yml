@@ -58,14 +58,6 @@ jobs:
           - linux/amd64
           # - linux/arm64
     steps:
-    - name: Download a single artifact
-      uses: actions/download-artifact@v8
-      with:
-        name: dist
-        path: .
-    - name: Unpack the artifact
-      run: tar -xvf dist.tar
-
     - name: Prepare
       run: |
         platform=${{ matrix.platform }}
@@ -98,6 +90,14 @@ jobs:
       #   version: "lab:latest"
       #   driver: cloud
       #   endpoint: "elonaire/elonaire-builder"
+
+    - name: Download a single artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: dist
+        path: .
+    - name: Unpack the artifact
+      run: tar -xvf dist.tar
 
     - name: Debug dist
       run: |
