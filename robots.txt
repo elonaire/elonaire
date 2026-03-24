@@ -1,26 +1,16 @@
+User-agent: *
+Allow: /
+
 User-agent: Googlebot
-Allow: /
-
-User-agent: Googlebot-Image
-Allow: /
-
-User-agent: Googlebot-Mobile
-Allow: /
-
-User-agent: Mediapartners-Google
-Allow: /
-
-User-agent: Adsbot-Google
-Allow: /
-
-User-agent: Googlebot-News
-Allow: /
-
-User-agent: Googlebot-Video
 Allow: /
 
 User-agent: Twitterbot
 Allow: /
 
-User-agent: *
-Disallow: /
+# Block only sensitive paths
+Disallow: /dashboard/
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /api/
+
+# Sitemap: https://techietenka.com/sitemap.xml
