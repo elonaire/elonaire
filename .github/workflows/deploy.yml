@@ -58,8 +58,6 @@ jobs:
           - linux/amd64
           # - linux/arm64
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
     - name: Download a single artifact
       uses: actions/download-artifact@v8
       with:
