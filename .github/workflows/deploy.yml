@@ -1,4 +1,4 @@
-name: pr_check
+name: Techie Tenka Frontend CI/CD
 
 on:
   workflow_dispatch:
@@ -105,7 +105,7 @@ jobs:
       id: build
       uses: docker/build-push-action@v6
       with:
-          # context: .
+          context: .
           # push: true
           tags: ${{ env.FRONTEND_REGISTRY_IMAGE }}
           platforms: ${{ matrix.platform }}
