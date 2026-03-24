@@ -53,7 +53,7 @@ pub fn TermsOfService() -> impl IntoView {
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
-        <div class="min-h-svh bg-contrast-white flex flex-col gap-[40px]">
+        <div class="min-h-svh flex flex-col gap-[40px]">
             <Nav onmenuclick=handle_menu_click() />
             // Header
             <div class="display-constraints blog-display-constraints border-b border-light-gray">
@@ -70,7 +70,7 @@ pub fn TermsOfService() -> impl IntoView {
             </p>
 
             // Sections
-            <div class="display-constraints blog-display-constraints">
+            <div class="display-constraints blog-display-constraints flex flex-col gap-[40px]">
                 {sections.into_iter().map(|(title, content)| view! {
                     <div class="border-l-2 border-primary pl-6">
                         <h4 class="mb-2">{title}</h4>

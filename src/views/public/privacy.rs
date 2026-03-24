@@ -141,7 +141,7 @@ pub fn PrivacyPolicy() -> impl IntoView {
             </p>
 
             // Sections
-            <div class="display-constraints blog-display-constraints">
+            <div class="display-constraints blog-display-constraints flex flex-col gap-[40px]">
                 {sections.into_iter().map(|(section_title, items)| view! {
                     <div>
                         <h4 class="mb-4 border-b border-light-gray pb-2">{section_title}</h4>

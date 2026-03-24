@@ -83,10 +83,16 @@ pub fn Home() -> impl IntoView {
 
     let ethics = vec![
         (
+            "bg-[url('https://api.techietenka.com/files/view/485ce03d-de84-499e-9696-b6e605c02eec?width=800')]",
+            "Commitment to Security",
+            "From physical to application - I ensure security at every layer.",
+            "md:row-span-1 md:col-span-1", // ethic1: spans 1 cols, 1 row
+        ),
+        (
             "bg-[url('https://api.techietenka.com/files/view/a7641914-73a2-4747-9728-8fd74177259c?width=800')]",
             "Commitment to Quality",
             "I never compromise on delivering exceptional results",
-            "md:row-span-1 md:col-span-2", // ethic1: spans 2 cols, 1 row
+            "md:row-span-1 md:col-span-1", // ethic1: spans 1 cols, 1 row
         ),
         (
             "bg-[url('https://api.techietenka.com/files/view/6162cb5a-62b6-43e4-9eab-1f2df0204140?width=800')]",
@@ -336,12 +342,34 @@ pub fn Home() -> impl IntoView {
                                     <span><Icon width="24" height="24" icon=BsGithub /></span>
                                 </A>
                             </div>
-                            <div class="hidden md:block w-[50%] bg-contrast-white dark:bg-navy rounded-[5px]">
-                                <img
-                                    alt="dp"
-                                    src={move || site_owner_info().get().profile_picture}
-                                    class="object-cover rounded-[5px] w-full h-auto mix-blend-multiply dark:mix-blend-normal"
-                                />
+                            <div class="hidden md:block w-[50%]">
+                                // Define the SVG clip path
+                                <svg width="0" height="0" class="absolute">
+                                    <defs>
+                                        <clipPath id="blob-clip" clipPathUnits="objectBoundingBox">
+                                            <path d="
+                                                M 0.15,0.05
+                                                C 0.3,-0.08 0.55,-0.02 0.7,0.04
+                                                C 0.85,0.1 1.02,0.18 0.98,0.35
+                                                C 0.94,0.5 1.06,0.62 0.97,0.75
+                                                C 0.88,0.88 0.72,1.04 0.55,0.99
+                                                C 0.38,0.94 0.25,1.06 0.12,0.97
+                                                C -0.02,0.88 -0.06,0.72 0.03,0.58
+                                                C 0.1,0.45 -0.04,0.32 0.04,0.2
+                                                C 0.08,0.12 0.05,0.14 0.15,0.05
+                                                Z
+                                            " />
+                                        </clipPath>
+                                    </defs>
+                                </svg>
+                                <div class="bg-contrast-white dark:bg-transparent rounded-[5px]">
+                                    <img
+                                        alt="dp"
+                                        src={move || site_owner_info().get().profile_picture}
+                                        class="object-cover w-full h-auto mix-blend-multiply dark:mix-blend-normal"
+                                        style="clip-path: url(#blob-clip);"
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -366,8 +394,14 @@ pub fn Home() -> impl IntoView {
                                     key=|(bg, title, _, _)| format!("{}{}", bg, title)
                                     children=move |(bg_image, title, description, span_class)| {
                                         view! {
-                                            <div class={format!("row-span-1 {} relative rounded-[5px] overflow-hidden bg-cover bg-center group cursor-pointer min-h-[200px] {}", span_class, bg_image)}>
+                                            <div class=format!("row-span-1 {} relative rounded-[5px] overflow-hidden group cursor-pointer min-h-[200px]", span_class)>
+                                                // Background image — scales on hover independently
+                                                <div
+                                                    class=format!("absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110 {}", bg_image)
+                                                ></div>
+                                                // Overlay
                                                 <div class="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300"></div>
+                                                // Content
                                                 <div class="relative h-full p-4 md:p-6 flex flex-col justify-end text-contrast-white">
                                                     <h3 class="text-lg md:text-xl font-bold mb-2 text-contrast-white">{title}</h3>
                                                     <p class="text-xs md:text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">{description}</p>

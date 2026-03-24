@@ -22,14 +22,14 @@ pub fn FlipCard(
 
                 /* Footer – 20% */
                 <div class="h-1/5 p-4 flex items-center justify-center bg-primary absolute bottom-0 left-0 right-0">
-                    <h5 class="line-clamp-1">{title.clone()}</h5>
+                    <h5 class="line-clamp-1 text-contrast-white">{title.clone()}</h5>
                 </div>
             </div>
 
             /* Back Face */
-            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-secondary to-primary text-contrast-white p-6 flex flex-col justify-center rotate-y-180 flip-back">
-                <h5 class="mb-3 ">{title.clone()}</h5>
-                <p class="text-sm mb-4 leading-relaxed">
+            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-primary to-secondary p-6 flex flex-col justify-center rotate-y-180 flip-back">
+                <h5 class="mb-3 text-contrast-white">{title.clone()}</h5>
+                <p class="text-sm mb-4 leading-relaxed text-light-gray">
                     {description}
                 </p>
                 <div class="text-xs">
