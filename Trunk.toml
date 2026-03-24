@@ -1,3 +1,19 @@
 [[proxy]]
 rewrite = "/api/acl"
 backend = "http://localhost:3007"
+
+[[proxy]]
+rewrite = "/api/files"
+backend = "http://localhost:3001"
+
+[[proxy]]
+rewrite = "/api/shared"
+backend = "http://localhost:3002"
+
+[[proxy]]
+rewrite = "/api/payments"
+backend = "http://localhost:3013"
+
+[[proxy]]
+rewrite = "/api/email"
+backend = "http://localhost:3019"

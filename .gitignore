@@ -1,5 +1,7 @@
 /target
 tailwindcss
-/styles/input.css
 /schemas
 /dist
+notes.txt
+.env
+prod.env

@@ -1,38 +1,69 @@
+use crate::components::forms::checkbox::CheckboxInputField;
+use crate::utils::forms::fire_bubbled_and_cancelable_event;
+use leptos::ev;
 use leptos::prelude::*;
 
-// Define the Leptos component
+/// ToggleSwitch is a component that renders a toggle switch input field.
+/// It can be used in forms to collect user input.
+/// Example usage:
+/// ```
+/// <ToggleSwitch
+///    active=RwSignal::new(true)
+///    label_active="Enabled"
+///    label_inactive="Disabled"
+///    name="status"
+/// />
+/// ```
 #[component]
 pub fn ToggleSwitch(
-    #[prop(into)] active: Signal<bool>,
-    #[prop(default = Callback::new(|_| {}), optional)] on_toggle: Callback<bool>,
-    #[prop(default = "On".to_string())] label_active: String,
-    #[prop(default = "Off".to_string())] label_inactive: String,
+    #[prop(into, optional)] name: String,
+    #[prop(into, optional, default = Signal::derive(move || false))] active: Signal<bool>,
+    #[prop(into, default = "On".into())] label_active: String,
+    #[prop(into, default = "Off".into())] label_inactive: String,
+    #[prop(into, optional)] id_attr: String,
+    #[prop(into, optional)] label: String,
+    #[prop(default = false)] required: bool,
 ) -> impl IntoView {
-    // Define the onclick handler
-    let onclick = move |_| {
-        leptos::logging::log!("clicked toggle");
-        on_toggle.run(!active.get());
+    let checkbox_ref = NodeRef::new();
+    let initial_value = RwSignal::new(String::from("false"));
+
+    let handle_toggle = move |ev: ev::MouseEvent| {
+        ev.stop_propagation();
+
+        if let Some(input_el) = checkbox_ref.get() {
+            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
+        }
     };
 
     view! {
-        <div class="flex items-center cursor-pointer" on:click=onclick>
-            <div class="relative">
-                <input type="checkbox" id="toggle-switch" class="sr-only"/>
-                <div
-                    class=move || format!(
-                        "block w-14 h-8 rounded-full {}",
-                        if active.get() { "bg-blue-950" } else { "bg-gray-300" }
-                    )
-                ></div>
-                <div
-                    class=move || format!(
-                        "dot absolute left-1 top-1 w-6 h-6 rounded-full transition transform {}",
-                        if active.get() { "translate-x-full" } else { "" }
-                    )
-                ></div>
-            </div>
-            <div class="ml-3 text-gray-700 font-medium">
-                {move || if active.get() { label_active.clone() } else { label_inactive.clone() }}
+        <div class="flex flex-col cursor-pointer relative">
+            <CheckboxInputField input_node_ref=checkbox_ref initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required />
+            <div class="flex items-center">
+                <div on:click=handle_toggle class="relative">
+                    <div
+                        class=move || format!(
+                            "block w-14 h-8 rounded-full {}",
+                            if active.get() { "bg-secondary" } else { "bg-mid-gray" }
+                        )
+                    ></div>
+                    <div
+                        class=move || format!(
+                            "dot absolute left-1 bottom-1 w-6 h-6 rounded-full transition transform {}",
+                            if active.get() { "translate-x-full" } else { "" }
+                        )
+                    ></div>
+                </div>
+                <div class="flex items-center ml-3 font-medium">
+                    <p>{
+                        move || {
+                            if active.get() {
+                                label_active.clone()
+                            } else {
+                                label_inactive.clone()
+                            }
+                        }
+                    }</p>
+                </div>
             </div>
         </div>
     }

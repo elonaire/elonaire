@@ -1,6 +1,6 @@
 mod app;
 mod components;
-mod schemas;
+mod data;
 mod utils;
 mod views;
 
