@@ -100,6 +100,10 @@ jobs:
       #   driver: cloud
       #   endpoint: "elonaire/elonaire-builder"
 
+    - name: Debug dist
+      run: |
+        ls -la
+        ls -la dist
 
     - name: Build and push Docker image
       id: build
