@@ -133,7 +133,7 @@ pub fn CheckboxGroup(
     horizontal: bool,
 ) -> impl IntoView {
     let base_fieldset_class = "border border-mid-gray rounded p-4";
-    let base_legend_class = "text-mid-gray text-sm font-bold px-2";
+    let base_legend_class = "text-sm font-bold px-2";
 
     let container_class = if horizontal {
         "flex flex-wrap gap-4"
@@ -165,7 +165,7 @@ pub fn CheckboxGroup(
                         view! {
                             <div>
                                 <label
-                                    class="flex gap-2 text-gray text-sm cursor-pointer"
+                                    class="flex gap-2 text-sm cursor-pointer"
                                     for=option_id.clone()
                                 >
                                     <input

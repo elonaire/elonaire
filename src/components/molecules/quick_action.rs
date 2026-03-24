@@ -22,7 +22,7 @@ pub fn QuickAction(
                 </div>
             </div>
 
-            <div class="text-gray">
+            <div>
                 <Icon width="15" height="15" icon=IconData::BsChevronRight />
             </div>
         </div>

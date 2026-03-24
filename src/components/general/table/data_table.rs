@@ -1,10 +1,11 @@
+use icondata::{BsFilter, BsPencil, BsSortDown, BsSortUp, BsThreeDots, BsTrash, ImDrawer2};
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::hash::Hasher;
 
 use chrono::DateTime;
 use chrono::Utc;
-use icondata as IconId;
+
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos_icons::Icon;
@@ -47,8 +48,7 @@ impl Column {
             name: name.to_string(),
             sortable,
             sort_order: Default::default(),
-            sort_icon: (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> })
-                .into(),
+            sort_icon: (|| view! { <Icon width="0.8em" height="0.8em" icon=BsFilter /> }).into(),
         }
     }
 
@@ -66,13 +66,13 @@ impl Column {
     pub fn toggle_sort_icon(&mut self) -> &mut Self {
         self.sort_icon = match self.sort_order {
             SortOrder::Default => {
-                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsFilter /> }).into()
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=BsFilter /> }).into()
             }
             SortOrder::Ascending => {
-                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortUp /> }).into()
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=BsSortUp /> }).into()
             }
             SortOrder::Descending => {
-                (|| view! { <Icon width="0.8em" height="0.8em" icon=IconId::BsSortDown /> }).into()
+                (|| view! { <Icon width="0.8em" height="0.8em" icon=BsSortDown /> }).into()
             }
         };
         self
@@ -459,7 +459,7 @@ pub fn DataTable(
     view! {
         <div class="w-full flex flex-col justify-between">
             <div class="overflow-x-auto">
-                <table class="table-fixed border-separate border border-light-gray rounded-[5px] table-fixed min-w-full h-full text-mid-gray mt-4 mb-4 text-md">
+                <table class="table-fixed border-separate border border-light-gray rounded-[5px] table-fixed min-w-full h-full mt-4 mb-4 text-md">
                     <thead>
                         <tr class="p-2">
                             <For
@@ -468,7 +468,7 @@ pub fn DataTable(
                                 let (column)
                             >
                                 <th
-                                    class="border-b p-2 border-light-gray text-nowrap font-bold text-mid-gray text-left cursor-pointer min-w-[150px]"
+                                    class="border-b p-2 border-light-gray text-nowrap font-bold text-left cursor-pointer min-w-[150px]"
                                     on:click=move |_| on_click_sort.run(column.clone())
                                 >
                                     <span class="flex flex-row items-center">
@@ -487,7 +487,7 @@ pub fn DataTable(
                             </For>
                             {move || if props.get().editable || props.get().deletable {
                                 Some(view! {
-                                    <th class="border-b p-2 border-light-gray text-wrap font-bold text-mid-gray text-left">
+                                    <th class="border-b p-2 border-light-gray text-wrap font-bold text-left">
                                         "Actions"
                                     </th>
                                 })
@@ -565,19 +565,19 @@ pub fn DataTable(
                                                         <td class="flex flex-row items-center gap-2 h-full py-2">
                                                             <Popover showing=showing display_item=|| view!{
                                                                 <BasicButton
-                                                                                icon=Some(IconId::BsThreeDots)
+                                                                                icon=Some(BsThreeDots)
                                                                             />
                                                                 }>
                                                                 <div class="flex flex-col gap-2">
                                                                     {if props.get().editable {
                                                                         Some(view! {
                                                                             <BasicButton
-                                                                                style_ext="text-gray px-0 hover:bg-primary hover:text-contrast-white"
+                                                                                style_ext="px-0 hover:bg-primary hover:text-contrast-white"
                                                                                 onclick=on_click_action_handler((row_data.clone(), "edit".into()))
                                                                                 >
                                                                                 <span class="flex items-center justify-between">
                                                                                     <span>Edit</span>
-                                                                                    <Icon icon=IconId::BsPencil />
+                                                                                    <Icon icon=BsPencil />
                                                                                 </span>
                                                                             </BasicButton>
                                                                         })
@@ -592,7 +592,7 @@ pub fn DataTable(
                                                                                 >
                                                                                 <span class="flex items-center justify-between">
                                                                                     <span>Delete</span>
-                                                                                    <Icon icon=IconId::BsTrash />
+                                                                                    <Icon icon=BsTrash />
                                                                                 </span>
                                                                             </BasicButton>
                                                                         })
@@ -643,8 +643,8 @@ pub fn DataTable(
                                 <tr>
                                     <td colspan={props.get().columns.len() + 1}>
                                         <div class="py-2 flex items-center justify-center">
-                                            <div class="flex-1 flex flex-col text-light-gray items-center justify-center">
-                                                <Icon width="2em" height="2em" icon=IconId::ImDrawer2 />
+                                            <div class="flex-1 flex flex-col items-center justify-center">
+                                                <Icon width="2em" height="2em" icon=ImDrawer2 />
                                                 <p>"No Content"</p>
                                             </div>
                                         </div>

@@ -16,8 +16,8 @@ use leptos::prelude::*;
 /// ```
 #[component]
 pub fn ToggleSwitch(
-    #[prop(into)] name: String,
-    #[prop(into, optional, default = RwSignal::new(false))] active: RwSignal<bool>,
+    #[prop(into, optional)] name: String,
+    #[prop(into, optional, default = Signal::derive(move || false))] active: Signal<bool>,
     #[prop(into, default = "On".into())] label_active: String,
     #[prop(into, default = "Off".into())] label_inactive: String,
     #[prop(into, optional)] id_attr: String,
@@ -29,20 +29,11 @@ pub fn ToggleSwitch(
 
     let handle_toggle = move |ev: ev::MouseEvent| {
         ev.stop_propagation();
-        active.set(!active.get());
-    };
 
-    Effect::new(move |_| {
-        let _value_hack = initial_value.get();
-        // Fire a bubbling Change event so that the form can capture changes
         if let Some(input_el) = checkbox_ref.get() {
-            fire_bubbled_and_cancelable_event("input", true, true, &input_el);
+            fire_bubbled_and_cancelable_event("change", true, true, &input_el);
         }
-    });
-
-    Effect::new(move |_| {
-        initial_value.set(active.get().to_string());
-    });
+    };
 
     view! {
         <div class="flex flex-col cursor-pointer relative">
@@ -62,7 +53,7 @@ pub fn ToggleSwitch(
                         )
                     ></div>
                 </div>
-                <div class="flex items-center ml-3 text-mid-gray font-medium">
+                <div class="flex items-center ml-3 font-medium">
                     <p>{
                         move || {
                             if active.get() {

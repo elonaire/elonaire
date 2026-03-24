@@ -12,7 +12,7 @@ pub enum Position {
 /// ```
 /// <Popover display_item=|| view!{ <p>"Elonaire here"</p> } showing=popover_open>
 ///    <div class="flex flex-row">
-///        <span class="text-gray-600">"Tenka"</span>
+///        <span class="text-gray">"Tenka"</span>
 ///        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRij6dtiHizH96qpCOe8WeXXP3yLyQJkPdGVg&s" />
 ///    </div>
 /// </Popover>

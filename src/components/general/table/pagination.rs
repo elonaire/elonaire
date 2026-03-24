@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BsChevronBarLeft, BsChevronBarRight, BsChevronLeft, BsChevronRight};
 use leptos::prelude::*;
 
 use crate::components::general::button::{BasicButton, ButtonGroup};
@@ -73,10 +73,10 @@ pub fn Pagination(
                     }
                 }
                 <ButtonGroup style_ext="font-bold bg-primary text-contrast-white hover:bg-secondary".to_string()>
-                    <BasicButton onclick=on_first_click disabled=is_first_page icon=Some(IconId::BsChevronBarLeft) />
-                    <BasicButton onclick=on_prev_click disabled=can_go_to_prev icon=Some(IconId::BsChevronLeft) />
-                    <BasicButton onclick=on_next_click disabled=can_go_to_next icon=Some(IconId::BsChevronRight) />
-                    <BasicButton onclick=on_last_click disabled=is_last_page icon=Some(IconId::BsChevronBarRight) />
+                    <BasicButton onclick=on_first_click disabled=is_first_page icon=Some(BsChevronBarLeft) />
+                    <BasicButton onclick=on_prev_click disabled=can_go_to_prev icon=Some(BsChevronLeft) />
+                    <BasicButton onclick=on_next_click disabled=can_go_to_next icon=Some(BsChevronRight) />
+                    <BasicButton onclick=on_last_click disabled=is_last_page icon=Some(BsChevronBarRight) />
                 </ButtonGroup>
             </div>
         </div>

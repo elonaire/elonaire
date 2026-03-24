@@ -154,7 +154,7 @@ pub fn DashboardLayout() -> impl IntoView {
                 {/* Sidebar overlay */}
                 <div
                     class=move || format!(
-                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white shadow-md z-40 {}",
+                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white dark:bg-navy shadow-md z-40 {}",
                         if collapsed.get() { "w-64" } else { "w-0" }
                     )
                 >
@@ -162,8 +162,8 @@ pub fn DashboardLayout() -> impl IntoView {
                     {move || if collapsed.get() {
                         Some(view! {
                             <div class="flex flex-col mx-[5%]">
-                                <div class="flex items-center justify-between h-[47px] border-y border-light-gray">
-                                    <p class="text-mid-gray font-medium">NAVIGATION</p>
+                                <div class="flex items-center justify-between h-[47px] border-b border-light-gray">
+                                    <p class="font-medium">NAVIGATION</p>
                                     <button
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
@@ -183,7 +183,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                             view! {
                                                 <div class=format!("flex rounded-[5px] hover:bg-light-gray h-[45px] {}", if is_active { "bg-primary text-contrast-white" } else { "" }) on:click=move |_| set_collapsed.set(false)>
                                                     <A attr:class="flex-1 h-full flex items-center gap-[10px]" href=child.path>
-                                                        <span class=format!("{}", if is_active { "text-contrast-white" } else { "text-mid-gray" })><Icon width="24" height="24" icon=child.icon /></span>
+                                                        <span class=format!("{}", if is_active { "text-contrast-white" } else { "" })><Icon width="24" height="24" icon=child.icon /></span>
                                                         <span class="flex-1">{child.label}</span>
                                                     </A>
                                                 </div>

@@ -1,4 +1,7 @@
-use icondata as IconId;
+use icondata::{
+    BiStrikethroughRegular, BsBraces, BsCode, BsImage, BsListOl, BsListUl, BsTypeItalic,
+    BsTypeUnderline, FiBold, VsMarkdown,
+};
 use js_sys::wasm_bindgen::prelude::Closure;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -562,38 +565,38 @@ pub fn RichTextEditor(
                     })
                 }
                 <BasicButton
-                    icon=Some(IconId::FiBold)
+                    icon=Some(FiBold)
                     icon_before=true
                     onclick=bold
                     style_ext_reactive=bold_style
                 />
                 <BasicButton
-                    icon=Some(IconId::BsTypeItalic)
+                    icon=Some(BsTypeItalic)
                     icon_before=true
                     onclick=italic
                     style_ext_reactive=italic_style
                 />
                 <BasicButton
-                    icon=Some(IconId::BsTypeUnderline)
+                    icon=Some(BsTypeUnderline)
                     icon_before=true
                     onclick=underline
                     style_ext_reactive=underline_style
                 />
                 <BasicButton
-                    icon=Some(IconId::BiStrikethroughRegular)
+                    icon=Some(BiStrikethroughRegular)
                     icon_before=true
                     onclick=strikethrough
                     style_ext_reactive=strikethrough_style
                 />
                 {
                     extra_formating_options.contains(&ExtraFormatingOption::ImageUpload).then(|| view!{
-                        <BasicButton icon=Some(IconId::BsImage) icon_before=true onclick=insert_image style_ext="hover:bg-light-gray" />
+                        <BasicButton icon=Some(BsImage) icon_before=true onclick=insert_image style_ext="hover:bg-light-gray" />
                     })
                 }
                 {
                     extra_formating_options.contains(&ExtraFormatingOption::InlineCode).then(|| view!{
                         <BasicButton
-                            icon=Some(IconId::BsCode)
+                            icon=Some(BsCode)
                             onclick=inline_code
                             style_ext_reactive=inline_code_style
                         />
@@ -602,7 +605,7 @@ pub fn RichTextEditor(
                 {
                     extra_formating_options.contains(&ExtraFormatingOption::CodeBlock).then(|| view!{
                         <BasicButton
-                            icon=Some(IconId::BsBraces)
+                            icon=Some(BsBraces)
                             onclick=code_block
                             style_ext_reactive=code_block_style
                         />
@@ -617,7 +620,7 @@ pub fn RichTextEditor(
                 {
                     extra_formating_options.contains(&ExtraFormatingOption::MarkdownUpload).then(|| view!{
                         <BasicButton
-                            icon=Some(IconId::VsMarkdown)
+                            icon=Some(VsMarkdown)
                             icon_before=true
                             onclick=upload_md
                             style_ext="hover:bg-light-gray"
@@ -629,13 +632,13 @@ pub fn RichTextEditor(
                 {
                     extra_formating_options.contains(&ExtraFormatingOption::Lists).then(|| view!{
                         <BasicButton
-                            icon=Some(IconId::BsListOl)
+                            icon=Some(BsListOl)
                             icon_before=true
                             onclick=ordered_list
                             style_ext_reactive=ordered_list_style
                         />
                         <BasicButton
-                            icon=Some(IconId::BsListUl)
+                            icon=Some(BsListUl)
                             icon_before=true
                             onclick=unordered_list
                             style_ext_reactive=unordered_list_style

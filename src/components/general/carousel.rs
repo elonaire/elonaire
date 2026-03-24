@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BiChevronLeftRegular, BiChevronRightRegular};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
@@ -66,7 +66,7 @@ pub fn Carousel(mut children: ChildrenFragmentMut) -> impl IntoView {
                 class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-transparent text-white hover:bg-opacity-75 transition-opacity z-10 h-full cursor-pointer"
                 on:click=move |_| prev_slide()
             >
-                <Icon width="1.5em" height="1.5em" icon=IconId::BiChevronLeftRegular />
+                <Icon width="1.5em" height="1.5em" icon=BiChevronLeftRegular />
             </button>
 
             // Next button
@@ -74,7 +74,7 @@ pub fn Carousel(mut children: ChildrenFragmentMut) -> impl IntoView {
                 class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-transparent text-white hover:bg-opacity-75 transition-opacity z-10 h-full cursor-pointer"
                 on:click=move |_| next_slide()
             >
-                <Icon width="1.5em" height="1.5em" icon=IconId::BiChevronRightRegular />
+                <Icon width="1.5em" height="1.5em" icon=BiChevronRightRegular />
             </button>
 
             // Indicators

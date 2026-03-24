@@ -35,6 +35,7 @@ use crate::{
         },
         public::{
             about::About,
+            attributions::Attributions,
             blog::{
                 about::About as AboutBlog, blog_post_detail::BlogPostDetail, home::BlogHome,
                 layout::BlogLayout,
@@ -91,6 +92,7 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("/terms") view=TermsOfService />
                     <Route path=StaticSegment("/privacy") view=PrivacyPolicy />
                     <Route path=StaticSegment("/contact") view=Contact />
+                    <Route path=StaticSegment("/attributions") view=Attributions />
                     <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />

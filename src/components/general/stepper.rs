@@ -199,7 +199,7 @@ pub fn Stepper(
                                             if is_current() {
                                                 "bg-primary text-contrast-white"
                                             } else {
-                                                "bg-light-gray text-gray"
+                                                "bg-light-gray"
                                             }
                                         )
                                     }>
@@ -223,7 +223,7 @@ pub fn Stepper(
                                         if is_current() {
                                             "font-bold text-primary"
                                         } else {
-                                            "text-gray"
+                                            ""
                                         }
                                     )}>
                                         { step_label.label.clone() }

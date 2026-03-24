@@ -83,7 +83,7 @@ pub fn ProgressBar(
         </div>
         {if show_percentage && !indeterminate {
             Some(view! {
-                <div class="text-xs text-center mt-1 text-mid-gray">
+                <div class="text-xs text-center mt-1">
                     {move || format!("{:.0}%", (progress.get()).min(100.0).max(0.0))}
                 </div>
             })

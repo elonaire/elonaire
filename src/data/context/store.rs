@@ -1,3 +1,4 @@
+use leptos::prelude::RwSignal;
 use reactive_stores::Store;
 
 use crate::{
@@ -35,4 +36,5 @@ pub struct AppStateContext {
     show_mobile_search: bool,
     error: Option<LocalGraphQLErrorMessage>,
     redirect_to: Option<String>,
+    dark_mode_is_active: bool,
 }

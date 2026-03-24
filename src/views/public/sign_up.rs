@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{AiGithubOutlined, AiGoogleOutlined};
 use leptos::ev;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -295,21 +295,21 @@ pub fn SignUp() -> impl IntoView {
                     button_text="Continue with Google"
                     style_ext="border-[1px] border-danger hover:bg-danger transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white text-danger w-full"
                     onclick=onsocial_sign_up(OauthClientName::Google)
-                    icon=Some(IconId::AiGoogleOutlined)
+                    icon=Some(AiGoogleOutlined)
                     icon_before=true
                 />
                 <BasicButton
                     button_text="Continue with GitHub"
-                    style_ext="border-[1px] border-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white text-gray w-full"
+                    style_ext="border-[1px] border-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white w-full"
                     onclick=onsocial_sign_up(OauthClientName::Github)
-                    icon=Some(IconId::AiGithubOutlined)
+                    icon=Some(AiGithubOutlined)
                     icon_before=true
                 />
             </div>
 
             <div class="w-full max-w-md flex items-center my-6">
                 <hr class="flex-grow border-t border-mid-gray"/>
-                <span class="mx-4 text-mid-gray">"OR"</span>
+                <span class="mx-4">"OR"</span>
                 <hr class="flex-grow border-t border-mid-gray"/>
             </div>
 

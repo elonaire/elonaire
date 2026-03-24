@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{AiGithubOutlined, AiGoogleOutlined};
 use leptos::ev;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -281,28 +281,31 @@ pub fn SignIn() -> impl IntoView {
             <Spinner />
         </Show>
 
-        <div class="flex flex-col items-center justify-center p-8 bg-contrast-white min-h-svh">
+        <div class="flex flex-col items-center justify-center p-8 min-h-svh">
             // <Breadcrumbs custom_route_names=["Home", "Sign In"] />
+                        <A href="/" attr:class="flex items-center h-[50px]">
+                            <img src="https://api.techietenka.com/files/view/47a6c9dd-6d87-42ff-a041-9d2a7896c47f" class="h-full w-auto object-cover" alt="Logo" />
+                        </A>
                         <h1 class="text-4xl font-bold my-4">{"Sign In"}</h1>
                         <div class="w-full max-w-md flex flex-col items-center gap-2 my-4">
                                                 <BasicButton
                                                     button_text="Continue with Google"
                                                     style_ext="border-[1px] border-danger hover:bg-danger transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white text-danger w-full"
                                                     onclick=onsocial_sign_in(OauthClientName::Google)
-                                                    icon=Some(IconId::AiGoogleOutlined) // Assuming you have icons for Google
+                                                    icon=Some(AiGoogleOutlined) // Assuming you have icons for Google
                                                     icon_before=true
                                                 />
                                                 <BasicButton
                                                     button_text="Continue with GitHub"
-                                                    style_ext="border-[1px] border-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white text-gray w-full"
+                                                    style_ext="border-[1px] border-gray hover:bg-gray transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:z-10 hover:text-contrast-white w-full"
                                                     onclick=onsocial_sign_in(OauthClientName::Github)
-                                                    icon=Some(IconId::AiGithubOutlined) // Assuming you have icons for GitHub
+                                                    icon=Some(AiGithubOutlined) // Assuming you have icons for GitHub
                                                     icon_before=true
                                                 />
                         </div>
                         <div class="w-full max-w-md flex items-center my-6">
                             <hr class="flex-grow border-t border-mid-gray"/>
-                            <span class="mx-4 text-mid-gray">{"OR"}</span>
+                            <span class="mx-4">{"OR"}</span>
                             <hr class="flex-grow border-t border-mid-gray"/>
                         </div>
 

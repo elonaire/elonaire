@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::BsCalendar2Date;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
@@ -15,7 +15,7 @@ pub fn BlogPostMetadata(
     #[prop(into)] read_time: u32,
 ) -> impl IntoView {
     view! {
-        <div class="flex items-center gap-[16px] text-mid-gray">
+        <div class="flex items-center gap-[16px]">
             <p class="text-xs">{category.to_string()}</p><div class="size-[5px] rounded-full bg-mid-gray" /><p class="text-xs">{format!("{} min read", read_time)}</p>
         </div>
     }
@@ -35,7 +35,7 @@ pub fn BlogDetailMetadata(
         <div class="flex items-center justify-between w-full md:gap-[20px] md:w-auto">
             <AuthorInfo author_name=author_name profile_pic=author_profile_pic />
             <div class="size-[5px] rounded-full bg-mid-gray" />
-            <p class="text-xs flex items-center gap-[10px]"><span><Icon icon=IconId::BsCalendar2Date /></span><span>{formated_creation_date}</span></p>
+            <p class="text-xs flex items-center gap-[10px]"><span><Icon icon=BsCalendar2Date /></span><span>{formated_creation_date}</span></p>
             <div class="size-[5px] rounded-full bg-mid-gray" />
             <p class="text-xs">{format!("{} min read", read_time)}</p>
         </div>

@@ -87,8 +87,8 @@ pub fn Resume() -> impl IntoView {
     view! {
         <Title text="Resume"/>
         <main>
-            <div class="min-h-svh bg-navy flex flex-col gap-[40px] text-light-gray">
-                <div class="sticky top-0 z-10 bg-navy">
+            <div class="min-h-svh flex flex-col gap-[40px]">
+                <div class="sticky top-0 z-10 bg-contrast-white dark:bg-navy">
                     <TopNav />
                 </div>
                 <Headline title="Resume" description="I am available for work" />

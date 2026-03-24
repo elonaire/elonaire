@@ -38,8 +38,8 @@ pub fn Ratecard() -> impl IntoView {
     view! {
         <Title text="My Ratecard"/>
         <main>
-            <div class="min-h-svh bg-navy flex flex-col gap-[40px]">
-                <div class="sticky top-0 z-10 bg-navy">
+            <div class="min-h-svh flex flex-col gap-[40px]">
+                <div class="sticky top-0 z-10 bg-contrast-white dark:bg-navy">
                     <TopNav />
                 </div>
                 <Headline title="My Ratecard" description="How much do I charge?" />

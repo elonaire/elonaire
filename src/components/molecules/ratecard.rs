@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use icondata as IconId;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
 use leptos::{ev, prelude::*};
@@ -391,7 +390,7 @@ pub fn RatecardComponent(
     });
 
     view! {
-        <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] text-light-gray min-h-[564px] max-w-[400px] flex-1">
+        <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] min-h-[564px] max-w-[400px] flex-1">
             <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false primary_button_text="Submit" disable_primary_close=true on_click_primary=handle_service_request_modal_primary_click primary_is_disabled=modal_primary_is_disabled>
                 <>
                 <Show when=move || is_loading.get()>
@@ -425,8 +424,8 @@ pub fn RatecardComponent(
             <div class="border-b-[0.5px]">
                 <div class="p-[10px] flex flex-row justify-between items-center">
                     <div class="flex flex-col">
-                        <h4 class="text-light-gray">{move || name.get()}</h4>
-                        <p class="text-primary font-bold text-2xl"><sup class="text-sm text-light-gray">$</sup>{ move ||
+                        <h4>{move || name.get()}</h4>
+                        <p class="text-primary font-bold text-2xl"><sup class="text-sm">$</sup>{ move ||
                             if let Some(amount) = amount.get() {
                                 format!("{:.2}", amount)
                             } else {
@@ -442,7 +441,7 @@ pub fn RatecardComponent(
                             options=billing_interval
                             required=true
                             initial_value=RwSignal::new("Hourly".into())
-                            ext_input_styles="text-light-gray"
+                            ext_input_styles=""
                             on:change=move |ev: ev::Event| {
                                 let target = ev
                                     .target()
@@ -467,7 +466,7 @@ pub fn RatecardComponent(
             </div>
 
             <ReactiveForm on:submit=handle_services_form_submit form_ref=services_form_ref>
-                <div class="p-[10px] flex flex-col gap-[10px] text-light-gray text-md">
+                <div class="p-[10px] flex flex-col gap-[10px] text-md">
                     <For
                         each=move || services.get()
                         key=|service| service.id.as_ref().unwrap_or(&String::new()).clone()

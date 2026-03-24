@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BiStarRegular, BsChevronRight};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::components::A;
@@ -24,14 +24,14 @@ pub fn FeaturedPost(
 
             {/* Featured Badge */}
             <div class="absolute top-[9px] left-[20px] flex items-center justify-center py-[5px] w-[175px] bg-light-gray gap-[10px] rounded-[5px] font-semibold md:top-0 md:left-0 md:right-auto z-10 text-primary">
-                <Icon icon=IconId::BiStarRegular />
+                <Icon icon=BiStarRegular />
                 <p>"Featured Post"</p>
             </div>
 
             {/* Content Card */}
-            <div class="absolute top-[105px] left-[20px] flex flex-col gap-[10px] px-[18px] w-[333px] h-[205px] bg-primary/95 rounded-[5px] text-contrast-white md:relative md:top-0 md:left-0 md:w-1/2 md:h-full md:bg-contrast-white md:px-0 md:gap-[20px] md:text-gray md:justify-center">
+            <div class="absolute top-[105px] left-[20px] flex flex-col gap-[10px] px-[18px] w-[333px] h-[205px] bg-primary/95 rounded-[5px] md:relative md:top-0 md:left-0 md:w-1/2 md:h-full md:bg-transparent md:px-0 md:gap-[20px]  md:justify-center">
                 <A href={format!("/blog/read/{}", link)}>
-                    <h1 class="text-contrast-white line-clamp-2 md:line-clamp-3 md:text-gray">{title}</h1>
+                    <h1 class="line-clamp-2 md:line-clamp-3">{title}</h1>
                 </A>
                 <p class="line-clamp-2 md:line-clamp-3">{short_description}</p>
                 <AuthorInfo profile_pic=author_profile_pic author_name=author_name />
@@ -40,7 +40,7 @@ pub fn FeaturedPost(
                     attr:class="hidden md:flex font-bold py-2 px-4 cursor-pointer rounded-[5px] bg-primary text-contrast-white w-[246px] justify-center items-center gap-[10px]"
                 >
                     <span>"Read Full Article"</span>
-                    <Icon icon=IconId::BsChevronRight />
+                    <Icon icon=BsChevronRight />
                 </A>
             </div>
         </div>

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use icondata as IconId;
+use icondata::BsPlusLg;
+use icondata::TbAwardOff;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -171,7 +172,7 @@ pub fn ResumeItemsList() -> impl IntoView {
                 <A href="/dashboard/resume/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconId::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />
@@ -376,8 +377,8 @@ pub fn CreateResumeItem() -> impl IntoView {
                         <h3>Achievements<span class="text-danger">"*"</span></h3>
                         { move || if achievements.get().is_empty() {
                             Some(view!{
-                                <div class="flex flex-col text-mid-gray">
-                                    <Icon icon=IconId::TbAwardOff />
+                                <div class="flex flex-col">
+                                    <Icon icon=TbAwardOff />
                                     <p class="text-sm">No achievements added yet.</p>
                                 </div>
                             })

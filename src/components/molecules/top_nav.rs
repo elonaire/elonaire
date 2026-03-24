@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::CgClose;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::components::A;
@@ -12,7 +12,7 @@ pub fn TopNav() -> impl IntoView {
                     attr:class="bg-transparent border-none cursor-pointer text-secondary"
                     href="/"
                 >
-                    <Icon width="3rem" height="3rem" icon=IconId::CgClose />
+                    <Icon width="3rem" height="3rem" icon=CgClose />
                 </A>
             </div>
         </>

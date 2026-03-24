@@ -3,10 +3,11 @@ use crate::components::general::button::BasicButton;
 use crate::utils::forms::fire_bubbled_and_cancelable_event;
 use chrono::Local; // Local::now()
 use chrono::{DateTime, Datelike, Duration, NaiveDate, TimeZone, Weekday};
-use icondata as IconId;
+use icondata::{BiChevronLeftRegular, BiChevronRightRegular};
+
+use icondata::BsCalendar2Date;
 use leptos::ev;
 use leptos::prelude::*;
-use leptos_icons::Icon;
 use web_sys::HtmlInputElement;
 
 /// This is a custom date picker component that allows users to select a date from a calendar.
@@ -91,7 +92,7 @@ pub fn DatePicker(
                 field_type=InputFieldType::Text
                 id_attr=format!("{id_attr}-display")
                 onblur=Callback::new(move |_| set_show_calendar.set(false))
-                icon=IconId::BsCalendar2Date
+                icon=BsCalendar2Date
                 icon_is_leading=false
             />
             {move || show_calendar.get().then(|| view! {
@@ -266,9 +267,9 @@ fn Calendar(
             {move || viewing_years.get().then(|| view! {
                 <div>
                     <div class="flex justify-between items-center mb-2">
-                        <BasicButton onclick=prev_year_page icon=Some(IconId::BiChevronLeftRegular) />
+                        <BasicButton onclick=prev_year_page icon=Some(BiChevronLeftRegular) />
                         <span class="cursor-pointer">"Years"</span>
-                        <BasicButton onclick=next_year_page icon=Some(IconId::BiChevronRightRegular) />
+                        <BasicButton onclick=next_year_page icon=Some(BiChevronRightRegular) />
                     </div>
                     <div class="grid grid-cols-4 gap-1 bg-contrast-white rounded p-2">
                         {move || render_years()}
@@ -289,7 +290,7 @@ fn Calendar(
                                         } else {*m -= 1}
                                     });
                                 })
-                                icon=Some(IconId::BiChevronLeftRegular)
+                                icon=Some(BiChevronLeftRegular)
                             />
                             <span
                                 on:click=move |_| toggle_viewing_years.run(())
@@ -311,10 +312,10 @@ fn Calendar(
                                         } else {*m += 1}
                                     });
                                 })
-                                icon=Some(IconId::BiChevronRightRegular)
+                                icon=Some(BiChevronRightRegular)
                             />
                         </div>
-                        <div class="grid grid-cols-7 gap-1 text-mid-gray bg-contrast-white border-none rounded p-2">
+                        <div class="grid grid-cols-7 gap-1 bg-contrast-white border-none rounded p-2">
                             {days_of_week.iter().map(|&day| view! {
                                 <div class="font-bold text-center text-sm">{day}</div>
                             }).collect::<Vec<_>>()}

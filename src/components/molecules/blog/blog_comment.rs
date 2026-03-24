@@ -1,5 +1,9 @@
 use chrono::Utc;
-use icondata as IconId;
+
+use icondata::{
+    AiHeartFilled, FaCommentRegular, FaFaceAngryRegular, FaFaceGrinTearsRegular,
+    FaFaceSadTearRegular, FaFaceSurpriseRegular, IoStatsChart, LuThumbsDown, LuThumbsUp,
+};
 use js_sys::wasm_bindgen::prelude::Closure;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
@@ -49,14 +53,14 @@ pub fn BlogComment(
     ];
 
     let selected_reaction_icon = match current_user_reaction {
-        Some(ReactionType::Like) => IconId::LuThumbsUp,
-        Some(ReactionType::Dislike) => IconId::LuThumbsDown,
-        Some(ReactionType::Love) => IconId::AiHeartFilled,
-        Some(ReactionType::Haha) => IconId::FaFaceGrinTearsRegular,
-        Some(ReactionType::Wow) => IconId::FaFaceSurpriseRegular,
-        Some(ReactionType::Sad) => IconId::FaFaceSadTearRegular,
-        Some(ReactionType::Angry) => IconId::FaFaceAngryRegular,
-        _ => IconId::LuThumbsUp,
+        Some(ReactionType::Like) => LuThumbsUp,
+        Some(ReactionType::Dislike) => LuThumbsDown,
+        Some(ReactionType::Love) => AiHeartFilled,
+        Some(ReactionType::Haha) => FaFaceGrinTearsRegular,
+        Some(ReactionType::Wow) => FaFaceSurpriseRegular,
+        Some(ReactionType::Sad) => FaFaceSadTearRegular,
+        Some(ReactionType::Angry) => FaFaceAngryRegular,
+        _ => LuThumbsUp,
     };
 
     // Clear timer helper
@@ -117,7 +121,7 @@ pub fn BlogComment(
                 <div inner_html={content} />
                 // Reactions
                 <div class="flex gap-[25px]">
-                    // <BasicButton icon=Some(IconId::BiHeartRegular) button_text="25" icon_before=true on:click=move |_| react_to_comment(CommentReactionDetails {
+                    // <BasicButton icon=Some(BiHeartRegular) button_text="25" icon_before=true on:click=move |_| react_to_comment(CommentReactionDetails {
                     //     comment_id: comment_id.clone(),
                     //     reaction_type: ReactionType::Like
                     // }) children_style_ext="text-xs" />
@@ -183,8 +187,8 @@ pub fn BlogComment(
                             }
                         </div>
                     </div>
-                    <BasicButton icon=Some(IconId::IoStatsChart) button_text="0" icon_before=true children_style_ext="text-xs" />
-                    <BasicButton icon=Some(IconId::FaCommentRegular) button_text=format!("{} {}", reply_count, if reply_count == 1 { "reply" } else { "replies" }) icon_before=true children_style_ext="text-xs" />
+                    <BasicButton icon=Some(IoStatsChart) button_text="0" icon_before=true children_style_ext="text-xs" />
+                    <BasicButton icon=Some(FaCommentRegular) button_text=format!("{} {}", reply_count, if reply_count == 1 { "reply" } else { "replies" }) icon_before=true children_style_ext="text-xs" />
                 </div>
             </div>
         </div>

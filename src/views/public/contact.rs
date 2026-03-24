@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BsEnvelope, BsGithub, BsLinkedin, BsPerson, BsSend, BsTwitterX};
 use leptos::wasm_bindgen::JsCast;
 use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
@@ -140,7 +140,7 @@ pub fn Contact() -> impl IntoView {
     ]);
 
     view! {
-        <div class="min-h-svh bg-contrast-white flex flex-col gap-[40px]">
+        <div class="min-h-svh flex flex-col gap-[40px]">
             <Nav onmenuclick=handle_menu_click() />
 
             <BasicModal
@@ -160,7 +160,7 @@ pub fn Contact() -> impl IntoView {
                     "Contact"
                 </span>
                 <h1>"Get In Touch"</h1>
-                <p class="text-body text-mid-gray mt-2">
+                <p class="text-body mt-2">
                     "Have a question, idea, or just want to say hello? I read every message."
                 </p>
             </div>
@@ -172,28 +172,28 @@ pub fn Contact() -> impl IntoView {
                     <div class="md:col-span-1 flex flex-col gap-6">
                         <div>
                             <h6 class="text-primary uppercase tracking-widest mb-2">"Email"</h6>
-                            <a
+                            <A
                                 href="mailto:info@techietenka.com"
-                                class="text-body text-gray hover:text-primary transition-colors"
+                                attr:class="text-body hover:text-primary transition-colors"
                             >
                                 "info@techietenka.com"
-                            </a>
+                            </A>
                         </div>
                         <div>
                             <h6 class="text-primary uppercase tracking-widest mb-2">"Response Time"</h6>
-                            <p class="text-body text-mid-gray">"Within 48 hours"</p>
+                            <p class="text-body">"Within 48 hours"</p>
                         </div>
                         <div>
                             <h6 class="text-primary uppercase tracking-widest mb-3">"Socials"</h6>
-                            <div class="flex gap-4 text-mid-gray">
+                            <div class="flex gap-4">
                                 <A href="#" attr:target="_blank" attr:class="hover:text-primary transition-colors">
-                                    <Icon width="1.5rem" height="1.5rem" icon=IconId::BsLinkedin />
+                                    <Icon width="1.5rem" height="1.5rem" icon=BsLinkedin />
                                 </A>
                                 <A href="#" attr:target="_blank" attr:class="hover:text-primary transition-colors">
-                                    <Icon width="1.5rem" height="1.5rem" icon=IconId::BsTwitterX />
+                                    <Icon width="1.5rem" height="1.5rem" icon=BsTwitterX />
                                 </A>
                                 <A href="#" attr:target="_blank" attr:class="hover:text-primary transition-colors">
-                                    <Icon width="1.5rem" height="1.5rem" icon=IconId::BsGithub />
+                                    <Icon width="1.5rem" height="1.5rem" icon=BsGithub />
                                 </A>
                             </div>
                         </div>
@@ -211,7 +211,7 @@ pub fn Contact() -> impl IntoView {
                                         name="sender_name"
                                         id_attr="sender_name"
                                         required=true
-                                        icon=IconId::BsPerson
+                                        icon=BsPerson
                                     />
                                     <InputField
                                         field_type=InputFieldType::Email
@@ -220,7 +220,7 @@ pub fn Contact() -> impl IntoView {
                                         name="sender_email"
                                         id_attr="sender_email"
                                         required=true
-                                        icon=IconId::BsEnvelope
+                                        icon=BsEnvelope
                                     />
                                 </div>
                                 <SelectInput
@@ -245,7 +245,7 @@ pub fn Contact() -> impl IntoView {
                                         button_type=ButtonType::Submit
                                         disabled=submit_disabled
                                         // is_loading=is_loading
-                                        icon=Some(IconId::BsSend)
+                                        icon=Some(BsSend)
                                     />
                                 </div>
                             </div>

@@ -96,7 +96,7 @@ pub fn InputField(
                     Some(
                         view! {
                             <label
-                                class={format!("block text-mid-gray text-sm font-bold {}", ext_label_styles)}
+                                class={format!("block text-sm font-bold {}", ext_label_styles)}
                                 for=id_attr.clone()
                             >
                                 {label}
@@ -128,7 +128,7 @@ pub fn InputField(
                 }
                 <input
                     class=format!(
-                        "w-full h-full py-2 px-3 text-gray leading-tight flex-grow focus:outline-none"
+                        "w-full h-full py-2 px-3 leading-tight flex-grow focus:outline-none"
                     )
                     type=move || if show_password.get() { "text" } else { input_field_type_str }
                     prop:value=initial_value

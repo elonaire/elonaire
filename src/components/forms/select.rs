@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::CgClose;
 use leptos::ev;
 use leptos::html::Select;
 use leptos::prelude::*;
@@ -74,7 +74,7 @@ pub fn SelectInput(
                     Some(
                         view! {
                             <label
-                                class={format!("block text-mid-gray text-sm font-bold")}
+                                class={format!("block text-sm font-bold")}
                                 for=id_attr.clone()
                             >
                                 {label}
@@ -90,7 +90,7 @@ pub fn SelectInput(
                 node_ref=input_node_ref
                 name=name
                 class=move || format!(
-                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded-[5px] w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow {}",
+                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded-[5px] w-full py-2 px-3 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow {}",
                     ext_input_styles
                 )
                 // value={initial_value.clone()}
@@ -103,7 +103,7 @@ pub fn SelectInput(
                     if placeholder.is_empty() {
                         None
                     } else {
-                        Some(view!{ <option class="text-light-gray" value="">{placeholder}</option> })
+                        Some(view!{ <option value="">{placeholder}</option> })
                     }
                 }
                 {move || options.get().into_iter()
@@ -196,7 +196,7 @@ pub fn CustomSelectInput(
 
     view! {
         <div class="relative w-full">
-            <label for=id_attr.clone() class="block text-mid-gray text-sm font-bold">
+            <label for=id_attr.clone() class="block text-sm font-bold">
                 {label.clone()}
                 {move || required.then_some(view! {
                     <span class="text-danger ml-1">*</span>
@@ -213,7 +213,7 @@ pub fn CustomSelectInput(
 
                     if selected.is_empty() {
                         Some(view! {
-                            <span class="text-mid-gray select-none">
+                            <span class="select-none">
                             "Select…"
                             </span>
                         }.into_view())
@@ -239,7 +239,7 @@ pub fn CustomSelectInput(
                                                bg-primary/20 text-primary rounded-[5px] text-sm"
                                     >
                                         {o.label}
-                                        <BasicButton icon=Some(IconId::CgClose) onclick=Callback::new(move |ev: ev::MouseEvent| {
+                                        <BasicButton icon=Some(CgClose) onclick=Callback::new(move |ev: ev::MouseEvent| {
                                             ev.stop_propagation();
                                             remove_value(val.clone());
                                         }) />

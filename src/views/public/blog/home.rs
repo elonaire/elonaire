@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use icondata as IconId;
+use icondata::{BsArrowLeft, BsSearch, VsSettings};
 use leptos::wasm_bindgen::JsCast;
 use leptos::{prelude::*, task::spawn_local};
 use leptos_icons::Icon;
@@ -389,7 +389,7 @@ pub fn BlogHome() -> impl IntoView {
             </div>
         </BasicModal>
         <main>
-            <div class="min-h-svh flex flex-col gap-[40px] bg-contrast-white">
+            <div class="min-h-svh flex flex-col gap-[40px]">
                 <div class="display-constraints h-[310px] md:h-[499px]">
                     {
                         move || {
@@ -425,7 +425,7 @@ pub fn BlogHome() -> impl IntoView {
                         <p>"Search through our collection of articles"</p>
                         <div class="w-[384px] flex items-center gap-[10px]">
                             <div class="flex-1 relative">
-                                <InputField field_type=InputFieldType::Text icon=IconId::BsSearch onfocus=handle_search_focus id_attr="search-input" onblur=handle_blur on:input=move |e| {
+                                <InputField field_type=InputFieldType::Text icon=BsSearch onfocus=handle_search_focus id_attr="search-input" onblur=handle_blur on:input=move |e| {
                                     set_query.set(event_target_value(&e));
                                 } />
                                 {move || show_overlay.get().then(|| view! {
@@ -435,7 +435,7 @@ pub fn BlogHome() -> impl IntoView {
                                     >
                                         // Loading state
                                         {move || is_loading.get().then(|| view! {
-                                            <div class="flex items-center justify-center py-8 text-gray-400 text-sm">
+                                            <div class="flex items-center justify-center py-8 text-sm">
                                                 <span>"Searching..."</span>
                                             </div>
                                         })}
@@ -453,12 +453,12 @@ pub fn BlogHome() -> impl IntoView {
                                                                 class="flex flex-col px-4 py-3 hover:bg-primary/10 \
                                                                        transition-colors cursor-pointer group"
                                                             >
-                                                                <span class="text-sm font-medium text-gray-900 \
+                                                                <span class="text-sm font-medium \
                                                                              group-hover:text-primary line-clamp-1">
                                                                     {article.title.unwrap_or_default()}
                                                                 </span>
                                                                 // Optional: subtitle/category
-                                                                <span class="text-xs text-gray-400 mt-0.5">
+                                                                <span class="text-xs mt-0.5">
                                                                     {article.category.text(None)}
                                                                 </span>
                                                             </a>
@@ -473,9 +473,9 @@ pub fn BlogHome() -> impl IntoView {
                                             let q = query.get();
                                             let results = search_results.get();
                                             (!q.is_empty() && results.is_empty() && !is_loading.get()).then(|| view! {
-                                                <div class="py-8 text-center text-sm text-gray-400">
+                                                <div class="py-8 text-center text-sm">
                                                     "No articles found for "
-                                                    <span class="font-medium text-gray-600">{q}</span>
+                                                    <span class="font-medium">{q}</span>
                                                 </div>
                                             })
                                         }}
@@ -497,18 +497,18 @@ pub fn BlogHome() -> impl IntoView {
                         >
                             // Back/close button
                             <button
-                                class="text-gray-600 shrink-0"
+                                class="shrink-0"
                                 on:click=move |_| {
                                     current_state.show_mobile_search().set(false);
                                 }
                             >
-                                <Icon icon=IconId::BsArrowLeft width="1.2rem" height="1.2rem" />
+                                <Icon icon=BsArrowLeft width="1.2rem" height="1.2rem" />
                             </button>
 
                             <div class="flex-1 relative">
                                 <InputField
                                     field_type=InputFieldType::Text
-                                    icon=IconId::BsSearch
+                                    icon=BsSearch
                                     id_attr="mobile-search-input"
                                     placeholder="Search articles..."
                                     on:input=move |e| {
@@ -523,7 +523,7 @@ pub fn BlogHome() -> impl IntoView {
                                     (!q.is_empty()).then(|| view! {
                                         <div class="absolute top-full mt-2 w-full bg-white rounded-[5px] shadow-2xl max-h-[60svh] overflow-y-auto z-50">
                                             {move || is_loading.get().then(|| view! {
-                                                <div class="flex items-center justify-center py-8 text-gray-400 text-sm">
+                                                <div class="flex items-center justify-center py-8 text-sm">
                                                     <span>"Searching..."</span>
                                                 </div>
                                             })}
@@ -537,10 +537,10 @@ pub fn BlogHome() -> impl IntoView {
                                                                     href=format!("/blog/read/{}", article.link.unwrap_or_default())
                                                                     class="flex flex-col px-4 py-3 hover:bg-primary/10 transition-colors cursor-pointer group"
                                                                 >
-                                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary line-clamp-1">
+                                                                    <span class="text-sm font-medium group-hover:text-primary line-clamp-1">
                                                                         {article.title.unwrap_or_default()}
                                                                     </span>
-                                                                    <span class="text-xs text-gray-400 mt-0.5">
+                                                                    <span class="text-xs mt-0.5">
                                                                         {article.category.text(None)}
                                                                     </span>
                                                                 </a>
@@ -553,9 +553,9 @@ pub fn BlogHome() -> impl IntoView {
                                                 let q = query.get();
                                                 let results = search_results.get();
                                                 (!q.is_empty() && results.is_empty() && !is_loading.get()).then(|| view! {
-                                                    <div class="py-8 text-center text-sm text-gray-400">
+                                                    <div class="py-8 text-center text-sm">
                                                         "No articles found for "
-                                                        <span class="font-medium text-gray-600">{q}</span>
+                                                        <span class="font-medium">{q}</span>
                                                     </div>
                                                 })
                                             }}
@@ -573,7 +573,7 @@ pub fn BlogHome() -> impl IntoView {
                                 <BlogSection title="More Posts"/>
                             </div>
                             <div class="flex items-center gap-[5px]">
-                                <Icon icon=IconId::VsSettings width="1rem" height="1rem" />
+                                <Icon icon=VsSettings width="1rem" height="1rem" />
                                 <Badge text="0" ><span>"Filters"</span></Badge>
                             </div>
                         </div>

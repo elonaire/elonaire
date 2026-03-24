@@ -1,7 +1,7 @@
 // privacy.rs
 use leptos::{ev, prelude::*};
 
-use crate::components::molecules::nav::Nav;
+use crate::components::molecules::{footer::Footer, nav::Nav};
 
 #[component]
 pub fn PrivacyPolicy() -> impl IntoView {
@@ -125,7 +125,7 @@ pub fn PrivacyPolicy() -> impl IntoView {
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
-        <div class="min-h-svh bg-contrast-white flex flex-col gap-[40px]">
+        <div class="min-h-svh flex flex-col gap-[40px]">
             <Nav onmenuclick=handle_menu_click() />
             // Header
             <div class="display-constraints blog-display-constraints border-b border-light-gray">
@@ -133,10 +133,10 @@ pub fn PrivacyPolicy() -> impl IntoView {
                     "Legal"
                 </span>
                 <h1>"Privacy Policy"</h1>
-                <p class="text-caption text-mid-gray mt-2">"Last updated: March 2026"</p>
+                <p class="text-caption mt-2">"Last updated: March 2026"</p>
             </div>
 
-            <p class="display-constraints blog-display-constraints text-body text-gray">
+            <p class="display-constraints blog-display-constraints text-body">
                 "At Techie Tenka, your privacy matters. This policy explains what data we collect, why we collect it, and how we protect it."
             </p>
 
@@ -144,20 +144,24 @@ pub fn PrivacyPolicy() -> impl IntoView {
             <div class="display-constraints blog-display-constraints">
                 {sections.into_iter().map(|(section_title, items)| view! {
                     <div>
-                        <h4 class="text-gray mb-4 border-b border-light-gray pb-2">{section_title}</h4>
+                        <h4 class="mb-4 border-b border-light-gray pb-2">{section_title}</h4>
                         <div class="space-y-4">
                             {items.into_iter().map(|(subtitle, content)| view! {
                                 <div class="flex gap-4">
                                     <div class="w-1 bg-primary rounded-full shrink-0 mt-1"></div>
                                     <div>
-                                        <p class="text-sm font-semibold text-gray mb-1">{subtitle}</p>
-                                        <p class="text-body text-mid-gray">{content}</p>
+                                        <p class="text-sm font-semibold mb-1">{subtitle}</p>
+                                        <p class="text-body">{content}</p>
                                     </div>
                                 </div>
                             }).collect::<Vec<_>>()}
                         </div>
                     </div>
                 }).collect::<Vec<_>>()}
+            </div>
+
+            <div class="mt-auto">
+                <Footer />
             </div>
         </div>
     }

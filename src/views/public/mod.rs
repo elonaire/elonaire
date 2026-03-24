@@ -1,4 +1,5 @@
 pub mod about;
+pub mod attributions;
 pub mod blog;
 pub mod contact;
 pub mod error_handler;

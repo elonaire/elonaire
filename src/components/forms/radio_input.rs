@@ -51,7 +51,7 @@ pub fn RadioInputField(
     #[prop(optional)] children: Option<ViewFn>,
 ) -> impl IntoView {
     view! {
-        <label for=move || initial_value.get() class="inline-flex items-center gap-2 text-mid-gray text-sm cursor-pointer px-2 py-1 rounded">
+        <label for=move || initial_value.get() class="inline-flex items-center gap-2 text-sm cursor-pointer px-2 py-1 rounded">
             <input
                 class="leading-tight size-5 rounded-full border-2 border-mid-gray text-secondary shadow-sm
                            focus:outline-none focus:ring-0 focus:border-secondary
@@ -81,7 +81,7 @@ pub fn RadioInputField(
 ///    RadioOption::new("false", "InActive", None),
 ///]>
 ///     <div class="flex items-center gap-2">
-///         <span class="text-gray-700 text-sm">Male</span>
+///         <span class="text-sm">Male</span>
 ///     </div>
 /// </RadioInputGroup>
 /// ```
@@ -107,7 +107,7 @@ pub fn RadioInputGroup(
 ) -> impl IntoView {
     // Create reactive state for display_error
     let base_fieldset_class = "border border-mid-gray rounded p-4";
-    let base_legend_class = "text-mid-gray text-sm font-bold px-2";
+    let base_legend_class = "text-sm font-bold px-2";
 
     let container_class = if horizontal {
         "flex flex-wrap gap-4"
@@ -138,7 +138,7 @@ pub fn RadioInputGroup(
                                 let is_selected = move || initial_value.get() == option_value_selected;
 
                                 view! {
-                                    <label class="inline-flex items-center gap-2 text-mid-gray text-sm cursor-pointer px-2 py-1 rounded">
+                                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer px-2 py-1 rounded">
                                         <input
                                             class="leading-tight size-5 rounded-full border-2 border-mid-gray text-secondary shadow-sm
                                                        focus:outline-none focus:ring-0 focus:border-secondary

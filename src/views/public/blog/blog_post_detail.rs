@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use icondata as IconId;
+use icondata::{
+    AiHeartFilled, BiBookmarkRegular, BiShareAltRegular, BsGithub, BsLinkedin, BsTwitterX,
+    FaCommentRegular, FaFaceAngryRegular, FaFaceGrinTearsRegular, FaFaceSadTearRegular,
+    FaFaceSurpriseRegular, LuThumbsDown, LuThumbsUp, MdiWeb,
+};
 use js_sys::wasm_bindgen::prelude::Closure;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -729,7 +733,7 @@ pub fn BlogPostDetail() -> impl IntoView {
         <Title text="Blog Detail"/>
 
         <main>
-            <div class="min-h-svh flex flex-col gap-[40px] bg-contrast-white relative">
+            <div class="min-h-svh flex flex-col gap-[40px] relative">
             <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                 <div class="p-[10px]">
                     <p>"Rate Card created successfully!"</p>
@@ -747,14 +751,14 @@ pub fn BlogPostDetail() -> impl IntoView {
                     move || {
                         let blog_post = blog_post.get();
                         let selected_reaction_icon = match selected_reaction.get() {
-                            Some(ReactionType::Like)    => IconId::LuThumbsUp,
-                            Some(ReactionType::Dislike) => IconId::LuThumbsDown,
-                            Some(ReactionType::Love)    => IconId::AiHeartFilled,
-                            Some(ReactionType::Haha)    => IconId::FaFaceGrinTearsRegular,
-                            Some(ReactionType::Wow)     => IconId::FaFaceSurpriseRegular,
-                            Some(ReactionType::Sad)     => IconId::FaFaceSadTearRegular,
-                            Some(ReactionType::Angry)   => IconId::FaFaceAngryRegular,
-                            None                        => IconId::LuThumbsUp,
+                            Some(ReactionType::Like)    => LuThumbsUp,
+                            Some(ReactionType::Dislike) => LuThumbsDown,
+                            Some(ReactionType::Love)    => AiHeartFilled,
+                            Some(ReactionType::Haha)    => FaFaceGrinTearsRegular,
+                            Some(ReactionType::Wow)     => FaFaceSurpriseRegular,
+                            Some(ReactionType::Sad)     => FaFaceSadTearRegular,
+                            Some(ReactionType::Angry)   => FaFaceAngryRegular,
+                            None                        => LuThumbsUp,
                         };
 
                         if let Some(blog_post) = blog_post {
@@ -789,7 +793,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                             } else {
                                                 "translate-y-[-100%] hidden"
                                             })>
-                                        // <BasicButton button_text="2K" icon=Some(IconId::LuThumbsUp) icon_before=true />
+                                        // <BasicButton button_text="2K" icon=Some(LuThumbsUp) icon_before=true />
                                         <div
                                             class="relative"
                                             on:mouseenter=on_mouse_enter
@@ -836,9 +840,9 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 />
                                             </div>
                                         </div>
-                                        <BasicButton button_text=blog_post.bookmarks_count.unwrap_or_default().to_string() icon=Some(IconId::BiBookmarkRegular) onclick=handle_bookmark icon_before=true style_ext=format!("{}", if blog_post.current_user_bookmarked.is_some() && blog_post.current_user_bookmarked.unwrap_or_default() { "text-primary" } else { "" }) />
-                                        <BasicButton button_text=format!("{}", blog_comments_ref.as_ref().unwrap_or(&&vec![]).len()) icon=Some(IconId::FaCommentRegular) onclick=handle_scroll_to_comments icon_before=true />
-                                        <BasicButton button_text=blog_post.shares_count.unwrap_or_default().to_string() icon=Some(IconId::BiShareAltRegular) icon_before=true onclick=handle_share />
+                                        <BasicButton button_text=blog_post.bookmarks_count.unwrap_or_default().to_string() icon=Some(BiBookmarkRegular) onclick=handle_bookmark icon_before=true style_ext=format!("{}", if blog_post.current_user_bookmarked.is_some() && blog_post.current_user_bookmarked.unwrap_or_default() { "text-primary" } else { "" }) />
+                                        <BasicButton button_text=format!("{}", blog_comments_ref.as_ref().unwrap_or(&&vec![]).len()) icon=Some(FaCommentRegular) onclick=handle_scroll_to_comments icon_before=true />
+                                        <BasicButton button_text=blog_post.shares_count.unwrap_or_default().to_string() icon=Some(BiShareAltRegular) icon_before=true onclick=handle_share />
                                     </div>
 
                                     <div class="flex flex-col gap-[20px] display-constraints blog-display-constraints" node_ref=comments_ref>
@@ -885,7 +889,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                             Some(comments) => {
                                                 if comments.is_empty() {
                                                     Some(view! {
-                                                        <p class="text-2xl text-mid-gray text-center">"No Comments to display"</p>
+                                                        <p class="text-2xl text-center">"No Comments to display"</p>
                                                     })
                                                 } else {
                                                     None
@@ -913,10 +917,10 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                                             author_details.socials.as_ref().map(|socials| {
                                                                                 socials.iter().map(|social| {
                                                                                     let (icon, url) = match social.name.to_lowercase().as_str() {
-                                                                                        "github" => (IconId::BsGithub, social.url.clone()),
-                                                                                        "linkedin" => (IconId::BsLinkedin, social.url.clone()),
-                                                                                        "x" | "twitter" => (IconId::BsTwitterX, social.url.clone()),
-                                                                                        _ => (IconId::MdiWeb, social.url.clone()),
+                                                                                        "github" => (BsGithub, social.url.clone()),
+                                                                                        "linkedin" => (BsLinkedin, social.url.clone()),
+                                                                                        "x" | "twitter" => (BsTwitterX, social.url.clone()),
+                                                                                        _ => (MdiWeb, social.url.clone()),
                                                                                     };
                                                                                     view! {
                                                                                         <A href=url attr:class="hover:text-primary transition-colors" target="_blank">

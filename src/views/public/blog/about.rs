@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BsGithub, BsLinkedin, BsTwitterX, MdiWeb};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::components::A;
@@ -22,7 +22,7 @@ pub fn About() -> impl IntoView {
     });
 
     view! {
-        <div class="min-h-svh bg-contrast-white">
+        <div class="min-h-svh">
             <div class="display-constraints">
 
                 // Header — editorial masthead style
@@ -31,7 +31,7 @@ pub fn About() -> impl IntoView {
                         "About This Blog"
                     </p>
                     <h1
-                        class="text-6xl md:text-8xl font-black text-mid-gray leading-none tracking-tight"
+                        class="text-6xl md:text-8xl font-black leading-none tracking-tight"
                     >
                         "The"
                         <br/>
@@ -46,7 +46,7 @@ pub fn About() -> impl IntoView {
                     <div class="md:col-span-4">
                         <div class="sticky top-12">
                             <div class="border-l-4 border-primary pl-6 mb-8">
-                                <p class="text-2xl leading-snug text-mid-gray italic font-serif">
+                                <p class="text-2xl leading-snug italic font-serif">
                                     "\"Sometimes your whole life boils down to one insane move.\""
                                     <br/>
                                     "~Jake Sully"
@@ -74,15 +74,15 @@ pub fn About() -> impl IntoView {
                                             ></div>
                                         </div>
                                         // Social links
-                                        <div class="flex gap-[15px] text-mid-gray">
+                                        <div class="flex gap-[15px]">
                                         {
                                                 site_owner_info.socials.as_ref().map(|socials| {
                                                     socials.iter().map(|social| {
                                                         let (icon, url) = match social.name.to_lowercase().as_str() {
-                                                            "github" => (IconId::BsGithub, social.url.clone()),
-                                                            "linkedin" => (IconId::BsLinkedin, social.url.clone()),
-                                                            "x" | "twitter" => (IconId::BsTwitterX, social.url.clone()),
-                                                            _ => (IconId::MdiWeb, social.url.clone()),
+                                                            "github" => (BsGithub, social.url.clone()),
+                                                            "linkedin" => (BsLinkedin, social.url.clone()),
+                                                            "x" | "twitter" => (BsTwitterX, social.url.clone()),
+                                                            _ => (MdiWeb, social.url.clone()),
                                                         };
                                                         view! {
                                                             <A href=url target="_blank">
@@ -103,7 +103,7 @@ pub fn About() -> impl IntoView {
                     <div class="md:col-span-8 md:border-l md:border-light-gray md:pl-12">
 
                         // Drop cap first paragraph
-                        <p class="text-lg leading-relaxed text-gray mb-6">
+                        <p class="text-lg leading-relaxed mb-6">
                             <span
                                 class="float-left text-8xl leading-none mr-3 mt-1 text-primary font-black"
                                 style="font-family: 'Georgia', serif; line-height: 0.75;"
@@ -113,11 +113,11 @@ pub fn About() -> impl IntoView {
                             "ello. I'm a writer, software engineer, and curious mind who believes that the best ideas live at the intersection of technology and nature. This blog is my attempt to map that territory by focusing on how technology can be used to solve real-life problems and not just financial problems."
                         </p>
 
-                        <p class="text-lg leading-relaxed text-gray mb-6">
+                        <p class="text-lg leading-relaxed mb-6">
                             "I've spent years building things on the web, and somewhere along the way I realized that the most interesting problems aren't in the browser. They sit somewhere at the intersection of nature(analog) and the digital realm. I discovered the fun of converting physical quantities into electrical signals, making meaning out of it and using the newfound information to inspire decision making over the internet. This is how I began my journey in the Internet of Things(IoT)."
                         </p>
 
-                        <p class="text-lg leading-relaxed text-gray mb-10">
+                        <p class="text-lg leading-relaxed mb-10">
                             "You'll find articles on software engineering, systems design, the Internet of Things (IoT), lifestyle, and whatever else has captured my attention this week. I try to write things I'd want to read: precise, honest, and occasionally opinionated."
                         </p>
 
@@ -138,8 +138,8 @@ pub fn About() -> impl IntoView {
                                 ("My Opinion", "Finally, you might come across my fresh unfiltered thoughts and I will be honest enough to tell you when I am stating opinions and not facts."),
                             ].into_iter().map(|(title, desc)| view! {
                                 <div class="border-t border-light-gray py-5 pr-6">
-                                    <h3 class="text-sm font-bold tracking-wide text-mid-gray mb-1 uppercase">{title}</h3>
-                                    <p class="text-sm text-mid-gray leading-relaxed">{desc}</p>
+                                    <h3 class="text-sm font-bold tracking-wide mb-1 uppercase">{title}</h3>
+                                    <p class="text-sm leading-relaxed">{desc}</p>
                                 </div>
                             }).collect::<Vec<_>>()}
                         </div>
@@ -152,7 +152,7 @@ pub fn About() -> impl IntoView {
 
                         // Contact
                         <h2 class="text-xs tracking-[0.3em] uppercase text-primary mb-4">"Get In Touch"</h2>
-                        <p class="text-lg leading-relaxed text-gray mb-6">
+                        <p class="text-lg leading-relaxed mb-6">
                             "Have a question, a project idea, or just want to say hello? I read every email and try to reply to all of them."
                         </p>
                         <A
@@ -173,7 +173,7 @@ pub fn About() -> impl IntoView {
                         ("Weekly", "Publishing Cadence"),
                     ].into_iter().map(|(stat, label)| view! {
                         <div>
-                            <p class="text-4xl font-black text-mid-gray leading-none mb-1">{stat}</p>
+                            <p class="text-4xl font-black leading-none mb-1">{stat}</p>
                             <p class="text-xs tracking-widest uppercase text-primary">{label}</p>
                         </div>
                     }).collect::<Vec<_>>()}

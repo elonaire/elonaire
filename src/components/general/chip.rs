@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::CgCloseO;
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
@@ -60,7 +60,7 @@ pub fn Chip(
                             on:click=on_click
                             aria-label="Remove chip"
                         >
-                            <Icon width="1em" height="1em" icon=IconId::CgCloseO />
+                            <Icon width="1em" height="1em" icon=CgCloseO />
                         </button>
                     }
                 )

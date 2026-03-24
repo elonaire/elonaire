@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use icondata as IconId;
+use icondata::{
+    BsChevronDoubleDown, BsGithub, BsInfoCircle, BsMoon, BsSun, IoClose, MdiCertificateOutline,
+    MdiStore, MdiTrophyAward, RiArticleDocumentLine,
+};
 use leptos::{ev, prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
@@ -9,6 +12,7 @@ use reactive_stores::Store;
 
 use crate::{
     components::{
+        forms::toggle_switch::ToggleSwitch,
         general::button::BasicButton,
         molecules::{footer::Footer, nav::Nav},
     },
@@ -39,6 +43,8 @@ pub fn Home() -> impl IntoView {
     let (selected_profession, set_selected_profession) = signal(String::new());
 
     let site_owner_info = move || current_state.site_owner_info(); // Should return ReadSignal<UserInfo>
+    let dark_mode_is_active = current_state.dark_mode_is_active();
+    let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     // Derived signal for the current description
     let current_description = Memo::new(move |_| {
         professions
@@ -54,12 +60,25 @@ pub fn Home() -> impl IntoView {
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("About", IconId::BsInfoCircle, "/about", vec![]),
-            MenuItem::new("Resume", IconId::MdiCertificateOutline, "/resume", vec![]),
-            MenuItem::new("Portfolio", IconId::MdiTrophyAward, "/portfolio", vec![]),
-            MenuItem::new("Marketplace", IconId::MdiStore, "/marketplace", vec![]),
-            MenuItem::new("Blog", IconId::RiArticleDocumentLine, "/blog", vec![]),
+            MenuItem::new("About", BsInfoCircle, "/about", vec![]),
+            MenuItem::new("Resume", MdiCertificateOutline, "/resume", vec![]),
+            MenuItem::new("Portfolio", MdiTrophyAward, "/portfolio", vec![]),
+            MenuItem::new("Marketplace", MdiStore, "/marketplace", vec![]),
+            MenuItem::new("Blog", RiArticleDocumentLine, "/blog", vec![]),
         ]
+    });
+
+    Effect::new(move |_| {
+        if let Some(doc) = document().document_element() {
+            let class_list = doc.class_list();
+
+            if !dark_mode_is_active.get() && class_list.contains("dark") {
+                let _ = class_list.remove_1("dark");
+            } else if !dark_mode_is_active.get() && !class_list.contains("dark") {
+            } else {
+                let _ = class_list.add_1("dark");
+            }
+        }
     });
 
     let ethics = vec![
@@ -178,21 +197,21 @@ pub fn Home() -> impl IntoView {
                 {/* Sidebar overlay */}
                 <div
                     class=move || format!(
-                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white shadow-md z-40 {}",
+                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white dark:bg-navy shadow-md z-40 {}",
                         if collapsed.get() { "w-64" } else { "w-0" }
                     )
                 >
                     {/* Only render content if expanded */}
                     {move || if collapsed.get() {
                         Some(view! {
-                            <div class="flex flex-col mx-[5%]">
-                                <div class="flex items-center justify-between h-[47px] border-y border-light-gray">
-                                    <p class="text-mid-gray font-medium">NAVIGATION</p>
+                            <div class="flex flex-col mx-[5%] min-h-svh">
+                                <div class="flex items-center justify-between h-[47px] border-b border-light-gray">
+                                    <p class="font-medium">NAVIGATION</p>
                                     <button
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
-                                        <Icon width="24" height="24" icon=IconId::IoClose />
+                                        <Icon width="24" height="24" icon=IoClose />
                                     </button>
                                 </div>
                                 <nav class="flex flex-col">
@@ -203,12 +222,41 @@ pub fn Home() -> impl IntoView {
                                     >
                                         <div class="flex rounded-[5px] hover:bg-light-gray h-[45px]" on:click=move |_| set_collapsed.set(false)>
                                             <A attr:class="flex-1 h-full flex items-center gap-[10px]" href=child.path>
-                                                <span class="text-mid-gray"><Icon width="24" height="24" icon=child.icon /></span>
+                                                <span><Icon width="24" height="24" icon=child.icon /></span>
                                                 <span class="flex-1">{child.label}</span>
                                             </A>
                                         </div>
                                     </For>
                                 </nav>
+                                <div class="md:hidden flex flex-col gap-[10px]">
+                                    <div class="flex items-center h-[40px] border-b border-light-gray">
+                                        <p class="font-medium text-xs">ACTIONS</p>
+                                    </div>
+                                    <A attr:class="block md:hidden py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold text-center" href="/ratecard">"Request Service"</A>
+                                </div>
+                                <div class="md:hidden mt-auto flex flex-col gap-[10px]">
+                                    <div class="flex items-center h-[40px] border-b border-light-gray">
+                                        <p class="font-medium text-xs">PREFERENCES</p>
+                                    </div>
+                                    <div class="flex md:hidden items-center gap-[5px]">
+                                        <ToggleSwitch
+                                        active=dark_mode_signal
+                                        label_active=""
+                                        label_inactive=""
+                                        on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
+                                        />
+                                        {
+                                            move || {
+                                                let icon = if !dark_mode_is_active.get() { BsSun } else { BsMoon };
+
+                                                view! {
+                                                    <Icon icon=icon />
+                                                }
+                                            }
+                                        }
+
+                                    </div>
+                                </div>
                             </div>
                         })
                     } else {
@@ -239,7 +287,7 @@ pub fn Home() -> impl IntoView {
                         <div class="flex flex-col md:flex-row gap-[20px] md:justify-between md:items-center display-constraints">
                             <div class="flex flex-col gap-[20px] md:gap-[40px] text-center md:text-left">
                                 <p class="text-salutation">Hello, I am</p>
-                                <p class="text-owner-name"><span class="text-primary">{move || site_owner_info().get().first_name}</span>{move || format!(" {} {}", site_owner_info().get().middle_name.unwrap_or_default(), site_owner_info().get().last_name.unwrap_or_default())}</p>
+                                <p class="text-owner-name dark:text-light-gray"><span class="text-primary">{move || site_owner_info().get().first_name}</span>{move || format!(" {} {}", site_owner_info().get().middle_name.unwrap_or_default(), site_owner_info().get().last_name.unwrap_or_default())}</p>
                                 <img alt="dp" src={{move || site_owner_info().get().profile_picture}} class="h-[435px] object-cover rounded-[5px] md:hidden" />
                                 <p class="text-2xl font-bold">
                                     {move || professions.get().into_iter().enumerate().map(|(idx, profession)| {
@@ -278,23 +326,29 @@ pub fn Home() -> impl IntoView {
                                 <p class="min-h-[90px] max-w-[600px] text-base">
                                     {current_description}
                                 </p>
-                                // <BasicButton button_text="Download my resume" icon=Some(IconId::FiDownload) icon_before=false style_ext="bg-primary text-contrast-white md:w-[292px]" />
+                                // <BasicButton button_text="Download my resume" icon=Some(FiDownload) icon_before=false style_ext="bg-primary text-contrast-white md:w-[292px]" />
                                 <A attr:class="font-bold py-2 px-4 cursor-pointer rounded-[5px] bg-primary text-contrast-white md:w-[292px] flex items-center justify-center gap-2" href={move || site_owner_info().get()
                                         .socials
                                         .as_ref()
                                         .and_then(|socials| socials.iter().find(|s| s.name.to_lowercase() == "github"))
                                         .and_then(|social| Some(social.url.clone())).unwrap_or_default()} target="_blank">
                                     <span>"Checkout my GitHub"</span>
-                                    <span><Icon width="24" height="24" icon=IconId::BsGithub /></span>
+                                    <span><Icon width="24" height="24" icon=BsGithub /></span>
                                 </A>
                             </div>
-                            <img alt="dp" src={move || site_owner_info().get().profile_picture} class="object-cover rounded-[5px] hidden md:block w-[50%] h-auto bg-contrast-white mix-blend-multiply" />
+                            <div class="hidden md:block w-[50%] bg-contrast-white dark:bg-navy rounded-[5px]">
+                                <img
+                                    alt="dp"
+                                    src={move || site_owner_info().get().profile_picture}
+                                    class="object-cover rounded-[5px] w-full h-auto mix-blend-multiply dark:mix-blend-normal"
+                                />
+                            </div>
                         </div>
 
                         {/* Scroll button */}
                         <BasicButton style_ext="hidden absolute bottom-8 left-1/2 -translate-x-1/2 md:flex flex-col items-center gap-2 text-sm opacity-60 hover:opacity-100 transition-opacity duration-300 cursor-pointer animate-bounce text-secondary">
                             <span class="text-xs tracking-widest uppercase">"Scroll"</span>
-                            <Icon icon=IconId::BsChevronDoubleDown width="2rem" height="2rem" />
+                            <Icon icon=BsChevronDoubleDown width="2rem" height="2rem" />
                         </BasicButton>
                     </div>
 

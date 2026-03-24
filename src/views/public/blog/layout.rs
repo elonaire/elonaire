@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use icondata as IconId;
+use icondata::{AiHomeOutlined, BsInfoCircle, BsMoon, BsRss, BsSun, IoClose};
 use leptos::{ev, prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
@@ -11,7 +11,7 @@ use leptos_router::{
 use reactive_stores::Store;
 
 use crate::{
-    components::molecules::nav::Nav,
+    components::{forms::toggle_switch::ToggleSwitch, molecules::nav::Nav},
     data::{
         context::{
             shared::{check_auth, fetch_single_user},
@@ -28,6 +28,9 @@ use crate::{
 #[component]
 pub fn BlogLayout() -> impl IntoView {
     let current_state = expect_context::<Store<AppStateContext>>();
+    let user_auth = current_state.user().auth_info();
+    let dark_mode_is_active = current_state.dark_mode_is_active();
+    let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     // track collapsed state
     let (collapsed, set_collapsed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -38,28 +41,14 @@ pub fn BlogLayout() -> impl IntoView {
 
     let menu_items = Memo::new(move |_| {
         vec![
-            MenuItem::new("Home", IconId::AiHomeOutlined, "/", vec![]),
-            MenuItem::new("Blog Feed", IconId::BsRss, "/blog", vec![]),
-            MenuItem::new("About", IconId::BsInfoCircle, "/blog/about", vec![]),
-            // MenuItem::new("Categories", IconId::BsFilter, "/blog/categories"),
-            // MenuItem::new("Pricing", IconId::BsCashCoin, "/blog/pricing"),
-            // MenuItem::new("Contact", IconId::BiContactSolid, "/blog/contact"),
+            MenuItem::new("Home", AiHomeOutlined, "/", vec![]),
+            MenuItem::new("Blog Feed", BsRss, "/blog", vec![]),
+            MenuItem::new("About", BsInfoCircle, "/blog/about", vec![]),
+            // MenuItem::new("Categories", BsFilter, "/blog/categories"),
+            // MenuItem::new("Pricing", BsCashCoin, "/blog/pricing"),
+            // MenuItem::new("Contact", BiContactSolid, "/blog/contact"),
         ]
     });
-
-    // Effect::new(move || {
-    //     set_is_loading.set(true);
-    //     spawn_local(async move {
-    //         let mut headers = HashMap::new() as HashMap<String, String>;
-    //         headers.insert(
-    //             "Authorization".into(),
-    //             format!(
-    //                 "Bearer {}",
-    //                 current_state.user().auth_info().token().get_untracked()
-    //             ),
-    //         );
-    //     });
-    // });
 
     // Effect to refresh user auth status
     Effect::new(move |_| {
@@ -134,29 +123,42 @@ pub fn BlogLayout() -> impl IntoView {
         });
     });
 
+    Effect::new(move |_| {
+        if let Some(doc) = document().document_element() {
+            let class_list = doc.class_list();
+
+            if !dark_mode_is_active.get() && class_list.contains("dark") {
+                let _ = class_list.remove_1("dark");
+            } else if !dark_mode_is_active.get() && !class_list.contains("dark") {
+            } else {
+                let _ = class_list.add_1("dark");
+            }
+        }
+    });
+
     view! {
         <Title text="Techie Tenka"/>
         <main>
             <ErrorHandler />
-            <div class="relative min-h-svh bg-contrast-white">
+            <div class="relative min-h-svh">
                 {/* Sidebar overlay */}
                 <div
                     class=move || format!(
-                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white shadow-md z-40 {}",
+                        "fixed top-0 left-0 h-full transition-all duration-300 bg-contrast-white dark:bg-navy shadow-md z-40 {}",
                         if collapsed.get() { "w-64" } else { "w-0" }
                     )
                 >
                     {/* Only render content if expanded */}
                     {move || if collapsed.get() {
                         Some(view! {
-                            <div class="flex flex-col mx-[5%]">
-                                <div class="flex items-center justify-between h-[47px] border-y border-light-gray">
-                                    <p class="text-mid-gray font-medium">NAVIGATION</p>
+                            <div class="flex flex-col mx-[5%] min-h-svh">
+                                <div class="flex items-center justify-between h-[47px] border-b border-light-gray">
+                                    <p class="font-medium">NAVIGATION</p>
                                     <button
                                         class="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
-                                        <Icon width="24" height="24" icon=IconId::IoClose />
+                                        <Icon width="24" height="24" icon=IoClose />
                                     </button>
                                 </div>
                                 <nav class="flex flex-col">
@@ -170,7 +172,7 @@ pub fn BlogLayout() -> impl IntoView {
                                             view! {
                                                 <div class=format!("flex rounded-[5px] hover:bg-light-gray h-[40px] my-[5px] {}", if is_active { "bg-primary text-contrast-white" } else { "" }) on:click=move |_| set_collapsed.set(false)>
                                                     <A attr:class="flex-1 h-full flex items-center gap-[10px]" href=child.path>
-                                                        <span class=format!("{}", if is_active { "text-contrast-white" } else { "text-mid-gray" })><Icon width="24" height="24" icon=child.icon /></span>
+                                                        <span class=format!("{}", if is_active { "text-contrast-white" } else { "" })><Icon width="24" height="24" icon=child.icon /></span>
                                                         <span class="flex-1">{child.label}</span>
                                                     </A>
                                                 </div>
@@ -180,6 +182,49 @@ pub fn BlogLayout() -> impl IntoView {
                                         }
                                     </For>
                                 </nav>
+                                {
+                                    move || {
+                                        let is_authenticated = !user_auth.get().token.is_empty();
+
+                                        if !is_authenticated {
+                                            Some(
+                                                view! {
+                                                    <div class="md:hidden flex flex-col gap-[10px]">
+                                                        <div class="flex items-center h-[40px] border-b border-light-gray">
+                                                            <p class="font-medium text-xs">ACTIONS</p>
+                                                        </div>
+                                                        <A attr:class="block md:hidden py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold text-center" href="/sign-in">"Sign In"</A>
+                                                    </div>
+                                                }
+                                            )
+                                        } else {
+                                            None
+                                        }
+                                    }
+                                }
+                                <div class="md:hidden mt-auto flex flex-col gap-[10px]">
+                                    <div class="flex items-center h-[40px] border-b border-light-gray">
+                                        <p class="font-medium text-xs">PREFERENCES</p>
+                                    </div>
+                                    <div class="flex md:hidden items-center gap-[5px]">
+                                        <ToggleSwitch
+                                        active=dark_mode_signal
+                                        label_active=""
+                                        label_inactive=""
+                                        on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
+                                        />
+                                        {
+                                            move || {
+                                                let icon = if !dark_mode_is_active.get() { BsSun } else { BsMoon };
+
+                                                view! {
+                                                    <Icon icon=icon />
+                                                }
+                                            }
+                                        }
+
+                                    </div>
+                                </div>
                             </div>
                         })
                     } else {

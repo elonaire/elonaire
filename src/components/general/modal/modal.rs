@@ -1,4 +1,6 @@
-use icondata as IconId;
+use icondata::{
+    AiInfoCircleOutlined, AiQuestionCircleOutlined, BiCheckCircleRegular, BiErrorSolid,
+};
 use leptos::{control_flow::Show, ev, portal::Portal, prelude::*};
 use leptos_icons::Icon;
 
@@ -89,22 +91,22 @@ pub fn BasicModal(
                                                             move || match use_case {
                                                                 UseCase::Error => Some(view! {
                                                                     <span class="text-danger mr-2">
-                                                                        <Icon width="2rem" height="2rem" icon=IconId::BiErrorSolid />
+                                                                        <Icon width="2rem" height="2rem" icon=BiErrorSolid />
                                                                     </span>
                                                                 }),
                                                                 UseCase::Success => Some(view! {
                                                                     <span class="text-success mr-2">
-                                                                        <Icon width="2rem" height="2rem" icon=IconId::BiCheckCircleRegular />
+                                                                        <Icon width="2rem" height="2rem" icon=BiCheckCircleRegular />
                                                                     </span>
                                                                 }),
                                                                 UseCase::Info => Some(view! {
                                                                     <span class="text-info mr-2">
-                                                                        <Icon width="2rem" height="2rem" icon=IconId::AiInfoCircleOutlined />
+                                                                        <Icon width="2rem" height="2rem" icon=AiInfoCircleOutlined />
                                                                     </span>
                                                                 }),
                                                                 UseCase::Confirmation => Some(view! {
                                                                     <span class="text-warning mr-2">
-                                                                        <Icon width="2rem" height="2rem" icon=IconId::AiQuestionCircleOutlined />
+                                                                        <Icon width="2rem" height="2rem" icon=AiQuestionCircleOutlined />
                                                                     </span>
                                                                 }),
                                                                 UseCase::General => None,

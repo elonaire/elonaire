@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BsDashLg, BsPlusLg};
 use leptos::html::*;
 use leptos::prelude::*;
 use leptos_icons::Icon;
@@ -136,9 +136,9 @@ pub fn Panel(
                     move || {
                         if children.get().is_some() {
                             let icon_id = if is_open.get() {
-                                IconId::BsDashLg
+                                BsDashLg
                             } else {
-                                IconId::BsPlusLg
+                                BsPlusLg
                             };
                             Some(view!{ <Icon icon=icon_id /> })
                         } else {

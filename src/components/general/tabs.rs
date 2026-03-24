@@ -1,4 +1,4 @@
-use icondata as IconId;
+use icondata::{BiChevronLeftRegular, BiChevronRightRegular};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use web_sys::HtmlDivElement;
@@ -100,7 +100,7 @@ pub fn Tabs(
                     on:click=move |_| scroll_left_click()
                     disabled=move || !can_scroll_left.get()
                 >
-                    <Icon width="2em" height="2em" icon=IconId::BiChevronLeftRegular />
+                    <Icon width="2em" height="2em" icon=BiChevronLeftRegular />
                 </button>
 
                 // Scrollable container
@@ -118,7 +118,7 @@ pub fn Tabs(
                                 if current == index {
                                     "border-primary text-primary"
                                 } else {
-                                    "border-transparent text-mid-gray"
+                                    "border-transparent"
                                 }
                             };
 
@@ -142,7 +142,7 @@ pub fn Tabs(
                     on:click=move |_| scroll_right_click()
                     disabled=move || !can_scroll_right.get()
                 >
-                    <Icon width="2em" height="2em" icon=IconId::BiChevronRightRegular />
+                    <Icon width="2em" height="2em" icon=BiChevronRightRegular />
                 </button>
             </div>
 

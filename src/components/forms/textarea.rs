@@ -31,7 +31,7 @@ pub fn Textarea(
 
     view! {
         <div>
-            // <label class="block text-mid-gray text-sm font-bold" for=id_attr.clone()>
+            // <label class="block text-sm font-bold" for=id_attr.clone()>
             //     {label}
             //     {move || required.then_some(view! {
             //         <span class="text-danger ml-1">*</span>
@@ -44,7 +44,7 @@ pub fn Textarea(
                     Some(
                         view! {
                             <label
-                                class={format!("block text-mid-gray text-sm font-bold")}
+                                class={format!("block text-sm font-bold")}
                                 for=id_attr.clone()
                             >
                                 {label}
@@ -58,7 +58,7 @@ pub fn Textarea(
             }
             <textarea
                 class=move || format!(
-                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow bg-transparent {}",
+                    "form-input ring-0 shadow appearance-none border border-mid-gray rounded w-full py-2 px-3 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow bg-transparent {}",
                     ext_input_styles
                 )
                 name=name

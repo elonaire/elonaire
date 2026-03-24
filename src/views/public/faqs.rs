@@ -3,7 +3,7 @@ use leptos::{ev, prelude::*};
 
 use crate::components::{
     general::collapse::{Collapse, PanelInfo},
-    molecules::nav::Nav,
+    molecules::{footer::Footer, nav::Nav},
 };
 
 #[component]
@@ -87,36 +87,38 @@ pub fn Faqs() -> impl IntoView {
 
     // Flatten all sections into PanelInfo, with a section heading as a non-interactive divider
     // between groups by using separate Collapse per section
-    let sections: Vec<(String, RwSignal<Vec<PanelInfo>>)> =
-        raw_faqs
-            .into_iter()
-            .map(|(category, items)| {
-                let panel_items =
-                    items
-                        .into_iter()
-                        .map(|(question, answer)| {
-                            let q = question.to_string();
-                            let a = answer.to_string();
-                            PanelInfo::builder(
-                        ViewFn::from(move || view! {
-                            <span class="text-sm font-medium text-gray">{q.clone()}</span>
+    let sections: Vec<(String, RwSignal<Vec<PanelInfo>>)> = raw_faqs
+        .into_iter()
+        .map(|(category, items)| {
+            let panel_items = items
+                .into_iter()
+                .map(|(question, answer)| {
+                    let q = question.to_string();
+                    let a = answer.to_string();
+                    PanelInfo::builder(
+                        ViewFn::from(move || {
+                            view! {
+                                <span class="text-sm font-medium">{q.clone()}</span>
+                            }
                         }),
-                        ViewFn::from(move || view! {
-                            <p class="text-body text-mid-gray">{a.clone()}</p>
+                        ViewFn::from(move || {
+                            view! {
+                                <p class="text-body">{a.clone()}</p>
+                            }
                         }),
                     )
                     .build()
-                        })
-                        .collect::<Vec<_>>();
-                (category.to_string(), RwSignal::new(panel_items))
-            })
-            .collect();
+                })
+                .collect::<Vec<_>>();
+            (category.to_string(), RwSignal::new(panel_items))
+        })
+        .collect();
 
     let handle_menu_click =
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
-        <div class="min-h-svh bg-contrast-white flex flex-col gap-[40px]">
+        <div class="min-h-svh flex flex-col gap-[40px]">
             <Nav onmenuclick=handle_menu_click() />
 
             // Header
@@ -125,7 +127,7 @@ pub fn Faqs() -> impl IntoView {
                     "Help"
                 </span>
                 <h1>"Frequently Asked Questions"</h1>
-                <p class="text-body text-mid-gray mt-2">
+                <p class="text-body mt-2">
                     "Can't find an answer? Email us at "
                     <a href="mailto:info@techietenka.com" class="text-primary hover:underline">
                         "info@techietenka.com"
@@ -141,6 +143,10 @@ pub fn Faqs() -> impl IntoView {
                         <Collapse is_accordion=true panel_items=panel_items />
                     </div>
                 }).collect::<Vec<_>>()}
+            </div>
+
+            <div class="mt-auto">
+                <Footer />
             </div>
         </div>
     }

@@ -1,7 +1,7 @@
 // terms.rs
 use leptos::{ev, prelude::*};
 
-use crate::components::molecules::nav::Nav;
+use crate::components::molecules::{footer::Footer, nav::Nav};
 
 #[component]
 pub fn TermsOfService() -> impl IntoView {
@@ -61,11 +61,11 @@ pub fn TermsOfService() -> impl IntoView {
                     "Legal"
                 </span>
                 <h1>"Terms of Service"</h1>
-                <p class="text-caption text-mid-gray mt-2">"Last updated: March 2026"</p>
+                <p class="text-caption mt-2">"Last updated: March 2026"</p>
             </div>
 
             // Intro
-            <p class="text-body text-gray display-constraints blog-display-constraints">
+            <p class="text-body display-constraints blog-display-constraints">
                 "These Terms of Service govern your access to and use of Techie Tenka's platform, marketplace, and services. Please read them carefully before proceeding."
             </p>
 
@@ -73,10 +73,14 @@ pub fn TermsOfService() -> impl IntoView {
             <div class="display-constraints blog-display-constraints">
                 {sections.into_iter().map(|(title, content)| view! {
                     <div class="border-l-2 border-primary pl-6">
-                        <h4 class="text-gray mb-2">{title}</h4>
-                        <p class="text-body text-mid-gray">{content}</p>
+                        <h4 class="mb-2">{title}</h4>
+                        <p class="text-body">{content}</p>
                     </div>
                 }).collect::<Vec<_>>()}
+            </div>
+
+            <div class="mt-auto">
+                <Footer />
             </div>
         </div>
     }

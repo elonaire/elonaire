@@ -1,5 +1,6 @@
 use crate::components::schemas::props::StringVec;
-use icondata as IconId;
+use icondata::BiChevronRightRegular;
+
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use leptos_router::{components::A, hooks::use_location};
@@ -87,7 +88,7 @@ pub fn Breadcrumbs(
                                     {if i < breadcrumbs.get().len() - 1 {
                                         Some(view! {
                                             <span class="text-xs mx-2">
-                                                <Icon icon=IconId::BiChevronRightRegular />
+                                                <Icon icon=BiChevronRightRegular />
                                             </span>
                                         })
                                     } else {
