@@ -5,6 +5,7 @@ metadata:
   namespace: techietenka
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-surrealist-ipallowlist@kubernetescrd"
 spec:
   ingressClassName: traefik
   rules:
