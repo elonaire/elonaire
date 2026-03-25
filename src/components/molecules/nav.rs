@@ -66,6 +66,7 @@ pub fn Nav(
     let dark_mode_is_active = current_state.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     let navigate = use_navigate();
+    let is_authenticated = Memo::new(move |_| !user_profile.get().profile_picture.is_none());
 
     let handle_sign_out = Callback::new(move |_| {
         let navigate = navigate.clone();
@@ -188,8 +189,8 @@ pub fn Nav(
 
                     // Sign in — dashboard or blog, no profile pic
                     {move || {
-                        let is_authenticated = !user_auth.get().token.is_empty();
-                        ((is_dashboard.get() || is_blog.get()) && !is_authenticated).then(|| view! {
+
+                        ((is_dashboard.get() || is_blog.get()) && !is_authenticated.get()).then(|| view! {
                             <A
                                 attr:class="hidden md:flex py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold text-sm"
                                 href="/sign-in"
