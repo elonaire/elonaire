@@ -12,6 +12,41 @@ spec:
     - host: techietenka.com
       http:
         paths:
+          - path: /api/acl
+            pathType: Prefix
+            backend:
+              service:
+                name: acl-service
+                port:
+                  number: 3007
+          - path: /api/files
+            pathType: Prefix
+            backend:
+              service:
+                name: files-service
+                port:
+                  number: 3001
+          - path: /api/shared
+            pathType: Prefix
+            backend:
+              service:
+                name: shared-service
+                port:
+                  number: 3002
+          - path: /api/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: payments-service
+                port:
+                  number: 3013
+          - path: /api/email
+            pathType: Prefix
+            backend:
+              service:
+                name: email-service
+                port:
+                  number: 3019
           - path: /
             pathType: Prefix
             backend:
