@@ -93,14 +93,14 @@ pub fn Tabs(
 
     view! {
         <div class="w-full">
-            <div class="relative w-full flex flex-row justify-between items-center border-b border-gray">
+            <div class="relative w-full flex flex-row justify-between items-center border-b border-mid-gray">
                 // Left caret
                 <button
-                    class="bg-gradient-to-r from-navy to-transparent z-10 cursor-pointer"
+                    class="dark:bg-gradient-to-r dark:from-navy dark:to-transparent z-10 cursor-pointer"
                     on:click=move |_| scroll_left_click()
                     disabled=move || !can_scroll_left.get()
                 >
-                    <Icon width="2em" height="2em" icon=BiChevronLeftRegular />
+                    <Icon width="2rem" height="2rem" icon=BiChevronLeftRegular />
                 </button>
 
                 // Scrollable container
@@ -138,11 +138,11 @@ pub fn Tabs(
 
                 // Right caret
                 <button
-                    class="bg-gradient-to-l from-navy to-transparent z-10 cursor-pointer"
+                    class="dark:bg-gradient-to-l dark:from-navy dark:to-transparent z-10 cursor-pointer"
                     on:click=move |_| scroll_right_click()
                     disabled=move || !can_scroll_right.get()
                 >
-                    <Icon width="2em" height="2em" icon=BiChevronRightRegular />
+                    <Icon width="2rem" height="2rem" icon=BiChevronRightRegular />
                 </button>
             </div>
 
