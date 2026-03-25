@@ -62,7 +62,6 @@ pub fn Nav(
 
     let current_state = expect_context::<Store<AppStateContext>>();
     let user_profile = current_state.user().user_profile();
-    let user_auth = current_state.user().auth_info();
     let dark_mode_is_active = current_state.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     let navigate = use_navigate();
@@ -82,13 +81,7 @@ pub fn Nav(
         spawn_local(async move {
             if let Ok(_) = sign_out(Some(&headers)).await {
                 current_state.user().set(Default::default());
-                navigate(
-                    "/sign-in",
-                    NavigateOptions {
-                        replace: true,
-                        ..Default::default()
-                    },
-                );
+                navigate("/sign-in", Default::default());
             };
         });
     });
