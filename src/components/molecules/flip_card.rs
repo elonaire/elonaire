@@ -14,7 +14,7 @@ pub fn FlipCard(
                 /* Image – 80% */
                 <div class="h-4/5 relative">
                     <img
-                        src={image_url}
+                        src=format!("{image_url}?width=600")
                         alt="card-image"
                         class="w-full h-full object-cover"
                     />
@@ -27,14 +27,24 @@ pub fn FlipCard(
             </div>
 
             /* Back Face */
-            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-primary to-secondary p-6 flex flex-col justify-center rotate-y-180 flip-back">
-                <h5 class="mb-3 text-contrast-white">{title.clone()}</h5>
-                <p class="text-sm mb-4 leading-relaxed text-light-gray">
-                    {description}
-                </p>
-                <div class="text-xs">
+            <div class="absolute inset-0 backface-hidden rounded-[5px] overflow-hidden shadow-lg bg-gradient-to-br from-primary to-secondary p-6 flex flex-col rotate-y-180 flip-back">
+
+                // Scrollable content
+                <div class="flex-1 overflow-y-auto">
+                    <h5 class="mb-3 text-contrast-white">
+                        {title.clone()}
+                    </h5>
+
+                    <p class="text-sm leading-relaxed text-light-gray">
+                        {description}
+                    </p>
+                </div>
+
+                // Fixed actions
+                <div class="text-xs mt-4 shrink-0">
                     {actions.map(|action| action.run())}
                 </div>
+
             </div>
         </div>
     }
