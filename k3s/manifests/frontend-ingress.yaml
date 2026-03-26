@@ -5,7 +5,7 @@ metadata:
   namespace: techietenka
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-surrealist-ipallowlist@kubernetescrd,techietenka-strip-api-acl@kubernetescrd,techietenka-strip-api-files@kubernetescrd,techietenka-strip-api-shared@kubernetescrd,techietenka-strip-api-email@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-surrealist-ipallowlist@kubernetescrd,techietenka-strip-api-acl@kubernetescrd,techietenka-strip-api-files@kubernetescrd,techietenka-strip-api-shared@kubernetescrd,techietenka-strip-api-email@kubernetescrd,techietenka-strip-api-payments@kubernetescrd"
 spec:
   ingressClassName: traefik
   rules:
@@ -47,6 +47,15 @@ spec:
                 name: email-service
                 port:
                   number: 3019
+
+          - path: /api/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: payments-service
+                port:
+                  number: 3013
+
           - path: /
             pathType: Prefix
             backend:
