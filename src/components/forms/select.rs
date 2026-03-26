@@ -1,4 +1,4 @@
-use icondata::CgClose;
+use icondata::{BsSearch, CgClose};
 use leptos::ev;
 use leptos::html::Select;
 use leptos::prelude::*;
@@ -196,12 +196,12 @@ pub fn CustomSelectInput(
 
     view! {
         <div class="relative w-full">
-            <label for=id_attr.clone() class="block text-sm font-bold">
+            <span class="block text-sm font-bold">
                 {label.clone()}
                 {move || required.then_some(view! {
                     <span class="text-danger ml-1">*</span>
                 })}
-            </label>
+            </span>
 
             // Control with chips
             <div
@@ -267,54 +267,58 @@ pub fn CustomSelectInput(
             })}
 
             // Dropdown
-            {move || open.get().then_some(view! {
-                <div class="absolute z-30 mt-1 w-full bg-contrast-white rounded-[5px] shadow">
-                    // Search
-                    <InputField placeholder="Search…" field_type=InputFieldType::Text id_attr="search" on:input=move |ev: ev::Event| {
-                        set_query.set(event_target_value(&ev));
-                    } />
+            {move || {
+                let id_attr_clone = id_attr.clone();
+                open.get().then_some(view! {
+                    <div class="absolute z-30 mt-1 w-full bg-contrast-white rounded-[5px] shadow">
+                        // Search
+                        <InputField placeholder="Search…" field_type=InputFieldType::Text icon=BsSearch id_attr="search" on:input=move |ev: ev::Event| {
+                            set_query.set(event_target_value(&ev));
+                        } />
 
-                    // Options
-                    <ul class="max-h-48 overflow-y-auto">
-                        {move || filtered_options.get().into_iter().map(|opt| {
-                            let selected = value.get().contains(&opt.value);
-                            let val = opt.value.clone();
+                        // Options
+                        <ul class="max-h-48 overflow-y-auto">
+                            {move || filtered_options.get().into_iter().map(|opt| {
+                                let selected = value.get().contains(&opt.value);
+                                let val = opt.value.clone();
+                                let current_id_attr = format!("{}_{}", id_attr_clone, opt.value);
 
-                            view! {
-                                <li
-                                    class="px-3 py-2 hover:bg-light-gray flex items-center
-                                           gap-2 cursor-pointer"
-                                    on:click=move |_| select_value(val.clone())
-                                >
-                                    {multiple.then_some(view! {
-                                        <CheckboxInputField checked=selected />
-                                    })}
+                                view! {
+                                    <li
+                                        class="px-3 py-2 hover:bg-light-gray flex items-center
+                                               gap-2 cursor-pointer"
+                                        on:click=move |_| select_value(val.clone())
+                                    >
+                                        {multiple.then_some(view! {
+                                            <CheckboxInputField checked=selected id_attr=current_id_attr.clone() />
+                                        })}
 
-                                    {
-                                        if !multiple {
-                                            Some(
-                                                view! {
-                                                    <RadioInputField is_selected=selected />
-                                                }
-                                            )
-                                        } else {
-                                            None
+                                        {
+                                            if !multiple {
+                                                Some(
+                                                    view! {
+                                                        <RadioInputField is_selected=selected id_attr=current_id_attr.clone() />
+                                                    }
+                                                )
+                                            } else {
+                                                None
+                                            }
                                         }
-                                    }
 
-                                    <span class=move || if selected {
-                                        "font-semibold"
-                                    } else {
-                                        ""
-                                    }>
-                                        {opt.label.clone()}
-                                    </span>
-                                </li>
-                            }
-                        }).collect::<Vec<_>>()}
-                    </ul>
-                </div>
-            })}
+                                        <span class=move || if selected {
+                                            "font-semibold"
+                                        } else {
+                                            ""
+                                        }>
+                                            {opt.label.clone()}
+                                        </span>
+                                    </li>
+                                }
+                            }).collect::<Vec<_>>()}
+                        </ul>
+                    </div>
+                })
+            }}
         </div>
     }
 }

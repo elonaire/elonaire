@@ -41,7 +41,7 @@ impl RadioOption {
 /// ```
 #[component]
 pub fn RadioInputField(
-    #[prop(into, optional, default = RwSignal::new("".to_string()))] initial_value: RwSignal<
+    #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
         String,
     >,
     #[prop(into, optional)] name: String,
@@ -49,9 +49,10 @@ pub fn RadioInputField(
     #[prop(default = false, optional)] required: bool,
     #[prop(optional, default = false)] is_selected: bool,
     #[prop(optional)] children: Option<ViewFn>,
+    #[prop(into, optional)] id_attr: String,
 ) -> impl IntoView {
     view! {
-        <label for=move || initial_value.get() class="inline-flex items-center gap-2 text-sm cursor-pointer px-2 py-1 rounded">
+        <label for=id_attr.clone() class="inline-flex items-center gap-2 text-sm cursor-pointer px-2 py-1 rounded">
             <input
                 class="leading-tight size-5 rounded-full border-2 border-mid-gray text-secondary shadow-sm
                            focus:outline-none focus:ring-0 focus:border-secondary
@@ -60,7 +61,7 @@ pub fn RadioInputField(
                 name=name
                 value=initial_value
                 checked=is_selected
-                id=move || initial_value.get()
+                id=id_attr.clone()
                 required=required
             />
             <div class="flex flex-col">
@@ -87,7 +88,7 @@ pub fn RadioInputField(
 /// ```
 #[component]
 pub fn RadioInputGroup(
-    #[prop(into, optional, default = RwSignal::new("".to_string()))] initial_value: RwSignal<
+    #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
         String,
     >,
     /// The legend text for the fieldset
@@ -145,7 +146,8 @@ pub fn RadioInputGroup(
                                                        checked:bg-secondary checked:border-secondary accent-secondary"
                                             type="radio"
                                             name=name.clone()
-                                            value=option_value
+                                            value=option_value.clone()
+                                            id=option_value.clone()
                                             checked=is_selected
                                             required=required
                                             on:input=move |ev| {

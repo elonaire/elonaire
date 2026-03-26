@@ -153,6 +153,7 @@ pub fn Nav(
                             label_active=""
                             label_inactive=""
                             on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
+                            id_attr="dark_mode_toggle"
                         />
                         {move || {
                             let icon = if dark_mode_is_active.get() { BsMoon } else { BsSun };
