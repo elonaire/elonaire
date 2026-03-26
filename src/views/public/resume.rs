@@ -186,7 +186,7 @@ fn generate_panel_info(skill: &UserSkill) -> PanelInfo {
                 <div class="flex-1 flex flex-row items-center justify-between">
                     <img src={title_skill.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
                     <p class="font-bold">{title_skill.name.as_ref().unwrap_or(&Default::default()).clone()}</p>
-                    <p class="text-xs text-primary">{format!("{:?}", level)}</p>
+                    <p class="text-xs">{format!("{:?}", level)}</p>
                 </div>
             }
         }),

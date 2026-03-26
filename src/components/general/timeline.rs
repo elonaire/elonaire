@@ -212,7 +212,7 @@ pub fn Timeline(#[prop(into)] steps: RwSignal<Vec<TimelineItem>>) -> impl IntoVi
                             <div class="ml-4 mb-4">
                                 <p class="text-sm">{item.time_info}</p>
                                 <div class="text-wrap">
-                                    <h4 class="text-primary">{item.title}<span class="text-sm">{
+                                    <h4 class="text-primary">{item.title}<span class="text-sm text-secondary">{
                                         item.more_info.as_ref().map(|info| format!(" - {}", info))
                                     }</span></h4>
                                 </div>
