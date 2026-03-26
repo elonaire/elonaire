@@ -225,7 +225,7 @@ impl Display for UserResumeSection {
 pub struct UserResume {
     pub id: Option<String>,
     pub title: Option<String>,
-    #[serde(rename = "moreinfo", alias = "more_info")]
+    #[serde(rename = "moreInfo", alias = "more_info")]
     pub more_info: Option<String>,
     #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: Option<String>,
