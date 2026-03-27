@@ -16,11 +16,13 @@ pub fn PrivacyPolicy() -> impl IntoView {
                 ),
                 (
                     "Purchase Information",
-                    "When you make a purchase, we collect billing details necessary to process your transaction. We do not store full card numbers.",
+                    "We collect limited billing information necessary to process your transactions, such as your name, email address, and purchase details.
+
+                    Payments are processed securely by our third-party payment provider, Paystack. We do not collect or store your full payment card details. Your payment information is handled directly by Paystack in accordance with their privacy and security policies.",
                 ),
                 (
                     "Usage Data",
-                    "We collect anonymized data on how you interact with our platform — pages visited, features used, and session duration — to improve our services.",
+                    "We collect anonymized data on how you interact with our platform — pages visited, features used, and session duration - to improve our services.",
                 ),
                 (
                     "Communications",

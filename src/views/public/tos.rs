@@ -17,7 +17,7 @@ pub fn TermsOfService() -> impl IntoView {
         ),
         (
             "3. Intellectual Property",
-            "All content on this platform — including IoT templates, Leptos components, Ebooks, articles, and source code — is protected by copyright. Purchased products are licensed for personal or commercial use as specified at the point of purchase. Redistribution or resale of any product without explicit permission is prohibited.",
+            "All content on this platform - including IoT products, Leptos templates, Ebooks, articles, and source code - is protected by copyright. Purchased products are licensed for personal or commercial use as specified at the point of purchase. Redistribution or resale of any product without explicit permission is prohibited.",
         ),
         (
             "4. User Accounts",

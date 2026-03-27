@@ -20,11 +20,11 @@ pub fn Faqs() -> impl IntoView {
                 ),
                 (
                     "Who is this for?",
-                    "Anyone who builds things — embedded developers, Rust enthusiasts, Leptos developers, IoT hobbyists, and curious minds who want to ship real products.",
+                    "Anyone who builds things - embedded developers, Rust enthusiasts, Leptos developers, IoT hobbyists, and curious minds who want to ship real products.",
                 ),
                 (
                     "Is the blog free to read?",
-                    "Yes. All blog articles are completely free. The marketplace will have both free and paid products.",
+                    "Yes. All blog articles are completely free for now but we may introduce paid content in the near future. The marketplace will have both free and paid products.",
                 ),
             ],
         ),
@@ -33,19 +33,19 @@ pub fn Faqs() -> impl IntoView {
             vec![
                 (
                     "What will be available in the marketplace?",
-                    "IoT product templates, firmware blueprints, Leptos UI components, full-stack starter kits, end-to-end project guides, and Ebooks on embedded systems, Rust, and systems design.",
+                    "IoT product templates, firmware blueprints, Leptos UI templates, full-stack starter kits, end-to-end project guides, and Ebooks on embedded systems, Rust, and systems design.",
                 ),
                 (
                     "When does the marketplace launch?",
-                    "We are targeting Q3 2025. Join the waitlist to be notified the moment we go live.",
+                    "We are targeting Q2 2026. Join the waitlist to be notified the moment we go live.",
                 ),
                 (
                     "What license do purchased products come with?",
-                    "Each product specifies its license at the point of purchase — typically personal use or commercial use. Redistribution or resale is not permitted unless explicitly stated.",
+                    "Each product specifies its license at the point of purchase - typically personal use or commercial use. Redistribution or resale is not permitted unless explicitly stated.",
                 ),
                 (
                     "Can I sell my own templates or products?",
-                    "Vendor accounts are planned for a future phase. Join the waitlist and indicate your interest — we'll reach out when vendor onboarding opens.",
+                    "Vendor accounts are planned for a future phase. Join the waitlist and indicate your interest - we'll reach out when vendor onboarding opens.",
                 ),
                 (
                     "What payment methods will be supported?",
@@ -58,11 +58,11 @@ pub fn Faqs() -> impl IntoView {
             vec![
                 (
                     "What stack is this platform built on?",
-                    "The platform is built with Rust, Leptos for the frontend, and Axum for the backend — fully type-safe from database to browser.",
+                    "The platform is built with Rust, Leptos for the frontend, SurrealDB for the database, and Axum for the backend.",
                 ),
                 (
-                    "Do the IoT templates support specific hardware?",
-                    "Templates will specify supported hardware. At launch expect coverage for ESP32, Raspberry Pi, and Arduino-compatible boards.",
+                    "Do the IoT products support specific hardware?",
+                    "IoT products will specify supported hardware. At launch expect coverage for ESP32, Raspberry Pi, and Arduino-compatible boards.",
                 ),
                 (
                     "Are the Leptos templates compatible with the latest version?",
