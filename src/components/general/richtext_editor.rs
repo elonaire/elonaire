@@ -341,7 +341,7 @@ pub fn RichTextEditor(
                     };
 
                     if let Ok(request) =
-                        gloo_net::http::Request::post(&format!("{files_service_api}upload"))
+                        gloo_net::http::Request::post(&format!("{files_service_api}/upload"))
                             .header(
                                 "Authorization",
                                 format!(
