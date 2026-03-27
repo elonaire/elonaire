@@ -4,8 +4,9 @@ metadata:
   name: frontend-ingress
   namespace: techietenka
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-surrealist-ipallowlist@kubernetescrd,techietenka-strip-api-acl@kubernetescrd,techietenka-strip-api-files@kubernetescrd,techietenka-strip-api-shared@kubernetescrd,techietenka-strip-api-email@kubernetescrd,techietenka-strip-api-payments@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-surrealist-ipallowlist@kubernetescrd,techietenka-strip-api-acl@kubernetescrd,techietenka-strip-api-files@kubernetescrd,techietenka-strip-api-shared@kubernetescrd,techietenka-strip-api-email@kubernetescrd,techietenka-strip-api-payments@kubernetescrd,techietenka-security-headers@kubernetescrd,techietenka-redirect-to-https@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.tls.options: "default-default@kubernetescrd"
 spec:
   ingressClassName: traefik
   rules:

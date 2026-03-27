@@ -106,7 +106,7 @@ pub fn Nav(
 
                 // Left — hamburger (mobile only on non-dashboard, always on dashboard)
                 <button
-                    class=move || format!("bg-transparent border-none cursor-pointer shrink-0 {}", if !is_dashboard.get() { "md:hidden" } else { "" })
+                    class=move || format!("border-none cursor-pointer shrink-0 {}", if !is_dashboard.get() { "md:hidden" } else { "" })
                     on:click=move |ev| onmenuclick.run(ev)
                 >
                     <Icon width="24" height="24" icon=IoMenu />
