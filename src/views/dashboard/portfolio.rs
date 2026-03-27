@@ -244,7 +244,7 @@ pub fn CreatePortfolio() -> impl IntoView {
 
                     spawn_local(async move {
                         let Ok(request) =
-                            gloo_net::http::Request::post(&format!("{files_service_api}upload"))
+                            gloo_net::http::Request::post(&format!("{files_service_api}/upload"))
                                 .header(
                                     "Authorization",
                                     format!(
