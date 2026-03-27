@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use icondata::{
-    BsInfoCircle, BsMoon, BsPower, BsRss, BsSun, IoMenu, IoSearchOutline,
+    BsInfoCircle, BsMoon, BsPower, BsRss, BsSun, CgMenuLeft, IoSearchOutline,
     MdiCardAccountDetailsOutline, MdiCertificateOutline, MdiStore, MdiTabletDashboard,
     MdiTrophyAward, RiArticleDocumentLine,
 };
@@ -109,7 +109,7 @@ pub fn Nav(
                     class=move || format!("border-none cursor-pointer shrink-0 {}", if !is_dashboard.get() { "md:hidden" } else { "" })
                     on:click=move |ev| onmenuclick.run(ev)
                 >
-                    <Icon width="24" height="24" icon=IoMenu />
+                    <Icon width="24" height="24" icon=CgMenuLeft />
                 </button>
 
                 // Center/Left — logo

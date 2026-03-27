@@ -31,10 +31,12 @@ pub fn FeaturedPost(
             {/* Content Card */}
             <div class="absolute top-[105px] left-[20px] flex flex-col gap-[10px] px-[18px] w-[333px] h-[205px] bg-primary/95 rounded-[5px] md:relative md:top-0 md:left-0 md:w-1/2 md:h-full md:bg-transparent md:px-0 md:gap-[20px]  md:justify-center">
                 <A href={format!("/blog/read/{}", link)}>
-                    <h1 class="line-clamp-2 md:line-clamp-3">{title}</h1>
+                    <h1 class="text-contrast-white md:text-gray dark:md:text-light-gray line-clamp-2 md:line-clamp-3">{title}</h1>
                 </A>
-                <p class="line-clamp-2 md:line-clamp-3">{short_description}</p>
-                <AuthorInfo profile_pic=author_profile_pic author_name=author_name />
+                <p class="text-light-gray md:text-mid-gray line-clamp-2 md:line-clamp-3">{short_description}</p>
+                <div class="text-light-gray md:text-mid-gray">
+                    <AuthorInfo profile_pic=author_profile_pic author_name=author_name />
+                </div>
                 <A
                     href={format!("/blog/read/{}", link)}
                     attr:class="hidden md:flex font-bold py-2 px-4 cursor-pointer rounded-[5px] bg-primary text-contrast-white w-[246px] justify-center items-center gap-[10px]"

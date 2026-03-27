@@ -29,7 +29,7 @@ pub fn Footer() -> impl IntoView {
                         <A href="/attributions" attr:class="text-sm">"Attributions"</A>
                     </div>
                 </div>
-                <div class="text-xs border-t border-contrast-white flex items-center justify-center h-[88px]">
+                <div class="text-[11px] border-t border-contrast-white flex items-center justify-center h-[88px]">
                     <span>"©"{format!(" {} Techie Tenka. All rights reserved.", chrono::Local::now().year()).to_uppercase()}</span>
                 </div>
             </div>
