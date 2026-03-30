@@ -111,6 +111,8 @@ pub fn CreateBlog() -> impl IntoView {
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
+    let (is_premium, set_is_premium) = signal(false);
+    let (is_featured, set_is_featured) = signal(false);
     let blog_statuses = RwSignal::new(
         BlogStatus::variants_slice()
             .iter()
@@ -358,6 +360,8 @@ pub fn CreateBlog() -> impl IntoView {
                        label_inactive="Free"
                        name="is_premium"
                        id_attr="is_premium"
+                       active=is_premium
+                       on:change=move |_| set_is_premium.set(!is_premium.get())
                     />
 
                     <ToggleSwitch
@@ -365,6 +369,8 @@ pub fn CreateBlog() -> impl IntoView {
                           label_inactive="Not Featured"
                           name="is_featured"
                           id_attr="is_featured"
+                          active=is_featured
+                          on:change=move |_| set_is_featured.set(!is_featured.get())
                     />
                     <CustomFileInput input_node_ref=thumbnail_file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <RichTextEditor name="content" extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock, ExtraFormatingOption::MarkdownUpload, ExtraFormatingOption::ImageUpload, ExtraFormatingOption::Lists, ExtraFormatingOption::Heading] />
