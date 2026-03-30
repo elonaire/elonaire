@@ -62,8 +62,6 @@ pub fn Attributions() -> impl IntoView {
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">
-            <Nav onmenuclick=handle_menu_click() />
-
             // Header
             <div class="display-constraints blog-display-constraints border-b border-light-gray pb-6">
                 <span class="inline-block text-xs tracking-[0.3em] uppercase text-primary mb-3">
@@ -125,10 +123,6 @@ pub fn Attributions() -> impl IntoView {
                         </div>
                     </div>
                 }).collect::<Vec<_>>()}
-            </div>
-
-            <div class="mt-auto">
-                <Footer />
             </div>
         </div>
     }
