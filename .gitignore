@@ -5,3 +5,4 @@ tailwindcss
 notes.txt
 .env
 prod.env
+styles/output.css

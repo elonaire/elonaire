@@ -119,8 +119,6 @@ pub fn Faqs() -> impl IntoView {
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">
-            <Nav onmenuclick=handle_menu_click() />
-
             // Header
             <div class="display-constraints blog-display-constraints border-b border-light-gray pb-8">
                 <span class="inline-block text-xs tracking-[0.3em] uppercase text-primary mb-3">
@@ -143,10 +141,6 @@ pub fn Faqs() -> impl IntoView {
                         <Collapse is_accordion=true panel_items=panel_items />
                     </div>
                 }).collect::<Vec<_>>()}
-            </div>
-
-            <div class="mt-auto">
-                <Footer />
             </div>
         </div>
     }

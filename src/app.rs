@@ -44,14 +44,15 @@ use crate::{
             error_handler::ErrorHandler,
             faqs::Faqs,
             home::Home,
+            layout::MainLayout,
             login::SignIn,
-            marketplace::waitlist::{Marketplace, WaitList},
             portfolio::Portfolio as PublicPortfolio,
             privacy::PrivacyPolicy,
             ratecard::Ratecard as PublicRatecard,
             resume::Resume as PublicResume,
             sign_up::SignUp,
             tos::TermsOfService,
+            waitlist::WaitList,
         },
     },
 };
@@ -83,16 +84,20 @@ pub fn App() -> impl IntoView {
                     >
             <Router>
                 <Routes fallback=|| "Page not found.">
-                    <Route path=StaticSegment("") view=Home />
+                    // <Route path=StaticSegment("") view=Home />
+                    <ParentRoute path=path!("") view=MainLayout>
+                        <Route path=path!("/faq") view=Faqs />
+                        <Route path=path!("/terms") view=TermsOfService />
+                        <Route path=path!("/privacy") view=PrivacyPolicy />
+                        <Route path=path!("/contact") view=Contact />
+                        <Route path=path!("/attributions") view=Attributions />
+                        <Route path=path!("/marketplace") view=WaitList />
+                        <Route path=path!("") view=Home />
+                    </ParentRoute>
                     <Route path=StaticSegment("/about") view=About />
                     <Route path=StaticSegment("/resume") view=PublicResume />
                     <Route path=StaticSegment("/portfolio") view=PublicPortfolio />
                     <Route path=StaticSegment("/ratecard") view=PublicRatecard />
-                    <Route path=StaticSegment("/faq") view=Faqs />
-                    <Route path=StaticSegment("/terms") view=TermsOfService />
-                    <Route path=StaticSegment("/privacy") view=PrivacyPolicy />
-                    <Route path=StaticSegment("/contact") view=Contact />
-                    <Route path=StaticSegment("/attributions") view=Attributions />
                     <ParentRoute path=path!("/dashboard") view=|| view! { <ProtectedRoute><DashboardLayout /></ProtectedRoute> }>
                         <ParentRoute path=path!("/portfolio") view=Portfolio>
                             <Route path=path!("") view=PortfolioList />
@@ -160,9 +165,6 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("") view=BlogHome />
                         <Route path=path!("/read/:slug") view=BlogPostDetail />
                         <Route path=path!("/about") view=AboutBlog />
-                    </ParentRoute>
-                    <ParentRoute path=path!("/marketplace") view=Marketplace>
-                        <Route path=path!("") view=WaitList />
                     </ParentRoute>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>
                     <Route path=StaticSegment("/sign-up") view=SignUp/>
