@@ -141,8 +141,6 @@ pub fn Contact() -> impl IntoView {
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">
-            <Nav onmenuclick=handle_menu_click() />
-
             <BasicModal
                 title="Message Sent"
                 is_open=success_modal_is_open

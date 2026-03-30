@@ -35,15 +35,6 @@ const MARKETPLACE_WAITLIST_MAILING_LIST_ID: Option<&str> =
 const EMAIL_SERVICE_API: Option<&str> = option_env!("EMAIL_SERVICE_API");
 
 #[component]
-pub fn Marketplace() -> impl IntoView {
-    view! {
-        <>
-            <Outlet />
-        </>
-    }
-}
-
-#[component]
 pub fn WaitList() -> impl IntoView {
     let (email, set_email) = signal(String::new());
     let (submitted, set_submitted) = signal(false);
@@ -169,10 +160,7 @@ pub fn WaitList() -> impl IntoView {
 
     view! {
         <div class="flex flex-col gap-[40px] min-h-svh">
-            <Nav onmenuclick=handle_menu_click() />
             <div>
-                // Top accent bar
-                // <div class="w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
                 <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
                     <div class="p-[10px]">
                         <p>"You have successfully subscribed to our marketplace launch update!"</p>

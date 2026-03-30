@@ -128,7 +128,6 @@ pub fn PrivacyPolicy() -> impl IntoView {
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">
-            <Nav onmenuclick=handle_menu_click() />
             // Header
             <div class="display-constraints blog-display-constraints border-b border-light-gray">
                 <span class="inline-block text-xs tracking-[0.3em] uppercase text-primary mb-3">
@@ -160,10 +159,6 @@ pub fn PrivacyPolicy() -> impl IntoView {
                         </div>
                     </div>
                 }).collect::<Vec<_>>()}
-            </div>
-
-            <div class="mt-auto">
-                <Footer />
             </div>
         </div>
     }

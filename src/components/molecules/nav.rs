@@ -8,7 +8,6 @@ use icondata::{
 use leptos::ev;
 use leptos::prelude::*;
 use leptos_icons::Icon;
-use leptos_router::NavigateOptions;
 use leptos_router::hooks::use_location;
 use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
