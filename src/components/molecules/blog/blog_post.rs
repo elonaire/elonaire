@@ -19,8 +19,8 @@ pub fn BlogPostPreview(
         <div class="flex h-[136px]  h-[111px] gap-[5px] border-b-[1px] border-light-gray">
             <img src=thumbnail class="w-[106px] object-cover" alt="Blog Post Image" />
             <div class="flex-1 flex flex-col justify-between">
-                <A href={format!("/blog/read/{}", link)}><h3 class="line-clamp-2">{title}</h3></A>
-                <p class="line-clamp-2">{short_description}</p>
+                <A href={format!("/blog/read/{}", link)}><h5 class="line-clamp-2">{title}</h5></A>
+                <p class="text-sm line-clamp-2">{short_description}</p>
                 <BlogPostMetadata category=category read_time=read_time />
             </div>
         </div>
