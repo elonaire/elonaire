@@ -19,6 +19,7 @@ use crate::data::models::general::{
     acl::{AuthInfoStoreFields, UserInfoStoreFields},
     files::UploadedFileResponse,
 };
+use crate::utils::forms::fire_bubbled_and_cancelable_event;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ExtraFormatingOption {
@@ -34,7 +35,6 @@ const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
 
 #[component]
 pub fn RichTextEditor(
-    #[prop(optional, default = Callback::new(|_| {}))] on_input: Callback<String>,
     #[prop(into, optional, default = RwSignal::new("<p><br></p>".into()))]
     initial_content: RwSignal<String>,
     #[prop(into, optional)] id_attr: String,
@@ -384,6 +384,15 @@ pub fn RichTextEditor(
                                                             selection.remove_all_ranges().ok();
                                                             selection.add_range(&new_range).ok();
                                                         }
+
+                                                        if let Some(editor) = editor_ref
+                                                            .get_untracked()
+                                                            as Option<HtmlDivElement>
+                                                        {
+                                                            fire_bubbled_and_cancelable_event(
+                                                                "input", true, true, &editor,
+                                                            );
+                                                        }
                                                     };
                                                 }
                                             }
@@ -487,8 +496,8 @@ pub fn RichTextEditor(
     };
 
     Effect::new(move |_| {
-        let changed_value = tracked_content.get();
-        on_input.run(changed_value);
+        let changed_value = initial_content.get();
+        set_tracked_content.set(changed_value);
     });
 
     let upload_md = Callback::new(move |_| {
@@ -510,11 +519,8 @@ pub fn RichTextEditor(
                                     &markdown_content,
                                     &markdown::Options::gfm(),
                                 ) {
-                                    // Update the editor content
-                                    initial_content.set(html_output.clone());
-
-                                    // Also update the tracked content
-                                    set_tracked_content.set(html_output);
+                                    // Also update the initial content
+                                    initial_content.set(html_output);
                                 };
                             }
                             Err(err) => {
