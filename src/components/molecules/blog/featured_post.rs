@@ -18,7 +18,7 @@ pub fn FeaturedPost(
         <div class="relative h-[310px] md:h-[499px] md:flex md:flex-row-reverse md:gap-[20px]">
             {/* Image */}
             <img
-                src=thumbnail
+                src=format!("{thumbnail}?width=600")
                 class="w-full h-[252px] object-cover rounded-[5px] md:h-full md:w-1/2 md:rounded-l-none"
             />
 
