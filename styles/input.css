@@ -125,6 +125,11 @@
         white-space: pre;
     }
 
+    article p code {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
     .display-constraints {
         @apply max-w-7xl mx-[5%] xl:mx-auto xl:w-full;
     }
