@@ -915,6 +915,28 @@ pub enum Subject {
     Suggestion,
 }
 
+impl EnumerableEnum for Subject {
+    fn variants_slice() -> Vec<Self> {
+        vec![
+            Self::JobOffer,
+            Self::Consultation,
+            Self::Feedback,
+            Self::Complaint,
+            Self::Enquiry,
+            Self::Suggestion,
+        ]
+    }
+}
+
+impl Display for Subject {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::JobOffer => write!(f, "Job Offer"),
+            any_other => write!(f, "{any_other:?}"),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Message {
     pub id: Option<String>,

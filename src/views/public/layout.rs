@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-
 use icondata::{
-    BsChevronDoubleDown, BsGithub, BsInfoCircle, BsMoon, BsSun, IoClose, MdiCertificateOutline,
-    MdiStore, MdiTrophyAward, RiArticleDocumentLine,
+    BsInfoCircle, BsMoon, BsSun, IoClose, MdiCertificateOutline, MdiStore, MdiTrophyAward,
+    RiArticleDocumentLine,
 };
-use leptos::{ev, prelude::*, task::spawn_local};
+use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
 use leptos_meta::*;
 use leptos_router::components::{A, Outlet};
@@ -13,47 +11,20 @@ use reactive_stores::Store;
 use crate::{
     components::{
         forms::toggle_switch::ToggleSwitch,
-        general::button::BasicButton,
         molecules::{footer::Footer, nav::Nav},
     },
-    data::{
-        context::{
-            store::{AppStateContext, AppStateContextStoreFields},
-            users::fetch_site_owner_info,
-        },
-        models::{
-            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-            graphql::shared::{FetchSiteResourcesResponse, UserProfessionalInfo},
-        },
-    },
-    utils::graphql_client::perform_query_without_vars,
+    data::context::store::{AppStateContext, AppStateContextStoreFields},
     views::dashboard::layout::MenuItem,
 };
-
-const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 
 #[component]
 pub fn MainLayout() -> impl IntoView {
     // track collapsed state
     let current_state = expect_context::<Store<AppStateContext>>();
     let (collapsed, set_collapsed) = signal(false);
-    let (is_loading, set_is_loading) = signal(false);
-    let (professions, set_professions) = signal(Vec::new() as Vec<UserProfessionalInfo>);
-    // State: index of the currently selected profession (default to first)
-    let (selected_profession, set_selected_profession) = signal(String::new());
 
-    let site_owner_info = move || current_state.site_owner_info(); // Should return ReadSignal<UserInfo>
     let dark_mode_is_active = current_state.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
-    // Derived signal for the current description
-    let current_description = Memo::new(move |_| {
-        professions
-            .get()
-            .iter()
-            .find(|r| r.id.clone().unwrap_or_default() == selected_profession.get())
-            .map(|r| r.description.clone())
-            .unwrap_or_default()
-    });
 
     let handle_menu_click =
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
@@ -79,121 +50,6 @@ pub fn MainLayout() -> impl IntoView {
                 let _ = class_list.add_1("dark");
             }
         }
-    });
-
-    let ethics = vec![
-        (
-            "bg-[url('https://api.techietenka.com/files/view/485ce03d-de84-499e-9696-b6e605c02eec?width=800')]",
-            "Commitment to Security",
-            "From physical to application - I ensure security at every layer.",
-            "md:row-span-1 md:col-span-1", // ethic1: spans 1 cols, 1 row
-        ),
-        (
-            "bg-[url('https://api.techietenka.com/files/view/a7641914-73a2-4747-9728-8fd74177259c?width=800')]",
-            "Commitment to Quality",
-            "I never compromise on delivering exceptional results",
-            "md:row-span-1 md:col-span-1", // ethic1: spans 1 cols, 1 row
-        ),
-        (
-            "bg-[url('https://api.techietenka.com/files/view/6162cb5a-62b6-43e4-9eab-1f2df0204140?width=800')]",
-            "Timely Delivery",
-            "Meeting deadlines is not negotiable",
-            "md:row-span-1 md:col-span-2", // ethic2: spans 2 cols, 1 row
-        ),
-        (
-            "bg-[url('https://api.techietenka.com/files/view/29eb4743-b4fe-4e74-b2a6-f74592829e85?width=800')]",
-            "Clear Communication",
-            "Transparency at every step of the process",
-            "md:row-span-2 md:col-span-2", // ethic3: spans 2 cols, 2 rows
-        ),
-        (
-            "bg-[url('https://api.techietenka.com/files/view/a6b4ac55-c487-4f82-bac8-fb1e4920869f?width=800')]",
-            "Continuous Learning",
-            "Always staying ahead with latest technologies",
-            "md:row-span-2 md:col-span-2", // ethic4: spans 2 cols, 2 rows
-        ),
-        (
-            "bg-[url('https://api.techietenka.com/files/view/8671a04d-8fbe-4b17-a75d-7e79217e3188?width=800')]",
-            "Client-Focused",
-            "Your success is my priority",
-            "md:row-span-1 md:col-span-2", // ethic5: spans 2 cols, 1 row
-        ),
-    ];
-
-    Effect::new(move || {
-        set_is_loading.set(true);
-        spawn_local(async move {
-            let fetch_professions_query = r#"
-                   query FetchSiteResources {
-                        fetchSiteResources {
-                            data {
-                                professionalInfo {
-                                    description
-                                    active
-                                    occupation
-                                    startDate
-                                    id
-                                    yearsOfExperience
-                                }
-                            }
-                            metadata {
-                                newAccessToken
-                                requestId
-                            }
-                        }
-                   }
-               "#;
-
-            let mut headers = HashMap::new() as HashMap<String, String>;
-            headers.insert(
-                "Authorization".into(),
-                format!(
-                    "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
-                ),
-            );
-
-            let Some(shared_service_api) = SHARED_SERVICE_API else {
-                return;
-            };
-
-            let fetch_professions_response =
-                perform_query_without_vars::<FetchSiteResourcesResponse>(
-                    None,
-                    shared_service_api,
-                    fetch_professions_query,
-                )
-                .await;
-
-            let _site_owner_info = fetch_site_owner_info(&current_state, None).await;
-
-            match fetch_professions_response.get_data() {
-                Some(data) => {
-                    let professions = data
-                        .fetch_site_resources
-                        .as_ref()
-                        .unwrap_or(&Default::default())
-                        .get_data()
-                        .professional_info
-                        .as_ref()
-                        .unwrap_or(&Default::default())
-                        .to_vec();
-
-                    if let Some(first) = &professions.first() {
-                        if let Some(id) = &first.id {
-                            set_selected_profession.set(id.clone());
-                        }
-                    }
-
-                    set_professions.set(professions);
-
-                    set_is_loading.set(false);
-                }
-                None => {
-                    set_is_loading.set(false);
-                }
-            };
-        });
     });
 
     view! {
