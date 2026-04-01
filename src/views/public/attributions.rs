@@ -1,8 +1,6 @@
 use leptos::{ev, prelude::*};
 use leptos_router::components::A;
 
-use crate::components::molecules::{footer::Footer, nav::Nav};
-
 #[derive(Clone)]
 pub struct Attribution {
     pub title: &'static str,
@@ -16,8 +14,6 @@ pub struct Attribution {
 
 #[component]
 pub fn Attributions() -> impl IntoView {
-    let (collapsed, set_collapsed) = signal(false);
-
     let attributions: Vec<(&'static str, Vec<Attribution>)> = vec![
         (
             "Icons",
@@ -56,9 +52,6 @@ pub fn Attributions() -> impl IntoView {
             }],
         ),
     ];
-
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">

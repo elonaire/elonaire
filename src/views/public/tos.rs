@@ -1,11 +1,8 @@
 // terms.rs
 use leptos::{ev, prelude::*};
 
-use crate::components::molecules::{footer::Footer, nav::Nav};
-
 #[component]
 pub fn TermsOfService() -> impl IntoView {
-    let (collapsed, set_collapsed) = signal(false);
     let sections = vec![
         (
             "1. Acceptance of Terms",
@@ -48,9 +45,6 @@ pub fn TermsOfService() -> impl IntoView {
             "For questions about these terms, contact us at legal@techietenka.com.",
         ),
     ];
-
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">

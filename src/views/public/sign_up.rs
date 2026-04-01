@@ -11,6 +11,8 @@ use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 use web_sys::window;
 
+use crate::components::general::modal::modal::BasicModal;
+use crate::components::general::modal::modal::UseCase;
 use crate::components::{
     forms::{
         input::{InputField, InputFieldType},
@@ -45,10 +47,14 @@ pub fn SignUp() -> impl IntoView {
     let signup_form_ref = NodeRef::new();
     let current_state = expect_context::<Store<AppStateContext>>();
     let (form_is_valid, set_form_is_valid) = signal(false);
-    let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
+    let (confirm_password_value, set_confirm_password_value) = signal(None as Option<String>);
+    let (password_is_matching, set_password_is_matching) = signal(false);
+    let submit_is_disabled =
+        Memo::new(move |_| !form_is_valid.get() || !password_is_matching.get());
     let (is_loading, set_is_loading) = signal(false);
     let is_authenticated = RwSignal::new(false);
     let navigate = use_navigate();
+    let success_modal_is_open = RwSignal::new(false);
 
     let query = use_query::<AuthCode>();
     Effect::new(move || {
@@ -198,9 +204,6 @@ pub fn SignUp() -> impl IntoView {
                             return;
                         };
 
-                        // TODO: add client-side password match validation if needed
-                        // if deserialized.password != deserialized.confirm_password { ... }
-
                         let vars = SignUpVars { user: deserialized };
 
                         let query = r#"
@@ -216,7 +219,6 @@ pub fn SignUp() -> impl IntoView {
                                         email
                                         country
                                         phone
-                                        password
                                         createdAt
                                         updatedAt
                                         status
@@ -243,7 +245,6 @@ pub fn SignUp() -> impl IntoView {
                             return;
                         };
 
-                        // TODO: replace SignInResponse with your SignUpResponse type
                         let res =
                             perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
                                 None,
@@ -265,13 +266,13 @@ pub fn SignUp() -> impl IntoView {
                                     }
 
                                     set_is_loading.set(false);
+                                    set_confirm_password_value.set(None);
+                                    success_modal_is_open.set(true);
+                                    // navigate("/sign-in", Default::default())
                                 }
                                 None => set_is_loading.set(false),
                             },
-                            None => {
-                                navigate("/sign-in", Default::default());
-                                set_is_loading.set(false)
-                            }
+                            None => set_is_loading.set(false),
                         };
                     });
                 }
@@ -279,12 +280,45 @@ pub fn SignUp() -> impl IntoView {
         }
     };
 
+    Effect::new(move || {
+        let Some(confirmed_password) = confirm_password_value.get() else {
+            return;
+        };
+        let Some(form_data) = get_form_data_from_form_ref(&signup_form_ref) else {
+            return;
+        };
+
+        let Some(deserialized) =
+            deserialize_form_data_to_struct::<UserInput>(&form_data, true, None)
+        else {
+            return;
+        };
+
+        if confirmed_password == deserialized.password {
+            set_password_is_matching.set(true);
+        } else {
+            set_password_is_matching.set(false);
+        };
+    });
+
     view! {
         <Title text="Sign Up"/>
 
         <Show when=move || is_loading.get()>
             <Spinner />
         </Show>
+
+        <BasicModal
+            title="Sign Up Successful"
+            is_open=success_modal_is_open
+            use_case=UseCase::Success
+            disable_auto_close=false
+        >
+            <div class="p-[10px]">
+                <p>"Your registration was successful!"</p>
+                <p>"A confirmation email was sent to your inbox. Confirm your email for your account to be activated."</p>
+            </div>
+        </BasicModal>
 
         <div class="flex flex-col items-center justify-center p-8 bg-contrast-white min-h-svh">
             <h1 class="text-4xl font-bold my-4">"Create Account"</h1>
@@ -346,7 +380,13 @@ pub fn SignUp() -> impl IntoView {
                         placeholder="Repeat your password"
                         id_attr="confirm_password"
                         ext_input_styles="focus:ring-secondary"
+                        on:input=move |e| set_confirm_password_value.set(Some(event_target_value(&e)))
                     />
+                    <p class=move || format!("text-xs py-[5px] h-[30px] {}", if password_is_matching.get() { "text-success" } else { "text-danger" })>{move || if confirm_password_value.get().is_some() {
+                        Some(
+                            format!("{}", if password_is_matching.get() { "Your passwords are matching!" } else { "Your passwords are not matching!" })
+                        )
+                    } else {None}}</p>
                 </div>
                 <BasicButton
                     button_text="Create Account"
