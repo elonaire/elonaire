@@ -1,11 +1,7 @@
-// privacy.rs
 use leptos::{ev, prelude::*};
-
-use crate::components::molecules::{footer::Footer, nav::Nav};
 
 #[component]
 pub fn PrivacyPolicy() -> impl IntoView {
-    let (collapsed, set_collapsed) = signal(false);
     let sections = vec![
         (
             "1. Information We Collect",
@@ -122,9 +118,6 @@ pub fn PrivacyPolicy() -> impl IntoView {
             )],
         ),
     ];
-
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">

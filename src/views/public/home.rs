@@ -1,21 +1,14 @@
 use std::collections::HashMap;
 
-use icondata::{
-    BsChevronDoubleDown, BsGithub, BsInfoCircle, BsMoon, BsSun, IoClose, MdiCertificateOutline,
-    MdiStore, MdiTrophyAward, RiArticleDocumentLine,
-};
-use leptos::{ev, prelude::*, task::spawn_local};
+use icondata::{BsChevronDoubleDown, BsGithub};
+use leptos::{prelude::*, task::spawn_local};
 use leptos_icons::Icon;
 use leptos_meta::*;
 use leptos_router::components::A;
 use reactive_stores::Store;
 
 use crate::{
-    components::{
-        forms::toggle_switch::ToggleSwitch,
-        general::button::BasicButton,
-        molecules::{footer::Footer, nav::Nav},
-    },
+    components::general::button::BasicButton,
     data::{
         context::{
             store::{AppStateContext, AppStateContextStoreFields},
@@ -27,7 +20,6 @@ use crate::{
         },
     },
     utils::graphql_client::perform_query_without_vars,
-    views::dashboard::layout::MenuItem,
 };
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
@@ -36,15 +28,13 @@ const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 pub fn Home() -> impl IntoView {
     // track collapsed state
     let current_state = expect_context::<Store<AppStateContext>>();
-    let (collapsed, set_collapsed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
     let (professions, set_professions) = signal(Vec::new() as Vec<UserProfessionalInfo>);
     // State: index of the currently selected profession (default to first)
     let (selected_profession, set_selected_profession) = signal(String::new());
 
     let site_owner_info = move || current_state.site_owner_info(); // Should return ReadSignal<UserInfo>
-    let dark_mode_is_active = current_state.dark_mode_is_active();
-    let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
+
     // Derived signal for the current description
     let current_description = Memo::new(move |_| {
         professions
@@ -53,32 +43,6 @@ pub fn Home() -> impl IntoView {
             .find(|r| r.id.clone().unwrap_or_default() == selected_profession.get())
             .map(|r| r.description.clone())
             .unwrap_or_default()
-    });
-
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
-
-    let menu_items = Memo::new(move |_| {
-        vec![
-            MenuItem::new("About", BsInfoCircle, "/about", vec![]),
-            MenuItem::new("Resume", MdiCertificateOutline, "/resume", vec![]),
-            MenuItem::new("Portfolio", MdiTrophyAward, "/portfolio", vec![]),
-            MenuItem::new("Marketplace", MdiStore, "/marketplace", vec![]),
-            MenuItem::new("Blog", RiArticleDocumentLine, "/blog", vec![]),
-        ]
-    });
-
-    Effect::new(move |_| {
-        if let Some(doc) = document().document_element() {
-            let class_list = doc.class_list();
-
-            if !dark_mode_is_active.get() && class_list.contains("dark") {
-                let _ = class_list.remove_1("dark");
-            } else if !dark_mode_is_active.get() && !class_list.contains("dark") {
-            } else {
-                let _ = class_list.add_1("dark");
-            }
-        }
     });
 
     let ethics = vec![

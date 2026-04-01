@@ -12,8 +12,10 @@ use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::button::{BasicButton, ButtonType};
 use crate::components::general::modal::modal::{BasicModal, UseCase};
-use crate::components::molecules::nav::Nav;
-use crate::data::models::graphql::shared::{MessageInput, SendMessageResponse, SendMessageVars};
+use crate::data::models::graphql::shared::{
+    MessageInput, SendMessageResponse, SendMessageVars, Subject,
+};
+use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
@@ -109,35 +111,12 @@ pub fn Contact() -> impl IntoView {
         }
     };
 
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
-
-    let subject_options = RwSignal::new(vec![
-        SelectOption {
-            label: "Job Offer".to_string(),
-            value: "JobOffer".to_string(),
-        },
-        SelectOption {
-            label: "Consultation".to_string(),
-            value: "Consultation".to_string(),
-        },
-        SelectOption {
-            label: "Feedback".to_string(),
-            value: "Feedback".to_string(),
-        },
-        SelectOption {
-            label: "Complaint".to_string(),
-            value: "Complaint".to_string(),
-        },
-        SelectOption {
-            label: "Enquiry".to_string(),
-            value: "Enquiry".to_string(),
-        },
-        SelectOption {
-            label: "Suggestion".to_string(),
-            value: "Suggestion".to_string(),
-        },
-    ]);
+    let subject_options = RwSignal::new(
+        Subject::variants_slice()
+            .iter()
+            .map(|subject| SelectOption::new(&format!("{subject:?}"), &subject.to_string()))
+            .collect::<Vec<SelectOption>>(),
+    );
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">

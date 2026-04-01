@@ -1,15 +1,9 @@
-// faq.rs
 use leptos::{ev, prelude::*};
 
-use crate::components::{
-    general::collapse::{Collapse, PanelInfo},
-    molecules::{footer::Footer, nav::Nav},
-};
+use crate::components::general::collapse::{Collapse, PanelInfo};
 
 #[component]
 pub fn Faqs() -> impl IntoView {
-    let (collapsed, set_collapsed) = signal(false);
-
     let raw_faqs = vec![
         (
             "General",
@@ -113,9 +107,6 @@ pub fn Faqs() -> impl IntoView {
             (category.to_string(), RwSignal::new(panel_items))
         })
         .collect();
-
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px]">
