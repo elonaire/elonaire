@@ -1,14 +1,9 @@
-// waitlist.rs
-
 use icondata::BsEnvelope;
+use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
-use leptos::{ev, prelude::*};
-use leptos_icons::Icon;
-use leptos_router::components::Outlet;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::{HtmlFormElement, SubmitEvent};
 
-use crate::components::molecules::nav::Nav;
 use crate::{
     components::{
         forms::{
@@ -36,14 +31,11 @@ const EMAIL_SERVICE_API: Option<&str> = option_env!("EMAIL_SERVICE_API");
 
 #[component]
 pub fn WaitList() -> impl IntoView {
-    let (email, set_email) = signal(String::new());
-    let (submitted, set_submitted) = signal(false);
     let subscription_form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let subscribe_button_is_disabled = Memo::new(move |_| !form_is_valid.get());
     let (is_loading, set_is_loading) = signal(false);
     let success_modal_is_open = RwSignal::new(false);
-    let (collapsed, set_collapsed) = signal(false);
 
     let create_subscription = move || {
         if form_is_valid.get() {
@@ -154,9 +146,6 @@ pub fn WaitList() -> impl IntoView {
             }
         }
     };
-
-    let handle_menu_click =
-        move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
 
     view! {
         <div class="flex flex-col gap-[40px] min-h-svh">

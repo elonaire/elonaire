@@ -1,4 +1,4 @@
-use leptos::{ev, prelude::*};
+use leptos::prelude::*;
 
 use crate::components::general::collapse::{Collapse, PanelInfo};
 

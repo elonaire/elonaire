@@ -41,7 +41,6 @@ use crate::{
                 layout::BlogLayout,
             },
             contact::Contact,
-            error_handler::ErrorHandler,
             faqs::Faqs,
             home::Home,
             layout::MainLayout,
