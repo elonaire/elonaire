@@ -1,4 +1,4 @@
-use leptos::{ev, prelude::*};
+use leptos::prelude::*;
 
 #[component]
 pub fn PrivacyPolicy() -> impl IntoView {

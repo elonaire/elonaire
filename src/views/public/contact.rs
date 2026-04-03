@@ -1,6 +1,6 @@
 use icondata::{BsEnvelope, BsGithub, BsLinkedin, BsPerson, BsSend, BsTwitterX};
+use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
-use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
 use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
