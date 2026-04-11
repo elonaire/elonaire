@@ -106,11 +106,12 @@ pub fn Stepper(
     #[prop(optional, default = Callback::new(|_| {}))] send_all_form_refs: Callback<
         Vec<NodeRef<Form>>,
     >,
-    #[prop(into, optional)] ext_wrapper_styles: String,
+    #[prop(into, optional)] ext_wrapper_styles: Signal<String>,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
     let (step_form_is_valid, set_step_form_is_valid) = signal(false); // Leptos signal for state
-    let step_count = children().nodes.collect_view().len(); // Get number of children
+    let child_nodes: Vec<AnyView> = children().nodes.into_iter().map(|n| n.into_any()).collect();
+    let step_count = child_nodes.len();
     let form_refs = RwSignal::new(
         (0..step_count)
             .map(|_| NodeRef::<Form>::new())
@@ -167,13 +168,13 @@ pub fn Stepper(
     });
 
     view! {
-        <div class="flex flex-col items-center max-w-full">
-            <div class="relative flex items-center w-full mb-4">
+        <div class="flex flex-col items-center gap-[40px] w-full h-full p-4">
+            <div class="relative flex items-center w-full overflow-x-auto">
                 // Line between steps (md+ screens only)
-                <div class="hidden md:flex justify-center w-full absolute top-4">
+                <div class="flex justify-center w-full absolute top-4">
                     <div class="w-full border-t border-mid-gray absolute z-0" />
                 </div>
-                <div class="relative flex flex-wrap md:flex-nowrap justify-center md:justify-between w-full md:space-x-2">
+                <div class="relative flex justify-between w-full space-x-2">
                     <For
                         each=move || step_labels.get().into_iter().enumerate()
                         key=|(index, _)| *index
@@ -187,12 +188,7 @@ pub fn Stepper(
                                         return;
                                     }
                                     set_current_step.update(|step| *step = index);
-                                } class=move || {
-                                    format!(
-                                        "relative flex items-center cursor-pointer bg-contrast-white space-x-2 px-4 mb-2 z-9 {}",
-                                        if !is_current() { "hidden md:flex" } else { "" }
-                                    )
-                                }>
+                                } class="relative flex items-center cursor-pointer bg-contrast-white dark:bg-navy gap-[10px] px-4 mb-2 z-9">
                                     <div class=move || {
                                         format!(
                                             "w-8 h-8 flex items-center justify-center rounded-full text-sm {}",
@@ -218,12 +214,13 @@ pub fn Stepper(
                                             }
                                         }
                                     </div>
+                                    // if !is_current() { "hidden md:flex" } else { "" }
                                     <div class=move || {format!(
                                         "text-sm {}",
                                         if is_current() {
                                             "font-bold text-primary"
                                         } else {
-                                            ""
+                                            "hidden md:flex"
                                         }
                                     )}>
                                         { step_label.label.clone() }
@@ -234,32 +231,24 @@ pub fn Stepper(
                     </For>
                 </div>
             </div>
-            <div on:submit=handle_step_form_submit class=format!("mb-4 p-4 border border-mid-gray rounded w-full {}", ext_wrapper_styles)>
+            <div on:submit=handle_step_form_submit class=move || format!("flex-1 w-full {}", ext_wrapper_styles.get())>
             {
-                    move || {
-                        let current = current_step.get();
-                        children()
-                            .nodes
-                            .into_iter()
-                            .enumerate()
-                            .map(|(i, child)| {
-                                if let Some(form_ref) = form_refs.get().get(i) {
-                                    let dynamic_class = move || if current == i { "block" } else { "hidden" };
-
-                                    Some(view! {
-                                        <ReactiveForm form_ref=form_ref.to_owned() ext_styles=dynamic_class()>
-                                            { child.into_view() }
-                                        </ReactiveForm>
-                                    })
-                                } else {
-                                    None
-                                }
-
-                            }).collect_view()
-                    }
+                    child_nodes.into_iter().enumerate().map(|(i, child)| {
+                        let form_ref = form_refs.get_untracked()[i].clone();
+                        view! {
+                            <ReactiveForm
+                                form_ref=form_ref
+                                ext_styles=Signal::derive(move || {
+                                    if current_step.get() == i { "block".to_string() } else { "hidden".to_string() }
+                                })
+                            >
+                                { child }
+                            </ReactiveForm>
+                        }
+                    }).collect_view()
                 }
             </div>
-            <div class="flex w-full justify-start gap-4">
+            <div class="mt-auto flex w-full justify-start gap-4">
                 {
                     move || if current_step.get() == 0 {
                         None
@@ -268,6 +257,7 @@ pub fn Stepper(
                             <BasicButton
                                 onclick=onclick_prev
                                 button_text="Previous"
+                                style_ext="bg-white"
                             />
                         })
                     }
@@ -278,6 +268,7 @@ pub fn Stepper(
                             <BasicButton
                                 onclick=handle_final_button_click
                                 button_text=final_button_text.clone()
+                                style_ext="bg-primary text-contrast-white"
                             />
                         }
                     } else {
@@ -286,6 +277,7 @@ pub fn Stepper(
                                 disabled=next_is_disabled
                                 onclick=onclick_next
                                 button_text="Next"
+                                style_ext="bg-primary text-contrast-white"
                             />
                         }
                     }

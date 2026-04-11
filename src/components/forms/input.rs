@@ -38,9 +38,7 @@ pub enum InputFieldType {
 
 #[component]
 pub fn InputField(
-    #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
-        String,
-    >,
+    #[prop(into, optional)] initial_value: Signal<String>,
     #[prop(into, optional)] label: String,
     field_type: InputFieldType,
     #[prop(into, optional)] name: String,
@@ -180,25 +178,147 @@ pub fn CustomFileInput(
     #[prop(into, optional)] multiple: bool,
     #[prop(into, optional)] accept: String,
 ) -> impl IntoView {
+    let selected_files = RwSignal::new(Vec::<String>::new());
+
+    let has_files = move || !selected_files.get().is_empty();
+
+    // --- on_change handler ---
+    let input_node_ref_for_change = input_node_ref.clone();
+    let on_change = move |_| {
+        if let Some(input) = input_node_ref_for_change.get() {
+            if let Some(files) = input.files() {
+                let mut names = Vec::new();
+
+                for i in 0..files.length() {
+                    if let Some(file) = files.get(i) {
+                        names.push(file.name());
+                    }
+                }
+
+                selected_files.set(names);
+            }
+        }
+    };
+
+    // --- remove file handler ---
+    let input_node_ref_for_remove = input_node_ref.clone();
+    let remove_file = move |index: usize| {
+        selected_files.update(|files| {
+            if index < files.len() {
+                files.remove(index);
+            }
+        });
+
+        // reset actual input if empty
+        if selected_files.get().is_empty() {
+            if let Some(input) = input_node_ref_for_remove.get() {
+                input.set_value("");
+            }
+        }
+    };
+
+    // clone props for closure safety
+    let name_c = name.clone();
+    let label_c = label.clone();
+    let id_attr_c = id_attr.clone();
+    let accept_c = accept.clone();
+
     view! {
-        <div class="relative">
+        <div class="relative flex flex-col gap-2">
+            // Hidden input (always mounted for form submission)
             <InputField
-                name=name
-                label=label
+                name=name_c
+                label=label_c
                 required=required
                 field_type=InputFieldType::File
-                ext_input_styles="absolute inset-y-0 left-0 w-full opacity-0"
-                id_attr=id_attr.clone()
+                ext_input_styles="sr-only"
+                id_attr=id_attr_c
                 input_node_ref=input_node_ref
                 multiple=multiple
-                accept=accept
+                accept=accept_c
+                on:change=on_change
             />
-               <BasicButton
-                   button_text="Choose File"
-                   icon=Some(IconData::FiUpload)
-                   icon_before=true
-                   style_ext="w-full bg-primary text-contrast-white"
+
+            // Upload button — shown when no files selected
+            <Show when=move || !has_files()>
+                <BasicButton
+                    button_text="Choose File"
+                    icon=Some(IconData::FiUpload)
+                    icon_before=true
+                    style_ext="w-full bg-primary text-contrast-white"
+                    on:click=move |_| {
+                        if let Some(ref input) = input_node_ref.get() {
+                            input.click();
+                        }
+                    }
                 />
+            </Show>
+
+            // File list — shown when files are selected
+            <Show when=has_files>
+                <div class="flex flex-col gap-2">
+                    <For
+                        each=move || {
+                            selected_files
+                                .get()
+                                .iter()
+                                .cloned()
+                                .enumerate()
+                                .collect::<Vec<_>>()
+                        }
+                        key=|(i, name)| format!("{i}-{name}")
+                        children=move |(index, name)| {
+                            // Derive a friendly extension label
+                            let ext = name
+                                .rsplit('.')
+                                .next()
+                                .unwrap_or("")
+                                .to_uppercase();
+                            let display_name = name.clone();
+
+                            view! {
+                                <div class="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm shadow-sm transition-shadow hover:shadow-md">
+                                    // File icon + name
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                                            <span class="h-4 w-4"><Icon icon=IconData::FiFile /></span>
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="truncate font-medium text-foreground leading-tight">
+                                                {display_name}
+                                            </span>
+                                            <span class="text-xs text-muted uppercase tracking-wide">
+                                                {ext}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    // Remove button
+                                    <BasicButton
+                                        button_text="Remove file"
+                                        style_ext="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus:outline-none focus:ring-2 focus:ring-danger/40"
+                                        on:click=move |_| remove_file(index)
+                                    >
+                                        <span class="h-4 w-4"><Icon icon=IconData::FiX /></span>
+                                    </BasicButton>
+                                </div>
+                            }
+                        }
+                    />
+
+                    // Re-upload affordance — lets user add/change files without removing first
+                    <BasicButton
+                        style_ext="mt-1 flex items-center gap-1.5 self-start text-xs text-muted underline-offset-2 hover:text-primary hover:underline transition-colors focus:outline-none cursor-pointer"
+                        on:click=move |_| {
+                            if let Some(ref input) = input_node_ref.get() {
+                                input.click();
+                            }
+                        }
+                    >
+                        <span class="h-3 w-3"><Icon icon=IconData::FiUpload /></span>
+                        "Choose different file(s)"
+                    </BasicButton>
+                </div>
+            </Show>
         </div>
     }
 }

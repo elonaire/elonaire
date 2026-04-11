@@ -1,5 +1,9 @@
+use crate::components::general::stepper::{Step, StepInfo, Stepper};
+use crate::utils::formatters::PipeOption;
 use std::collections::HashMap;
 
+use icondata::{AiFilePdfOutlined, AiReadOutlined, BsArrowRight, MdiFileDocumentEditOutline};
+use leptos::html::Form;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
 use leptos::{ev, prelude::*};
@@ -44,6 +48,7 @@ pub fn RatecardComponent(
     let service_request_form_ref = NodeRef::new();
     let service_request_metadata_form_ref = NodeRef::new();
     let billing_interval_form_ref = NodeRef::new();
+    let billing_interval_field_ref = NodeRef::new();
     let file_input_ref = NodeRef::new();
     let (services_form_is_valid, set_services_form_is_valid) = signal(false);
     let (service_request_form_is_valid, set_service_request_form_is_valid) = signal(false);
@@ -61,8 +66,13 @@ pub fn RatecardComponent(
     let service_request_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
-    let init_date = RwSignal::new(None);
     let current_state = expect_context::<Store<AppStateContext>>();
+
+    let stepper_form_refs = RwSignal::new(Vec::new());
+
+    let handle_received_form_refs = Callback::new(move |form_refs: Vec<NodeRef<Form>>| {
+        stepper_form_refs.update(|prev| *prev = form_refs);
+    });
 
     let billing_interval = RwSignal::new(
         BillingInterval::variants_slice()
@@ -76,11 +86,6 @@ pub fn RatecardComponent(
             .collect::<Vec<SelectOption>>(),
     );
     let (selected_billing_interval, set_selected_billing_interval) = signal("hr");
-
-    // This is to force the form to reset the date input
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
 
     Effect::new(move || {
         let target: Option<HtmlFormElement> = billing_interval_form_ref.get();
@@ -391,23 +396,87 @@ pub fn RatecardComponent(
 
     view! {
         <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] min-h-[564px] max-w-[400px] flex-1">
-            <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false primary_button_text="Submit" disable_primary_close=true on_click_primary=handle_service_request_modal_primary_click primary_is_disabled=modal_primary_is_disabled>
+            <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false primary_button_text="Submit" disable_primary_close=true on_click_primary=handle_service_request_modal_primary_click primary_is_disabled=modal_primary_is_disabled container_style_ext="md:w-[70%] h-[70svh]" show_footer=false>
                 <>
                 <Show when=move || is_loading.get()>
                     <Spinner />
                 </Show>
-                <ReactiveForm on:submit=handle_service_request_form_submit form_ref=service_request_form_ref onreset=onreset_handler>
-                    <div class="p-[10px] flex flex-col gap-[20px]">
-                        <Textarea label="Description" required=true id_attr="description" name="description" />
-                        <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                        <InputField label="Engagement Length" min="1" field_type=InputFieldType::Number required=true id_attr="engagement_length" name="engagement_length" />
-                    </div>
-                </ReactiveForm>
-                <ReactiveForm on:submit=handle_service_request_metadata_form_submit form_ref=service_request_metadata_form_ref>
-                    <div class="p-[10px] flex flex-col gap-[20px]">
-                        <CustomFileInput input_node_ref=file_input_ref label="Supporting Documents" name="supporting_documents" id_attr="supporting_documents" accept="image/*, .pdf, .docx, .txt, .odt, .md" required=true />
-                    </div>
-                </ReactiveForm>
+                <Stepper step_labels=RwSignal::new(vec![StepInfo::new("Basic Information", Some(MdiFileDocumentEditOutline)), StepInfo::new("Supporting Documents", Some(AiFilePdfOutlined)), StepInfo::new("Review", Some(AiReadOutlined))]) send_all_form_refs=handle_received_form_refs is_linear=true final_button_text="Finish" ext_wrapper_styles="h-full overflow-y-auto">
+                   <Step>
+                       <div class="flex flex-col gap-[20px] p-2">
+                           <Textarea label="Description" required=true id_attr="description" name="description" placeholder="Describe your request" />
+                           <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                           {
+                               move || {
+                                   let mut interval_str = "";
+                                   if let Some(input_el) = billing_interval_field_ref.get() as Option<HtmlSelectElement> {
+                                       interval_str = match input_el.value().as_str() {
+                                           "Monthly" => "months",
+                                           "Hourly" => "hours",
+                                           "Weekly" => "weeks",
+                                           "Annual" => "years",
+                                           "Milestone" => "milestones",
+                                           _ => "_ _",
+                                       };
+                                   };
+                                   view! {
+                                       <InputField label=format!("Engagement Length ({})", interval_str) min="1" field_type=InputFieldType::Number required=true id_attr="engagement_length" name="engagement_length" placeholder="e.g. 1" />
+                                   }
+                               }
+                           }
+                       </div>
+                   </Step>
+                   <Step>
+                       <div class="flex flex-col gap-[20px] p-2">
+                           <CustomFileInput input_node_ref=file_input_ref label="Supporting Documents" name="supporting_documents" id_attr="supporting_documents" accept="image/*, .pdf, .docx, .txt, .odt, .md" required=true multiple=true />
+                       </div>
+                   </Step>
+                   <Step>
+                       <p>"Third step"</p>
+                       // { move || {
+                       //     if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
+                       //         let form_data = get_form_data_from_form_ref(first_form_ref).unwrap_or_default();
+                       //         let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap_or_default();
+                       //         Some(view! {
+                       //             <h2 class="text-lg">"First Step Verification"</h2>
+                       //             <p><strong>"Username: "</strong>{data.user_name}</p>
+                       //         })
+                       //     } else {
+                       //         None
+                       //     }
+                       // }
+                       // }
+                   </Step>
+                </Stepper>
+                // <ReactiveForm on:submit=handle_service_request_form_submit form_ref=service_request_form_ref onreset=onreset_handler>
+                //     <div class="p-[10px] flex flex-col gap-[20px]">
+                //         <Textarea label="Description" required=true id_attr="description" name="description" />
+                //         <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
+                //         {
+                //             move || {
+                //                 let mut interval_str = "";
+                //                 if let Some(input_el) = billing_interval_field_ref.get() as Option<HtmlSelectElement> {
+                //                     interval_str = match input_el.value().as_str() {
+                //                         "Monthly" => "months",
+                //                         "Hourly" => "hours",
+                //                         "Weekly" => "weeks",
+                //                         "Annual" => "years",
+                //                         "Milestone" => "milestones",
+                //                         _ => "_ _",
+                //                     };
+                //                 };
+                //                 view! {
+                //                     <InputField label=format!("Engagement Length ({})", interval_str) min="1" field_type=InputFieldType::Number required=true id_attr="engagement_length" name="engagement_length" />
+                //                 }
+                //             }
+                //         }
+                //     </div>
+                // </ReactiveForm>
+                // <ReactiveForm on:submit=handle_service_request_metadata_form_submit form_ref=service_request_metadata_form_ref>
+                //     <div class="p-[10px] flex flex-col gap-[20px]">
+                //         <CustomFileInput input_node_ref=file_input_ref label="Supporting Documents" name="supporting_documents" id_attr="supporting_documents" accept="image/*, .pdf, .docx, .txt, .odt, .md" required=true multiple=true />
+                //     </div>
+                // </ReactiveForm>
                 </>
             </BasicModal>
                 <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
@@ -426,10 +495,9 @@ pub fn RatecardComponent(
                     <div class="flex flex-col">
                         <h4>{move || name.get()}</h4>
                         <p class="text-primary font-bold text-2xl"><sup class="text-sm">$</sup>{ move ||
-                            if let Some(amount) = amount.get() {
-                                format!("{:.2}", amount)
-                            } else {
-                                "_ _".into()
+                            {
+                                let amount_val = amount.get();
+                                amount_val.float(Some(2), Some("_ _"))
                             }
                         }/{move || selected_billing_interval.get()}</p>
                     </div>
@@ -442,6 +510,7 @@ pub fn RatecardComponent(
                             required=true
                             initial_value=RwSignal::new("Hourly".into())
                             ext_input_styles=""
+                            input_node_ref=billing_interval_field_ref
                             on:change=move |ev: ev::Event| {
                                 let target = ev
                                     .target()
@@ -479,7 +548,7 @@ pub fn RatecardComponent(
                 </div>
             </ReactiveForm>
             <div class="p-[10px] mt-auto">
-                // <BasicButton button_text="Request Service" icon=Some(IconId::BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
+                // <BasicButton button_text="Request Service" icon=Some(BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
             </div>
         </div>
     }

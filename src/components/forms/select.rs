@@ -48,9 +48,7 @@ impl SelectOption {
 /// You may use the SelectOption struct to create custom options for the SelectInput component.
 #[component]
 pub fn SelectInput(
-    #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<
-        String,
-    >,
+    #[prop(into, optional)] initial_value: Signal<String>,
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] placeholder: String,
     #[prop(into, optional)] name: String,
@@ -93,7 +91,7 @@ pub fn SelectInput(
                     "form-input ring-0 shadow appearance-none border border-mid-gray rounded-[5px] w-full py-2 px-3 leading-tight focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent flex-grow {}",
                     ext_input_styles
                 )
-                // value={initial_value.clone()}
+                prop:value=move || initial_value.get()
                 // readonly={readonly}
                 // on:change=move |ev| onchange.run(ev)
                 id=id_attr.clone()
@@ -111,9 +109,9 @@ pub fn SelectInput(
                         view! {
                             <option
                                 value={option.value.clone()}
-                                selected={ move ||
-                                    !initial_value.get().is_empty() && initial_value.get() == option.value.clone()
-                                }
+                                // selected={ move ||
+                                //     !initial_value.get().is_empty() && initial_value.get() == option.value.clone()
+                                // }
                             >
                                 {option.label.clone()}
                             </option>
