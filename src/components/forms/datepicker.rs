@@ -7,6 +7,7 @@ use icondata::{BiChevronLeftRegular, BiChevronRightRegular};
 
 use icondata::BsCalendar2Date;
 use leptos::ev;
+use leptos::html::*;
 use leptos::prelude::*;
 use web_sys::HtmlInputElement;
 
@@ -32,10 +33,11 @@ pub fn DatePicker(
         Option<DateTime<Local>>,
     >,
     #[prop(into, optional)] id_attr: String,
+    #[prop(optional)] input_node_ref: NodeRef<Input>,
 ) -> impl IntoView {
     let (show_calendar, set_show_calendar) = signal(false);
     let (selected_date, set_selected_date) = signal(None);
-    let date_input_ref = NodeRef::new();
+    // let date_input_ref = NodeRef::new();
 
     let selected_date_value = Memo::new(move |_| {
         selected_date
@@ -65,7 +67,7 @@ pub fn DatePicker(
 
         let date_str = date.to_rfc3339();
 
-        if let Some(el) = date_input_ref.get() as Option<HtmlInputElement> {
+        if let Some(el) = input_node_ref.get() as Option<HtmlInputElement> {
             el.set_value(&date_str);
             fire_bubbled_and_cancelable_event("input", true, true, &el);
             fire_bubbled_and_cancelable_event("change", true, true, &el);
@@ -81,7 +83,7 @@ pub fn DatePicker(
                 required=required
                 ext_wrapper_styles="sr-only"
                 id_attr=id_attr.clone()
-                input_node_ref=date_input_ref
+                input_node_ref=input_node_ref
             />
             <InputField
                 readonly=true

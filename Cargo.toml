@@ -12,12 +12,12 @@ gql_client = { git = "https://github.com/elonaire/gql-client-rs", branch = "quic
 html2md = "0.2.15"
 icondata = "0.5.0"
 js-sys = "0.3.77"
-leptos = { version = "0.8.2", features = ["csr"] }
-leptos_icons = "0.6.0"
-leptos_meta = "0.8.2"
-leptos_router = "0.8.2"
+leptos = { version = "0.8.17", features = ["csr"] }
+leptos_icons = "0.7.1"
+leptos_meta = "0.8.6"
+leptos_router = "0.8.13"
 markdown = "1.0.0"
-reactive_stores = "0.2.2"
+reactive_stores = "0.4.2"
 reqwest = { version = "0.12.15", features = ["json"] }
 serde = "1.0.219"
 serde_json = "1.0.140"
