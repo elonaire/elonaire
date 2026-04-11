@@ -15,9 +15,7 @@ use leptos::prelude::*;
 /// ```
 #[component]
 pub fn Textarea(
-    #[prop(into, default = Signal::derive(move || "".to_string()), optional)] initial_value: Signal<
-        String,
-    >,
+    #[prop(into, optional)] initial_value: Signal<String>,
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Textarea>,
@@ -31,12 +29,6 @@ pub fn Textarea(
 
     view! {
         <div>
-            // <label class="block text-sm font-bold" for=id_attr.clone()>
-            //     {label}
-            //     {move || required.then_some(view! {
-            //         <span class="text-danger ml-1">*</span>
-            //     })}
-            // </label>
             {
                 if label.is_empty() {
                     None

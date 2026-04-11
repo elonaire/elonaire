@@ -36,7 +36,7 @@ use crate::utils::forms::fire_bubbled_and_cancelable_event;
 #[component]
 pub fn ReactiveForm(
     form_ref: NodeRef<Form>,
-    #[prop(into, optional)] ext_styles: String,
+    #[prop(into, optional)] ext_styles: Signal<String>,
     #[prop(default = Callback::new(|_| {}))] onreset: Callback<ev::Event>,
     children: Children,
 ) -> impl IntoView {

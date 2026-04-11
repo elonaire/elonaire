@@ -45,7 +45,7 @@ impl CheckboxOption {
 /// ```
 #[component]
 pub fn CheckboxInputField(
-    #[prop(into, optional, default = RwSignal::new("".into()))] initial_value: RwSignal<String>,
+    #[prop(into, optional)] initial_value: Signal<String>,
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] name: String,
     #[prop(optional)] input_node_ref: NodeRef<Input>,

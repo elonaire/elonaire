@@ -41,9 +41,7 @@ impl RadioOption {
 /// ```
 #[component]
 pub fn RadioInputField(
-    #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
-        String,
-    >,
+    #[prop(into, optional)] initial_value: Signal<String>,
     #[prop(into, optional)] name: String,
     #[prop(into, optional)] label: String,
     #[prop(default = false, optional)] required: bool,
@@ -88,9 +86,7 @@ pub fn RadioInputField(
 /// ```
 #[component]
 pub fn RadioInputGroup(
-    #[prop(into, optional, default = Signal::derive(move || "".to_string()))] initial_value: Signal<
-        String,
-    >,
+    #[prop(into, optional)] initial_value: Signal<String>,
     /// The legend text for the fieldset
     #[prop(into, optional)]
     legend: String,
