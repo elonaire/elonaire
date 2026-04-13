@@ -616,7 +616,7 @@ pub struct ServiceRequestInput {
     #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
     #[serde(rename = "engagementLength", alias = "engagement_length")]
-    pub engagement_length: String,
+    pub engagement_length: i32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -643,7 +643,7 @@ pub struct ServiceRequest {
     #[serde(rename = "startDate")]
     pub start_date: Option<String>,
     #[serde(rename = "engagementLength")]
-    pub engagement_length: Option<String>,
+    pub engagement_length: Option<i32>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
     #[serde(rename = "updatedAt")]

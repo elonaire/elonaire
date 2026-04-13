@@ -3,7 +3,7 @@ use serde::de::DeserializeOwned;
 use web_sys::{CustomEvent, CustomEventInit, Event, EventInit, EventTarget};
 
 use js_sys::Array;
-use serde_json::{Map, Value};
+use serde_json::{Map, Number, Value};
 use web_sys::FormData;
 
 pub fn get_form_data_from_form_ref(form_ref: &NodeRef<Form>) -> Option<FormData> {
@@ -40,7 +40,19 @@ pub fn deserialize_form_data_to_struct<T: DeserializeOwned>(
                 } else if deserialize_bool && (s == "true" || s == "false") {
                     Value::Bool(s.parse::<bool>().unwrap_or_default())
                 } else {
-                    Value::String(s)
+                    let trimmed = s.trim();
+                    // Attempt integer parsing first
+                    if let Ok(i) = trimmed.parse::<i64>() {
+                        Value::Number(Number::from(i))
+                    }
+                    // Attempt float parsing
+                    else if let Ok(f) = trimmed.parse::<f64>() {
+                        Number::from_f64(f)
+                            .map(Value::Number)
+                            .unwrap_or(Value::String(trimmed.to_string()))
+                    } else {
+                        Value::String(trimmed.to_string())
+                    }
                 };
 
                 // Merge into existing entry if present

@@ -98,15 +98,17 @@ impl StepInfo {
 pub fn Stepper(
     mut children: ChildrenFragmentMut, // Children passed as a function
     #[prop(into, optional)] final_button_text: String,
-    #[prop(optional, default = Callback::new(|_| {}))] on_click_final_button: Callback<
-        Vec<NodeRef<Form>>,
-    >,
+    #[prop(optional, default = Callback::new(|_| {}))] on_click_final_button: Callback<()>,
     #[prop(into)] step_labels: RwSignal<Vec<StepInfo>>,
     #[prop(optional, default = false)] is_linear: bool,
     #[prop(optional, default = Callback::new(|_| {}))] send_all_form_refs: Callback<
         Vec<NodeRef<Form>>,
     >,
     #[prop(into, optional)] ext_wrapper_styles: Signal<String>,
+    #[prop(into, optional, default = Signal::derive(|| false))] final_button_is_disabled: Signal<
+        bool,
+    >,
+    #[prop(optional, default = Callback::new(|_| {}))] handle_on_cleanup: Callback<()>,
 ) -> impl IntoView {
     let (current_step, set_current_step) = signal(0); // Leptos signal for state
     let (step_form_is_valid, set_step_form_is_valid) = signal(false); // Leptos signal for state
@@ -137,8 +139,7 @@ pub fn Stepper(
     });
 
     let handle_final_button_click = Callback::new(move |_| {
-        let form_refs = form_refs.get();
-        on_click_final_button.run(form_refs);
+        on_click_final_button.run(());
     });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
@@ -167,6 +168,11 @@ pub fn Stepper(
         }
     });
 
+    // Cleanup
+    on_cleanup(move || {
+        handle_on_cleanup.run(());
+    });
+
     view! {
         <div class="flex flex-col items-center gap-[40px] w-full h-full p-4">
             <div class="relative flex items-center w-full overflow-x-auto">
@@ -188,6 +194,9 @@ pub fn Stepper(
                                         return;
                                     }
                                     set_current_step.update(|step| *step = index);
+
+                                    let form_refs = form_refs.get();
+                                    send_all_form_refs.run(form_refs);
                                 } class="relative flex items-center cursor-pointer bg-contrast-white dark:bg-navy gap-[10px] px-4 mb-2 z-9">
                                     <div class=move || {
                                         format!(
@@ -269,6 +278,7 @@ pub fn Stepper(
                                 onclick=handle_final_button_click
                                 button_text=final_button_text.clone()
                                 style_ext="bg-primary text-contrast-white"
+                                disabled=final_button_is_disabled
                             />
                         }
                     } else {
