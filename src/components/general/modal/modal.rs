@@ -144,7 +144,7 @@ pub fn BasicModal(
                                             if show_footer {
                                                 Some(
                                                     view! {
-                                                        <div class="mt-auto flex p-[10px] border-light-gray border-t">
+                                                        <div class="mt-auto flex gap-[20px] p-[10px] border-light-gray border-t">
                                                             {move || {
                                                                 if use_case == UseCase::Confirmation {
                                                                     Some(view! {

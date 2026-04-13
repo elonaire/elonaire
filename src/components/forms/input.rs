@@ -182,42 +182,20 @@ pub fn CustomFileInput(
 
     let has_files = move || !selected_files.get().is_empty();
 
-    // --- on_change handler ---
-    let input_node_ref_for_change = input_node_ref.clone();
     let on_change = move |_| {
-        if let Some(input) = input_node_ref_for_change.get() {
+        if let Some(input) = input_node_ref.get() {
             if let Some(files) = input.files() {
                 let mut names = Vec::new();
-
                 for i in 0..files.length() {
                     if let Some(file) = files.get(i) {
                         names.push(file.name());
                     }
                 }
-
                 selected_files.set(names);
             }
         }
     };
 
-    // --- remove file handler ---
-    let input_node_ref_for_remove = input_node_ref.clone();
-    let remove_file = move |index: usize| {
-        selected_files.update(|files| {
-            if index < files.len() {
-                files.remove(index);
-            }
-        });
-
-        // reset actual input if empty
-        if selected_files.get().is_empty() {
-            if let Some(input) = input_node_ref_for_remove.get() {
-                input.set_value("");
-            }
-        }
-    };
-
-    // clone props for closure safety
     let name_c = name.clone();
     let label_c = label.clone();
     let id_attr_c = id_attr.clone();
@@ -225,7 +203,6 @@ pub fn CustomFileInput(
 
     view! {
         <div class="relative flex flex-col gap-2">
-            // Hidden input (always mounted for form submission)
             <InputField
                 name=name_c
                 label=label_c
@@ -254,7 +231,7 @@ pub fn CustomFileInput(
                 />
             </Show>
 
-            // File list — shown when files are selected
+            // File list + replace affordance — shown when files are selected
             <Show when=has_files>
                 <div class="flex flex-col gap-2">
                     <For
@@ -267,8 +244,7 @@ pub fn CustomFileInput(
                                 .collect::<Vec<_>>()
                         }
                         key=|(i, name)| format!("{i}-{name}")
-                        children=move |(index, name)| {
-                            // Derive a friendly extension label
+                        children=move |(_, name)| {
                             let ext = name
                                 .rsplit('.')
                                 .next()
@@ -277,35 +253,23 @@ pub fn CustomFileInput(
                             let display_name = name.clone();
 
                             view! {
-                                <div class="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm shadow-sm transition-shadow hover:shadow-md">
-                                    // File icon + name
-                                    <div class="flex items-center gap-2.5 min-w-0">
-                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                                            <span class="h-4 w-4"><Icon icon=IconData::FiFile /></span>
-                                        </div>
-                                        <div class="flex flex-col min-w-0">
-                                            <span class="truncate font-medium text-foreground leading-tight">
-                                                {display_name}
-                                            </span>
-                                            <span class="text-xs text-muted uppercase tracking-wide">
-                                                {ext}
-                                            </span>
-                                        </div>
+                                <div class="flex items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm shadow-sm">
+                                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                                        <span class="h-4 w-4"><Icon icon=IconData::FiFile /></span>
                                     </div>
-                                    // Remove button
-                                    <BasicButton
-                                        button_text="Remove file"
-                                        style_ext="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger focus:outline-none focus:ring-2 focus:ring-danger/40"
-                                        on:click=move |_| remove_file(index)
-                                    >
-                                        <span class="h-4 w-4"><Icon icon=IconData::FiX /></span>
-                                    </BasicButton>
+                                    <div class="flex flex-col min-w-0">
+                                        <span class="truncate font-medium text-foreground leading-tight">
+                                            {display_name}
+                                        </span>
+                                        <span class="text-xs text-muted uppercase tracking-wide">
+                                            {ext}
+                                        </span>
+                                    </div>
                                 </div>
                             }
                         }
                     />
 
-                    // Re-upload affordance — lets user add/change files without removing first
                     <BasicButton
                         style_ext="mt-1 flex items-center gap-1.5 self-start text-xs text-muted underline-offset-2 hover:text-primary hover:underline transition-colors focus:outline-none cursor-pointer"
                         on:click=move |_| {

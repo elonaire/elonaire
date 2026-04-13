@@ -1,7 +1,8 @@
 use crate::components::general::stepper::{Step, StepInfo, Stepper};
-use crate::utils::formatters::PipeOption;
+use crate::utils::formatters::{Pipe, PipeOption};
 use std::collections::HashMap;
 
+use chrono::Local;
 use icondata::{AiFilePdfOutlined, AiReadOutlined, BsArrowRight, MdiFileDocumentEditOutline};
 use leptos::html::Form;
 use leptos::task::spawn_local;
@@ -45,23 +46,15 @@ pub fn RatecardComponent(
     #[prop(into)] services: RwSignal<Vec<UserService>>,
 ) -> impl IntoView {
     let services_form_ref = NodeRef::new();
-    let service_request_form_ref = NodeRef::new();
-    let service_request_metadata_form_ref = NodeRef::new();
     let billing_interval_form_ref = NodeRef::new();
     let billing_interval_field_ref = NodeRef::new();
     let file_input_ref = NodeRef::new();
     let (services_form_is_valid, set_services_form_is_valid) = signal(false);
-    let (service_request_form_is_valid, set_service_request_form_is_valid) = signal(false);
-    let (service_request_metadata_form_is_valid, set_service_request_metadata_form_is_valid) =
-        signal(false);
     let (billing_interval_form_is_valid, set_billing_interval_form_is_valid) = signal(false);
     let (amount, set_amount) = signal(None as Option<f64>);
     let submit_is_disabled =
         Memo::new(move |_| !services_form_is_valid.get() || !billing_interval_form_is_valid.get());
-    let modal_primary_is_disabled = Memo::new(move |_| {
-        !service_request_form_is_valid.get() || !service_request_metadata_form_is_valid.get()
-        // || !services_form_is_valid.get()
-    });
+
     let success_modal_is_open = RwSignal::new(false);
     let service_request_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
@@ -69,6 +62,21 @@ pub fn RatecardComponent(
     let current_state = expect_context::<Store<AppStateContext>>();
 
     let stepper_form_refs = RwSignal::new(Vec::new());
+
+    let modal_primary_is_disabled = Memo::new(move |_| {
+        let refs = stepper_form_refs.get();
+
+        if refs.is_empty() {
+            return true;
+        }
+
+        refs.iter().any(|form_ref: &NodeRef<Form>| {
+            form_ref
+                .get()
+                .map(|form| !form.check_validity())
+                .unwrap_or(true) // if form ref not yet mounted, treat as invalid
+        })
+    });
 
     let handle_received_form_refs = Callback::new(move |form_refs: Vec<NodeRef<Form>>| {
         stepper_form_refs.update(|prev| *prev = form_refs);
@@ -164,47 +172,12 @@ pub fn RatecardComponent(
         }
     };
 
-    let handle_service_request_form_submit = move |ev: SubmitEvent| {
-        ev.prevent_default();
-        ev.stop_propagation();
-
-        // Implement logic to show form validity
-        let target = ev
-            .target()
-            .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
-
-        if let Some(form) = target {
-            set_service_request_form_is_valid.set(form.check_validity());
-
-            if let Some(_submitter) = ev.submitter() {
-                confirm_modal_is_open.update(|status| *status = true);
-            }
-        }
-    };
-
-    let handle_service_request_metadata_form_submit = move |ev: SubmitEvent| {
-        ev.prevent_default();
-        ev.stop_propagation();
-
-        // Implement logic to show form validity
-        let target = ev
-            .target()
-            .and_then(|t| t.dyn_into::<HtmlFormElement>().ok());
-
-        if let Some(form) = target {
-            set_service_request_metadata_form_is_valid.set(form.check_validity());
-        }
-    };
-
     let handle_service_request_modal_primary_click = Callback::new(move |_| {
         confirm_modal_is_open.update(|status| *status = true);
     });
 
     let onprimary_confirm_handler = Callback::new(move |_| {
-        if service_request_form_is_valid.get()
-            && service_request_metadata_form_is_valid.get()
-            && services_form_is_valid.get()
-        {
+        if !modal_primary_is_disabled.get() {
             set_is_loading.set(true);
             if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
                 if let Ok(files_form_data) = FormData::new() {
@@ -261,16 +234,21 @@ pub fn RatecardComponent(
                                 }
                             };
 
-                        let (
-                            Some(service_request_form_data),
-                            Some(request_metadata_form_data),
-                            Some(services_form_data),
-                        ) = (
-                            get_form_data_from_form_ref(&service_request_form_ref),
-                            get_form_data_from_form_ref(&service_request_metadata_form_ref),
-                            get_form_data_from_form_ref(&services_form_ref),
-                        )
+                        let Some(service_request_form_ref) =
+                            stepper_form_refs.get_untracked().first().cloned()
                         else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+                        let Ok(request_metadata_form_data) = FormData::new() else {
+                            set_is_loading.set(false);
+                            return;
+                        };
+
+                        let (Some(service_request_form_data), Some(services_form_data)) = (
+                            get_form_data_from_form_ref(&service_request_form_ref),
+                            get_form_data_from_form_ref(&services_form_ref),
+                        ) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -328,14 +306,15 @@ pub fn RatecardComponent(
                         };
 
                         let query = r#"
-                            mutation CreateServiceRequest(
-                                $serviceRequestInput: ServiceRequestInput,
-                                $serviceRequestInputMetadata: ServiceRequestInputMetadata
+                        mutation CreateServiceRequest(
+                            $serviceRequestInput: ServiceRequestInput!,
+                            $serviceRequestInputMetadata: ServiceRequestInputMetadata!
+                        ) {
+                            createServiceRequest(
+                                serviceRequestInput: $serviceRequestInput,
+                                serviceRequestInputMetadata: $serviceRequestInputMetadata
                             ) {
-                                createServiceRequest(
-                                    serviceRequestInput: $serviceRequestInput,
-                                    serviceRequestInputMetadata: $serviceRequestInputMetadata
-                                ) {
+                                data {
                                     description
                                     startDate
                                     engagementLength
@@ -347,8 +326,13 @@ pub fn RatecardComponent(
                                         fileId
                                     }
                                 }
+                                metadata {
+                                    requestId
+                                    newAccessToken
+                                }
                             }
-                        "#;
+                        }
+                    "#;
 
                         let mut headers = HashMap::new() as HashMap<String, String>;
                         headers.insert(
@@ -378,7 +362,6 @@ pub fn RatecardComponent(
                                     .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
                                 {
                                     form.reset();
-                                    set_service_request_form_is_valid.set(false);
                                 }
                                 set_is_loading.set(false);
                                 success_modal_is_open.update(|status| *status = true);
@@ -394,18 +377,22 @@ pub fn RatecardComponent(
         }
     });
 
+    let handle_stepper_on_cleanup = Callback::new(move |_| {
+        stepper_form_refs.update(|refs| refs.clear());
+    });
+
     view! {
         <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] min-h-[564px] max-w-[400px] flex-1">
-            <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false primary_button_text="Submit" disable_primary_close=true on_click_primary=handle_service_request_modal_primary_click primary_is_disabled=modal_primary_is_disabled container_style_ext="md:w-[70%] h-[70svh]" show_footer=false>
+            <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false container_style_ext="md:w-[70%] h-[70svh]" show_footer=false>
                 <>
                 <Show when=move || is_loading.get()>
                     <Spinner />
                 </Show>
-                <Stepper step_labels=RwSignal::new(vec![StepInfo::new("Basic Information", Some(MdiFileDocumentEditOutline)), StepInfo::new("Supporting Documents", Some(AiFilePdfOutlined)), StepInfo::new("Review", Some(AiReadOutlined))]) send_all_form_refs=handle_received_form_refs is_linear=true final_button_text="Finish" ext_wrapper_styles="h-full overflow-y-auto">
+                <Stepper step_labels=RwSignal::new(vec![StepInfo::new("Basic Information", Some(MdiFileDocumentEditOutline)), StepInfo::new("Supporting Documents", Some(AiFilePdfOutlined)), StepInfo::new("Review", Some(AiReadOutlined))]) send_all_form_refs=handle_received_form_refs is_linear=true final_button_text="Submit" ext_wrapper_styles="h-full overflow-y-auto" on_click_final_button=handle_service_request_modal_primary_click final_button_is_disabled=modal_primary_is_disabled handle_on_cleanup=handle_stepper_on_cleanup>
                    <Step>
                        <div class="flex flex-col gap-[20px] p-2">
                            <Textarea label="Description" required=true id_attr="description" name="description" placeholder="Describe your request" />
-                           <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                           <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" min=Local::now() />
                            {
                                move || {
                                    let mut interval_str = "";
@@ -432,51 +419,89 @@ pub fn RatecardComponent(
                        </div>
                    </Step>
                    <Step>
-                       <p>"Third step"</p>
-                       // { move || {
-                       //     if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
-                       //         let form_data = get_form_data_from_form_ref(first_form_ref).unwrap_or_default();
-                       //         let data = deserialize_form_data_to_struct::<FirstForm>(&form_data).unwrap_or_default();
-                       //         Some(view! {
-                       //             <h2 class="text-lg">"First Step Verification"</h2>
-                       //             <p><strong>"Username: "</strong>{data.user_name}</p>
-                       //         })
-                       //     } else {
-                       //         None
-                       //     }
-                       // }
-                       // }
+                        <div class="flex flex-col gap-[20px]">
+                            { move || if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
+                                let Some(form_data) = get_form_data_from_form_ref(first_form_ref) else { return None };
+                                let Some(data) = deserialize_form_data_to_struct::<ServiceRequestInput>(&form_data, false, None) else { return None };
+                                Some(view! {
+                                    <h4>"Basic Information"</h4>
+                                    <table class="border-collapse border border-light-gray dark:border-mid-gray">
+                                        <tr>
+                                            <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2"><strong>"Description"</strong></td>
+                                            <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2">{data.description.text(None)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2"><strong>"Start Date"</strong></td>
+                                            <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2">{data.start_date.date("%b %e %Y", None)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2"><strong>"Engagement Length"</strong></td>
+                                            <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2">{data.engagement_length.int(None)}</td>
+                                        </tr>
+                                    </table>
+                                })
+                            } else {
+                                None
+                            }
+                            }
+                            { move ||
+                                if let Some(_second_form_ref) = stepper_form_refs.get().get(1) {
+                                    let Some(file_input) = file_input_ref.to_owned().get() else { return None };
+
+                                    let files = file_input.files();
+                                    let file_list = files.map(|fl| {
+                                        (0..fl.length())
+                                            .filter_map(|i| fl.item(i))
+                                            .collect::<Vec<_>>()
+                                    }).unwrap_or_default();
+
+                                    Some(view! {
+                                        <h4>"Supporting Documents"</h4>
+                                        {if file_list.is_empty() {
+                                            view! {
+                                                <p class="text-light-gray dark:text-mid-gray italic">"No documents uploaded."</p>
+                                            }.into_any()
+                                        } else {
+                                            view! {
+                                                <table class="border-collapse border border-light-gray dark:border-mid-gray">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2 text-left"><strong>"File Name"</strong></th>
+                                                            <th class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2 text-left"><strong>"Size"</strong></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {file_list.into_iter().map(|file| {
+                                                            let name = file.name();
+                                                            let size = file.size();
+
+                                                            let size_display = if size < 1024.0 {
+                                                                format!("{:.0} B", size)
+                                                            } else if size < 1024.0 * 1024.0 {
+                                                                format!("{:.1} KB", size / 1024.0)
+                                                            } else {
+                                                                format!("{:.1} MB", size / (1024.0 * 1024.0))
+                                                            };
+
+                                                            view! {
+                                                                <tr>
+                                                                    <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2">{name}</td>
+                                                                    <td class="border-collapse border border-light-gray dark:border-mid-gray px-4 py-2">{size_display}</td>
+                                                                </tr>
+                                                            }
+                                                        }).collect::<Vec<_>>()}
+                                                    </tbody>
+                                                </table>
+                                            }.into_any()
+                                        }}
+                                    })
+                                } else {
+                                    None
+                                }
+                            }
+                       </div>
                    </Step>
                 </Stepper>
-                // <ReactiveForm on:submit=handle_service_request_form_submit form_ref=service_request_form_ref onreset=onreset_handler>
-                //     <div class="p-[10px] flex flex-col gap-[20px]">
-                //         <Textarea label="Description" required=true id_attr="description" name="description" />
-                //         <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                //         {
-                //             move || {
-                //                 let mut interval_str = "";
-                //                 if let Some(input_el) = billing_interval_field_ref.get() as Option<HtmlSelectElement> {
-                //                     interval_str = match input_el.value().as_str() {
-                //                         "Monthly" => "months",
-                //                         "Hourly" => "hours",
-                //                         "Weekly" => "weeks",
-                //                         "Annual" => "years",
-                //                         "Milestone" => "milestones",
-                //                         _ => "_ _",
-                //                     };
-                //                 };
-                //                 view! {
-                //                     <InputField label=format!("Engagement Length ({})", interval_str) min="1" field_type=InputFieldType::Number required=true id_attr="engagement_length" name="engagement_length" />
-                //                 }
-                //             }
-                //         }
-                //     </div>
-                // </ReactiveForm>
-                // <ReactiveForm on:submit=handle_service_request_metadata_form_submit form_ref=service_request_metadata_form_ref>
-                //     <div class="p-[10px] flex flex-col gap-[20px]">
-                //         <CustomFileInput input_node_ref=file_input_ref label="Supporting Documents" name="supporting_documents" id_attr="supporting_documents" accept="image/*, .pdf, .docx, .txt, .odt, .md" required=true multiple=true />
-                //     </div>
-                // </ReactiveForm>
                 </>
             </BasicModal>
                 <BasicModal title="Success" is_open=success_modal_is_open use_case=UseCase::Success disable_auto_close=false>
@@ -534,7 +559,20 @@ pub fn RatecardComponent(
                 </div>
             </div>
 
-            <ReactiveForm on:submit=handle_services_form_submit form_ref=services_form_ref>
+            <ReactiveForm
+            on:submit=handle_services_form_submit
+            form_ref=services_form_ref
+            on:change=move |_| {
+                if let Some(form) = services_form_ref.get() {
+                    let has_checked = form
+                        .query_selector_all("input[name='service_ids']:checked")
+                        .map(|nodes| nodes.length() > 0)
+                        .unwrap_or(false);
+
+                    set_services_form_is_valid.set(has_checked);
+                }
+            }
+            >
                 <div class="p-[10px] flex flex-col gap-[10px] text-md">
                     <For
                         each=move || services.get()
@@ -548,7 +586,7 @@ pub fn RatecardComponent(
                 </div>
             </ReactiveForm>
             <div class="p-[10px] mt-auto">
-                // <BasicButton button_text="Request Service" icon=Some(BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
+                <BasicButton button_text="Request Service" icon=Some(BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
             </div>
         </div>
     }
