@@ -1,14 +1,18 @@
+use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
+
 /// For Plain T
 pub trait Pipe {
     fn text(&self, fallback: Option<&str>) -> Option<String>;
     fn float(&self, precision: Option<usize>, fallback: Option<&str>) -> Option<String>;
     fn int(&self, fallback: Option<&str>) -> Option<String>;
+    fn date(&self, fmt_out: &str, fallback: Option<&str>) -> Option<String>;
 }
 /// For Option<T>
 pub trait PipeOption {
     fn text(&self, fallback: Option<&str>) -> Option<String>;
     fn float(&self, precision: Option<usize>, fallback: Option<&str>) -> Option<String>;
     fn int(&self, fallback: Option<&str>) -> Option<String>;
+    fn date(&self, fmt_out: &str, fallback: Option<&str>) -> Option<String>;
 }
 
 fn format_with_commas(f: f64, precision: Option<usize>) -> String {
@@ -130,6 +134,39 @@ impl<T: std::fmt::Display> PipeOption for Option<T> {
             None => Some(fallback.unwrap_or("N/A").to_string()),
         }
     }
+
+    /// Formats a date string (ISO 8601 / RFC 3339) parseable as a datetime.
+    ///
+    /// Uses `fmt_out` as the output format. It must be a valid ISO 8601 / RFC 3339 string.
+    ///
+    /// Falls back to provided default or "N/A" if empty or unparseable.
+    ///
+    /// Usage:
+    /// ```
+    /// "2026-04-22T00:00:00+03:00".date("%b %e %Y", None)
+    /// // → Some("Apr 22 2026")
+    /// ```
+    ///
+    /// ```
+    /// some_optional_field.date("%b %e %Y", Some("—"))
+    /// // → Some("—") if None/empty/unparseable
+    /// ```
+    fn date(&self, fmt_out: &str, fallback: Option<&str>) -> Option<String> {
+        match &self {
+            Some(v) => {
+                let s = v.to_string();
+                let trimmed = s.trim();
+                if trimmed.is_empty() {
+                    return Some(fallback.unwrap_or("N/A").to_string());
+                }
+                match DateTime::parse_from_rfc3339(trimmed) {
+                    Ok(dt) => Some(dt.with_timezone(&Local).format(fmt_out).to_string()),
+                    Err(_) => Some(fallback.unwrap_or("N/A").to_string()),
+                }
+            }
+            None => Some(fallback.unwrap_or("N/A").to_string()),
+        }
+    }
 }
 
 /// For plain T — wraps in Some and delegates
@@ -159,5 +196,25 @@ impl<T: std::fmt::Display> Pipe for T {
     /// Falls back to provided default or "N/A" if empty or unparseable.
     fn int(&self, fallback: Option<&str>) -> Option<String> {
         Some(self).int(fallback)
+    }
+
+    /// Formats a date string (ISO 8601 / RFC 3339) parseable as a datetime.
+    ///
+    /// Uses `fmt_out` as the output format. It must be a valid ISO 8601 / RFC 3339 string.
+    ///
+    /// Falls back to provided default or "N/A" if empty or unparseable.
+    ///
+    /// Usage:
+    /// ```
+    /// "2026-04-22T00:00:00+03:00".date("%b %e %Y", None)
+    /// // Some("Apr 22 2026")
+    /// ```
+    ///
+    /// ```
+    /// some_optional_field.date("%b %e %Y", Some("—"))
+    /// // Some("—") if None/empty/unparseable
+    /// ```
+    fn date(&self, fmt_out: &str, fallback: Option<&str>) -> Option<String> {
+        Some(self).date(fmt_out, fallback)
     }
 }
