@@ -144,12 +144,12 @@ impl<T: std::fmt::Display> PipeOption for Option<T> {
     /// Usage:
     /// ```
     /// "2026-04-22T00:00:00+03:00".date("%b %e %Y", None)
-    /// // → Some("Apr 22 2026")
+    /// // Some("Apr 22 2026")
     /// ```
     ///
     /// ```
     /// some_optional_field.date("%b %e %Y", Some("—"))
-    /// // → Some("—") if None/empty/unparseable
+    /// // Some("—") if None/empty/unparseable
     /// ```
     fn date(&self, fmt_out: &str, fallback: Option<&str>) -> Option<String> {
         match &self {
