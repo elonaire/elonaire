@@ -37,6 +37,7 @@ use crate::data::{
         graphql::acl::UserLoginsInput,
     },
 };
+use crate::utils::errors::handle_graphql_errors;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
@@ -179,7 +180,7 @@ pub fn SignUp() -> impl IntoView {
     let handle_signup_submit = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
         ev.stop_propagation();
-        let navigate = navigate_submit.clone();
+        // let navigate = navigate_submit.clone();
 
         let target = ev
             .target()
@@ -272,7 +273,11 @@ pub fn SignUp() -> impl IntoView {
                                 }
                                 None => set_is_loading.set(false),
                             },
-                            None => set_is_loading.set(false),
+                            None => {
+                                let _handle_errors =
+                                    handle_graphql_errors(&res, &current_state, None);
+                                set_is_loading.set(false);
+                            }
                         };
                     });
                 }

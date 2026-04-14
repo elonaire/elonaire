@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::utils::errors::LocalRestErrorMessage;
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 pub struct ApiResponse<T> {
     data: T,
@@ -26,4 +28,12 @@ impl<T: Sync + Send + Clone> ApiResponse<T> {
     pub fn get_new_access_token(&self) -> Option<String> {
         self.metadata.new_access_token.as_ref().cloned()
     }
+}
+
+// REST
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RestResponse<T> {
+    pub success: bool,
+    pub data: Option<T>,
+    pub error: Option<LocalRestErrorMessage>,
 }
