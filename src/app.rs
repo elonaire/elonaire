@@ -62,10 +62,10 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
-        <Link rel="icon" type_="image/png" sizes="32x32" href="/favicon-32x32.png"/>
-        <Link rel="icon" type_="image/png" sizes="16x16" href="/favicon-16x16.png"/>
-        <Link rel="manifest" href="/site.webmanifest"/>
+        <Link rel="apple-touch-icon" sizes="180x180" href="public/apple-touch-icon.png"/>
+        <Link rel="icon" type_="image/png" sizes="32x32" href="public/favicon-32x32.png"/>
+        <Link rel="icon" type_="image/png" sizes="16x16" href="public/favicon-16x16.png"/>
+        <Link rel="manifest" href="public/site.webmanifest"/>
         <div id="modal-root"></div>
         <ErrorBoundary
                         // the fallback receives a signal containing current errors
