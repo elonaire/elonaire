@@ -331,8 +331,11 @@ pub fn BlogPostDetail() -> impl IntoView {
                             success_modal_is_open.update(|status| *status = true);
                         }
                         None => {
-                            let _handle_errors =
-                                handle_graphql_errors(&response, &current_state, &redirect_to);
+                            let _handle_errors = handle_graphql_errors(
+                                &response,
+                                &current_state,
+                                Some(&redirect_to),
+                            );
                             set_is_loading.set(false);
                         }
                     };
@@ -460,7 +463,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 }
                 None => {
                     let _handle_errors =
-                        handle_graphql_errors(&response, &current_state, &redirect_to);
+                        handle_graphql_errors(&response, &current_state, Some(&redirect_to));
                     set_is_loading.set(false);
                 }
             };
@@ -543,7 +546,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 }
                 None => {
                     let _handle_errors =
-                        handle_graphql_errors(&response, &current_state, &redirect_to);
+                        handle_graphql_errors(&response, &current_state, Some(&redirect_to));
                     set_is_loading.set(false);
                 }
             };
@@ -717,7 +720,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 }
                 None => {
                     let _handle_errors =
-                        handle_graphql_errors(&response, &current_state, &redirect_to);
+                        handle_graphql_errors(&response, &current_state, Some(&redirect_to));
                     set_is_loading.set(false);
                 }
             };

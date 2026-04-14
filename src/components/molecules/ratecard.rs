@@ -1,5 +1,8 @@
 use crate::components::general::stepper::{Step, StepInfo, Stepper};
+use crate::data::models::general::shared::RestResponse;
+use crate::utils::errors::{handle_graphql_errors, unwrap_rest_response};
 use crate::utils::formatters::{Pipe, PipeOption};
+use crate::views::public::error_handler::ErrorHandler;
 use std::collections::HashMap;
 
 use chrono::Local;
@@ -130,7 +133,8 @@ pub fn RatecardComponent(
                                     service_ids: services.service_ids,
                                 };
 
-                                let billing_rate = fetch_billing_rate(vars, None).await;
+                                let billing_rate =
+                                    fetch_billing_rate(vars, None, &current_state).await;
 
                                 if let Ok(amount_str) = billing_rate {
                                     // Process ratecards data here
@@ -212,7 +216,7 @@ pub fn RatecardComponent(
                             return;
                         };
 
-                        let response = match request.send().await {
+                        let body = match request.send().await {
                             Ok(r) => r,
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
@@ -221,18 +225,24 @@ pub fn RatecardComponent(
                             }
                         };
 
-                        let uploaded_files =
-                            match response.json::<Vec<UploadedFileResponse>>().await {
-                                Ok(f) => f,
+                        let body =
+                            match body.json::<RestResponse<Vec<UploadedFileResponse>>>().await {
+                                Ok(b) => b,
                                 Err(err) => {
                                     leptos::logging::error!(
-                                        "Failed to parse uploaded file response: {:?}",
+                                        "Failed to parse upload response: {:?}",
                                         err
                                     );
                                     set_is_loading.set(false);
                                     return;
                                 }
                             };
+
+                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state)
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
 
                         let Some(service_request_form_ref) =
                             stepper_form_refs.get_untracked().first().cloned()
@@ -368,6 +378,8 @@ pub fn RatecardComponent(
                                 service_request_modal_is_open.update(|status| *status = false);
                             }
                             None => {
+                                let _handle_errors =
+                                    handle_graphql_errors(&response, &current_state, None);
                                 set_is_loading.set(false);
                             }
                         }
@@ -382,6 +394,7 @@ pub fn RatecardComponent(
     });
 
     view! {
+        <ErrorHandler />
         <div class="flex flex-col gap-[20px] border-[0.5px] border-light-gray rounded-[5px] min-h-[564px] max-w-[400px] flex-1">
             <BasicModal title="Service Request" is_open=service_request_modal_is_open use_case=UseCase::General disable_auto_close=false container_style_ext="md:w-[70%] h-[70svh]" show_footer=false>
                 <>

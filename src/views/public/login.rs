@@ -31,8 +31,10 @@ use crate::data::{
         graphql::acl::UserLoginsInput,
     },
 };
+use crate::utils::errors::handle_graphql_errors;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
+use crate::views::public::error_handler::ErrorHandler;
 
 const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
 
@@ -263,8 +265,9 @@ pub fn SignIn() -> impl IntoView {
                                     };
                                 }
                                 None => {
+                                    let _handle_errors =
+                                        handle_graphql_errors(&login_res, &current_state, None);
                                     set_is_loading.set(false);
-                                    // login_res.get_error()
                                 }
                             };
                         };
@@ -280,7 +283,7 @@ pub fn SignIn() -> impl IntoView {
         <Show when=move || is_loading.get()>
             <Spinner />
         </Show>
-
+        <ErrorHandler />
         <div class="flex flex-col items-center justify-center p-8 min-h-svh">
             // <Breadcrumbs custom_route_names=["Home", "Sign In"] />
                         <A href="/" attr:class="flex items-center h-[50px]">

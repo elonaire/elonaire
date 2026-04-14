@@ -14,12 +14,14 @@ use crate::components::forms::input::CustomFileInput;
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::spinner::Spinner;
 use crate::components::general::table::data_table::TableCellData;
+use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::shared::{CreateUserServiceResponse, UserServiceInputVars};
 use crate::data::{
     context::shared::fetch_services,
     models::{general::files::UploadedFileResponse, graphql::shared::UserServiceInput},
 };
 
+use crate::utils::errors::unwrap_rest_response;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
     components::{
@@ -203,7 +205,7 @@ pub fn CreateUserService() -> impl IntoView {
                             return;
                         };
 
-                        let response = match request.send().await {
+                        let body = match request.send().await {
                             Ok(r) => r,
                             Err(err) => {
                                 leptos::logging::error!("Failed to upload files: {:?}", err);
@@ -212,18 +214,24 @@ pub fn CreateUserService() -> impl IntoView {
                             }
                         };
 
-                        let uploaded_files =
-                            match response.json::<Vec<UploadedFileResponse>>().await {
-                                Ok(f) => f,
+                        let body =
+                            match body.json::<RestResponse<Vec<UploadedFileResponse>>>().await {
+                                Ok(b) => b,
                                 Err(err) => {
                                     leptos::logging::error!(
-                                        "Failed to parse uploaded file response: {:?}",
+                                        "Failed to parse upload response: {:?}",
                                         err
                                     );
                                     set_is_loading.set(false);
                                     return;
                                 }
                             };
+
+                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state)
+                        else {
+                            set_is_loading.set(false);
+                            return;
+                        };
 
                         let Some(form_data) = get_form_data_from_form_ref(&form_ref) else {
                             set_is_loading.set(false);

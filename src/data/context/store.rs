@@ -1,4 +1,3 @@
-use leptos::prelude::RwSignal;
 use reactive_stores::Store;
 
 use crate::{
@@ -12,7 +11,7 @@ use crate::{
             },
         },
     },
-    utils::graphql_client::LocalGraphQLErrorMessage,
+    utils::{errors::LocalErrorMessage, graphql_client::LocalGraphQLErrorMessage},
 };
 
 #[derive(Clone, Debug, Default, Store, PartialEq, Eq)]
@@ -34,7 +33,7 @@ pub struct AppStateContext {
     ratecards: Vec<Ratecard>,
     service_requests: Vec<ServiceRequest>,
     show_mobile_search: bool,
-    error: Option<LocalGraphQLErrorMessage>,
+    error: Option<LocalErrorMessage>,
     redirect_to: Option<String>,
     dark_mode_is_active: bool,
 }
