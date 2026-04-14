@@ -74,7 +74,7 @@ pub fn ProfilePage() -> impl IntoView {
                                 </div>
                                 <div>
                                     <p class="text-xs mb-1">"User Role"</p>
-                                    <p class="text-sm font-semibold">"Admin"</p>
+                                    <p class="text-sm font-semibold">"Guest"</p>
                                 </div>
                             </div>
                         </div>
