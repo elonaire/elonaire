@@ -14,7 +14,7 @@ use crate::{
         molecules::{footer::Footer, nav::Nav},
     },
     data::context::store::{AppStateContext, AppStateContextStoreFields},
-    views::dashboard::layout::MenuItem,
+    views::{dashboard::layout::MenuItem, public::error_handler::ErrorHandler},
 };
 
 #[component]
@@ -55,6 +55,7 @@ pub fn MainLayout() -> impl IntoView {
     view! {
         <Title text="Techie Tenka"/>
         <main>
+            <ErrorHandler />
             <div class="relative min-h-svh">
                 {/* Sidebar overlay */}
                 <div

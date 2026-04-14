@@ -20,7 +20,10 @@ use crate::{
             },
         },
     },
-    utils::graphql_client::{perform_mutation_or_query_with_vars, perform_query_without_vars},
+    utils::{
+        errors::handle_graphql_errors,
+        graphql_client::{perform_mutation_or_query_with_vars, perform_query_without_vars},
+    },
 };
 use reactive_stores::Store;
 
@@ -797,6 +800,7 @@ pub async fn fetch_ratecards(
 pub async fn fetch_billing_rate(
     vars: FetchBillingRateVars,
     headers: Option<&HashMap<String, String>>,
+    current_state: &Store<AppStateContext>,
 ) -> Result<String, Vec<GraphQLErrorMessage>> {
     let fetch_billing_rate_query = r#"
         query FetchBillingRate($billingInterval: BillingInterval!, $serviceIds: [String!]!) {
@@ -833,7 +837,11 @@ pub async fn fetch_billing_rate(
 
             Ok(owned_data)
         }
-        None => Err(fetch_billing_rate_response.get_error().to_vec()),
+        None => {
+            let _handle_errors =
+                handle_graphql_errors(&fetch_billing_rate_response, &current_state, None);
+            Err(fetch_billing_rate_response.get_error().to_vec())
+        }
     }
 }
 
