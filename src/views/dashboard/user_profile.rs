@@ -18,7 +18,7 @@ pub fn ProfilePage() -> impl IntoView {
     // let auth_status = current_state.user().auth_info();
 
     view! {
-        <div class="min-h-svh bg-contrast-white flex flex-col gap-[40px] display-constraints">
+        <div class="min-h-svh flex flex-col gap-[40px] display-constraints">
 
             {
                 move || {
@@ -26,7 +26,7 @@ pub fn ProfilePage() -> impl IntoView {
                     let auth_status = current_state.user().auth_info().get();
                     view! {
                         // Avatar card
-                        <div class="bg-white rounded-[5px] shadow-sm p-6 mb-4 flex items-center gap-5">
+                        <div class="bg-white dark:bg-navy-light rounded-[5px] shadow-sm p-6 mb-4 flex items-center gap-5">
                             <div class="relative w-20 h-20 shrink-0">
                                 <img
                                     src=format!("{}?width=300", user.profile_picture.unwrap_or_default())
@@ -44,10 +44,10 @@ pub fn ProfilePage() -> impl IntoView {
                         </div>
 
                         // Personal Information card
-                        <div class="bg-white rounded-[5px] shadow-sm p-6 mb-4">
+                        <div class="bg-white dark:bg-navy-light rounded-[5px] shadow-sm p-6 mb-4">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-base font-semibold">"Personal Information"</h3>
-                                <BasicButton style_ext="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-secondary transition-colors">
+                                <BasicButton style_ext="bg-primary text-white text-sm font-medium px-4 py-2 rounded-[5px] hover:bg-secondary transition-colors">
                                     <Icon icon=BsPencil />
                                 </BasicButton>
                             </div>
@@ -80,7 +80,7 @@ pub fn ProfilePage() -> impl IntoView {
                         </div>
 
                         // Address card
-                        <div class="bg-white rounded-[5px] shadow-sm p-6">
+                        <div class="bg-white dark:bg-navy-light rounded-[5px] shadow-sm p-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-base font-semibold">"Address"</h3>
                                 <BasicButton style_ext="border border-light-gray text-sm font-medium px-4 py-2 rounded-[5px] hover:bg-gray/20 transition-colors">
