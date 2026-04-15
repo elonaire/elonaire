@@ -1,4 +1,5 @@
 pub mod blog;
+pub mod cookie_banner;
 pub mod flip_card;
 pub mod footer;
 pub mod headline;
