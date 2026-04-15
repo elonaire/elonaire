@@ -72,39 +72,36 @@ pub fn CookieBanner(
 
     view! {
         <Show when=move || visible.get()>
-            // Backdrop — visible only behind the expanded panel
             <Show when=move || show_details.get()>
                 <div
-                    class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+                    class="fixed inset-0 bg-navy/40 dark:bg-navy/60 backdrop-blur-sm z-40"
                     on:click=move |_| set_show_details.set(false)
                 />
             </Show>
 
             <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-xl p-5 flex flex-col gap-4">
+                <div class="bg-contrast-white dark:bg-navy border border-gray/10 dark:border-mid-gray/20 rounded-2xl shadow-xl p-5 flex flex-col gap-4">
 
-                    // Header
                     <div class="flex items-center gap-2">
                         <span class="text-xl leading-none">"🍪"</span>
-                        <h2 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
+                        <h2 class="text-base font-semibold text-gray dark:text-contrast-white tracking-tight">
                             "We use cookies"
                         </h2>
                     </div>
 
-                    // Summary or detail body
                     <Show
                         when=move || show_details.get()
                         fallback=move || view! {
-                            <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                            <p class="text-sm text-gray/60 dark:text-mid-gray leading-relaxed">
                                 "We use cookies to personalise content, analyse traffic, and improve
                                 your experience. You can choose which categories to allow."
                             </p>
                         }
                     >
-                        <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        <p class="text-sm text-gray/60 dark:text-mid-gray leading-relaxed">
                             "Manage your preferences below. Necessary cookies are always active."
                         </p>
-                        <div class="flex flex-col divide-y divide-zinc-100 dark:divide-zinc-800">
+                        <div class="flex flex-col divide-y divide-gray/10 dark:divide-mid-gray/20">
                             <CookieRow
                                 label="Necessary"
                                 description="Required for login sessions and core site functionality. Cannot be disabled."
@@ -132,10 +129,9 @@ pub fn CookieBanner(
                         </div>
                     </Show>
 
-                    // Actions
                     <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
                         <button
-                            class="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 px-3 py-2 transition-colors"
+                            class="text-sm text-gray/50 dark:text-mid-gray hover:text-gray dark:hover:text-contrast-white px-3 py-2 transition-colors"
                             on:click=reject_all
                         >
                             "Reject all"
@@ -145,7 +141,7 @@ pub fn CookieBanner(
                             when=move || show_details.get()
                             fallback=move || view! {
                                 <button
-                                    class="text-sm px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                    class="text-sm px-4 py-2 rounded-lg border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                     on:click=move |_| set_show_details.set(true)
                                 >
                                     "Manage preferences"
@@ -153,7 +149,7 @@ pub fn CookieBanner(
                             }
                         >
                             <button
-                                class="text-sm px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                class="text-sm px-4 py-2 rounded-lg border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                 on:click=save_preferences
                             >
                                 "Save preferences"
@@ -161,7 +157,7 @@ pub fn CookieBanner(
                         </Show>
 
                         <button
-                            class="text-sm px-4 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 transition-opacity font-medium"
+                            class="text-sm px-4 py-2 rounded-lg bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
                             on:click=accept_all
                         >
                             "Accept all"
@@ -186,8 +182,8 @@ fn CookieRow(
     view! {
         <div class="flex items-center justify-between gap-4 py-3">
             <div class="flex flex-col gap-0.5">
-                <span class="text-sm font-medium text-zinc-800 dark:text-zinc-200">{label}</span>
-                <span class="text-xs text-zinc-400 dark:text-zinc-500 leading-snug">{description}</span>
+                <span class="text-sm font-medium text-gray dark:text-contrast-white">{label}</span>
+                <span class="text-xs text-gray/60 dark:text-mid-gray leading-snug">{description}</span>
             </div>
             <div class=move || if readonly { "opacity-40 pointer-events-none flex-shrink-0" } else { "flex-shrink-0" }>
                 <ToggleSwitch
