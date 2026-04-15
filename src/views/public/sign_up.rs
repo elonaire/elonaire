@@ -325,7 +325,7 @@ pub fn SignUp() -> impl IntoView {
             </div>
         </BasicModal>
 
-        <div class="flex flex-col items-center justify-center p-8 bg-contrast-white min-h-svh">
+        <div class="flex flex-col items-center justify-center p-8 min-h-svh">
             <h1 class="text-4xl font-bold my-4">"Create Account"</h1>
 
             // Social sign-up
