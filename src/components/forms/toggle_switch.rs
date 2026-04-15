@@ -18,11 +18,12 @@ use leptos::prelude::*;
 pub fn ToggleSwitch(
     #[prop(into, optional)] name: String,
     #[prop(into, optional, default = Signal::derive(move || false))] active: Signal<bool>,
-    #[prop(into, default = "On".into())] label_active: String,
-    #[prop(into, default = "Off".into())] label_inactive: String,
+    #[prop(into, optional)] label_active: String,
+    #[prop(into, optional)] label_inactive: String,
     #[prop(into, optional)] id_attr: String,
     #[prop(into, optional)] label: String,
     #[prop(default = false)] required: bool,
+    #[prop(optional, default = false)] readonly: bool,
 ) -> impl IntoView {
     let checkbox_ref = NodeRef::new();
     let initial_value = RwSignal::new(String::from("false"));
@@ -37,7 +38,7 @@ pub fn ToggleSwitch(
 
     view! {
         <div class="flex flex-col cursor-pointer relative">
-            <CheckboxInputField input_node_ref=checkbox_ref initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required />
+            <CheckboxInputField input_node_ref=checkbox_ref initial_value=initial_value label=label name=name id_attr=id_attr checked=active ext_wrapper_styles="absolute opacity-0" required=required readonly=readonly />
             <div class="flex items-center">
                 <div on:click=handle_toggle class="relative">
                     <div

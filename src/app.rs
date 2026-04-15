@@ -8,7 +8,9 @@ use leptos_router::{
 use reactive_stores::Store;
 
 use crate::{
-    components::general::hocs::protected_route::ProtectedRoute,
+    components::{
+        general::hocs::protected_route::ProtectedRoute, molecules::cookie_banner::CookieBanner,
+    },
     data::context::store::AppStateContext,
     views::{
         dashboard::{
@@ -66,6 +68,7 @@ pub fn App() -> impl IntoView {
         <Link rel="icon" type_="image/png" sizes="32x32" href="public/favicon-32x32.png"/>
         <Link rel="icon" type_="image/png" sizes="16x16" href="public/favicon-16x16.png"/>
         <Link rel="manifest" href="public/site.webmanifest"/>
+        <CookieBanner />
         <div id="modal-root"></div>
         <ErrorBoundary
                         // the fallback receives a signal containing current errors
