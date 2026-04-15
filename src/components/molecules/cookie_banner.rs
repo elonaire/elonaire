@@ -80,7 +80,7 @@ pub fn CookieBanner(
             </Show>
 
             <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
-                <div class="bg-contrast-white dark:bg-navy border border-gray/10 dark:border-mid-gray/20 rounded-2xl shadow-xl p-5 flex flex-col gap-4">
+                <div class="bg-contrast-white dark:bg-navy border border-gray/10 dark:border-mid-gray/20 rounded-[5px] shadow-xl p-5 flex flex-col gap-4">
 
                     <div class="flex items-center gap-2">
                         <span class="text-xl leading-none">"🍪"</span>
@@ -141,7 +141,7 @@ pub fn CookieBanner(
                             when=move || show_details.get()
                             fallback=move || view! {
                                 <button
-                                    class="text-sm px-4 py-2 rounded-lg border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
+                                    class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                     on:click=move |_| set_show_details.set(true)
                                 >
                                     "Manage preferences"
@@ -149,7 +149,7 @@ pub fn CookieBanner(
                             }
                         >
                             <button
-                                class="text-sm px-4 py-2 rounded-lg border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
+                                class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                 on:click=save_preferences
                             >
                                 "Save preferences"
@@ -157,7 +157,7 @@ pub fn CookieBanner(
                         </Show>
 
                         <button
-                            class="text-sm px-4 py-2 rounded-lg bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
+                            class="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
                             on:click=accept_all
                         >
                             "Accept all"
