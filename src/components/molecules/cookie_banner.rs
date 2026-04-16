@@ -1,13 +1,21 @@
 use leptos::prelude::*;
+use web_sys::Storage;
 
 use crate::components::forms::toggle_switch::ToggleSwitch;
 
-#[derive(Clone, Debug, PartialEq)]
+const COOKIE_PREFS_KEY: &str = "cookie_preferences";
+
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct CookiePreferences {
+    #[serde(default = "default_true")]
     pub necessary: bool,
     pub analytics: bool,
     pub marketing: bool,
     pub preferences: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 impl Default for CookiePreferences {
@@ -35,39 +43,60 @@ pub fn CookieBanner(
     #[prop(optional, default = Callback::new(|_| {}))] on_accept: Callback<CookiePreferences>,
     #[prop(optional, default = Callback::new(|_| {}))] on_reject: Callback<()>,
 ) -> impl IntoView {
-    let (visible, set_visible) = signal(true);
+    // Initialise from localStorage — banner is hidden if prefs already exist
+    let saved = load_preferences();
+    let (visible, set_visible) = signal(saved.is_none());
     let (show_details, set_show_details) = signal(false);
 
-    let analytics = RwSignal::new(false);
-    let marketing = RwSignal::new(false);
-    let preferences = RwSignal::new(false);
+    let analytics = RwSignal::new(saved.as_ref().map(|p| p.analytics).unwrap_or(false));
+    let marketing = RwSignal::new(saved.as_ref().map(|p| p.marketing).unwrap_or(false));
+    let preferences = RwSignal::new(saved.as_ref().map(|p| p.preferences).unwrap_or(false));
 
     let on_accept = StoredValue::new(on_accept);
     let on_reject = StoredValue::new(on_reject);
 
+    let save_preferences = move |prefs: &CookiePreferences| {
+        if let Some(storage) = get_local_storage() {
+            if let Ok(serialized) = serde_json::to_string(prefs) {
+                storage.set_item(COOKIE_PREFS_KEY, &serialized).ok();
+            }
+        }
+    };
+
     let accept_all = move |_| {
-        set_visible.set(false);
-        on_accept.get_value().run(CookiePreferences {
+        let prefs = CookiePreferences {
             necessary: true,
             analytics: true,
             marketing: true,
             preferences: true,
-        });
+        };
+        save_preferences(&prefs);
+        set_visible.set(false);
+        on_accept.get_value().run(prefs);
     };
 
     let reject_all = move |_| {
+        let prefs = CookiePreferences {
+            necessary: true,
+            analytics: false,
+            marketing: false,
+            preferences: false,
+        };
+        save_preferences(&prefs);
         set_visible.set(false);
         on_reject.get_value().run(());
     };
 
-    let save_preferences = move |_| {
-        set_visible.set(false);
-        on_accept.get_value().run(CookiePreferences {
+    let save_preferences_handler = move |_| {
+        let prefs = CookiePreferences {
             necessary: true,
             analytics: analytics.get(),
             marketing: marketing.get(),
             preferences: preferences.get(),
-        });
+        };
+        save_preferences(&prefs);
+        set_visible.set(false);
+        on_accept.get_value().run(prefs);
     };
 
     view! {
@@ -150,7 +179,7 @@ pub fn CookieBanner(
                         >
                             <button
                                 class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
-                                on:click=save_preferences
+                                on:click=save_preferences_handler
                             >
                                 "Save preferences"
                             </button>
@@ -201,4 +230,16 @@ fn CookieRow(
             </div>
         </div>
     }
+}
+
+// Helper functions
+
+fn get_local_storage() -> Option<Storage> {
+    web_sys::window()?.local_storage().ok()?
+}
+
+fn load_preferences() -> Option<CookiePreferences> {
+    let storage = get_local_storage()?;
+    let raw = storage.get_item(COOKIE_PREFS_KEY).ok()??;
+    serde_json::from_str(&raw).ok()
 }
