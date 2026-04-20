@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use web_sys::Storage;
+use web_sys::{Storage, window};
 
 use crate::components::forms::toggle_switch::ToggleSwitch;
 
@@ -235,7 +235,7 @@ fn CookieRow(
 // Helper functions
 
 fn get_local_storage() -> Option<Storage> {
-    web_sys::window()?.local_storage().ok()?
+    window()?.local_storage().ok()?
 }
 
 fn load_preferences() -> Option<CookiePreferences> {
