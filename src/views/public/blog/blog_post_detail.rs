@@ -61,7 +61,7 @@ pub fn BlogPostDetail() -> impl IntoView {
     let (blog_post, set_blog_post) = signal(None);
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let (show_reactions, set_show_reactions) = signal(false);
     let hover_timer: StoredValue<Option<i32>> = StoredValue::new(None);
     let location = use_location();
@@ -126,7 +126,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -249,7 +249,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                         "Authorization".into(),
                         format!(
                             "Bearer {}",
-                            current_state.user().auth_info().token().get_untracked()
+                            store.user().auth_info().token().get_untracked()
                         ),
                     );
 
@@ -331,11 +331,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                             success_modal_is_open.update(|status| *status = true);
                         }
                         None => {
-                            let _handle_errors = handle_graphql_errors(
-                                &response,
-                                &current_state,
-                                Some(&redirect_to),
-                            );
+                            let _handle_errors =
+                                handle_graphql_errors(&response, &store, Some(&redirect_to));
                             set_is_loading.set(false);
                         }
                     };
@@ -428,7 +425,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -463,7 +460,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 }
                 None => {
                     let _handle_errors =
-                        handle_graphql_errors(&response, &current_state, Some(&redirect_to));
+                        handle_graphql_errors(&response, &store, Some(&redirect_to));
                     set_is_loading.set(false);
                 }
             };
@@ -500,7 +497,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -546,7 +543,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 }
                 None => {
                     let _handle_errors =
-                        handle_graphql_errors(&response, &current_state, Some(&redirect_to));
+                        handle_graphql_errors(&response, &store, Some(&redirect_to));
                     set_is_loading.set(false);
                 }
             };
@@ -598,7 +595,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 
@@ -681,7 +678,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -720,7 +717,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 }
                 None => {
                     let _handle_errors =
-                        handle_graphql_errors(&response, &current_state, Some(&redirect_to));
+                        handle_graphql_errors(&response, &store, Some(&redirect_to));
                     set_is_loading.set(false);
                 }
             };

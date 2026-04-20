@@ -18,8 +18,8 @@ use crate::{
 
 #[component]
 pub fn Portfolio() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let portfolio = move || current_state.portfolio();
+    let store = expect_context::<Store<AppStateContext>>();
+    let portfolio = move || store.portfolio();
     let (is_loading, set_is_loading) = signal(false);
     let javascript_projects = RwSignal::new(vec![] as Vec<UserPortfolio>);
     let rust_projects = RwSignal::new(vec![] as Vec<UserPortfolio>);
@@ -104,7 +104,7 @@ pub fn Portfolio() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let _portfolio_res = fetch_portfolio(&current_state, None).await;
+            let _portfolio_res = fetch_portfolio(&store, None).await;
 
             set_is_loading.set(false);
         });

@@ -51,8 +51,8 @@ pub fn Ratecards() -> impl IntoView {
 
 #[component]
 pub fn RatecardsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let ratecards = move || current_state.ratecards();
+    let store = expect_context::<Store<AppStateContext>>();
+    let ratecards = move || store.ratecards();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -71,11 +71,11 @@ pub fn RatecardsList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _response = fetch_ratecards(&current_state, Some(&headers)).await;
+            let _response = fetch_ratecards(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -169,8 +169,8 @@ pub fn CreateRatecard() -> impl IntoView {
     let submit_is_disabled = Memo::new(move |_| {
         (!main_form_is_valid.get() || selected_services_options.get().is_empty())
     });
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let services = move || current_state.services();
+    let store = expect_context::<Store<AppStateContext>>();
+    let services = move || store.services();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -229,7 +229,7 @@ pub fn CreateRatecard() -> impl IntoView {
                         "Authorization".into(),
                         format!(
                             "Bearer {}",
-                            current_state.user().auth_info().token().get_untracked()
+                            store.user().auth_info().token().get_untracked()
                         ),
                     );
 
@@ -277,11 +277,11 @@ pub fn CreateRatecard() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_services_res = fetch_services(&current_state, Some(&headers)).await;
+            let _fetch_services_res = fetch_services(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });

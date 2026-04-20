@@ -27,9 +27,9 @@ use crate::{
 
 #[component]
 pub fn BlogLayout() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let user_auth = current_state.user().auth_info();
-    let dark_mode_is_active = current_state.dark_mode_is_active();
+    let store = expect_context::<Store<AppStateContext>>();
+    let user_auth = store.user().auth_info();
+    let dark_mode_is_active = store.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     // track collapsed state
     let (collapsed, set_collapsed) = signal(false);
@@ -52,14 +52,14 @@ pub fn BlogLayout() -> impl IntoView {
 
     // Effect to refresh user auth status
     Effect::new(move |_| {
-        let current_state = current_state.clone();
+        let store = store.clone();
         spawn_local(async move {
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -67,7 +67,7 @@ pub fn BlogLayout() -> impl IntoView {
 
             match check_auth {
                 Ok(auth) => {
-                    current_state.user().auth_info().set(AuthInfo {
+                    store.user().auth_info().set(AuthInfo {
                         token: auth
                             .new_access_token
                             .as_ref()
@@ -115,7 +115,7 @@ pub fn BlogLayout() -> impl IntoView {
                     if let Ok(user_profile) =
                         fetch_single_user(&user_id_vars, None, fetch_user_info_query).await
                     {
-                        current_state.user().user_profile().set(user_profile);
+                        store.user().user_profile().set(user_profile);
                     };
                 }
                 Err(_) => {}

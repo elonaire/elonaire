@@ -12,16 +12,16 @@ use crate::data::context::users::fetch_site_owner_info;
 
 #[component]
 pub fn About() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let site_owner_info = move || current_state.site_owner_info();
-    let services = move || current_state.services();
+    let store = expect_context::<Store<AppStateContext>>();
+    let site_owner_info = move || store.site_owner_info();
+    let services = move || store.services();
     let (is_loading, set_is_loading) = signal(false);
 
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let _site_owner_info = fetch_site_owner_info(&current_state, None).await;
-            let _fetch_services_res = fetch_services(&current_state, None).await;
+            let _site_owner_info = fetch_site_owner_info(&store, None).await;
+            let _fetch_services_res = fetch_services(&store, None).await;
             set_is_loading.set(false);
         });
     });

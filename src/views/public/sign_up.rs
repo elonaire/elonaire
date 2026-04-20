@@ -46,7 +46,7 @@ const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
 #[component]
 pub fn SignUp() -> impl IntoView {
     let signup_form_ref = NodeRef::new();
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let (confirm_password_value, set_confirm_password_value) = signal(None as Option<String>);
     let (password_is_matching, set_password_is_matching) = signal(false);
@@ -83,7 +83,7 @@ pub fn SignUp() -> impl IntoView {
                         .await
                     {
                         if let Ok(auth_status) = response.json::<AuthDetails>().await {
-                            current_state
+                            store
                                 .user()
                                 .auth_info()
                                 .token()
@@ -103,9 +103,9 @@ pub fn SignUp() -> impl IntoView {
 
     Effect::new(move || {
         if is_authenticated.get() {
-            let redirect_to = current_state.redirect_to().get();
+            let redirect_to = store.redirect_to().get();
             if let Some(redirect_to) = redirect_to {
-                current_state.error().set(None);
+                store.error().set(None);
                 navigate_effect(&redirect_to, Default::default());
             } else {
                 navigate_effect("/dashboard", Default::default());
@@ -274,8 +274,7 @@ pub fn SignUp() -> impl IntoView {
                                 None => set_is_loading.set(false),
                             },
                             None => {
-                                let _handle_errors =
-                                    handle_graphql_errors(&res, &current_state, None);
+                                let _handle_errors = handle_graphql_errors(&res, &store, None);
                                 set_is_loading.set(false);
                             }
                         };

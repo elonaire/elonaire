@@ -2,6 +2,7 @@ use icondata as IconData;
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::hooks::use_navigate;
+use reactive_stores::Store;
 
 use crate::{
     components::{
@@ -11,6 +12,10 @@ use crate::{
             timeline::{Timeline, TimelineItem, TimelineStatus},
         },
         molecules::{quick_action::QuickAction, stats_card::StatsCard},
+    },
+    data::{
+        context::store::{AppStateContext, AppStateContextStoreFields},
+        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
     },
     utils::hooks::use_permissions::use_permission,
 };
@@ -26,6 +31,7 @@ pub fn DashboardHome() -> impl IntoView {
         ..Default::default()
     }]);
     let navigate = use_navigate();
+    let store = expect_context::<Store<AppStateContext>>();
 
     let can_view = use_permission(
         &vec!["read:stats".to_string(), "write:portfolio".to_string()],
@@ -33,7 +39,8 @@ pub fn DashboardHome() -> impl IntoView {
     );
 
     Effect::new(move |_| {
-        if !can_view.get() {
+        let is_authenticated = !store.user().auth_info().token().get().is_empty();
+        if !can_view.get() && is_authenticated {
             navigate("/dashboard/user/profile", Default::default());
         }
     });

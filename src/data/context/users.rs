@@ -15,7 +15,7 @@ use reactive_stores::Store;
 const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
 
 pub async fn fetch_site_owner_info(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_site_owner_query = r#"
@@ -70,7 +70,7 @@ pub async fn fetch_site_owner_info(
                 .unwrap_or(&Default::default())
                 .get_data()
                 .to_owned();
-            current_state.site_owner_info().set(owned_data);
+            store.site_owner_info().set(owned_data);
 
             Ok(())
         }

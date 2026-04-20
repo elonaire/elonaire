@@ -51,8 +51,8 @@ pub fn Resources() -> impl IntoView {
 
 #[component]
 pub fn ResourcesList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let resources = move || current_state.resources();
+    let store = expect_context::<Store<AppStateContext>>();
+    let resources = move || store.resources();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -71,11 +71,11 @@ pub fn ResourcesList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_resources_res = fetch_resources(&current_state, Some(&headers)).await;
+            let _fetch_resources_res = fetch_resources(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -169,9 +169,9 @@ pub fn CreateResource() -> impl IntoView {
     let (metadata_form_is_valid, set_metadata_form_is_valid) = signal(false);
     let submit_is_disabled =
         Memo::new(move |_| !main_form_is_valid.get() || !metadata_form_is_valid.get());
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let organizations = move || current_state.organizations();
-    let departments = move || current_state.departments();
+    let store = expect_context::<Store<AppStateContext>>();
+    let organizations = move || store.organizations();
+    let departments = move || store.departments();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -232,7 +232,7 @@ pub fn CreateResource() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 
@@ -289,12 +289,12 @@ pub fn CreateResource() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_organizations = fetch_organizations(&current_state, Some(&headers)).await;
-            let _fetch_departments = fetch_departments(&current_state, Some(&headers)).await;
+            let _fetch_organizations = fetch_organizations(&store, Some(&headers)).await;
+            let _fetch_departments = fetch_departments(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
