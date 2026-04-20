@@ -22,6 +22,7 @@ use crate::components::{
     },
 };
 use crate::data::models::general::acl::OauthClientName;
+use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::acl::SignInResponse;
 use crate::data::models::graphql::acl::SignInVars;
 use crate::data::{
@@ -72,8 +73,13 @@ pub fn SignIn() -> impl IntoView {
                         .send()
                         .await
                     {
-                        if let Ok(auth_status) = response.json::<AuthDetails>().await {
-                            let token = auth_status.token.unwrap_or_default();
+                        if let Ok(auth_status) = response.json::<RestResponse<AuthDetails>>().await
+                        {
+                            let token = auth_status
+                                .data
+                                .map(|auth_detail| auth_detail.token.unwrap_or_default())
+                                .unwrap_or_default();
+                            leptos::logging::log!("social-sign-in token: {token}");
                             store.user().auth_info().token().set(token);
 
                             set_is_loading.set(false);
@@ -92,6 +98,7 @@ pub fn SignIn() -> impl IntoView {
     Effect::new(move || {
         let redirect_to = store.redirect_to().get();
         let is_authenticated = !store.user().auth_info().token().get().is_empty();
+        leptos::logging::log!("is_authenticated: {is_authenticated}");
         // User is authenticated, redirect to the previous page or dashboard
         if is_authenticated {
             if let Some(redirect_to) = redirect_to {
