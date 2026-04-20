@@ -15,6 +15,7 @@ use crate::components::forms::select::{SelectInput, SelectOption};
 use crate::components::forms::textarea::Textarea;
 use crate::components::general::button::BasicButton;
 use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
+use crate::data::models::general::shared::RestResponse;
 use crate::data::models::general::{
     acl::{AuthInfoStoreFields, UserInfoStoreFields},
     files::UploadedFileResponse,
@@ -354,7 +355,10 @@ pub fn RichTextEditor(
                     {
                         match request.send().await {
                             Ok(response) => {
-                                match response.json::<Vec<UploadedFileResponse>>().await {
+                                match response
+                                    .json::<RestResponse<Vec<UploadedFileResponse>>>()
+                                    .await
+                                {
                                     Ok(uploaded_files) => {
                                         if let Some(doc) = window().and_then(|w| w.document()) {
                                             if let Ok(Some(selection)) = doc.get_selection() {
@@ -364,7 +368,12 @@ pub fn RichTextEditor(
                                                             "src",
                                                             &format!(
                                                                 "{files_service_api}/view/{}",
-                                                                uploaded_files[0].file_name
+                                                                uploaded_files
+                                                                    .data
+                                                                    .map(|files| files[0]
+                                                                        .file_name
+                                                                        .clone())
+                                                                    .unwrap_or_default()
                                                             ),
                                                         )
                                                         .unwrap_or_default();
