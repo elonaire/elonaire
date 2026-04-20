@@ -17,8 +17,8 @@ use crate::{
 
 #[component]
 pub fn Ratecard() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let ratecards = move || current_state.ratecards();
+    let store = expect_context::<Store<AppStateContext>>();
+    let ratecards = move || store.ratecards();
 
     Effect::new(move || {
         spawn_local(async move {
@@ -27,11 +27,11 @@ pub fn Ratecard() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _ratecards_res = fetch_ratecards(&current_state, None).await;
+            let _ratecards_res = fetch_ratecards(&store, None).await;
         });
     });
 

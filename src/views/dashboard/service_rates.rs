@@ -51,8 +51,8 @@ pub fn ServiceRates() -> impl IntoView {
 
 #[component]
 pub fn ServiceRatesList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let service_rates = move || current_state.service_rates();
+    let store = expect_context::<Store<AppStateContext>>();
+    let service_rates = move || store.service_rates();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -72,11 +72,11 @@ pub fn ServiceRatesList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _response = fetch_service_rates(&current_state, Some(&headers)).await;
+            let _response = fetch_service_rates(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -177,9 +177,9 @@ pub fn CreateServiceRate() -> impl IntoView {
             || selected_services_options.get().is_empty()
             || selected_currency_options.get().is_empty())
     });
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let services = move || current_state.services();
-    let currencies = move || current_state.currencies();
+    let store = expect_context::<Store<AppStateContext>>();
+    let services = move || store.services();
+    let currencies = move || store.currencies();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -238,7 +238,7 @@ pub fn CreateServiceRate() -> impl IntoView {
                         "Authorization".into(),
                         format!(
                             "Bearer {}",
-                            current_state.user().auth_info().token().get_untracked()
+                            store.user().auth_info().token().get_untracked()
                         ),
                     );
 
@@ -285,12 +285,12 @@ pub fn CreateServiceRate() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_services_res = fetch_services(&current_state, Some(&headers)).await;
-            let _fetch_currencies_res = fetch_currencies(&current_state, Some(&headers)).await;
+            let _fetch_services_res = fetch_services(&store, Some(&headers)).await;
+            let _fetch_currencies_res = fetch_currencies(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });

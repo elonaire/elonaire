@@ -63,8 +63,8 @@ pub fn Skills() -> impl IntoView {
 
 #[component]
 pub fn SkillsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let skills = move || current_state.skills();
+    let store = expect_context::<Store<AppStateContext>>();
+    let skills = move || store.skills();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -160,7 +160,7 @@ pub fn SkillsList() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let _fetch_skills = fetch_skills(&current_state, None).await;
+            let _fetch_skills = fetch_skills(&store, None).await;
 
             set_is_loading.set(false);
         });
@@ -202,7 +202,7 @@ pub fn CreateSkill() -> impl IntoView {
     let file_input_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let init_date = RwSignal::new(None);
@@ -248,7 +248,7 @@ pub fn CreateSkill() -> impl IntoView {
                                     "Authorization",
                                     format!(
                                         "Bearer {}",
-                                        current_state.user().auth_info().token().get_untracked()
+                                        store.user().auth_info().token().get_untracked()
                                     )
                                     .as_str(),
                                 )
@@ -280,8 +280,7 @@ pub fn CreateSkill() -> impl IntoView {
                                 }
                             };
 
-                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state, None)
-                        else {
+                        let Some(uploaded_files) = unwrap_rest_response(body, &store, None) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -343,7 +342,7 @@ pub fn CreateSkill() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 

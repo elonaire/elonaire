@@ -31,8 +31,8 @@ pub fn ServiceRequests() -> impl IntoView {
 
 #[component]
 pub fn ServiceRequestsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let service_requests = move || current_state.service_requests();
+    let store = expect_context::<Store<AppStateContext>>();
+    let service_requests = move || store.service_requests();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -51,11 +51,11 @@ pub fn ServiceRequestsList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _response = fetch_service_requests(&current_state, Some(&headers)).await;
+            let _response = fetch_service_requests(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });

@@ -59,7 +59,7 @@ const EMAIL_SERVICE_API: Option<&str> = option_env!("EMAIL_SERVICE_API");
 pub fn BlogHome() -> impl IntoView {
     let subscription_form_ref = NodeRef::new();
     let (is_loading, set_is_loading) = signal(false);
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let (featured_posts, set_featured_posts) = signal(vec![] as Vec<BlogPost>);
     let (other_posts, set_other_posts) = signal(vec![] as Vec<BlogPost>);
     let (other_post_filters, set_other_post_filters) = signal(FetchBlogPostsQueryFilters {
@@ -267,7 +267,7 @@ pub fn BlogHome() -> impl IntoView {
         set_timeout(
             move || {
                 set_show_overlay.set(false);
-                current_state.show_mobile_search().set(false);
+                store.show_mobile_search().set(false);
             },
             Duration::from_millis(150),
         );
@@ -486,10 +486,10 @@ pub fn BlogHome() -> impl IntoView {
                     </div>
                 </div>
                 // Mobile search overlay
-                {move || current_state.show_mobile_search().get().then(|| view! {
+                {move || store.show_mobile_search().get().then(|| view! {
                     <div class="fixed inset-0 z-50 bg-black/50 md:hidden"
                         on:mousedown=move |_| {
-                            current_state.show_mobile_search().set(false);
+                            store.show_mobile_search().set(false);
                         }
                     >
                         <div class="bg-white w-full px-4 py-3 flex items-center gap-3 shadow-lg"
@@ -499,7 +499,7 @@ pub fn BlogHome() -> impl IntoView {
                             <button
                                 class="shrink-0"
                                 on:click=move |_| {
-                                    current_state.show_mobile_search().set(false);
+                                    store.show_mobile_search().set(false);
                                 }
                             >
                                 <Icon icon=BsArrowLeft width="1.2rem" height="1.2rem" />

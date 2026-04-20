@@ -12,12 +12,12 @@ use crate::data::context::{
 
 #[component]
 pub fn About() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let site_owner_info = move || current_state.site_owner_info();
+    let store = expect_context::<Store<AppStateContext>>();
+    let site_owner_info = move || store.site_owner_info();
 
     Effect::new(move || {
         spawn_local(async move {
-            let _site_owner_info = fetch_site_owner_info(&current_state, None).await;
+            let _site_owner_info = fetch_site_owner_info(&store, None).await;
         });
     });
 

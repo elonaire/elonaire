@@ -32,7 +32,7 @@ const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 const PAYMENTS_SERVICE_API: Option<&str> = option_env!("PAYMENTS_SERVICE_API");
 
 pub async fn fetch_services(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_services_query = r#"
@@ -76,7 +76,7 @@ pub async fn fetch_services(
                 .as_ref()
                 .unwrap_or(&Default::default())
                 .to_vec();
-            current_state.services().set(owned_data);
+            store.services().set(owned_data);
 
             Ok(())
         }
@@ -85,7 +85,7 @@ pub async fn fetch_services(
 }
 
 pub async fn fetch_professions(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_professions_query = r#"
@@ -131,7 +131,7 @@ pub async fn fetch_professions(
                 .as_ref()
                 .unwrap_or(&Default::default())
                 .to_vec();
-            current_state.professions().set(owned_data);
+            store.professions().set(owned_data);
 
             Ok(())
         }
@@ -140,7 +140,7 @@ pub async fn fetch_professions(
 }
 
 pub async fn fetch_resume(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_resume_query = r#"
@@ -192,7 +192,7 @@ pub async fn fetch_resume(
                 .as_ref()
                 .unwrap_or(&Default::default())
                 .to_vec();
-            current_state.resume().set(owned_data);
+            store.resume().set(owned_data);
 
             Ok(())
         }
@@ -201,7 +201,7 @@ pub async fn fetch_resume(
 }
 
 pub async fn fetch_skills(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_skills_query = r#"
@@ -249,7 +249,7 @@ pub async fn fetch_skills(
                 .as_ref()
                 .unwrap_or(&Default::default())
                 .to_vec();
-            current_state.skills().set(owned_data);
+            store.skills().set(owned_data);
 
             Ok(())
         }
@@ -258,7 +258,7 @@ pub async fn fetch_skills(
 }
 
 pub async fn fetch_portfolio(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_portfolio_query = r#"
@@ -307,7 +307,7 @@ pub async fn fetch_portfolio(
                 .as_ref()
                 .unwrap_or(&Default::default())
                 .to_vec();
-            current_state.portfolio().set(owned_data);
+            store.portfolio().set(owned_data);
 
             Ok(())
         }
@@ -466,7 +466,7 @@ pub async fn check_auth(
 }
 
 pub async fn fetch_departments(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_departments_query = r#"
@@ -506,7 +506,7 @@ pub async fn fetch_departments(
                 .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
-            current_state.departments().set(owned_data);
+            store.departments().set(owned_data);
 
             Ok(())
         }
@@ -515,7 +515,7 @@ pub async fn fetch_departments(
 }
 
 pub async fn fetch_organizations(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_orgs_query = r#"
@@ -555,7 +555,7 @@ pub async fn fetch_organizations(
                 .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
-            current_state.organizations().set(owned_data);
+            store.organizations().set(owned_data);
 
             Ok(())
         }
@@ -564,7 +564,7 @@ pub async fn fetch_organizations(
 }
 
 pub async fn fetch_permissions(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_permissions_query = r#"
@@ -607,7 +607,7 @@ pub async fn fetch_permissions(
                 .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
-            current_state.permissions().set(owned_data);
+            store.permissions().set(owned_data);
 
             Ok(())
         }
@@ -616,7 +616,7 @@ pub async fn fetch_permissions(
 }
 
 pub async fn fetch_resources(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_resources_query = r#"
@@ -655,7 +655,7 @@ pub async fn fetch_resources(
                 .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
-            current_state.resources().set(owned_data);
+            store.resources().set(owned_data);
 
             Ok(())
         }
@@ -664,7 +664,7 @@ pub async fn fetch_resources(
 }
 
 pub async fn fetch_roles(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_roles_query = r#"
@@ -704,7 +704,7 @@ pub async fn fetch_roles(
                 .unwrap_or(&Default::default())
                 .get_data()
                 .to_vec();
-            current_state.roles().set(owned_data);
+            store.roles().set(owned_data);
 
             Ok(())
         }
@@ -743,7 +743,7 @@ pub async fn fetch_single_user(
 }
 
 pub async fn fetch_ratecards(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_ratecards_query = r#"
@@ -789,7 +789,7 @@ pub async fn fetch_ratecards(
                 .get_data()
                 .to_vec();
 
-            current_state.ratecards().set(owned_data);
+            store.ratecards().set(owned_data);
 
             Ok(())
         }
@@ -800,7 +800,7 @@ pub async fn fetch_ratecards(
 pub async fn fetch_billing_rate(
     vars: FetchBillingRateVars,
     headers: Option<&HashMap<String, String>>,
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
 ) -> Result<String, Vec<GraphQLErrorMessage>> {
     let fetch_billing_rate_query = r#"
         query FetchBillingRate($billingInterval: BillingInterval!, $serviceIds: [String!]!) {
@@ -839,14 +839,14 @@ pub async fn fetch_billing_rate(
         }
         None => {
             let _handle_errors =
-                handle_graphql_errors(&fetch_billing_rate_response, &current_state, None);
+                handle_graphql_errors(&fetch_billing_rate_response, &store, None);
             Err(fetch_billing_rate_response.get_error().to_vec())
         }
     }
 }
 
 pub async fn fetch_service_rates(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let fetch_service_rates_query = r#"
@@ -897,7 +897,7 @@ pub async fn fetch_service_rates(
                 .get_data()
                 .to_vec();
 
-            current_state.service_rates().set(owned_data);
+            store.service_rates().set(owned_data);
 
             Ok(())
         }
@@ -906,7 +906,7 @@ pub async fn fetch_service_rates(
 }
 
 pub async fn fetch_currencies(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let query = r#"
@@ -946,7 +946,7 @@ pub async fn fetch_currencies(
                 .get_data()
                 .to_vec();
 
-            current_state.currencies().set(owned_data);
+            store.currencies().set(owned_data);
 
             Ok(())
         }
@@ -955,7 +955,7 @@ pub async fn fetch_currencies(
 }
 
 pub async fn fetch_service_requests(
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     headers: Option<&HashMap<String, String>>,
 ) -> Result<(), Vec<GraphQLErrorMessage>> {
     let query = r#"
@@ -1001,7 +1001,7 @@ pub async fn fetch_service_requests(
                 .get_data()
                 .to_vec();
 
-            current_state.service_requests().set(owned_data);
+            store.service_requests().set(owned_data);
 
             Ok(())
         }

@@ -24,9 +24,9 @@ use crate::{
 
 #[component]
 pub fn Resume() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let resume = move || current_state.resume();
-    let skills = move || current_state.skills();
+    let store = expect_context::<Store<AppStateContext>>();
+    let resume = move || store.resume();
+    let skills = move || store.skills();
     let (is_loading, set_is_loading) = signal(false);
 
     let education_timeline_items = RwSignal::new(vec![] as Vec<TimelineItem>);
@@ -77,8 +77,8 @@ pub fn Resume() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let _fetch_resume_res = fetch_resume(&current_state, None).await;
-            let _fetch_skills_res = fetch_skills(&current_state, None).await;
+            let _fetch_resume_res = fetch_resume(&store, None).await;
+            let _fetch_skills_res = fetch_skills(&store, None).await;
 
             set_is_loading.set(false);
         });

@@ -64,7 +64,7 @@ pub fn RatecardComponent(
     let service_request_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
 
     let stepper_form_refs = RwSignal::new(Vec::new());
 
@@ -136,7 +136,7 @@ pub fn RatecardComponent(
                                 };
 
                                 let billing_rate =
-                                    fetch_billing_rate(vars, None, &current_state).await;
+                                    fetch_billing_rate(vars, None, &store).await;
 
                                 if let Ok(amount_str) = billing_rate {
                                     // Process ratecards data here
@@ -210,7 +210,7 @@ pub fn RatecardComponent(
                                     "Authorization",
                                     format!(
                                         "Bearer {}",
-                                        current_state.user().auth_info().token().get_untracked()
+                                        store.user().auth_info().token().get_untracked()
                                     )
                                     .as_str(),
                                 )
@@ -243,7 +243,7 @@ pub fn RatecardComponent(
                             };
 
                         let Some(uploaded_files) =
-                            unwrap_rest_response(body, &current_state, Some(&redirect_to))
+                            unwrap_rest_response(body, &store, Some(&redirect_to))
                         else {
                             set_is_loading.set(false);
                             return;
@@ -354,7 +354,7 @@ pub fn RatecardComponent(
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 
@@ -385,7 +385,7 @@ pub fn RatecardComponent(
                             None => {
                                 let _handle_errors = handle_graphql_errors(
                                     &response,
-                                    &current_state,
+                                    &store,
                                     Some(&redirect_to),
                                 );
                                 set_is_loading.set(false);

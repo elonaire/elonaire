@@ -109,7 +109,7 @@ pub fn CreateBlog() -> impl IntoView {
     let thumbnail_file_input_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -162,7 +162,7 @@ pub fn CreateBlog() -> impl IntoView {
                                     "Authorization",
                                     format!(
                                         "Bearer {}",
-                                        current_state.user().auth_info().token().get_untracked()
+                                        store.user().auth_info().token().get_untracked()
                                     )
                                     .as_str(),
                                 )
@@ -194,8 +194,7 @@ pub fn CreateBlog() -> impl IntoView {
                                 }
                             };
 
-                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state, None)
-                        else {
+                        let Some(uploaded_files) = unwrap_rest_response(body, &store, None) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -264,7 +263,7 @@ pub fn CreateBlog() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 

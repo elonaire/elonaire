@@ -44,7 +44,7 @@ pub fn RichTextEditor(
 ) -> impl IntoView {
     let editor_ref = NodeRef::new();
     let file_input_ref = NodeRef::new();
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let font_options = RwSignal::new(vec![
         SelectOption::new("p", "Normal"),
         SelectOption::new("h1", "H1"),
@@ -346,7 +346,7 @@ pub fn RichTextEditor(
                                 "Authorization",
                                 format!(
                                     "Bearer {}",
-                                    current_state.user().auth_info().token().get_untracked()
+                                    store.user().auth_info().token().get_untracked()
                                 )
                                 .as_str(),
                             )

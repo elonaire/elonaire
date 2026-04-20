@@ -51,8 +51,8 @@ pub fn Departments() -> impl IntoView {
 
 #[component]
 pub fn DepartmentsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let departments = move || current_state.departments();
+    let store = expect_context::<Store<AppStateContext>>();
+    let departments = move || store.departments();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -121,11 +121,11 @@ pub fn DepartmentsList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_departments_res = fetch_departments(&current_state, Some(&headers)).await;
+            let _fetch_departments_res = fetch_departments(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -169,9 +169,9 @@ pub fn CreateDepartment() -> impl IntoView {
     let (metadata_form_is_valid, set_metadata_form_is_valid) = signal(false);
     let submit_is_disabled =
         Memo::new(move |_| !main_form_is_valid.get() || !metadata_form_is_valid.get());
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let departments = move || current_state.departments();
-    let organizations = move || current_state.organizations();
+    let store = expect_context::<Store<AppStateContext>>();
+    let departments = move || store.departments();
+    let organizations = move || store.organizations();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -234,7 +234,7 @@ pub fn CreateDepartment() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 
@@ -291,13 +291,13 @@ pub fn CreateDepartment() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_orgs = fetch_organizations(&current_state, Some(&headers)).await;
+            let _fetch_orgs = fetch_organizations(&store, Some(&headers)).await;
 
-            let _fetch_departments_res = fetch_departments(&current_state, Some(&headers)).await;
+            let _fetch_departments_res = fetch_departments(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });

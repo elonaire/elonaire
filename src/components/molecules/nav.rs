@@ -59,12 +59,11 @@ pub fn Nav(
         ]
     });
 
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let user_profile = current_state.user().user_profile();
-    let dark_mode_is_active = current_state.dark_mode_is_active();
+    let store = expect_context::<Store<AppStateContext>>();
+    let user_profile = store.user().user_profile();
+    let dark_mode_is_active = store.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     let navigate = use_navigate();
-    let is_authenticated = Memo::new(move |_| !user_profile.get().profile_picture.is_none());
 
     let handle_sign_out = Callback::new(move |_| {
         let navigate = navigate.clone();
@@ -73,13 +72,13 @@ pub fn Nav(
             "Authorization".into(),
             format!(
                 "Bearer {}",
-                current_state.user().auth_info().token().get_untracked()
+                store.user().auth_info().token().get_untracked()
             ),
         );
 
         spawn_local(async move {
             if let Ok(_) = sign_out(Some(&headers)).await {
-                current_state.user().set(Default::default());
+                store.user().set(Default::default());
                 navigate("/sign-in", Default::default());
             };
         });
@@ -174,7 +173,7 @@ pub fn Nav(
                     {move || is_blog_home.get().then(|| view! {
                         <span
                             class="flex md:hidden items-center cursor-pointer"
-                            on:click=move |_| current_state.show_mobile_search().set(true)
+                            on:click=move |_| store.show_mobile_search().set(true)
                         >
                             <Icon width="24" height="24" icon=IoSearchOutline />
                         </span>
@@ -182,8 +181,9 @@ pub fn Nav(
 
                     // Sign in — dashboard or blog, no profile pic
                     {move || {
+                        let is_authenticated = !store.user().auth_info().token().get().is_empty();
 
-                        ((is_dashboard.get() || is_blog.get()) && !is_authenticated.get()).then(|| view! {
+                        (is_blog.get() && !is_authenticated).then(|| view! {
                             <A
                                 attr:class="hidden md:flex py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold text-sm"
                                 href="/sign-in"
