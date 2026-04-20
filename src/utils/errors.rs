@@ -98,7 +98,11 @@ impl LocalErrorMessage {
     }
 }
 
-pub fn unwrap_rest_response<T>(body: RestResponse<T>, store: &Store<AppStateContext>) -> Option<T> {
+pub fn unwrap_rest_response<T>(
+    body: RestResponse<T>,
+    store: &Store<AppStateContext>,
+    redirect_to: Option<&str>,
+) -> Option<T> {
     if !body.success {
         let error = body.error.map(LocalErrorMessage::Rest).unwrap_or_else(|| {
             LocalErrorMessage::Rest(LocalRestErrorMessage {
@@ -106,6 +110,9 @@ pub fn unwrap_rest_response<T>(body: RestResponse<T>, store: &Store<AppStateCont
                 message: "An unknown error occurred".into(),
             })
         });
+        store
+            .redirect_to()
+            .set(redirect_to.map(|link| link.to_string()));
         store.error().set(Some(error));
         return None;
     }

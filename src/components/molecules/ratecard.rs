@@ -11,6 +11,7 @@ use leptos::html::Form;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
 use leptos::{ev, prelude::*};
+use leptos_router::hooks::use_location;
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement, HtmlSelectElement, SubmitEvent};
 
@@ -57,6 +58,7 @@ pub fn RatecardComponent(
     let (amount, set_amount) = signal(None as Option<f64>);
     let submit_is_disabled =
         Memo::new(move |_| !services_form_is_valid.get() || !billing_interval_form_is_valid.get());
+    let location = use_location();
 
     let success_modal_is_open = RwSignal::new(false);
     let service_request_modal_is_open = RwSignal::new(false);
@@ -183,6 +185,8 @@ pub fn RatecardComponent(
     let onprimary_confirm_handler = Callback::new(move |_| {
         if !modal_primary_is_disabled.get() {
             set_is_loading.set(true);
+            let redirect_to = location.pathname.get();
+
             if let Some(file_input) = file_input_ref.to_owned().get() as Option<HtmlInputElement> {
                 if let Ok(files_form_data) = FormData::new() {
                     if let Some(filelist) = file_input.files() {
@@ -238,7 +242,8 @@ pub fn RatecardComponent(
                                 }
                             };
 
-                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state)
+                        let Some(uploaded_files) =
+                            unwrap_rest_response(body, &current_state, Some(&redirect_to))
                         else {
                             set_is_loading.set(false);
                             return;
@@ -378,8 +383,11 @@ pub fn RatecardComponent(
                                 service_request_modal_is_open.update(|status| *status = false);
                             }
                             None => {
-                                let _handle_errors =
-                                    handle_graphql_errors(&response, &current_state, None);
+                                let _handle_errors = handle_graphql_errors(
+                                    &response,
+                                    &current_state,
+                                    Some(&redirect_to),
+                                );
                                 set_is_loading.set(false);
                             }
                         }

@@ -283,7 +283,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                 }
                             };
 
-                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state)
+                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state, None)
                         else {
                             set_is_loading.set(false);
                             return;
