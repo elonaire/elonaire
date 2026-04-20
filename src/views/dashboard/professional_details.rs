@@ -59,8 +59,8 @@ pub fn ProfessionalDetails() -> impl IntoView {
 
 #[component]
 pub fn ProfessionalDetailsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let professions = move || current_state.professions();
+    let store = expect_context::<Store<AppStateContext>>();
+    let professions = move || store.professions();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -80,11 +80,11 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_professions_res = fetch_professions(&current_state, Some(&headers)).await;
+            let _fetch_professions_res = fetch_professions(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -191,7 +191,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let init_date = RwSignal::new(None);
@@ -240,7 +240,7 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                         "Authorization".into(),
                         format!(
                             "Bearer {}",
-                            current_state.user().auth_info().token().get_untracked()
+                            store.user().auth_info().token().get_untracked()
                         ),
                     );
 

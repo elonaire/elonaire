@@ -20,10 +20,10 @@ use crate::{
 #[component]
 pub fn MainLayout() -> impl IntoView {
     // track collapsed state
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let (collapsed, set_collapsed) = signal(false);
 
-    let dark_mode_is_active = current_state.dark_mode_is_active();
+    let dark_mode_is_active = store.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
 
     let handle_menu_click =

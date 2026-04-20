@@ -49,14 +49,10 @@ pub fn PermissionGuard(
     /// Content to render if authorized
     children: ChildrenFn,
 ) -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
 
     let is_authorized = Memo::new(move |_| {
-        let user_permissions = current_state
-            .user()
-            .auth_info()
-            .current_role_permissions()
-            .get();
+        let user_permissions = store.user().auth_info().current_role_permissions().get();
 
         match match_mode {
             PermissionMatch::All => permissions.iter().all(|p| user_permissions.contains(p)),

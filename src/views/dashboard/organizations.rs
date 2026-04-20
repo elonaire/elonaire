@@ -50,8 +50,8 @@ pub fn Organizations() -> impl IntoView {
 
 #[component]
 pub fn OrganizationsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let organizations = move || current_state.organizations();
+    let store = expect_context::<Store<AppStateContext>>();
+    let organizations = move || store.organizations();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -70,11 +70,11 @@ pub fn OrganizationsList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_orgs = fetch_organizations(&current_state, Some(&headers)).await;
+            let _fetch_orgs = fetch_organizations(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -165,7 +165,7 @@ pub fn CreateOrganization() -> impl IntoView {
     let form_ref = NodeRef::new();
     let (main_form_is_valid, set_main_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !main_form_is_valid.get());
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -215,7 +215,7 @@ pub fn CreateOrganization() -> impl IntoView {
                         "Authorization".into(),
                         format!(
                             "Bearer {}",
-                            current_state.user().auth_info().token().get_untracked()
+                            store.user().auth_info().token().get_untracked()
                         ),
                     );
 

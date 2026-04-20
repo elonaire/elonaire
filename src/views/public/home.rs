@@ -27,13 +27,13 @@ const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 #[component]
 pub fn Home() -> impl IntoView {
     // track collapsed state
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let (is_loading, set_is_loading) = signal(false);
     let (professions, set_professions) = signal(Vec::new() as Vec<UserProfessionalInfo>);
     // State: index of the currently selected profession (default to first)
     let (selected_profession, set_selected_profession) = signal(String::new());
 
-    let site_owner_info = move || current_state.site_owner_info(); // Should return ReadSignal<UserInfo>
+    let site_owner_info = move || store.site_owner_info(); // Should return ReadSignal<UserInfo>
 
     // Derived signal for the current description
     let current_description = Memo::new(move |_| {
@@ -113,7 +113,7 @@ pub fn Home() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -129,7 +129,7 @@ pub fn Home() -> impl IntoView {
                 )
                 .await;
 
-            let _site_owner_info = fetch_site_owner_info(&current_state, None).await;
+            let _site_owner_info = fetch_site_owner_info(&store, None).await;
 
             match fetch_professions_response.get_data() {
                 Some(data) => {

@@ -57,8 +57,8 @@ pub fn Roles() -> impl IntoView {
 
 #[component]
 pub fn RolesList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let roles = move || current_state.roles();
+    let store = expect_context::<Store<AppStateContext>>();
+    let roles = move || store.roles();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -77,11 +77,11 @@ pub fn RolesList() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_roles_response = fetch_roles(&current_state, Some(&headers)).await;
+            let _fetch_roles_response = fetch_roles(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });
@@ -182,10 +182,10 @@ pub fn CreateRole() -> impl IntoView {
     let (metadata_form_is_valid, set_metadata_form_is_valid) = signal(false);
     let submit_is_disabled =
         Memo::new(move |_| (!main_form_is_valid.get() || !metadata_form_is_valid.get()));
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let departments = move || current_state.departments();
-    let organizations = move || current_state.organizations();
-    let permissions = move || current_state.permissions();
+    let store = expect_context::<Store<AppStateContext>>();
+    let departments = move || store.departments();
+    let organizations = move || store.organizations();
+    let permissions = move || store.permissions();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -266,7 +266,7 @@ pub fn CreateRole() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 
@@ -323,14 +323,13 @@ pub fn CreateRole() -> impl IntoView {
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
-            let _fetch_organizations_res =
-                fetch_organizations(&current_state, Some(&headers)).await;
-            let _fetch_departments_res = fetch_departments(&current_state, Some(&headers)).await;
-            let _fetch_permissions_res = fetch_permissions(&current_state, Some(&headers)).await;
+            let _fetch_organizations_res = fetch_organizations(&store, Some(&headers)).await;
+            let _fetch_departments_res = fetch_departments(&store, Some(&headers)).await;
+            let _fetch_permissions_res = fetch_permissions(&store, Some(&headers)).await;
 
             set_is_loading.set(false);
         });

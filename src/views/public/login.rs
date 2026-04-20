@@ -41,11 +41,10 @@ const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
 #[component]
 pub fn SignIn() -> impl IntoView {
     let login_form_ref = NodeRef::new();
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled = Memo::new(move |_| !form_is_valid.get());
     let (is_loading, set_is_loading) = signal(false);
-    let is_authenticated = RwSignal::new(false);
     let navigate = use_navigate();
 
     let query = use_query::<AuthCode>();
@@ -75,9 +74,8 @@ pub fn SignIn() -> impl IntoView {
                     {
                         if let Ok(auth_status) = response.json::<AuthDetails>().await {
                             let token = auth_status.token.unwrap_or_default();
-                            current_state.user().auth_info().token().set(token);
+                            store.user().auth_info().token().set(token);
 
-                            is_authenticated.set(true);
                             set_is_loading.set(false);
                         } else {
                             set_is_loading.set(false);
@@ -92,11 +90,12 @@ pub fn SignIn() -> impl IntoView {
     });
 
     Effect::new(move || {
-        let redirect_to = current_state.redirect_to().get();
+        let redirect_to = store.redirect_to().get();
+        let is_authenticated = !store.user().auth_info().token().get().is_empty();
         // User is authenticated, redirect to the previous page or dashboard
-        if is_authenticated.get() {
+        if is_authenticated {
             if let Some(redirect_to) = redirect_to {
-                current_state.error().set(None);
+                store.error().set(None);
                 navigate(&redirect_to, Default::default());
             } else {
                 navigate("/dashboard", Default::default());
@@ -247,10 +246,9 @@ pub fn SignIn() -> impl IntoView {
                                                 set_form_is_valid.set(false);
                                             } else {
                                             }
-                                            is_authenticated.set(true);
                                             set_is_loading.set(false);
 
-                                            current_state.user().auth_info().token().set(
+                                            store.user().auth_info().token().set(
                                                 auth_details
                                                     .get_data()
                                                     .token
@@ -266,7 +264,7 @@ pub fn SignIn() -> impl IntoView {
                                 }
                                 None => {
                                     let _handle_errors =
-                                        handle_graphql_errors(&login_res, &current_state, None);
+                                        handle_graphql_errors(&login_res, &store, None);
                                     set_is_loading.set(false);
                                 }
                             };

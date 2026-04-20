@@ -22,21 +22,21 @@ use reactive_stores::Store;
 /// ```
 #[component]
 pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let navigate = use_navigate();
     let (is_authenticated, set_is_authenticated) = signal(false);
 
     // Effect to handle navigation based on auth status
     Effect::new(move |_| {
         let navigate = navigate.clone();
-        let current_state = current_state.clone();
+        let store = store.clone();
         spawn_local(async move {
             let mut headers = HashMap::new() as HashMap<String, String>;
             headers.insert(
                 "Authorization".into(),
                 format!(
                     "Bearer {}",
-                    current_state.user().auth_info().token().get_untracked()
+                    store.user().auth_info().token().get_untracked()
                 ),
             );
 
@@ -45,7 +45,7 @@ pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
             match check_auth {
                 Ok(auth) => {
                     set_is_authenticated.set(true);
-                    current_state.user().auth_info().set(AuthInfo {
+                    store.user().auth_info().set(AuthInfo {
                         token: auth
                             .new_access_token
                             .as_ref()
@@ -93,7 +93,7 @@ pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
                     if let Ok(user_profile) =
                         fetch_single_user(&user_id_vars, None, fetch_user_info_query).await
                     {
-                        current_state.user().user_profile().set(user_profile);
+                        store.user().user_profile().set(user_profile);
                     };
                 }
                 Err(_) => {

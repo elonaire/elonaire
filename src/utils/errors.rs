@@ -11,19 +11,17 @@ use serde::{Deserialize, Serialize};
 
 pub fn handle_graphql_errors<T>(
     response: &GraphQLResponse<T>,
-    current_state: &Store<AppStateContext>,
+    store: &Store<AppStateContext>,
     redirect_to: Option<&str>,
 ) -> () {
     let errors = response.get_error();
     errors.iter().for_each(|e| {
         if let Ok(value) = serde_json::to_value(e) {
             if let Ok(err) = serde_json::from_value(value) as Result<LocalGraphQLErrorMessage, _> {
-                current_state
+                store
                     .redirect_to()
                     .set(redirect_to.map(|link| link.to_string()));
-                current_state
-                    .error()
-                    .set(Some(LocalErrorMessage::GraphQL(err)));
+                store.error().set(Some(LocalErrorMessage::GraphQL(err)));
             }
         }
     });

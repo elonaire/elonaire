@@ -55,8 +55,8 @@ pub fn Resume() -> impl IntoView {
 
 #[component]
 pub fn ResumeItemsList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let resume = move || current_state.resume();
+    let store = expect_context::<Store<AppStateContext>>();
+    let resume = move || store.resume();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -146,11 +146,11 @@ pub fn ResumeItemsList() -> impl IntoView {
             //     "Authorization".into(),
             //     format!(
             //         "Bearer {}",
-            //         current_state.user().auth_info().token().get_untracked()
+            //         store.user().auth_info().token().get_untracked()
             //     ),
             // );
 
-            let _fetch_resume_res = fetch_resume(&current_state, None).await;
+            let _fetch_resume_res = fetch_resume(&store, None).await;
 
             set_is_loading.set(false);
         });
@@ -195,7 +195,7 @@ pub fn CreateResumeItem() -> impl IntoView {
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled =
         Memo::new(move |_| !form_is_valid.get() || achievements.get().len() == 0);
-    let current_state = expect_context::<Store<AppStateContext>>();
+    let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let init_date = RwSignal::new(None);
@@ -254,7 +254,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                         "Authorization".into(),
                         format!(
                             "Bearer {}",
-                            current_state.user().auth_info().token().get_untracked()
+                            store.user().auth_info().token().get_untracked()
                         ),
                     );
 

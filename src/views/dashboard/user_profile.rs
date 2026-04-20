@@ -13,17 +13,17 @@ use icondata::{BsCamera, BsPencil};
 
 #[component]
 pub fn ProfilePage() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    // let user_profile = current_state.user().user_profile();
-    // let auth_status = current_state.user().auth_info();
+    let store = expect_context::<Store<AppStateContext>>();
+    // let user_profile = store.user().user_profile();
+    // let auth_status = store.user().auth_info();
 
     view! {
         <div class="min-h-svh flex flex-col gap-[40px] display-constraints">
 
             {
                 move || {
-                    let user = current_state.user().user_profile().get();
-                    let auth_status = current_state.user().auth_info().get();
+                    let user = store.user().user_profile().get();
+                    let auth_status = store.user().auth_info().get();
                     view! {
                         // Avatar card
                         <div class="bg-white dark:bg-navy-light rounded-[5px] shadow-sm p-6 mb-4 flex items-center gap-5">

@@ -67,8 +67,8 @@ pub fn Portfolio() -> impl IntoView {
 
 #[component]
 pub fn PortfolioList() -> impl IntoView {
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let portfolio = move || current_state.portfolio();
+    let store = expect_context::<Store<AppStateContext>>();
+    let portfolio = move || store.portfolio();
     let (is_loading, set_is_loading) = signal(false);
 
     let table_data = RwSignal::new((
@@ -162,11 +162,11 @@ pub fn PortfolioList() -> impl IntoView {
             //     "Authorization".into(),
             //     format!(
             //         "Bearer {}",
-            //         current_state.user().auth_info().token().get_untracked()
+            //         store.user().auth_info().token().get_untracked()
             //     ),
             // );
 
-            let _portfolio_res = fetch_portfolio(&current_state, None).await;
+            let _portfolio_res = fetch_portfolio(&store, None).await;
 
             set_is_loading.set(false);
         });
@@ -210,8 +210,8 @@ pub fn CreatePortfolio() -> impl IntoView {
     let (form_is_valid, set_form_is_valid) = signal(false);
     let submit_is_disabled =
         Memo::new(move |_| !form_is_valid.get() || applied_skills.get().is_empty());
-    let current_state = expect_context::<Store<AppStateContext>>();
-    let skills = move || current_state.skills();
+    let store = expect_context::<Store<AppStateContext>>();
+    let skills = move || store.skills();
     let skills_select_options = RwSignal::new(vec![] as Vec<SelectOption>);
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
@@ -251,7 +251,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                     "Authorization",
                                     format!(
                                         "Bearer {}",
-                                        current_state.user().auth_info().token().get_untracked()
+                                        store.user().auth_info().token().get_untracked()
                                     )
                                     .as_str(),
                                 )
@@ -283,8 +283,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                                 }
                             };
 
-                        let Some(uploaded_files) = unwrap_rest_response(body, &current_state, None)
-                        else {
+                        let Some(uploaded_files) = unwrap_rest_response(body, &store, None) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -352,7 +351,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                             "Authorization".into(),
                             format!(
                                 "Bearer {}",
-                                current_state.user().auth_info().token().get_untracked()
+                                store.user().auth_info().token().get_untracked()
                             ),
                         );
 
@@ -408,7 +407,7 @@ pub fn CreatePortfolio() -> impl IntoView {
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
-            let _fetch_skills_res = fetch_skills(&current_state, None).await;
+            let _fetch_skills_res = fetch_skills(&store, None).await;
 
             set_is_loading.set(false);
         });
