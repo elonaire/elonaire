@@ -26,6 +26,7 @@ use crate::components::{
 use crate::data::models::general::acl::AuthCode;
 use crate::data::models::general::acl::AuthDetails;
 use crate::data::models::general::acl::OauthClientName;
+use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::acl::SignUpResponse;
 use crate::data::models::graphql::acl::SignUpVars;
 use crate::data::models::graphql::acl::UserInput;
@@ -82,12 +83,14 @@ pub fn SignUp() -> impl IntoView {
                         .send()
                         .await
                     {
-                        if let Ok(auth_status) = response.json::<AuthDetails>().await {
-                            store
-                                .user()
-                                .auth_info()
-                                .token()
-                                .set(auth_status.token.unwrap_or_default());
+                        if let Ok(auth_status) = response.json::<RestResponse<AuthDetails>>().await
+                        {
+                            store.user().auth_info().token().set(
+                                auth_status
+                                    .data
+                                    .map(|auth_detail| auth_detail.token.unwrap_or_default())
+                                    .unwrap_or_default(),
+                            );
                             is_authenticated.set(true);
                             set_is_loading.set(false);
                         };
