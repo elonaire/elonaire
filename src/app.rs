@@ -77,6 +77,7 @@ pub fn App() -> impl IntoView {
                                 <p>"Something went wrong: "</p>
                                 // we can render a list of errors
                                 // as strings, if we'd like
+                                // I might improve this one
                                 <ul>
                                     {move || errors.get()
                                         .into_iter()
