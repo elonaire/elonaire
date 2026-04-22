@@ -20,7 +20,11 @@ use crate::components::general::button::BasicButton;
 use crate::components::general::hocs::permission_guard::PermissionGuard;
 use crate::components::general::hocs::permission_guard::PermissionMatch;
 use crate::components::general::popover::Popover;
+use crate::data::context::shared::check_auth;
+use crate::data::context::shared::fetch_single_user;
 use crate::data::context::users::sign_out;
+use crate::data::models::general::acl::AuthInfo;
+use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
@@ -64,6 +68,12 @@ pub fn Nav(
     let dark_mode_is_active = store.dark_mode_is_active();
     let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     let navigate = use_navigate();
+    // To this — so it only tracks one signal:
+    let token = store.user().auth_info().token();
+    let is_authenticated = Memo::new(move |_| {
+        let t = token.get();
+        !t.is_empty()
+    });
 
     let handle_sign_out = Callback::new(move |_| {
         let navigate = navigate.clone();
@@ -95,6 +105,79 @@ pub fn Nav(
                 let _ = class_list.add_1("dark");
             }
         }
+    });
+
+    // Effect to refresh user auth status
+    Effect::new(move |_| {
+        let store = store.clone();
+        spawn_local(async move {
+            let mut headers = HashMap::new() as HashMap<String, String>;
+            headers.insert(
+                "Authorization".into(),
+                format!(
+                    "Bearer {}",
+                    store.user().auth_info().token().get_untracked()
+                ),
+            );
+
+            let check_auth = check_auth(Some(&headers)).await;
+
+            match check_auth {
+                Ok(auth) => {
+                    store.user().auth_info().set(AuthInfo {
+                        token: auth
+                            .new_access_token
+                            .as_ref()
+                            .unwrap_or(&String::new())
+                            .to_owned(),
+                        current_role: auth.current_role.clone(),
+                        current_role_permissions: auth.current_role_permissions,
+                    });
+                    let user_id_vars = FetchSingleUserVars {
+                        user_id: auth.sub.clone(),
+                    };
+
+                    let fetch_user_info_query = r#"
+                        query FetchSingleUser($userId: String!) {
+                            fetchSingleUser(userId: $userId) {
+                                data {
+                                    firstName
+                                    middleName
+                                    lastName
+                                    gender
+                                    dob
+                                    email
+                                    country
+                                    phone
+                                    createdAt
+                                    updatedAt
+                                    oauthClient
+                                    oauthUserId
+                                    profilePicture
+                                    bio
+                                    website
+                                    address
+                                    id
+                                    fullName
+                                    age
+                                }
+                                metadata {
+                                    requestId
+                                    newAccessToken
+                                }
+                            }
+                        }
+                       "#;
+
+                    if let Ok(user_profile) =
+                        fetch_single_user(&user_id_vars, None, fetch_user_info_query).await
+                    {
+                        store.user().user_profile().set(user_profile);
+                    };
+                }
+                Err(_) => {}
+            }
+        });
     });
 
     view! {
@@ -181,9 +264,10 @@ pub fn Nav(
 
                     // Sign in — dashboard or blog, no profile pic
                     {move || {
-                        let is_authenticated = !store.user().auth_info().token().get().is_empty();
+                        let is_authenticated = is_authenticated.get();
+                        let on_blog_page = is_blog.get();
 
-                        (is_blog.get() && !is_authenticated).then(|| view! {
+                        ((on_blog_page && !is_authenticated)).then(|| view! {
                             <A
                                 attr:class="hidden md:flex py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold text-sm"
                                 href="/sign-in"
@@ -196,7 +280,8 @@ pub fn Nav(
                     // Profile pic + popover — dashboard or blog, has profile pic
                     {move || {
                         let profile_pic = user_profile.get().profile_picture;
-                        ((is_dashboard.get() || is_blog.get())).then(|| {
+                        let is_authenticated = is_authenticated.get();
+                        (((is_dashboard.get() || is_blog.get()) && is_authenticated)).then(|| {
                             profile_pic.map(|pic| view! {
                                 <Popover
                                     showing=showing_user_popover
