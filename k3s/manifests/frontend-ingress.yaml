@@ -1,60 +1,60 @@
 ---
 # maintenance-ingress-http
 # Redirects HTTP -> HTTPS for techietenka.com (maintenance)
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: maintenance-ingress-http
-  namespace: techietenka
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
-    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-redirect-to-https@kubernetescrd"
-spec:
-  ingressClassName: traefik
-  rules:
-    - host: techietenka.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: maintenance
-                port:
-                  number: 80
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: maintenance-ingress-http
+#   namespace: techietenka
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: web
+#     traefik.ingress.kubernetes.io/router.middlewares: "techietenka-redirect-to-https@kubernetescrd"
+# spec:
+#   ingressClassName: traefik
+#   rules:
+#     - host: techietenka.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: maintenance
+#                 port:
+#                   number: 80
 ---
 # maintenance-ingress
 # Serves maintenance page on techietenka.com
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: maintenance-ingress
-  namespace: techietenka
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.middlewares: "techietenka-secure-chain@kubernetescrd"
-    traefik.ingress.kubernetes.io/router.tls.options: "default"
-spec:
-  ingressClassName: traefik
-  rules:
-    - host: techietenka.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: maintenance
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - techietenka.com
-      secretName: techietenka-main-tls
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: maintenance-ingress
+#   namespace: techietenka
+#   annotations:
+#     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+#     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+#     traefik.ingress.kubernetes.io/router.middlewares: "techietenka-secure-chain@kubernetescrd"
+#     traefik.ingress.kubernetes.io/router.tls.options: "default"
+# spec:
+#   ingressClassName: traefik
+#   rules:
+#     - host: techietenka.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: maintenance
+#                 port:
+#                   number: 80
+#   tls:
+#     - hosts:
+#         - techietenka.com
+#       secretName: techietenka-main-tls
 ---
 # frontend-ingress-http
-# Redirects HTTP -> HTTPS for dev.techietenka.com
+# Redirects HTTP -> HTTPS for techietenka.com
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -66,7 +66,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: dev.techietenka.com
+    - host: techietenka.com
       http:
         paths:
           - path: /
@@ -78,7 +78,7 @@ spec:
                   number: 8080
 ---
 # frontend-ingress
-# Serves frontend + proxies /api/* routes on dev.techietenka.com
+# Serves frontend + proxies /api/* routes on techietenka.com
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -97,7 +97,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: dev.techietenka.com
+    - host: techietenka.com
       http:
         paths:
           - path: /api/acl
@@ -137,11 +137,11 @@ spec:
                   number: 8080
   tls:
     - hosts:
-        - dev.techietenka.com
-      secretName: techietenka-dev-tls
+        - techietenka.com
+      secretName: techietenka-main-tls
 ---
 # frontend-ingress-payments
-# Separated to apply payments-chain (strict rate limiting) on dev.techietenka.com
+# Separated to apply payments-chain (strict rate limiting) on techietenka.com
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -158,7 +158,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: dev.techietenka.com
+    - host: techietenka.com
       http:
         paths:
           - path: /api/payments
@@ -170,5 +170,5 @@ spec:
                   number: 3013
   tls:
     - hosts:
-        - dev.techietenka.com
-      secretName: techietenka-dev-tls
+        - techietenka.com
+      secretName: techietenka-main-tls
