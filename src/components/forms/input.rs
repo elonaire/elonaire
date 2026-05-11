@@ -86,7 +86,7 @@ pub fn InputField(
     };
 
     view! {
-        <div class=move || format!("{}", ext_wrapper_styles)>
+        <div class=move || format!("box-border {}", ext_wrapper_styles)>
             {
                 if label.is_empty() {
                     None
@@ -202,7 +202,7 @@ pub fn CustomFileInput(
     let accept_c = accept.clone();
 
     view! {
-        <div class="relative flex flex-col gap-2">
+        <div class="relative flex flex-col gap-2 box-border">
             <InputField
                 name=name_c
                 label=label_c
