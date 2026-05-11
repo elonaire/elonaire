@@ -28,7 +28,7 @@ pub fn Textarea(
     // Create reactive state for display_error
 
     view! {
-        <div>
+        <div class="box-border">
             {
                 if label.is_empty() {
                     None
