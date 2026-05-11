@@ -292,7 +292,7 @@ pub fn SignIn() -> impl IntoView {
         <div class="flex flex-col items-center justify-center p-8 min-h-svh">
             // <Breadcrumbs custom_route_names=["Home", "Sign In"] />
                         <A href="/" attr:class="flex items-center h-[50px]">
-                            <img src="https://api.techietenka.com/files/view/47a6c9dd-6d87-42ff-a041-9d2a7896c47f" class="h-full w-auto object-cover" alt="Logo" />
+                            <img src="https://techietenka.com/api/files/view/default/Techie Tenka-01.png" class="h-full w-auto object-cover" alt="Logo" />
                         </A>
                         <h1 class="text-4xl font-bold my-4">{"Sign In"}</h1>
                         <div class="w-full max-w-md flex flex-col items-center gap-2 my-4">
