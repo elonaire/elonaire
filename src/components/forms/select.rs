@@ -64,7 +64,7 @@ pub fn SelectInput(
     let (display_error, _set_display_error) = signal(false);
 
     view! {
-        <div>
+        <div class="box-border">
             {
                 if label.is_empty() {
                     None
