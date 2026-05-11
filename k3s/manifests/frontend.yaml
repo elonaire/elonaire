@@ -53,126 +53,126 @@ spec:
   type: ClusterIP
 ---
 # Maintenance ConfigMap
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: maintenance-html
-#   namespace: techietenka
-# data:
-#   index.html: |
-#     <!DOCTYPE html>
-#     <html lang="en">
-#     <head>
-#       <meta charset="UTF-8" />
-#       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-#       <title>Under Maintenance</title>
-#       <style>
-#         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-#         :root {
-#           --navy: #000E1E;
-#           --contrast-white: #F8FAFC;
-#           --gray: #4B5563;
-#           --mid-gray: #9CA3AF;
-#           --navy-light: #0D1F35;
-#         }
-#         body {
-#           min-height: 100svh;
-#           display: flex;
-#           align-items: center;
-#           justify-content: center;
-#           padding: 1rem;
-#           font-family: system-ui, -apple-system, sans-serif;
-#           background: var(--contrast-white);
-#           color: var(--gray);
-#         }
-#         @media (prefers-color-scheme: dark) {
-#           body { background: var(--navy); color: var(--contrast-white); }
-#           .card { background: var(--navy-light); border-color: rgba(156,163,175,0.15); }
-#           .muted { color: var(--mid-gray); }
-#         }
-#         .card {
-#           display: flex;
-#           flex-direction: column;
-#           align-items: center;
-#           text-align: center;
-#           gap: 1.5rem;
-#           max-width: 420px;
-#           width: 100%;
-#           padding: 2.5rem 2rem;
-#           border: 1px solid rgba(75,85,99,0.12);
-#           border-radius: 5px;
-#         }
-#         .icon { font-size: 2.5rem; line-height: 1; }
-#         h1 { font-size: 1.2rem; font-weight: 600; }
-#         .muted { font-size: 0.875rem; line-height: 1.6; color: rgba(75,85,99,0.7); }
-#         .badge {
-#           font-size: 0.75rem;
-#           font-weight: 500;
-#           padding: 0.3rem 0.85rem;
-#           border-radius: 999px;
-#           border: 1px solid rgba(75,85,99,0.2);
-#           letter-spacing: 0.03em;
-#         }
-#       </style>
-#     </head>
-#     <body>
-#       <div class="card">
-#         <span class="icon">🔧</span>
-#         <div style="display:flex;flex-direction:column;gap:0.5rem">
-#           <h1>We'll be right back</h1>
-#           <p class="muted">
-#             We're performing scheduled maintenance and will be back shortly.
-#             Thanks for your patience.
-#           </p>
-#         </div>
-#         <span class="badge">Under maintenance</span>
-#       </div>
-#     </body>
-#     </html>
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: maintenance-html
+  namespace: techietenka
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Under Maintenance</title>
+      <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+          --navy: #000E1E;
+          --contrast-white: #F8FAFC;
+          --gray: #4B5563;
+          --mid-gray: #9CA3AF;
+          --navy-light: #0D1F35;
+        }
+        body {
+          min-height: 100svh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          font-family: system-ui, -apple-system, sans-serif;
+          background: var(--contrast-white);
+          color: var(--gray);
+        }
+        @media (prefers-color-scheme: dark) {
+          body { background: var(--navy); color: var(--contrast-white); }
+          .card { background: var(--navy-light); border-color: rgba(156,163,175,0.15); }
+          .muted { color: var(--mid-gray); }
+        }
+        .card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 1.5rem;
+          max-width: 420px;
+          width: 100%;
+          padding: 2.5rem 2rem;
+          border: 1px solid rgba(75,85,99,0.12);
+          border-radius: 5px;
+        }
+        .icon { font-size: 2.5rem; line-height: 1; }
+        h1 { font-size: 1.2rem; font-weight: 600; }
+        .muted { font-size: 0.875rem; line-height: 1.6; color: rgba(75,85,99,0.7); }
+        .badge {
+          font-size: 0.75rem;
+          font-weight: 500;
+          padding: 0.3rem 0.85rem;
+          border-radius: 999px;
+          border: 1px solid rgba(75,85,99,0.2);
+          letter-spacing: 0.03em;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <span class="icon">🔧</span>
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <h1>We'll be right back</h1>
+          <p class="muted">
+            We're performing scheduled maintenance and will be back shortly.
+            Thanks for your patience.
+          </p>
+        </div>
+        <span class="badge">Under maintenance</span>
+      </div>
+    </body>
+    </html>
 ---
 # Maintenance Deployment
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: maintenance
-#   labels:
-#     app: maintenance
-#   namespace: techietenka
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: maintenance
-#   template:
-#     metadata:
-#       labels:
-#         app: maintenance
-#     spec:
-#       containers:
-#         - name: nginx
-#           image: nginx:alpine
-#           ports:
-#             - name: http
-#               containerPort: 80
-#           volumeMounts:
-#             - name: html
-#               mountPath: /usr/share/nginx/html
-#       volumes:
-#         - name: html
-#           configMap:
-#             name: maintenance-html
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maintenance
+  labels:
+    app: maintenance
+  namespace: techietenka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maintenance
+  template:
+    metadata:
+      labels:
+        app: maintenance
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html
+          configMap:
+            name: maintenance-html
 ---
 # Maintenance Service
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: maintenance
-#   namespace: techietenka
-# spec:
-#   selector:
-#     app: maintenance
-#   ports:
-#     - name: http
-#       port: 80
-#       targetPort: 80
-#   type: ClusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  name: maintenance
+  namespace: techietenka
+spec:
+  selector:
+    app: maintenance
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: ClusterIP
