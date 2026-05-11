@@ -195,7 +195,7 @@ pub fn Nav(
 
                 // Center/Left — logo
                 <A href="/" attr:class="flex items-center h-full shrink-0">
-                    <img src="https://api.techietenka.com/files/view/47a6c9dd-6d87-42ff-a041-9d2a7896c47f" class="h-full w-auto object-cover" alt="Logo" />
+                    <img src="https://techietenka.com/api/files/view/default/Techie Tenka-01.png" class="h-full w-auto object-cover" alt="Logo" />
                 </A>
 
                 // Right — all right-side items

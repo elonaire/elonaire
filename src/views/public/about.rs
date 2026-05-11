@@ -36,8 +36,8 @@ pub fn About() -> impl IntoView {
                 <Headline title="About Me" description="Who Am I?" />
                 <div class="flex flex-col md:flex-row md:justify-center md:gap-[20px] display-constraints">
                     <div class="max-w-[400px] h-[479px] relative md:basis-1/2">
-                        <img src="https://api.techietenka.com/files/view/ba183079-0126-4fc5-b870-de2ffdbe3bca?width=600" alt="gallery-pic" class="rounded-[5px] w-[299px] h-[429px] object-cover"/>
-                        <img src="https://api.techietenka.com/files/view/a92c140b-9871-419c-adef-96d44d8f49c0?width=600" alt="gallery-pic" class="rounded-[5px] w-[196px] h-[218px] absolute bottom-0 right-0 object-cover"/>
+                        <img src="https://techietenka.com/api/files/view/default/20230701_181652.jpg?width=600" alt="gallery-pic" class="rounded-[5px] w-[299px] h-[429px] object-cover"/>
+                        <img src="https://techietenka.com/api/files/view/default/20240228_000643.jpg?width=600" alt="gallery-pic" class="rounded-[5px] w-[196px] h-[218px] absolute bottom-0 right-0 object-cover"/>
                     </div>
                     <div class="max-w-[400px] flex flex-col gap-[20px] md:basis-1/2">
                         <div class="flex flex-col gap-[20px]">

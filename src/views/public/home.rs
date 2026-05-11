@@ -47,37 +47,37 @@ pub fn Home() -> impl IntoView {
 
     let ethics = vec![
         (
-            "bg-[url('https://api.techietenka.com/files/view/485ce03d-de84-499e-9696-b6e605c02eec?width=800')]",
+            "bg-[url('https://techietenka.com/api/files/view/default/vecteezy_a-businessman-works-on-his-laptop-at-home-with-a-virtual_19935805.jpg?width=800')]",
             "Commitment to Security",
             "From physical to application - I ensure security at every layer.",
             "md:row-span-1 md:col-span-1", // ethic1: spans 1 cols, 1 row
         ),
         (
-            "bg-[url('https://api.techietenka.com/files/view/a7641914-73a2-4747-9728-8fd74177259c?width=800')]",
+            "bg-[url('https://techietenka.com/api/files/view/default/vecteezy_businessman-checking-documents-iso-standards-quality_12859725.jpg?width=800')]",
             "Commitment to Quality",
             "I never compromise on delivering exceptional results",
             "md:row-span-1 md:col-span-1", // ethic1: spans 1 cols, 1 row
         ),
         (
-            "bg-[url('https://api.techietenka.com/files/view/6162cb5a-62b6-43e4-9eab-1f2df0204140?width=800')]",
+            "bg-[url('https://techietenka.com/api/files/view/default/medium-vecteezy_time-management-concept-businessman-manages-time-for_55787084_medium.jpg?width=800')]",
             "Timely Delivery",
             "Meeting deadlines is not negotiable",
             "md:row-span-1 md:col-span-2", // ethic2: spans 2 cols, 1 row
         ),
         (
-            "bg-[url('https://api.techietenka.com/files/view/29eb4743-b4fe-4e74-b2a6-f74592829e85?width=800')]",
+            "bg-[url('https://techietenka.com/api/files/view/default/medium-vecteezy_man-hand-virtual-world-icon-communication-and-use-of-modern_4816140_medium.jpg?width=800')]",
             "Clear Communication",
             "Transparency at every step of the process",
             "md:row-span-2 md:col-span-2", // ethic3: spans 2 cols, 2 rows
         ),
         (
-            "bg-[url('https://api.techietenka.com/files/view/a6b4ac55-c487-4f82-bac8-fb1e4920869f?width=800')]",
+            "bg-[url('https://techietenka.com/api/files/view/default/medium-vecteezy_concept-of-education-adds-new-skills-business-education_27547463_medium.jpg?width=800')]",
             "Continuous Learning",
             "Always staying ahead with latest technologies",
             "md:row-span-2 md:col-span-2", // ethic4: spans 2 cols, 2 rows
         ),
         (
-            "bg-[url('https://api.techietenka.com/files/view/8671a04d-8fbe-4b17-a75d-7e79217e3188?width=800')]",
+            "bg-[url('https://techietenka.com/api/files/view/default/medium-vecteezy_ai-generative-photo-american-business-male-people-shaking_29333390_medium.jpg?width=800')]",
             "Client-Focused",
             "Your success is my priority",
             "md:row-span-1 md:col-span-2", // ethic5: spans 2 cols, 1 row
@@ -293,7 +293,7 @@ pub fn Home() -> impl IntoView {
                     {/* Background image — full width */}
                     <div
                         class="absolute inset-0 bg-cover bg-center rounded-[5px]"
-                        style="background-image: url('https://api.techietenka.com/files/view/be829ce6-1c68-4c88-8491-9e0df8817967?width=1500');"
+                        style="background-image: url('https://techietenka.com/api/files/view/default/medium-vecteezy_a-man-and-virtual-icon-modern-cyberspace-network-technology_24162388_medium.jpg?width=1500');"
                     />
 
                     {/* Primary color — left half with diagonal right edge */}
