@@ -245,18 +245,18 @@ pub fn CreatePortfolio() -> impl IntoView {
                     };
 
                     spawn_local(async move {
-                        let Ok(request) =
-                            gloo_net::http::Request::post(&format!("{files_service_api}/upload"))
-                                .header(
-                                    "Authorization",
-                                    format!(
-                                        "Bearer {}",
-                                        store.user().auth_info().token().get_untracked()
-                                    )
-                                    .as_str(),
-                                )
-                                .body(files_form_data)
-                        else {
+                        let Ok(request) = gloo_net::http::Request::post(&format!(
+                            "{files_service_api}/upload/default"
+                        ))
+                        .header(
+                            "Authorization",
+                            format!(
+                                "Bearer {}",
+                                store.user().auth_info().token().get_untracked()
+                            )
+                            .as_str(),
+                        )
+                        .body(files_form_data) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -299,8 +299,11 @@ pub fn CreatePortfolio() -> impl IntoView {
 
                         if let Err(e) = form_data.append_with_str(
                             "thumbnail",
-                            format!("{files_service_api}/view/{}", uploaded_files[0].file_name)
-                                .as_str(),
+                            format!(
+                                "{files_service_api}/view/default/{}",
+                                uploaded_files[0].original_filename
+                            )
+                            .as_str(),
                         ) {
                             leptos::logging::log!("Error appending thumbnail: {:?}", e);
                             set_is_loading.set(false);

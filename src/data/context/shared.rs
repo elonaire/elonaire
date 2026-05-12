@@ -213,7 +213,7 @@ pub async fn fetch_skills(
                             name
                             description
                             level
-                            type
+                            skillType
                             startDate
                             id
                             yearsOfExperience
@@ -377,13 +377,13 @@ pub async fn fetch_single_blog_post(
                         author
                         reactionCount
                         currentUserReaction {
-                            type
+                            skillType
                             id
                         }
                     }
                     reactionCount
                     currentUserReaction {
-                        type
+                        skillType
                         id
                     }
                     bookmarksCount
@@ -838,8 +838,7 @@ pub async fn fetch_billing_rate(
             Ok(owned_data)
         }
         None => {
-            let _handle_errors =
-                handle_graphql_errors(&fetch_billing_rate_response, &store, None);
+            let _handle_errors = handle_graphql_errors(&fetch_billing_rate_response, &store, None);
             Err(fetch_billing_rate_response.get_error().to_vec())
         }
     }

@@ -5,4 +5,5 @@ pub struct UploadedFileResponse {
     pub field_name: String,
     pub file_id: String,
     pub file_name: String,
+    pub original_filename: String,
 }

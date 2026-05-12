@@ -142,7 +142,7 @@ pub fn SkillsList() -> impl IntoView {
                     TableCellData::String(format!(
                         "{:?}",
                         skill
-                            .r#type
+                            .skill_type
                             .as_ref()
                             .unwrap_or(&UserSkillType::Technical)
                             .to_owned()
@@ -242,18 +242,18 @@ pub fn CreateSkill() -> impl IntoView {
                     };
 
                     spawn_local(async move {
-                        let Ok(request) =
-                            gloo_net::http::Request::post(&format!("{files_service_api}/upload"))
-                                .header(
-                                    "Authorization",
-                                    format!(
-                                        "Bearer {}",
-                                        store.user().auth_info().token().get_untracked()
-                                    )
-                                    .as_str(),
-                                )
-                                .body(files_form_data)
-                        else {
+                        let Ok(request) = gloo_net::http::Request::post(&format!(
+                            "{files_service_api}/upload/default"
+                        ))
+                        .header(
+                            "Authorization",
+                            format!(
+                                "Bearer {}",
+                                store.user().auth_info().token().get_untracked()
+                            )
+                            .as_str(),
+                        )
+                        .body(files_form_data) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -296,8 +296,11 @@ pub fn CreateSkill() -> impl IntoView {
 
                         if let Err(e) = form_data.append_with_str(
                             "thumbnail",
-                            format!("{files_service_api}/view/{}", uploaded_files[0].file_name)
-                                .as_str(),
+                            format!(
+                                "{files_service_api}/view/default/{}",
+                                uploaded_files[0].original_filename
+                            )
+                            .as_str(),
                         ) {
                             leptos::logging::log!("Error appending thumbnail: {:?}", e);
                             set_is_loading.set(false);
@@ -325,7 +328,7 @@ pub fn CreateSkill() -> impl IntoView {
                                         name
                                         description
                                         level
-                                        type
+                                        skillType
                                         startDate
                                         id
                                     }
@@ -432,9 +435,9 @@ pub fn CreateSkill() -> impl IntoView {
                     <Textarea label="Description" required=true id_attr="description" name="description" />
                     <SelectInput
                     label="Type"
-                    name="type"
+                    name="skill_type"
                     required=true
-                    id_attr="type"
+                    id_attr="skill_type"
                     placeholder="Select Type"
                     options=user_skill_types
                     />

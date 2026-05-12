@@ -69,7 +69,7 @@ pub fn BlogPostDetail() -> impl IntoView {
     let selected_reaction = Memo::new(move |_| {
         blog_post
             .get()
-            .and_then(|bp: BlogPost| bp.current_user_reaction.as_ref().map(|r| r.r#type))
+            .and_then(|bp: BlogPost| bp.current_user_reaction.as_ref().map(|r| r.reaction_type))
     });
 
     let reactions = vec![
@@ -397,7 +397,9 @@ pub fn BlogPostDetail() -> impl IntoView {
         let redirect_to = location.pathname.get();
         spawn_local(async move {
             let input_vars = ReactToBlogPostVars {
-                reaction: ReactionInput { r#type: reaction },
+                reaction: ReactionInput {
+                    reaction_type: reaction,
+                },
                 blog_post_id: blog_post
                     .get_untracked()
                     .unwrap_or_default()
@@ -409,7 +411,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 mutation ReactToBlogPost($reaction: ReactionInput!, $blogPostId: String!) {
                     reactToBlogPost(reaction: $reaction, blogPostId: $blogPostId) {
                         data {
-                            type
+                            reactionType
                             id
                         }
                         metadata {
@@ -472,7 +474,7 @@ pub fn BlogPostDetail() -> impl IntoView {
         spawn_local(async move {
             let input_vars = ReactToBlogCommentVars {
                 reaction: ReactionInput {
-                    r#type: reaction.reaction_type.clone(),
+                    reaction_type: reaction.reaction_type.clone(),
                 },
                 comment_id: reaction.comment_id.clone(),
             };
@@ -481,7 +483,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                 mutation ReactToBlogComment($reaction: ReactionInput!, $commentId: String!) {
                     reactToBlogComment(reaction: $reaction, commentId: $commentId) {
                         data {
-                            type
+                            reactionType
                             id
                         }
                         metadata {
@@ -873,7 +875,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                             comments.into_iter()
                                                             .map(|comment| {
                                                                 view! {
-                                                                    <BlogComment comment_id=comment.id.as_ref().unwrap_or(&String::new()).to_owned() content=comment.content.as_ref().unwrap_or(&String::new()).to_owned() date_of_creation=comment.created_at.as_ref().unwrap_or(&String::new()).to_owned() author_name=comment.full_author_details.as_ref().unwrap_or(&Default::default()).full_name.as_ref().unwrap_or(&Default::default()).to_owned() author_avatar=comment.full_author_details.as_ref().unwrap_or(&Default::default()).profile_picture.as_ref().unwrap_or(&Default::default()).to_owned() reply_count=comment.reply_count.as_ref().unwrap_or(&0).to_owned() reaction_count=comment.reaction_count.as_ref().unwrap_or(&0).to_owned() current_user_reaction=comment.current_user_reaction.as_ref().map(|r| r.r#type) on_reaction=handle_comment_reaction_click />
+                                                                    <BlogComment comment_id=comment.id.as_ref().unwrap_or(&String::new()).to_owned() content=comment.content.as_ref().unwrap_or(&String::new()).to_owned() date_of_creation=comment.created_at.as_ref().unwrap_or(&String::new()).to_owned() author_name=comment.full_author_details.as_ref().unwrap_or(&Default::default()).full_name.as_ref().unwrap_or(&Default::default()).to_owned() author_avatar=comment.full_author_details.as_ref().unwrap_or(&Default::default()).profile_picture.as_ref().unwrap_or(&Default::default()).to_owned() reply_count=comment.reply_count.as_ref().unwrap_or(&0).to_owned() reaction_count=comment.reaction_count.as_ref().unwrap_or(&0).to_owned() current_user_reaction=comment.current_user_reaction.as_ref().map(|r| r.reaction_type) on_reaction=handle_comment_reaction_click />
                                                                 }
                                                             })
                                                             .collect_view()

@@ -135,8 +135,7 @@ pub fn RatecardComponent(
                                     service_ids: services.service_ids,
                                 };
 
-                                let billing_rate =
-                                    fetch_billing_rate(vars, None, &store).await;
+                                let billing_rate = fetch_billing_rate(vars, None, &store).await;
 
                                 if let Ok(amount_str) = billing_rate {
                                     // Process ratecards data here
@@ -204,18 +203,18 @@ pub fn RatecardComponent(
                     };
 
                     spawn_local(async move {
-                        let Ok(request) =
-                            gloo_net::http::Request::post(&format!("{files_service_api}/upload"))
-                                .header(
-                                    "Authorization",
-                                    format!(
-                                        "Bearer {}",
-                                        store.user().auth_info().token().get_untracked()
-                                    )
-                                    .as_str(),
-                                )
-                                .body(files_form_data)
-                        else {
+                        let Ok(request) = gloo_net::http::Request::post(&format!(
+                            "{files_service_api}/upload/default"
+                        ))
+                        .header(
+                            "Authorization",
+                            format!(
+                                "Bearer {}",
+                                store.user().auth_info().token().get_untracked()
+                            )
+                            .as_str(),
+                        )
+                        .body(files_form_data) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -383,11 +382,8 @@ pub fn RatecardComponent(
                                 service_request_modal_is_open.update(|status| *status = false);
                             }
                             None => {
-                                let _handle_errors = handle_graphql_errors(
-                                    &response,
-                                    &store,
-                                    Some(&redirect_to),
-                                );
+                                let _handle_errors =
+                                    handle_graphql_errors(&response, &store, Some(&redirect_to));
                                 set_is_loading.set(false);
                             }
                         }
