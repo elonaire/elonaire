@@ -341,17 +341,18 @@ pub fn RichTextEditor(
                         return;
                     };
 
-                    if let Ok(request) =
-                        gloo_net::http::Request::post(&format!("{files_service_api}/upload"))
-                            .header(
-                                "Authorization",
-                                format!(
-                                    "Bearer {}",
-                                    store.user().auth_info().token().get_untracked()
-                                )
-                                .as_str(),
-                            )
-                            .body(files_form_data)
+                    if let Ok(request) = gloo_net::http::Request::post(&format!(
+                        "{files_service_api}/upload/default"
+                    ))
+                    .header(
+                        "Authorization",
+                        format!(
+                            "Bearer {}",
+                            store.user().auth_info().token().get_untracked()
+                        )
+                        .as_str(),
+                    )
+                    .body(files_form_data)
                     {
                         match request.send().await {
                             Ok(response) => {
@@ -367,11 +368,11 @@ pub fn RichTextEditor(
                                                         img.set_attribute(
                                                             "src",
                                                             &format!(
-                                                                "{files_service_api}/view/{}",
+                                                                "{files_service_api}/view/default/{}",
                                                                 uploaded_files
                                                                     .data
                                                                     .map(|files| files[0]
-                                                                        .file_name
+                                                                        .original_filename
                                                                         .clone())
                                                                     .unwrap_or_default()
                                                             ),
