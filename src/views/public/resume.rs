@@ -60,7 +60,7 @@ pub fn Resume() -> impl IntoView {
             skills()
                 .get()
                 .iter()
-                .filter(|skill| skill.r#type.as_ref() == Some(&UserSkillType::Technical))
+                .filter(|skill| skill.skill_type.as_ref() == Some(&UserSkillType::Technical))
                 .map(|skill| generate_panel_info(skill))
                 .collect(),
         );
@@ -68,7 +68,7 @@ pub fn Resume() -> impl IntoView {
             skills()
                 .get()
                 .iter()
-                .filter(|skill| skill.r#type.as_ref() == Some(&UserSkillType::Soft))
+                .filter(|skill| skill.skill_type.as_ref() == Some(&UserSkillType::Soft))
                 .map(|skill| generate_panel_info(skill))
                 .collect(),
         );

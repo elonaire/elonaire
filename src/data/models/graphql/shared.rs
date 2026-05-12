@@ -263,8 +263,8 @@ pub struct CreateUserSkillVars {
 pub struct UserSkillInput {
     pub name: String,
     pub description: String,
-    #[serde(rename = "type")]
-    pub r#type: UserSkillType,
+    #[serde(rename = "skillType", alias = "skill_type")]
+    pub skill_type: UserSkillType,
     pub level: UserSkillLevel,
     #[serde(rename = "startDate", alias = "start_date")]
     pub start_date: String,
@@ -279,8 +279,8 @@ pub struct UserSkill {
     pub name: Option<String>,
     pub description: Option<String>,
     pub level: Option<UserSkillLevel>,
-    #[serde(rename = "type")]
-    pub r#type: Option<UserSkillType>,
+    #[serde(rename = "skillType")]
+    pub skill_type: Option<UserSkillType>,
     #[serde(rename = "startDate")]
     pub start_date: Option<String>,
     #[serde(rename = "yearsOfExperience", alias = "years_of_experience")]
@@ -805,13 +805,15 @@ pub struct FetchBlogPostsVars {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ReactionInput {
-    pub r#type: ReactionType,
+    #[serde(rename = "reactionType")]
+    pub reaction_type: ReactionType,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct Reaction {
     pub id: String,
-    pub r#type: ReactionType,
+    #[serde(rename = "reactionType")]
+    pub reaction_type: ReactionType,
 }
 
 // enum for ReactionType
