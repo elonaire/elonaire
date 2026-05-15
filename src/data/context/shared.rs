@@ -377,13 +377,13 @@ pub async fn fetch_single_blog_post(
                         author
                         reactionCount
                         currentUserReaction {
-                            skillType
+                            reactionType
                             id
                         }
                     }
                     reactionCount
                     currentUserReaction {
-                        skillType
+                        reactionType
                         id
                     }
                     bookmarksCount
