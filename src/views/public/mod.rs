@@ -3,6 +3,7 @@ pub mod attributions;
 pub mod blog;
 pub mod contact;
 pub mod error_handler;
+pub mod errors;
 pub mod faqs;
 pub mod home;
 pub mod layout;
