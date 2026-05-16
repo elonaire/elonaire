@@ -43,6 +43,7 @@ use crate::{
                 layout::BlogLayout,
             },
             contact::Contact,
+            errors::*,
             faqs::Faqs,
             home::Home,
             layout::MainLayout,
@@ -89,7 +90,7 @@ pub fn App() -> impl IntoView {
                         }
                     >
             <Router>
-                <Routes fallback=|| "Page not found.">
+                <Routes fallback=NotFound>
                     // <Route path=StaticSegment("") view=Home />
                     <ParentRoute path=path!("") view=MainLayout>
                         <Route path=path!("/faq") view=Faqs />
@@ -172,6 +173,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/read/:slug") view=BlogPostDetail />
                         <Route path=path!("/about") view=AboutBlog />
                     </ParentRoute>
+                    <Route path=StaticSegment("/500") view=InternalServerError/>
                     <Route path=StaticSegment("/sign-in") view=SignIn/>
                     <Route path=StaticSegment("/sign-up") view=SignUp/>
                 </Routes>

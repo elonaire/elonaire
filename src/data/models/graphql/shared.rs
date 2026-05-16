@@ -673,7 +673,7 @@ pub struct FetchServiceRequestsResponse {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceRateInput {
     #[serde(rename = "baseRate", alias = "base_rate")]
-    pub base_rate: String,
+    pub base_rate: f64,
     #[serde(rename = "hourWeek", alias = "hour_week")]
     pub hour_week: Option<u8>,
 }

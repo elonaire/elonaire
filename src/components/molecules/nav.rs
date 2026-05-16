@@ -180,6 +180,10 @@ pub fn Nav(
         });
     });
 
+    Effect::new(move || {
+        leptos::logging::log!("is_authenticated: {}", is_authenticated.get());
+    });
+
     view! {
         <>
         <div class="border-b-[1px] border-light-gray dark:border-mid-gray">
