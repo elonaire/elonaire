@@ -6,10 +6,14 @@ use leptos_router::{
     components::{A, Outlet},
     hooks::use_location,
 };
+use reactive_stores::Store;
 
-use crate::components::{
-    general::hocs::permission_guard::{PermissionGuard, PermissionMatch},
-    molecules::nav::Nav,
+use crate::{
+    components::{
+        general::hocs::permission_guard::{PermissionGuard, PermissionMatch},
+        molecules::nav::Nav,
+    },
+    data::context::store::AppStateContext,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -36,6 +40,7 @@ pub fn DashboardLayout() -> impl IntoView {
     // track collapsed state
     let (collapsed, set_collapsed) = signal(false);
     let current_path = use_location().pathname;
+    let store = expect_context::<Store<AppStateContext>>();
 
     let handle_menu_click =
         move || Callback::new(move |_ev: ev::MouseEvent| set_collapsed.set(true));
