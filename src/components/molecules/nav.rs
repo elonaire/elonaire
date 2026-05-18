@@ -20,11 +20,7 @@ use crate::components::general::button::BasicButton;
 use crate::components::general::hocs::permission_guard::PermissionGuard;
 use crate::components::general::hocs::permission_guard::PermissionMatch;
 use crate::components::general::popover::Popover;
-use crate::data::context::shared::check_auth;
-use crate::data::context::shared::fetch_single_user;
 use crate::data::context::users::sign_out;
-use crate::data::models::general::acl::AuthInfo;
-use crate::data::models::graphql::acl::FetchSingleUserVars;
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
@@ -105,83 +101,6 @@ pub fn Nav(
                 let _ = class_list.add_1("dark");
             }
         }
-    });
-
-    // Effect to refresh user auth status
-    Effect::new(move |_| {
-        let store = store.clone();
-        spawn_local(async move {
-            let mut headers = HashMap::new() as HashMap<String, String>;
-            headers.insert(
-                "Authorization".into(),
-                format!(
-                    "Bearer {}",
-                    store.user().auth_info().token().get_untracked()
-                ),
-            );
-
-            let check_auth = check_auth(Some(&headers)).await;
-
-            match check_auth {
-                Ok(auth) => {
-                    store.user().auth_info().set(AuthInfo {
-                        token: auth
-                            .new_access_token
-                            .as_ref()
-                            .unwrap_or(&String::new())
-                            .to_owned(),
-                        current_role: auth.current_role.clone(),
-                        current_role_permissions: auth.current_role_permissions,
-                    });
-                    let user_id_vars = FetchSingleUserVars {
-                        user_id: auth.sub.clone(),
-                    };
-
-                    let fetch_user_info_query = r#"
-                        query FetchSingleUser($userId: String!) {
-                            fetchSingleUser(userId: $userId) {
-                                data {
-                                    firstName
-                                    middleName
-                                    lastName
-                                    gender
-                                    dob
-                                    email
-                                    country
-                                    phone
-                                    createdAt
-                                    updatedAt
-                                    oauthClient
-                                    oauthUserId
-                                    profilePicture
-                                    bio
-                                    website
-                                    address
-                                    id
-                                    fullName
-                                    age
-                                }
-                                metadata {
-                                    requestId
-                                    newAccessToken
-                                }
-                            }
-                        }
-                       "#;
-
-                    if let Ok(user_profile) =
-                        fetch_single_user(&user_id_vars, None, fetch_user_info_query).await
-                    {
-                        store.user().user_profile().set(user_profile);
-                    };
-                }
-                Err(_) => {}
-            }
-        });
-    });
-
-    Effect::new(move || {
-        leptos::logging::log!("is_authenticated: {}", is_authenticated.get());
     });
 
     view! {
@@ -270,8 +189,9 @@ pub fn Nav(
                     {move || {
                         let is_authenticated = is_authenticated.get();
                         let on_blog_page = is_blog.get();
+                        let is_dashboard = is_dashboard.get();
 
-                        ((on_blog_page && !is_authenticated)).then(|| view! {
+                        ((on_blog_page && !is_authenticated && !is_dashboard)).then(|| view! {
                             <A
                                 attr:class="hidden md:flex py-2 px-4 cursor-pointer rounded-[5px] border-2 border-primary text-primary hover:bg-primary hover:text-contrast-white font-bold text-sm"
                                 href="/sign-in"

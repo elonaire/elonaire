@@ -39,7 +39,7 @@ pub fn DashboardHome() -> impl IntoView {
     );
 
     Effect::new(move |_| {
-        let is_authenticated = !store.user().auth_info().token().get().is_empty();
+        let is_authenticated = !store.user().auth_info().token().get_untracked().is_empty();
         if !can_view.get() && is_authenticated {
             navigate("/dashboard/user/profile", Default::default());
         }
