@@ -32,6 +32,7 @@ use crate::data::{
         graphql::acl::UserLoginsInput,
     },
 };
+use crate::utils::auth::check_auth_and_update_store_auth_info;
 use crate::utils::errors::handle_graphql_errors;
 use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
@@ -75,12 +76,15 @@ pub fn SignIn() -> impl IntoView {
                     {
                         if let Ok(auth_status) = response.json::<RestResponse<AuthDetails>>().await
                         {
-                            let token = auth_status
-                                .data
-                                .map(|auth_detail| auth_detail.token.unwrap_or_default())
-                                .unwrap_or_default();
-                            leptos::logging::log!("social-sign-in token: {token}");
-                            store.user().auth_info().token().set(token);
+                            match auth_status.data {
+                                Some(auth_detail) => match auth_detail.token {
+                                    Some(token) => {
+                                        check_auth_and_update_store_auth_info(&token, &store).await;
+                                    }
+                                    None => {}
+                                },
+                                None => {}
+                            };
 
                             set_is_loading.set(false);
                         } else {
@@ -98,7 +102,6 @@ pub fn SignIn() -> impl IntoView {
     Effect::new(move || {
         let redirect_to = store.redirect_to().get();
         let is_authenticated = !store.user().auth_info().token().get().is_empty();
-        leptos::logging::log!("is_authenticated: {is_authenticated}");
         // User is authenticated, redirect to the previous page or dashboard
         if is_authenticated {
             if let Some(redirect_to) = redirect_to {
@@ -253,16 +256,18 @@ pub fn SignIn() -> impl IntoView {
                                                 set_form_is_valid.set(false);
                                             } else {
                                             }
-                                            set_is_loading.set(false);
 
-                                            store.user().auth_info().token().set(
-                                                auth_details
-                                                    .get_data()
-                                                    .token
-                                                    .as_ref()
-                                                    .unwrap_or(&String::new())
-                                                    .to_owned(),
-                                            );
+                                            match auth_details.get_data().token {
+                                                Some(token) => {
+                                                    check_auth_and_update_store_auth_info(
+                                                        &token, &store,
+                                                    )
+                                                    .await;
+                                                }
+                                                None => {}
+                                            };
+
+                                            set_is_loading.set(false);
                                         }
                                         None => {
                                             set_is_loading.set(false);

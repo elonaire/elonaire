@@ -13,10 +13,7 @@ use crate::{
         },
         molecules::{quick_action::QuickAction, stats_card::StatsCard},
     },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
+    data::context::store::AppStateContext,
     utils::hooks::use_permissions::use_permission,
 };
 
@@ -31,7 +28,6 @@ pub fn DashboardHome() -> impl IntoView {
         ..Default::default()
     }]);
     let navigate = use_navigate();
-    let store = expect_context::<Store<AppStateContext>>();
 
     let can_view = use_permission(
         &vec!["read:stats".to_string(), "write:portfolio".to_string()],
@@ -39,8 +35,7 @@ pub fn DashboardHome() -> impl IntoView {
     );
 
     Effect::new(move |_| {
-        let is_authenticated = !store.user().auth_info().token().get_untracked().is_empty();
-        if !can_view.get() && is_authenticated {
+        if !can_view.get() {
             navigate("/dashboard/user/profile", Default::default());
         }
     });
