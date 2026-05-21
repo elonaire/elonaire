@@ -11,7 +11,7 @@ use crate::{
             },
         },
     },
-    utils::{errors::LocalErrorMessage, graphql_client::LocalGraphQLErrorMessage},
+    utils::errors::LocalErrorMessage,
 };
 
 #[derive(Clone, Debug, Default, Store, PartialEq, Eq)]

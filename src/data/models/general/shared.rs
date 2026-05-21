@@ -11,9 +11,9 @@ pub struct ApiResponse<T> {
 #[derive(Clone, Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
 pub struct ApiResponseMetadata {
     #[serde(rename = "requestId", alias = "request_id")]
-    request_id: String,
+    pub request_id: String,
     #[serde(rename = "newAccessToken", alias = "new_access_token")]
-    new_access_token: Option<String>,
+    pub new_access_token: Option<String>,
 }
 
 impl<T: Sync + Send + Clone> ApiResponse<T> {
@@ -36,4 +36,5 @@ pub struct RestResponse<T> {
     pub success: bool,
     pub data: Option<T>,
     pub error: Option<LocalRestErrorMessage>,
+    pub metadata: ApiResponseMetadata,
 }

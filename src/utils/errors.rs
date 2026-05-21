@@ -1,7 +1,10 @@
 use crate::{
     data::{
         context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::shared::RestResponse,
+        models::{
+            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            general::shared::RestResponse,
+        },
     },
     utils::graphql_client::{GraphQLResponse, LocalGraphQLErrorMessage},
 };
@@ -114,5 +117,9 @@ pub fn unwrap_rest_response<T>(
         store.error().set(Some(error));
         return None;
     }
+    match body.metadata.new_access_token {
+        Some(token) => store.user().auth_info().token().set(token),
+        None => {}
+    };
     body.data
 }
