@@ -44,9 +44,8 @@ web-sys = { version = "0.3.77", features = [
 ] }
 wasm-bindgen-futures = "0.4.61"
 
-[profile.release]
-strip = true      # Automatically strip symbols from the binary.
-opt-level = 'z'   # Optimize for size
-lto = true        # Enable link-time optimization
-codegen-units = 1 # Reduce number of codegen units to increase optimizations
-panic = 'abort'   # Abort on panic
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
