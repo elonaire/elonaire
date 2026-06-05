@@ -1,6 +1,29 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::{
+            table::data_table::{Column, DataTable, TableCellData},
+            tag::LabelTag,
+        },
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            datepicker::DatePicker,
+            input::{InputField, InputFieldType},
+            radio_input::{RadioInputGroup, RadioOption},
+            reactive_form::ReactiveForm,
+            textarea::Textarea,
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+        schemas::props::ColorTemperature,
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+};
+use icondata::BsPlusLg;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,41 +33,18 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::forms::radio_input::RadioOption;
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
-use crate::components::schemas::props::ColorTemperature;
 use crate::data::context::shared::fetch_professions;
 use crate::data::models::graphql::shared::{
     CreateProfessionalDetailsResponse, ProfessionalDetailsInputVars,
 };
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            datepicker::DatePicker,
-            input::{InputField, InputFieldType},
-            radio_input::RadioInputGroup,
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-            tag::LabelTag,
-        },
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::{
+        general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+        graphql::shared::UserProfessionalInfoInput,
     },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::{
-            general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-            graphql::shared::UserProfessionalInfoInput,
-        },
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 
@@ -172,7 +172,7 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
                 <A href="/dashboard/professional-details/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />

@@ -1,19 +1,21 @@
-use icondata as IconData;
+use icondata::{
+    AiFileAddOutlined, BiBriefcaseRegular, BsPlusLg, BsVectorPen, FaUserGroupSolid,
+    RiArticleDocumentLine, RiCoinsFinanceLine,
+};
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::hooks::use_navigate;
-use reactive_stores::Store;
+
+use detaxine_ui::components::{
+    data_display::timeline::{Timeline, TimelineItem, TimelineStatus},
+    navigation::breadcrumbs::Breadcrumbs,
+};
 
 use crate::{
     components::{
-        general::{
-            breadcrumbs::Breadcrumbs,
-            hocs::permission_guard::PermissionMatch,
-            timeline::{Timeline, TimelineItem, TimelineStatus},
-        },
+        hocs::permission_guard::PermissionMatch,
         molecules::{quick_action::QuickAction, stats_card::StatsCard},
     },
-    data::context::store::AppStateContext,
     utils::hooks::use_permissions::use_permission,
 };
 
@@ -50,10 +52,10 @@ pub fn DashboardHome() -> impl IntoView {
             <h1 class="display-constraints">Dashboard Overview</h1>
 
             <div class="display-constraints grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
-                <StatsCard color="info" title="Total Projects" figures=RwSignal::new(25) icon=IconData::BiBriefcaseRegular percentage=RwSignal::new(-2) />
-                <StatsCard color="success" title="Published Posts" figures=RwSignal::new(12) icon=IconData::RiArticleDocumentLine percentage=RwSignal::new(3) />
-                <StatsCard color="warning" title="Monthly Visitors" figures=RwSignal::new(5) icon=IconData::FaUserGroupSolid percentage=RwSignal::new(-2) />
-                <StatsCard color="primary" title="Weekly Revenue" figures=RwSignal::new(2500) icon=IconData::RiCoinsFinanceLine percentage=RwSignal::new(-2) />
+                <StatsCard color="info" title="Total Projects" figures=RwSignal::new(25) icon=BiBriefcaseRegular percentage=RwSignal::new(-2) />
+                <StatsCard color="success" title="Published Posts" figures=RwSignal::new(12) icon=RiArticleDocumentLine percentage=RwSignal::new(3) />
+                <StatsCard color="warning" title="Monthly Visitors" figures=RwSignal::new(5) icon=FaUserGroupSolid percentage=RwSignal::new(-2) />
+                <StatsCard color="primary" title="Weekly Revenue" figures=RwSignal::new(2500) icon=RiCoinsFinanceLine percentage=RwSignal::new(-2) />
             </div>
             <div class="display-constraints  flex flex-col lg:flex-row">
                 <div class="flex flex-col gap-[10px] md:basis-1/2">
@@ -66,9 +68,9 @@ pub fn DashboardHome() -> impl IntoView {
                     <h3>Quick Actions</h3>
 
                     <div class="flex flex-col gap-[10px]">
-                        <QuickAction title="Create Project" description="Create a new portfolio project" color="primary" icon=IconData::BsPlusLg />
-                        <QuickAction title="New Blog Post" description="Create a new blog post" color="info" icon=IconData::BsVectorPen />
-                        <QuickAction title="Upload Media" description="Upload images and files" color="warning" icon=IconData::AiFileAddOutlined />
+                        <QuickAction title="Create Project" description="Create a new portfolio project" color="primary" icon=BsPlusLg />
+                        <QuickAction title="New Blog Post" description="Create a new blog post" color="info" icon=BsVectorPen />
+                        <QuickAction title="Upload Media" description="Upload images and files" color="warning" icon=AiFileAddOutlined />
                     </div>
                 </div>
             </div>

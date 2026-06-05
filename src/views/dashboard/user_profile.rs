@@ -1,14 +1,15 @@
+use detaxine_ui::{
+    components::actions::button::BasicButton,
+    utils::formatters::{Pipe, PipeOption},
+};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 use reactive_stores::Store;
 
-use crate::components::general::button::BasicButton;
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
     models::general::acl::UserInfoStoreFields,
 };
-use crate::utils::formatters::Pipe;
-use crate::utils::formatters::PipeOption;
 use icondata::{BsCamera, BsPencil};
 
 #[component]

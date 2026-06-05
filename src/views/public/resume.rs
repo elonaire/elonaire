@@ -1,15 +1,16 @@
+use detaxine_ui::{
+    components::{
+        content::collapse::{Collapse, PanelInfo},
+        data_display::timeline::{Timeline, TimelineItem, TimelineStatus},
+    },
+    utils::time::convert_date_to_human_readable_format,
+};
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
 use reactive_stores::Store;
 
 use crate::{
-    components::{
-        general::{
-            collapse::{Collapse, PanelInfo},
-            timeline::{Timeline, TimelineItem, TimelineStatus},
-        },
-        molecules::{headline::Headline, section_title::SectionTitle, top_nav::TopNav},
-    },
+    components::molecules::{headline::Headline, section_title::SectionTitle, top_nav::TopNav},
     data::{
         context::{
             shared::{fetch_resume, fetch_skills},
@@ -19,7 +20,6 @@ use crate::{
             UserResume, UserResumeSection, UserSkill, UserSkillLevel, UserSkillType,
         },
     },
-    utils::time::convert_date_to_human_readable_format,
 };
 
 #[component]

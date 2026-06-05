@@ -1,4 +1,4 @@
-use crate::components::general::hocs::permission_guard::PermissionMatch;
+use crate::components::hocs::permission_guard::PermissionMatch;
 use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::data::models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields};
 use leptos::prelude::*;

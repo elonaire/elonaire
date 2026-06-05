@@ -9,7 +9,7 @@ use crate::data::{
         store::{AppStateContext, AppStateContextStoreFields},
     },
     models::{
-        general::acl::{AuthInfo, AuthInfoStoreFields, UserInfoStoreFields},
+        general::acl::{AuthInfo, UserInfoStoreFields},
         graphql::acl::FetchSingleUserVars,
     },
 };

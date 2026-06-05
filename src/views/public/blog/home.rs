@@ -1,5 +1,22 @@
 use std::time::Duration;
 
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        content::carousel::Carousel,
+        data_display::{badge::Badge, chip::Chip, table::pagination::Pagination},
+        feedback::modal::modal::{BasicModal, UseCase},
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+        },
+        schemas::props::ColorTemperature,
+    },
+    utils::{
+        formatters::PipeOption,
+        forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    },
+};
 use icondata::{BsArrowLeft, BsSearch, VsSettings};
 use leptos::wasm_bindgen::JsCast;
 use leptos::{prelude::*, task::spawn_local};
@@ -7,35 +24,18 @@ use leptos_icons::Icon;
 use leptos_meta::*;
 use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent, SubmitEvent};
 
-use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::data::models::graphql::email::{
     CreateSubscriptionResponse, CreateSubscriptionVars, SubscriberInput, SubscriptionInput,
     SubscriptionInputMetadata,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::formatters::PipeOption;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
+    components::molecules::{
+        blog::{
+            blog_post::BlogPostPreview, blog_section::BlogSection, featured_post::FeaturedPost,
         },
-        general::{
-            badge::Badge,
-            button::{BasicButton, ButtonType},
-            carousel::Carousel,
-            chip::Chip,
-            table::pagination::Pagination,
-        },
-        molecules::{
-            blog::{
-                blog_post::BlogPostPreview, blog_section::BlogSection, featured_post::FeaturedPost,
-            },
-            footer::Footer,
-        },
-        schemas::props::ColorTemperature,
+        footer::Footer,
     },
     data::{
         context::{

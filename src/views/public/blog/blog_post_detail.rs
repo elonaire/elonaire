@@ -1,5 +1,20 @@
 use std::collections::HashMap;
 
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        content::richtext_editor::{ExtraFormatingOption, RichTextEditor},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::reactive_form::ReactiveForm,
+    },
+    utils::{
+        formatters::PipeOption,
+        forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    },
+};
 use icondata::{
     AiHeartFilled, BiBookmarkRegular, BiShareAltRegular, BsGithub, BsLinkedin, BsTwitterX,
     FaCommentRegular, FaFaceAngryRegular, FaFaceGrinTearsRegular, FaFaceSadTearRegular,
@@ -16,18 +31,10 @@ use leptos_router::hooks::{use_location, use_params_map};
 use reactive_stores::Store;
 use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent};
 
-use crate::components::general::button::ButtonType;
-use crate::components::general::modal::modal::{BasicModal, UseCase};
-use crate::components::general::richtext_editor::ExtraFormatingOption;
-use crate::components::general::spinner::Spinner;
 use crate::components::molecules::blog::blog_comment::CommentReactionDetails;
-use crate::components::{
-    forms::reactive_form::ReactiveForm,
-    general::{button::BasicButton, richtext_editor::RichTextEditor},
-    molecules::{
-        blog::{blog_comment::BlogComment, blog_post_metadata::BlogDetailMetadata},
-        footer::Footer,
-    },
+use crate::components::molecules::{
+    blog::{blog_comment::BlogComment, blog_post_metadata::BlogDetailMetadata},
+    footer::Footer,
 };
 use crate::data::context::shared::{fetch_single_blog_post, fetch_single_user};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
@@ -43,8 +50,6 @@ use crate::data::{
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
 use crate::utils::errors::handle_graphql_errors;
-use crate::utils::formatters::PipeOption;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");

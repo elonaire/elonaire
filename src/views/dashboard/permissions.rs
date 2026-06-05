@@ -1,6 +1,27 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::{
+            table::data_table::{Column, DataTable, TableCellData},
+            tag::LabelTag,
+        },
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+        schemas::props::ColorTemperature,
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+};
+use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,37 +31,17 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::forms::select::{SelectInput, SelectOption};
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
-use crate::components::general::tag::LabelTag;
-use crate::components::schemas::props::ColorTemperature;
 use crate::data::context::shared::{fetch_permissions, fetch_resources};
 use crate::data::models::graphql::acl::{
     AdminPrivilege, CreatePermissionResponse, CreatePermissionVars, PermissionInput,
     PermissionMetadata,
 };
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+};
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-};
 
 const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
 
@@ -177,7 +178,7 @@ pub fn PermissionsList() -> impl IntoView {
                 <A href="/dashboard/permissions/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />

@@ -1,3 +1,14 @@
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        feedback::spinner::Spinner,
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+        },
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+};
 use icondata::{AiGithubOutlined, AiGoogleOutlined};
 use leptos::ev;
 use leptos::prelude::*;
@@ -11,16 +22,6 @@ use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 use web_sys::window;
 
-use crate::components::{
-    forms::{
-        input::{InputField, InputFieldType},
-        reactive_form::ReactiveForm,
-    },
-    general::{
-        button::{BasicButton, ButtonType},
-        spinner::Spinner,
-    },
-};
 use crate::data::models::general::acl::OauthClientName;
 use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::acl::SignInResponse;
@@ -34,7 +35,6 @@ use crate::data::{
 };
 use crate::utils::auth::check_auth_and_update_store_auth_info;
 use crate::utils::errors::handle_graphql_errors;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::views::public::error_handler::ErrorHandler;
 

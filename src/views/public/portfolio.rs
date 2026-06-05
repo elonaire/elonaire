@@ -1,3 +1,4 @@
+use detaxine_ui::components::navigation::tabs::{Tab, TabLabel, Tabs};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos_meta::*;
@@ -9,10 +10,7 @@ use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::data::models::graphql::shared::UserPortfolio;
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::{
-    components::{
-        general::tabs::{Tab, TabLabel, Tabs},
-        molecules::{headline::Headline, top_nav::TopNav},
-    },
+    components::molecules::{headline::Headline, top_nav::TopNav},
     data::models::graphql::shared::UserPortfolioCategory,
 };
 

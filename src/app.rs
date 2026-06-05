@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
 use leptos_router::{
@@ -10,18 +8,10 @@ use leptos_router::{
 use reactive_stores::Store;
 
 use crate::{
-    components::{
-        general::hocs::protected_route::ProtectedRoute, molecules::cookie_banner::CookieBanner,
-    },
+    components::{hocs::protected_route::ProtectedRoute, molecules::cookie_banner::CookieBanner},
     data::{
-        context::{
-            shared::{check_auth, fetch_single_user},
-            store::{AppStateContext, AppStateContextStoreFields},
-        },
-        models::{
-            general::acl::{AuthInfo, AuthInfoStoreFields, UserInfoStoreFields},
-            graphql::acl::FetchSingleUserVars,
-        },
+        context::store::{AppStateContext, AppStateContextStoreFields},
+        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
     },
     utils::auth::check_auth_and_update_store_auth_info,
     views::{

@@ -1,6 +1,25 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::table::data_table::{Column, DataTable, TableCellData},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            datepicker::DatePicker,
+            input::{CustomFileInput, InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{CustomSelectInput, SelectInput, SelectOption},
+            textarea::Textarea,
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+};
+use icondata::BsPlusLg;
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,48 +29,27 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::select::CustomSelectInput;
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_portfolio;
 use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::shared::{
     CreatePortfolioItemResponse, UserPortfolioCategory, UserPortfolioInputVars,
 };
+use crate::data::{
+    context::{
+        shared::fetch_skills,
+        store::{AppStateContext, AppStateContextStoreFields},
+    },
+    models::{
+        general::{
+            acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            files::UploadedFileResponse,
+        },
+        graphql::shared::UserPortfolioInput,
+    },
+};
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::errors::unwrap_rest_response;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            datepicker::DatePicker,
-            input::{CustomFileInput, InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-            select::{SelectInput, SelectOption},
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::{
-            shared::fetch_skills,
-            store::{AppStateContext, AppStateContextStoreFields},
-        },
-        models::{
-            general::{
-                acl::{AuthInfoStoreFields, UserInfoStoreFields},
-                files::UploadedFileResponse,
-            },
-            graphql::shared::UserPortfolioInput,
-        },
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-};
 
 const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
@@ -188,7 +186,7 @@ pub fn PortfolioList() -> impl IntoView {
                 <A href="/dashboard/portfolio/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />

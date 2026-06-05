@@ -15,11 +15,12 @@ use reactive_stores::Store;
 use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
 
-use crate::components::forms::toggle_switch::ToggleSwitch;
-use crate::components::general::button::BasicButton;
-use crate::components::general::hocs::permission_guard::PermissionGuard;
-use crate::components::general::hocs::permission_guard::PermissionMatch;
-use crate::components::general::popover::Popover;
+use detaxine_ui::components::{
+    actions::button::BasicButton, feedback::popover::Popover, forms::toggle_switch::ToggleSwitch,
+};
+
+use crate::components::hocs::permission_guard::PermissionGuard;
+use crate::components::hocs::permission_guard::PermissionMatch;
 use crate::data::context::users::sign_out;
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
@@ -151,19 +152,21 @@ pub fn Nav(
                     })}
 
                     // Dark mode toggle — desktop only
-                    <div class="hidden md:flex items-center gap-[5px]">
-                        <ToggleSwitch
-                            active=dark_mode_signal
-                            label_active=""
-                            label_inactive=""
-                            on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
-                            id_attr="dark_mode_toggle"
-                        />
-                        {move || {
-                            let icon = if dark_mode_is_active.get() { BsMoon } else { BsSun };
-                            view! { <Icon icon=icon /> }
-                        }}
-                    </div>
+                    {move || {
+                        let is_dark = dark_mode_is_active.get();
+                        let icon = if is_dark { BsMoon } else { BsSun };
+                        view! {
+                            <div class="hidden md:flex items-center gap-[5px]">
+                                <ToggleSwitch
+                                    initial_active_state=is_dark
+                                    on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
+                                    id_attr="dark_mode_toggle"
+                                />
+
+                            </div>
+                            <Icon icon=icon />
+                        }
+                    }}
 
                     // CTA — desktop, public only
                     {move || (!is_dashboard.get() && !is_blog.get()).then(|| view! {

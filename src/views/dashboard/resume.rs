@@ -1,5 +1,23 @@
 use std::collections::HashMap;
 
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::table::data_table::{Column, DataTable, TableCellData},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            datepicker::DatePicker,
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+};
 use icondata::BsPlusLg;
 use icondata::TbAwardOff;
 use leptos::ev::{self, SubmitEvent};
@@ -12,35 +30,16 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::select::{SelectInput, SelectOption};
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_resume;
 use crate::data::models::graphql::shared::{
     CreateResumeItemResponse, ResumeItemInputVars, UserResumeInput, UserResumeSection,
 };
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+};
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            datepicker::DatePicker,
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-};
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 

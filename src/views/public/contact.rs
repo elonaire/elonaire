@@ -1,3 +1,16 @@
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        feedback::modal::modal::{BasicModal, UseCase},
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+            textarea::Textarea,
+        },
+    },
+    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+};
 use icondata::{BsEnvelope, BsGithub, BsLinkedin, BsPerson, BsSend, BsTwitterX};
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
@@ -6,17 +19,10 @@ use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::{HtmlFormElement, SubmitEvent};
 
-use crate::components::forms::input::{InputField, InputFieldType};
-use crate::components::forms::reactive_form::ReactiveForm;
-use crate::components::forms::select::{SelectInput, SelectOption};
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::button::{BasicButton, ButtonType};
-use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::data::models::graphql::shared::{
     MessageInput, SendMessageResponse, SendMessageVars, Subject,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");

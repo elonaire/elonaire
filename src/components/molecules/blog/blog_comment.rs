@@ -1,5 +1,6 @@
 use chrono::Utc;
 
+use detaxine_ui::{components::actions::button::BasicButton, utils::time::get_elapsed_time};
 use icondata::{
     AiHeartFilled, FaCommentRegular, FaFaceAngryRegular, FaFaceGrinTearsRegular,
     FaFaceSadTearRegular, FaFaceSurpriseRegular, IoStatsChart, LuThumbsDown, LuThumbsUp,
@@ -9,10 +10,7 @@ use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
 use web_sys::MouseEvent;
 
-use crate::{
-    components::general::button::BasicButton, data::models::graphql::shared::ReactionType,
-    utils::time::get_elapsed_time,
-};
+use crate::data::models::graphql::shared::ReactionType;
 
 #[derive(Clone, Debug)]
 pub struct CommentReactionDetails {

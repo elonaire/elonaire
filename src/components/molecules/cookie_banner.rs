@@ -1,7 +1,6 @@
+use detaxine_ui::components::forms::toggle_switch::ToggleSwitch;
 use leptos::prelude::*;
 use web_sys::{Storage, window};
-
-use crate::components::forms::toggle_switch::ToggleSwitch;
 
 const COOKIE_PREFS_KEY: &str = "cookie_preferences";
 
@@ -134,27 +133,52 @@ pub fn CookieBanner(
                             <CookieRow
                                 label="Necessary"
                                 description="Required for login sessions and core site functionality. Cannot be disabled."
-                                is_active=RwSignal::new(true)
+                                is_active=true
                                 readonly=true
                             />
-                            <CookieRow
-                                label="Analytics"
-                                description="Helps us understand how visitors interact with the site."
-                                is_active=analytics
-                                readonly=false
-                            />
-                            <CookieRow
-                                label="Marketing"
-                                description="Used to deliver personalised advertisements."
-                                is_active=marketing
-                                readonly=false
-                            />
-                            <CookieRow
-                                label="Preferences"
-                                description="Remembers your settings and personalisation choices."
-                                is_active=preferences
-                                readonly=false
-                            />
+                            {move || {
+                                let received_analytics = analytics.get();
+                                view!{
+                                    <CookieRow
+                                        label="Analytics"
+                                        description="Helps us understand how visitors interact with the site."
+                                        is_active=received_analytics
+                                        readonly=false
+                                        on:change=move |_| {
+                                            analytics.update(|v| *v = !*v);
+                                        }
+                                    />
+                                }
+                            }}
+                            {move || {
+                                let received_marketing = marketing.get();
+                                view!{
+                                    <CookieRow
+                                        label="Marketing"
+                                        description="Used to deliver personalised advertisements."
+                                        is_active=received_marketing
+                                        readonly=false
+                                        on:change=move |_| {
+                                            marketing.update(|v| *v = !*v);
+                                        }
+                                    />
+                                }
+                            }}
+                            {move || {
+                                let received_preferences = preferences.get();
+                                view!{
+                                    <CookieRow
+                                        label="Preferences"
+                                        description="Remembers your settings and personalisation choices."
+                                        is_active=received_preferences
+                                        readonly=false
+                                        on:change=move |_| {
+                                            preferences.update(|v| *v = !*v);
+                                        }
+                                    />
+                                }
+                            }}
+
                         </div>
                     </Show>
 
@@ -203,7 +227,7 @@ pub fn CookieBanner(
 fn CookieRow(
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] description: String,
-    is_active: RwSignal<bool>,
+    is_active: bool,
     readonly: bool,
 ) -> impl IntoView {
     let id = format!("cookie-toggle-{}", label.to_lowercase());
@@ -216,15 +240,10 @@ fn CookieRow(
             </div>
             <div class=move || if readonly { "opacity-40 pointer-events-none flex-shrink-0" } else { "flex-shrink-0" }>
                 <ToggleSwitch
-                    active=is_active
+                    initial_active_state=is_active
                     label_active=""
                     label_inactive=""
                     id_attr=id.clone()
-                    on:change=move |_| {
-                        if !readonly {
-                            is_active.update(|v| *v = !*v);
-                        }
-                    }
                     readonly=readonly
                 />
             </div>

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,43 +10,44 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::textarea::Textarea;
-use crate::components::forms::toggle_switch::ToggleSwitch;
-use crate::components::general::richtext_editor::{ExtraFormatingOption, RichTextEditor};
-use crate::components::general::spinner::Spinner;
-use crate::data::models::general::shared::RestResponse;
-use crate::data::models::graphql::shared::{
-    BlogCategory, BlogStatus, CreateBlogPostResponse, CreateBlogPostVars,
-};
-use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::errors::unwrap_rest_response;
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
+use detaxine_ui::{
     components::{
+        actions::button::{BasicButton, ButtonType},
+        content::richtext_editor::{ExtraFormatingOption, RichTextEditor},
+        data_display::table::data_table::{Column, DataTable},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
         forms::{
             input::{CustomFileInput, InputField, InputFieldType},
             reactive_form::ReactiveForm,
             select::{SelectInput, SelectOption},
+            textarea::Textarea,
+            toggle_switch::ToggleSwitch,
         },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::{
-            general::{
-                acl::{AuthInfoStoreFields, UserInfoStoreFields},
-                files::UploadedFileResponse,
-            },
-            graphql::shared::BlogPostInput,
-        },
+        navigation::breadcrumbs::Breadcrumbs,
     },
     utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
+
+use crate::data::models::general::shared::RestResponse;
+use crate::data::models::graphql::shared::{
+    BlogCategory, BlogStatus, CreateBlogPostResponse, CreateBlogPostVars,
+};
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::{
+        general::{
+            acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            files::UploadedFileResponse,
+        },
+        graphql::shared::BlogPostInput,
+    },
+};
+use crate::utils::custom_traits::EnumerableEnum;
+use crate::utils::errors::unwrap_rest_response;
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
@@ -89,7 +90,7 @@ pub fn BlogList() -> impl IntoView {
                 <A href="/dashboard/blog/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />
@@ -113,8 +114,6 @@ pub fn CreateBlog() -> impl IntoView {
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
     let (is_loading, set_is_loading) = signal(false);
-    let (is_premium, set_is_premium) = signal(false);
-    let (is_featured, set_is_featured) = signal(false);
     let blog_statuses = RwSignal::new(
         BlogStatus::variants_slice()
             .iter()
@@ -371,8 +370,7 @@ pub fn CreateBlog() -> impl IntoView {
                        label_inactive="Free"
                        name="is_premium"
                        id_attr="is_premium"
-                       active=is_premium
-                       on:change=move |_| set_is_premium.set(!is_premium.get())
+                       initial_active_state=false
                     />
 
                     <ToggleSwitch
@@ -380,8 +378,7 @@ pub fn CreateBlog() -> impl IntoView {
                           label_inactive="Not Featured"
                           name="is_featured"
                           id_attr="is_featured"
-                          active=is_featured
-                          on:change=move |_| set_is_featured.set(!is_featured.get())
+                          initial_active_state=false
                     />
                     <CustomFileInput input_node_ref=thumbnail_file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <RichTextEditor name="content" extra_formating_options=vec![ExtraFormatingOption::InlineCode, ExtraFormatingOption::CodeBlock, ExtraFormatingOption::MarkdownUpload, ExtraFormatingOption::ImageUpload, ExtraFormatingOption::Lists, ExtraFormatingOption::Heading] />

@@ -1,7 +1,5 @@
-use crate::components::general::stepper::{Step, StepInfo, Stepper};
 use crate::data::models::general::shared::RestResponse;
 use crate::utils::errors::{handle_graphql_errors, unwrap_rest_response};
-use crate::utils::formatters::{Pipe, PipeOption};
 use crate::views::public::error_handler::ErrorHandler;
 use std::collections::HashMap;
 
@@ -15,17 +13,29 @@ use leptos_router::hooks::use_location;
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement, HtmlSelectElement, SubmitEvent};
 
-use crate::components::forms::checkbox::CheckboxInputField;
-use crate::components::forms::datepicker::DatePicker;
-use crate::components::forms::input::{CustomFileInput, InputField, InputFieldType};
-use crate::components::forms::reactive_form::ReactiveForm;
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::modal::modal::{BasicModal, UseCase};
-use crate::components::general::spinner::Spinner;
-use crate::components::{
-    forms::select::{SelectInput, SelectOption},
-    general::button::BasicButton,
+use detaxine_ui::{
+    components::{
+        actions::button::BasicButton,
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            checkbox::CheckboxInputField,
+            datepicker::DatePicker,
+            input::{CustomFileInput, InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+            textarea::Textarea,
+        },
+        navigation::stepper::{Step, StepInfo, Stepper},
+    },
+    utils::{
+        formatters::{Pipe, PipeOption},
+        forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    },
 };
+
 use crate::data::context::shared::fetch_billing_rate;
 use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::data::models::general::{
@@ -38,7 +48,6 @@ use crate::data::models::graphql::shared::{
     UserService,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");

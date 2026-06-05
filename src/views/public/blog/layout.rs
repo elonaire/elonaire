@@ -1,3 +1,4 @@
+use detaxine_ui::components::forms::toggle_switch::ToggleSwitch;
 use icondata::{AiHomeOutlined, BsInfoCircle, BsMoon, BsRss, BsSun, IoClose};
 use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
@@ -9,7 +10,7 @@ use leptos_router::{
 use reactive_stores::Store;
 
 use crate::{
-    components::{forms::toggle_switch::ToggleSwitch, molecules::nav::Nav},
+    components::molecules::nav::Nav,
     data::{
         context::store::{AppStateContext, AppStateContextStoreFields},
         models::general::acl::UserInfoStoreFields,
@@ -22,7 +23,6 @@ pub fn BlogLayout() -> impl IntoView {
     let store = expect_context::<Store<AppStateContext>>();
     let user_auth = store.user().auth_info();
     let dark_mode_is_active = store.dark_mode_is_active();
-    let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     // track collapsed state
     let (collapsed, set_collapsed) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -125,24 +125,23 @@ pub fn BlogLayout() -> impl IntoView {
                                     <div class="flex items-center h-[40px] border-b border-light-gray">
                                         <p class="font-medium text-xs">PREFERENCES</p>
                                     </div>
-                                    <div class="flex md:hidden items-center gap-[5px]">
-                                        <ToggleSwitch
-                                        active=dark_mode_signal
-                                        label_active=""
-                                        label_inactive=""
-                                        on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
-                                        />
-                                        {
-                                            move || {
-                                                let icon = if !dark_mode_is_active.get() { BsSun } else { BsMoon };
+                                    {
+                                        move || {
+                                            let is_dark = dark_mode_is_active.get();
+                                            let icon = if !is_dark { BsSun } else { BsMoon };
 
-                                                view! {
+                                            view! {
+                                                <div class="flex md:hidden items-center gap-[5px]">
+                                                    <ToggleSwitch
+                                                    initial_active_state=is_dark
+                                                    label_active=""
+                                                    label_inactive=""
+                                                    />
                                                     <Icon icon=icon />
-                                                }
+                                                </div>
                                             }
                                         }
-
-                                    </div>
+                                    }
                                 </div>
                             </div>
                         })

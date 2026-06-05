@@ -87,7 +87,7 @@ background = true
 command = [
   "bash",
   "-c",
-  "set -a && source .env && set +a && exec trunk serve"
+  "set -a && source .env && set +a && exec trunk serve --dist dist"
 ]
 need_stdout = true
 allow_warnings = true
