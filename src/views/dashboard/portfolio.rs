@@ -17,10 +17,10 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::{deserialize_form, get_form_data_from_form_ref},
 };
 use icondata::BsPlusLg;
-use leptos::ev::{self, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -213,7 +213,6 @@ pub fn CreatePortfolio() -> impl IntoView {
     let skills_select_options = RwSignal::new(vec![] as Vec<SelectOption>);
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
     let portfolio_categories = RwSignal::new(
@@ -309,9 +308,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form_data_to_struct::<UserPortfolioInput>(
-                                &form_data, false, None,
-                            )
+                            deserialize_form::<UserPortfolioInput>(&form_ref, false, None)
                         else {
                             set_is_loading.set(false);
                             return;
@@ -390,9 +387,9 @@ pub fn CreatePortfolio() -> impl IntoView {
         }
     });
 
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
+    // let onreset_handler = Callback::new(move |_ev: ev::Event| {
+    //     init_date.set(None);
+    // });
 
     Effect::new(move || {
         skills().get().iter().for_each(|skill| {
@@ -455,12 +452,12 @@ pub fn CreatePortfolio() -> impl IntoView {
 
             <h1 class="display-constraints">Create New Portfolio Project</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <Textarea label="Description" required=true id_attr="description" name="description" />
-                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <DatePicker label="End Date" required=true id_attr="end_date" initial_value=init_date name="end_date" />
+                    <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                    <DatePicker label="End Date" required=true id_attr="end_date" name="end_date" />
                     <InputField field_type=InputFieldType::Text label="Link" required=true id_attr="link" name="link" />
                     <SelectInput
                     label="Category"

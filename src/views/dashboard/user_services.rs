@@ -15,7 +15,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::{deserialize_form, get_form_data_from_form_ref},
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -252,9 +252,7 @@ pub fn CreateUserService() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form_data_to_struct::<UserServiceInput>(
-                                &form_data, false, None,
-                            )
+                            deserialize_form::<UserServiceInput>(&form_ref, false, None)
                         else {
                             set_is_loading.set(false);
                             return;

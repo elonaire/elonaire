@@ -9,7 +9,7 @@ use detaxine_ui::{
             textarea::Textarea,
         },
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::{BsEnvelope, BsGithub, BsLinkedin, BsPerson, BsSend, BsTwitterX};
 use leptos::prelude::*;
@@ -29,7 +29,6 @@ const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 
 #[component]
 pub fn Contact() -> impl IntoView {
-    let (collapsed, set_collapsed) = signal(false);
     let contact_form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -50,13 +49,8 @@ pub fn Contact() -> impl IntoView {
             if ev.submitter().is_some() && form_is_valid.get() {
                 set_is_loading.set(true);
                 spawn_local(async move {
-                    let Some(form_data) = get_form_data_from_form_ref(&contact_form_ref) else {
-                        set_is_loading.set(false);
-                        return;
-                    };
-
                     let Some(message) =
-                        deserialize_form_data_to_struct::<MessageInput>(&form_data, false, None)
+                        deserialize_form::<MessageInput>(&contact_form_ref, false, None)
                     else {
                         set_is_loading.set(false);
                         return;

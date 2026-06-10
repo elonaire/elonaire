@@ -14,7 +14,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -173,88 +173,79 @@ pub fn CreateOrganization() -> impl IntoView {
         if main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                        OrganizationInput,
-                    >(
-                        &main_form_data, false, None
-                    );
+                let deserialized_main_form_data =
+                    deserialize_form::<OrganizationInput>(&form_ref, false, None);
 
-                    if deserialized_main_form_data.is_none() {
-                        set_is_loading.set(false);
-                        return;
-                    }
+                if deserialized_main_form_data.is_none() {
+                    set_is_loading.set(false);
+                    return;
+                }
 
-                    let deserialized_main_form_data = deserialized_main_form_data.unwrap();
+                let deserialized_main_form_data = deserialized_main_form_data.unwrap();
 
-                    let input_vars = CreateOrganizationVars {
-                        organization_input: deserialized_main_form_data,
-                    };
+                let input_vars = CreateOrganizationVars {
+                    organization_input: deserialized_main_form_data,
+                };
 
-                    let query = r#"
-                           mutation CreateOrganization($organizationInput: OrganizationInput!) {
-                                createOrganization(organizationInput: $organizationInput) {
-                                    data {
-                                        orgName
-                                        createdAt
-                                        updatedAt
-                                        id
-                                        createdBy
-                                    }
-                                    metadata {
-                                        newAccessToken
-                                        requestId
-                                    }
+                let query = r#"
+                       mutation CreateOrganization($organizationInput: OrganizationInput!) {
+                            createOrganization(organizationInput: $organizationInput) {
+                                data {
+                                    orgName
+                                    createdAt
+                                    updatedAt
+                                    id
+                                    createdBy
                                 }
-                           }
-                       "#;
-
-                    let mut headers = HashMap::new() as HashMap<String, String>;
-                    headers.insert(
-                        "Authorization".into(),
-                        format!(
-                            "Bearer {}",
-                            store.user().auth_info().token().get_untracked()
-                        ),
-                    );
-
-                    let Some(acl_service_api) = ACL_SERVICE_API else {
-                        return;
-                    };
-
-                    let response = perform_mutation_or_query_with_vars::<
-                        CreateOrganizationResponse,
-                        CreateOrganizationVars,
-                    >(
-                        Some(&headers), acl_service_api, query, input_vars
-                    )
-                    .await;
-
-                    match response.get_data() {
-                        Some(_data) => {
-                            if let Some(form) = form_ref
-                                .get_untracked()
-                                .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                            {
-                                form.reset();
-                                set_main_form_is_valid.set(false);
-                            } else {
+                                metadata {
+                                    newAccessToken
+                                    requestId
+                                }
                             }
+                       }
+                   "#;
 
-                            set_is_loading.set(false);
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
 
-                            success_modal_is_open.update(|status| *status = true);
+                let Some(acl_service_api) = ACL_SERVICE_API else {
+                    return;
+                };
+
+                let response = perform_mutation_or_query_with_vars::<
+                    CreateOrganizationResponse,
+                    CreateOrganizationVars,
+                >(Some(&headers), acl_service_api, query, input_vars)
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_main_form_is_valid.set(false);
+                        } else {
                         }
-                        None => {
-                            set_is_loading.set(false);
-                        }
-                    };
+
+                        set_is_loading.set(false);
+
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }
     });
-
-    Effect::new(move || {});
 
     let handle_main_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();

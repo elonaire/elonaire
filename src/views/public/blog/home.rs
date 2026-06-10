@@ -12,10 +12,7 @@ use detaxine_ui::{
         },
         schemas::props::ColorTemperature,
     },
-    utils::{
-        formatters::PipeOption,
-        forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-    },
+    utils::{formatters::PipeOption, forms::deserialize_form},
 };
 use icondata::{BsArrowLeft, BsSearch, VsSettings};
 use leptos::wasm_bindgen::JsCast;
@@ -277,13 +274,8 @@ pub fn BlogHome() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let Some(form_data) = get_form_data_from_form_ref(&subscription_form_ref) else {
-                    set_is_loading.set(false);
-                    return;
-                };
-
                 let Some(deserialized_form_data) =
-                    deserialize_form_data_to_struct::<SubscriberInput>(&form_data, false, None)
+                    deserialize_form::<SubscriberInput>(&subscription_form_ref, false, None)
                 else {
                     set_is_loading.set(false);
                     return;

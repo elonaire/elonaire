@@ -17,10 +17,10 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::{deserialize_form, get_form_data_from_form_ref},
 };
 use icondata::BsPlusLg;
-use leptos::ev::{self, SubmitEvent};
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -204,7 +204,6 @@ pub fn CreateSkill() -> impl IntoView {
     let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
     let user_skill_levels = RwSignal::new(
         UserSkillLevel::variants_slice()
@@ -307,9 +306,7 @@ pub fn CreateSkill() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form_data_to_struct::<UserSkillInput>(
-                                &form_data, false, None,
-                            )
+                            deserialize_form::<UserSkillInput>(&form_ref, false, None)
                         else {
                             set_is_loading.set(false);
                             return;
@@ -383,9 +380,9 @@ pub fn CreateSkill() -> impl IntoView {
     });
 
     // This is to force the form to reset the date input
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
+    // let onreset_handler = Callback::new(move |_ev: ev::Event| {
+    //     init_date.set(None);
+    // });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
@@ -428,7 +425,7 @@ pub fn CreateSkill() -> impl IntoView {
 
             <h1 class="display-constraints">Create New Skill</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Name" required=true id_attr="name" name="name" />
                     <Textarea label="Description" required=true id_attr="description" name="description" />
@@ -448,7 +445,7 @@ pub fn CreateSkill() -> impl IntoView {
                     placeholder="Select Level"
                     options=user_skill_levels
                     />
-                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
+                    <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
                     <CustomFileInput input_node_ref=file_input_ref label="Thumbnail" name="thumbnail" id_attr="thumbnail" accept="image/*" required=true />
                     <BasicButton
                         button_text="Submit"

@@ -63,7 +63,6 @@ pub fn Nav(
     let store = expect_context::<Store<AppStateContext>>();
     let user_profile = store.user().user_profile();
     let dark_mode_is_active = store.dark_mode_is_active();
-    let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     let navigate = use_navigate();
     // To this — so it only tracks one signal:
     let token = store.user().auth_info().token();

@@ -10,7 +10,7 @@ use detaxine_ui::{
             reactive_form::ReactiveForm,
         },
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::{AiGithubOutlined, AiGoogleOutlined};
 use leptos::ev;
@@ -103,7 +103,6 @@ pub fn SignUp() -> impl IntoView {
     });
 
     let navigate_effect = navigate.clone();
-    let navigate_submit = navigate.clone();
 
     Effect::new(move || {
         if is_authenticated.get() {
@@ -197,13 +196,8 @@ pub fn SignUp() -> impl IntoView {
                 if let Some(_submitter) = ev.submitter() {
                     set_is_loading.set(true);
                     spawn_local(async move {
-                        let Some(form_data) = get_form_data_from_form_ref(&signup_form_ref) else {
-                            set_is_loading.set(false);
-                            return;
-                        };
-
                         let Some(deserialized) =
-                            deserialize_form_data_to_struct::<UserInput>(&form_data, true, None)
+                            deserialize_form::<UserInput>(&signup_form_ref, true, None)
                         else {
                             set_is_loading.set(false);
                             return;
@@ -292,13 +286,8 @@ pub fn SignUp() -> impl IntoView {
         let Some(confirmed_password) = confirm_password_value.get() else {
             return;
         };
-        let Some(form_data) = get_form_data_from_form_ref(&signup_form_ref) else {
-            return;
-        };
 
-        let Some(deserialized) =
-            deserialize_form_data_to_struct::<UserInput>(&form_data, true, None)
-        else {
+        let Some(deserialized) = deserialize_form::<UserInput>(&signup_form_ref, true, None) else {
             return;
         };
 

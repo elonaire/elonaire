@@ -15,7 +15,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -192,86 +192,80 @@ pub fn CreateServiceRate() -> impl IntoView {
         {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                        ServiceRateInput,
-                    >(
-                        &main_form_data, false, None
-                    );
+                let deserialized_main_form_data =
+                    deserialize_form::<ServiceRateInput>(&form_ref, false, None);
 
-                    if deserialized_main_form_data.is_none() {
-                        set_is_loading.set(false);
-                        return;
-                    }
+                if deserialized_main_form_data.is_none() {
+                    set_is_loading.set(false);
+                    return;
+                }
 
-                    let deserialized_main_form_data = deserialized_main_form_data.unwrap();
+                let deserialized_main_form_data = deserialized_main_form_data.unwrap();
 
-                    let input_vars = CreateServiceRateVars {
-                        service_rate_input: deserialized_main_form_data,
-                        service_rate_input_metadata: ServiceRateInputMetadata {
-                            service_id: selected_services_options.get_untracked().join(","),
-                            currency_id: selected_currency_options.get_untracked().join(","),
-                        },
-                    };
+                let input_vars = CreateServiceRateVars {
+                    service_rate_input: deserialized_main_form_data,
+                    service_rate_input_metadata: ServiceRateInputMetadata {
+                        service_id: selected_services_options.get_untracked().join(","),
+                        currency_id: selected_currency_options.get_untracked().join(","),
+                    },
+                };
 
-                    let query = r#"
-                           mutation CreateServiceRate($serviceRateInput: ServiceRateInput!, $serviceRateInputMetadata: ServiceRateInputMetadata!) {
-                                createServiceRate(serviceRateInput: $serviceRateInput, serviceRateInputMetadata: $serviceRateInputMetadata) {
-                                   data {
-                                        hourWeek
-                                        createdAt
-                                        updatedAt
-                                        id
-                                        baseRate
-                                   }
-                                   metadata {
-                                        newAccessToken
-                                        requestId
-                                   }
+                let query = r#"
+                       mutation CreateServiceRate($serviceRateInput: ServiceRateInput!, $serviceRateInputMetadata: ServiceRateInputMetadata!) {
+                            createServiceRate(serviceRateInput: $serviceRateInput, serviceRateInputMetadata: $serviceRateInputMetadata) {
+                               data {
+                                    hourWeek
+                                    createdAt
+                                    updatedAt
+                                    id
+                                    baseRate
+                               }
+                               metadata {
+                                    newAccessToken
+                                    requestId
                                }
                            }
-                       "#;
+                       }
+                   "#;
 
-                    let mut headers = HashMap::new() as HashMap<String, String>;
-                    headers.insert(
-                        "Authorization".into(),
-                        format!(
-                            "Bearer {}",
-                            store.user().auth_info().token().get_untracked()
-                        ),
-                    );
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
 
-                    let Some(shared_service_api) = SHARED_SERVICE_API else {
-                        return;
-                    };
+                let Some(shared_service_api) = SHARED_SERVICE_API else {
+                    return;
+                };
 
-                    let response = perform_mutation_or_query_with_vars::<
+                let response =
+                    perform_mutation_or_query_with_vars::<
                         CreateServiceRateResponse,
                         CreateServiceRateVars,
-                    >(
-                        Some(&headers), shared_service_api, query, input_vars
-                    )
+                    >(Some(&headers), shared_service_api, query, input_vars)
                     .await;
 
-                    match response.get_data() {
-                        Some(_data) => {
-                            if let Some(form) = form_ref
-                                .get_untracked()
-                                .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                            {
-                                form.reset();
-                                set_main_form_is_valid.set(false);
-                            } else {
-                            }
-
-                            set_is_loading.set(false);
-
-                            success_modal_is_open.update(|status| *status = true);
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_main_form_is_valid.set(false);
+                        } else {
                         }
-                        None => {
-                            set_is_loading.set(false);
-                        }
-                    };
+
+                        set_is_loading.set(false);
+
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }

@@ -18,7 +18,7 @@ use detaxine_ui::{
         navigation::breadcrumbs::Breadcrumbs,
         schemas::props::ColorTemperature,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -225,79 +225,75 @@ pub fn CreateUser() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data =
-                        deserialize_form_data_to_struct::<UserInput>(&form_data, true, None);
+                let deserialized_form_data = deserialize_form::<UserInput>(&form_ref, true, None);
 
-                    if deserialized_form_data.is_none() {
-                        set_is_loading.set(false);
-                        return;
-                    }
+                if deserialized_form_data.is_none() {
+                    set_is_loading.set(false);
+                    return;
+                }
 
-                    let deserialized_form_data = deserialized_form_data.unwrap_or_default();
+                let deserialized_form_data = deserialized_form_data.unwrap_or_default();
 
-                    let input_vars = SignUpVars {
-                        user: deserialized_form_data,
-                    };
+                let input_vars = SignUpVars {
+                    user: deserialized_form_data,
+                };
 
-                    let query = r#"
-                           mutation SignUp($user: UserInput!) {
-                                signUp(user: $user) {
-                                    data {
-                                        id
-                                        fullName
-                                        email
-                                        status
-                                        oauthClient
-                                    }
-                                    metadata {
-                                        newAccessToken
-                                        requestId
-                                    }
+                let query = r#"
+                       mutation SignUp($user: UserInput!) {
+                            signUp(user: $user) {
+                                data {
+                                    id
+                                    fullName
+                                    email
+                                    status
+                                    oauthClient
                                 }
-                           }
-                       "#;
-
-                    let mut headers = HashMap::new() as HashMap<String, String>;
-                    headers.insert(
-                        "Authorization".into(),
-                        format!(
-                            "Bearer {}",
-                            store.user().auth_info().token().get_untracked()
-                        ),
-                    );
-
-                    let Some(acl_service_api) = ACL_SERVICE_API else {
-                        return;
-                    };
-
-                    let response =
-                        perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
-                            Some(&headers),
-                            acl_service_api,
-                            query,
-                            input_vars,
-                        )
-                        .await;
-
-                    match response.get_data() {
-                        Some(_data) => {
-                            if let Some(form) = form_ref
-                                .get_untracked()
-                                .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                            {
-                                form.reset();
-                                set_form_is_valid.set(false);
-                            } else {
+                                metadata {
+                                    newAccessToken
+                                    requestId
+                                }
                             }
-                            set_is_loading.set(false);
+                       }
+                   "#;
 
-                            success_modal_is_open.update(|status| *status = true);
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
+
+                let Some(acl_service_api) = ACL_SERVICE_API else {
+                    return;
+                };
+
+                let response = perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
+                    Some(&headers),
+                    acl_service_api,
+                    query,
+                    input_vars,
+                )
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_form_is_valid.set(false);
+                        } else {
                         }
-                        None => {
-                            set_is_loading.set(false);
-                        }
-                    };
+                        set_is_loading.set(false);
+
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }

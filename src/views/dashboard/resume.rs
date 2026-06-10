@@ -16,7 +16,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::BsPlusLg;
 use icondata::TbAwardOff;
@@ -197,7 +197,6 @@ pub fn CreateResumeItem() -> impl IntoView {
     let store = expect_context::<Store<AppStateContext>>();
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
     let resume_sections = RwSignal::new(
@@ -211,91 +210,88 @@ pub fn CreateResumeItem() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data =
-                        deserialize_form_data_to_struct::<UserResumeInput>(&form_data, true, None);
+                let deserialized_form_data =
+                    deserialize_form::<UserResumeInput>(&form_ref, true, None);
 
-                    if deserialized_form_data.is_none() {
-                        set_is_loading.set(false);
-                        return;
-                    }
+                if deserialized_form_data.is_none() {
+                    set_is_loading.set(false);
+                    return;
+                }
 
-                    let deserialized_form_data = deserialized_form_data.unwrap();
+                let deserialized_form_data = deserialized_form_data.unwrap();
 
-                    let input_vars = ResumeItemInputVars {
-                        resume_item: deserialized_form_data,
-                        achievements: achievements.get_untracked(),
-                    };
+                let input_vars = ResumeItemInputVars {
+                    resume_item: deserialized_form_data,
+                    achievements: achievements.get_untracked(),
+                };
 
-                    let query = r#"
-                           mutation CreateResumeItem($resumeItem: UserResumeInput!, $achievements: [String!]!) {
-                                createResumeItem(resumeItem: $resumeItem, achievements: $achievements) {
-                                    data {
-                                        title
-                                        moreInfo
-                                        startDate
-                                        endDate
-                                        link
-                                        section
-                                        id
-                                        yearsOfExperience
-                                    }
-                                    metadata {
-                                        newAccessToken
-                                        requestId
-                                    }
+                let query = r#"
+                       mutation CreateResumeItem($resumeItem: UserResumeInput!, $achievements: [String!]!) {
+                            createResumeItem(resumeItem: $resumeItem, achievements: $achievements) {
+                                data {
+                                    title
+                                    moreInfo
+                                    startDate
+                                    endDate
+                                    link
+                                    section
+                                    id
+                                    yearsOfExperience
                                 }
-                           }
-                       "#;
+                                metadata {
+                                    newAccessToken
+                                    requestId
+                                }
+                            }
+                       }
+                   "#;
 
-                    let mut headers = HashMap::new() as HashMap<String, String>;
-                    headers.insert(
-                        "Authorization".into(),
-                        format!(
-                            "Bearer {}",
-                            store.user().auth_info().token().get_untracked()
-                        ),
-                    );
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
 
-                    let Some(shared_service_api) = SHARED_SERVICE_API else {
-                        return;
-                    };
+                let Some(shared_service_api) = SHARED_SERVICE_API else {
+                    return;
+                };
 
-                    let response = perform_mutation_or_query_with_vars::<
+                let response =
+                    perform_mutation_or_query_with_vars::<
                         CreateResumeItemResponse,
                         ResumeItemInputVars,
-                    >(
-                        Some(&headers), shared_service_api, query, input_vars
-                    )
+                    >(Some(&headers), shared_service_api, query, input_vars)
                     .await;
 
-                    match response.get_data() {
-                        Some(_data) => {
-                            if let Some(form) = form_ref
-                                .get_untracked()
-                                .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                            {
-                                form.reset();
-                                set_form_is_valid.set(false);
-                            } else {
-                            }
-                            set_is_loading.set(false);
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_form_is_valid.set(false);
+                        } else {
+                        }
+                        set_is_loading.set(false);
 
-                            success_modal_is_open.update(|status| *status = true);
-                            set_achievements.set(vec![]);
-                        }
-                        None => {
-                            set_is_loading.set(false);
-                        }
-                    };
+                        success_modal_is_open.update(|status| *status = true);
+                        set_achievements.set(vec![]);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }
     });
 
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
+    // let onreset_handler = Callback::new(move |_ev: ev::Event| {
+    //     init_date.set(None);
+    // });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();
@@ -355,13 +351,13 @@ pub fn CreateResumeItem() -> impl IntoView {
 
             <h1 class="display-constraints">New Resume Item</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <InputField field_type=InputFieldType::Text label="More Info" id_attr="more_info" name="more_info" />
 
-                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <DatePicker label="End Date" id_attr="end_date" initial_value=init_date name="end_date" />
+                    <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                    <DatePicker label="End Date" id_attr="end_date" name="end_date" />
                     <InputField field_type=InputFieldType::Text label="Link" id_attr="link" name="link" />
                     <SelectInput
                     label="Section"

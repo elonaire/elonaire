@@ -20,7 +20,7 @@ use detaxine_ui::{
         navigation::breadcrumbs::Breadcrumbs,
         schemas::props::ColorTemperature,
     },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+    utils::forms::deserialize_form,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -210,108 +210,97 @@ pub fn CreateRole() -> impl IntoView {
         if metadata_form_is_valid.get() && main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(metadata_form_data) = get_form_data_from_form_ref(&metadata_form_ref) {
-                    if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
-                        let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                            RoleInput,
-                        >(
-                            &main_form_data, false, None
-                        );
-                        let deserialized_metadata_form_data =
-                            deserialize_form_data_to_struct::<RoleMetadata>(
-                                &metadata_form_data,
-                                false,
-                                Some(&["permission_ids"]),
-                            );
+                let deserialized_main_form_data =
+                    deserialize_form::<RoleInput>(&form_ref, false, None);
+                let deserialized_metadata_form_data = deserialize_form::<RoleMetadata>(
+                    &metadata_form_ref,
+                    false,
+                    Some(&["permission_ids"]),
+                );
 
-                        if deserialized_main_form_data.is_none()
-                            || deserialized_metadata_form_data.is_none()
+                if deserialized_main_form_data.is_none()
+                    || deserialized_metadata_form_data.is_none()
+                {
+                    set_is_loading.set(false);
+                    return;
+                }
+
+                let deserialized_main_form_data = deserialized_main_form_data.unwrap_or_default();
+                let deserialized_metadata_form_data =
+                    deserialized_metadata_form_data.unwrap_or_default();
+
+                let input_vars = CreateSystemRoleVars {
+                    role_input: deserialized_main_form_data,
+                    role_metadata: deserialized_metadata_form_data,
+                };
+
+                let query = r#"
+                       mutation CreateSystemRole($roleInput: RoleInput!, $roleMetadata: RoleMetadata!) {
+                            createSystemRole(roleInput: $roleInput, roleMetadata: $roleMetadata) {
+                                data {
+                                    roleName
+                                    createdAt
+                                    isAdmin
+                                    isDefault
+                                    isSuperAdmin
+                                    updatedAt
+                                    id
+                                    createdBy
+                                }
+                                metadata {
+                                    newAccessToken
+                                    requestId
+                                }
+                            }
+                       }
+                   "#;
+
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
+
+                let Some(acl_service_api) = ACL_SERVICE_API else {
+                    return;
+                };
+
+                let response = perform_mutation_or_query_with_vars::<
+                    CreateSystemRoleResponse,
+                    CreateSystemRoleVars,
+                >(Some(&headers), acl_service_api, query, input_vars)
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
                         {
-                            set_is_loading.set(false);
-                            return;
+                            form.reset();
+                            set_main_form_is_valid.set(false);
+                        } else {
                         }
 
-                        let deserialized_main_form_data =
-                            deserialized_main_form_data.unwrap_or_default();
-                        let deserialized_metadata_form_data =
-                            deserialized_metadata_form_data.unwrap_or_default();
+                        if let Some(form) = metadata_form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_main_form_is_valid.set(false);
+                        } else {
+                        }
 
-                        let input_vars = CreateSystemRoleVars {
-                            role_input: deserialized_main_form_data,
-                            role_metadata: deserialized_metadata_form_data,
-                        };
+                        set_is_loading.set(false);
 
-                        let query = r#"
-                               mutation CreateSystemRole($roleInput: RoleInput!, $roleMetadata: RoleMetadata!) {
-                                    createSystemRole(roleInput: $roleInput, roleMetadata: $roleMetadata) {
-                                        data {
-                                            roleName
-                                            createdAt
-                                            isAdmin
-                                            isDefault
-                                            isSuperAdmin
-                                            updatedAt
-                                            id
-                                            createdBy
-                                        }
-                                        metadata {
-                                            newAccessToken
-                                            requestId
-                                        }
-                                    }
-                               }
-                           "#;
-
-                        let mut headers = HashMap::new() as HashMap<String, String>;
-                        headers.insert(
-                            "Authorization".into(),
-                            format!(
-                                "Bearer {}",
-                                store.user().auth_info().token().get_untracked()
-                            ),
-                        );
-
-                        let Some(acl_service_api) = ACL_SERVICE_API else {
-                            return;
-                        };
-
-                        let response = perform_mutation_or_query_with_vars::<
-                            CreateSystemRoleResponse,
-                            CreateSystemRoleVars,
-                        >(
-                            Some(&headers), acl_service_api, query, input_vars
-                        )
-                        .await;
-
-                        match response.get_data() {
-                            Some(_data) => {
-                                if let Some(form) = form_ref
-                                    .get_untracked()
-                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                                {
-                                    form.reset();
-                                    set_main_form_is_valid.set(false);
-                                } else {
-                                }
-
-                                if let Some(form) = metadata_form_ref
-                                    .get_untracked()
-                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                                {
-                                    form.reset();
-                                    set_main_form_is_valid.set(false);
-                                } else {
-                                }
-
-                                set_is_loading.set(false);
-
-                                success_modal_is_open.update(|status| *status = true);
-                            }
-                            None => {
-                                set_is_loading.set(false);
-                            }
-                        };
-                    };
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }
