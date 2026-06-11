@@ -43,7 +43,7 @@ web-sys = { version = "0.3.99", features = [
     "NodeList",
 ] }
 wasm-bindgen-futures = "0.4.61"
-detaxine-ui = "0.8.29"
+detaxine-ui = "0.8.30"
 
 [profile.wasm-release]
 inherits = "release"
