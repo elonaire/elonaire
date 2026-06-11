@@ -392,14 +392,16 @@ pub fn CreatePortfolio() -> impl IntoView {
     // });
 
     Effect::new(move || {
-        skills().get().iter().for_each(|skill| {
-            let skill_option = SelectOption {
+        let select_options = skills()
+            .get()
+            .iter()
+            .map(|skill| SelectOption {
                 value: skill.id.as_ref().unwrap_or(&Default::default()).clone(),
                 label: skill.name.as_ref().unwrap_or(&Default::default()).clone(),
-            };
+            })
+            .collect::<Vec<_>>();
 
-            skills_select_options.update(|prev| prev.push(skill_option));
-        });
+        skills_select_options.set(select_options);
     });
 
     Effect::new(move || {
