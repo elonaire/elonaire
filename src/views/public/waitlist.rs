@@ -1,3 +1,14 @@
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        feedback::modal::modal::{BasicModal, UseCase},
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+        },
+    },
+    utils::forms::deserialize_form,
+};
 use icondata::BsEnvelope;
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
@@ -5,24 +16,11 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::{HtmlFormElement, SubmitEvent};
 
 use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-        },
-    },
     data::models::graphql::email::{
         CreateSubscriptionResponse, CreateSubscriptionVars, SubscriberInput, SubscriptionInput,
         SubscriptionInputMetadata,
     },
-    utils::{
-        forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-        graphql_client::perform_mutation_or_query_with_vars,
-    },
+    utils::graphql_client::perform_mutation_or_query_with_vars,
 };
 
 const MARKETPLACE_WAITLIST_MAILING_LIST_ID: Option<&str> =
@@ -41,13 +39,8 @@ pub fn WaitList() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let Some(form_data) = get_form_data_from_form_ref(&subscription_form_ref) else {
-                    set_is_loading.set(false);
-                    return;
-                };
-
                 let Some(deserialized_form_data) =
-                    deserialize_form_data_to_struct::<SubscriberInput>(&form_data, false, None)
+                    deserialize_form::<SubscriberInput>(&subscription_form_ref, false, None)
                 else {
                     set_is_loading.set(false);
                     return;

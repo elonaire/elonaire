@@ -1,7 +1,6 @@
+use detaxine_ui::components::{actions::button::BasicButton, forms::toggle_switch::ToggleSwitch};
 use leptos::prelude::*;
 use web_sys::{Storage, window};
-
-use crate::components::forms::toggle_switch::ToggleSwitch;
 
 const COOKIE_PREFS_KEY: &str = "cookie_preferences";
 
@@ -134,63 +133,88 @@ pub fn CookieBanner(
                             <CookieRow
                                 label="Necessary"
                                 description="Required for login sessions and core site functionality. Cannot be disabled."
-                                is_active=RwSignal::new(true)
+                                is_active=true
                                 readonly=true
                             />
-                            <CookieRow
-                                label="Analytics"
-                                description="Helps us understand how visitors interact with the site."
-                                is_active=analytics
-                                readonly=false
-                            />
-                            <CookieRow
-                                label="Marketing"
-                                description="Used to deliver personalised advertisements."
-                                is_active=marketing
-                                readonly=false
-                            />
-                            <CookieRow
-                                label="Preferences"
-                                description="Remembers your settings and personalisation choices."
-                                is_active=preferences
-                                readonly=false
-                            />
+                            {move || {
+                                let received_analytics = analytics.get();
+                                view!{
+                                    <CookieRow
+                                        label="Analytics"
+                                        description="Helps us understand how visitors interact with the site."
+                                        is_active=received_analytics
+                                        readonly=false
+                                        on:change=move |_| {
+                                            analytics.update(|v| *v = !*v);
+                                        }
+                                    />
+                                }
+                            }}
+                            {move || {
+                                let received_marketing = marketing.get();
+                                view!{
+                                    <CookieRow
+                                        label="Marketing"
+                                        description="Used to deliver personalised advertisements."
+                                        is_active=received_marketing
+                                        readonly=false
+                                        on:change=move |_| {
+                                            marketing.update(|v| *v = !*v);
+                                        }
+                                    />
+                                }
+                            }}
+                            {move || {
+                                let received_preferences = preferences.get();
+                                view!{
+                                    <CookieRow
+                                        label="Preferences"
+                                        description="Remembers your settings and personalisation choices."
+                                        is_active=received_preferences
+                                        readonly=false
+                                        on:change=move |_| {
+                                            preferences.update(|v| *v = !*v);
+                                        }
+                                    />
+                                }
+                            }}
+
                         </div>
                     </Show>
 
                     <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
-                        <button
-                            class="text-sm text-gray/50 dark:text-mid-gray hover:text-gray dark:hover:text-contrast-white px-3 py-2 transition-colors"
+                        <BasicButton
+                            style_ext="text-sm text-gray/50 dark:text-mid-gray hover:text-gray dark:hover:text-contrast-white px-3 py-2 transition-colors"
                             on:click=reject_all
                         >
                             "Reject all"
-                        </button>
+                        </BasicButton>
 
                         <Show
                             when=move || show_details.get()
                             fallback=move || view! {
-                                <button
-                                    class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
+                                <BasicButton
+                                    style_ext="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                     on:click=move |_| set_show_details.set(true)
                                 >
                                     "Manage preferences"
-                                </button>
+                                </BasicButton>
                             }
                         >
-                            <button
-                                class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
+                            <BasicButton
+                                style_ext="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                 on:click=save_preferences_handler
                             >
                                 "Save preferences"
-                            </button>
+                            </BasicButton>
                         </Show>
 
-                        <button
-                            class="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
+                        <BasicButton
+                            style_ext="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
                             on:click=accept_all
                         >
                             "Accept all"
-                        </button>
+                        </BasicButton>
                     </div>
 
                 </div>
@@ -203,7 +227,7 @@ pub fn CookieBanner(
 fn CookieRow(
     #[prop(into, optional)] label: String,
     #[prop(into, optional)] description: String,
-    is_active: RwSignal<bool>,
+    is_active: bool,
     readonly: bool,
 ) -> impl IntoView {
     let id = format!("cookie-toggle-{}", label.to_lowercase());
@@ -216,15 +240,10 @@ fn CookieRow(
             </div>
             <div class=move || if readonly { "opacity-40 pointer-events-none flex-shrink-0" } else { "flex-shrink-0" }>
                 <ToggleSwitch
-                    active=is_active
+                    initial_active_state=is_active
                     label_active=""
                     label_inactive=""
                     id_attr=id.clone()
-                    on:change=move |_| {
-                        if !readonly {
-                            is_active.update(|v| *v = !*v);
-                        }
-                    }
                     readonly=readonly
                 />
             </div>

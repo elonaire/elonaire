@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::components::general::collapse::{Collapse, PanelInfo};
+use detaxine_ui::components::content::collapse::{Collapse, PanelInfo};
 
 #[component]
 pub fn Faqs() -> impl IntoView {

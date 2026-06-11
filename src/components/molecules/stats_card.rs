@@ -13,9 +13,9 @@ pub fn StatsCard(
 ) -> impl IntoView {
     let trend_color = Memo::new(move |_| {
         if percentage.get() > 0 {
-            String::from("success")
+            String::from("text-success")
         } else {
-            String::from("danger")
+            String::from("text-danger")
         }
     });
 
@@ -34,8 +34,8 @@ pub fn StatsCard(
                     <Icon width="24" height="24" icon=icon />
                 </div>
 
-                <div class=move || format!("flex flex-row items-center gap-[10px] text-{}", trend_color.get())>
-                    <Icon width="24" height="24" icon=trend_icon />
+                <div class=move || format!("flex flex-row items-center gap-[10px] text-xs {}", trend_color.get())>
+                    <Icon width="12" height="12" icon=trend_icon />
                     <span>{move || percentage.get()}%</span>
                 </div>
             </div>

@@ -1,5 +1,19 @@
 use std::time::Duration;
 
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        content::carousel::Carousel,
+        data_display::{badge::Badge, chip::Chip, table::pagination::Pagination},
+        feedback::modal::modal::{BasicModal, UseCase},
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+        },
+        schemas::props::ColorTemperature,
+    },
+    utils::{formatters::PipeOption, forms::deserialize_form},
+};
 use icondata::{BsArrowLeft, BsSearch, VsSettings};
 use leptos::wasm_bindgen::JsCast;
 use leptos::{prelude::*, task::spawn_local};
@@ -7,35 +21,18 @@ use leptos_icons::Icon;
 use leptos_meta::*;
 use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent, SubmitEvent};
 
-use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::data::models::graphql::email::{
     CreateSubscriptionResponse, CreateSubscriptionVars, SubscriberInput, SubscriptionInput,
     SubscriptionInputMetadata,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::formatters::PipeOption;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
+    components::molecules::{
+        blog::{
+            blog_post::BlogPostPreview, blog_section::BlogSection, featured_post::FeaturedPost,
         },
-        general::{
-            badge::Badge,
-            button::{BasicButton, ButtonType},
-            carousel::Carousel,
-            chip::Chip,
-            table::pagination::Pagination,
-        },
-        molecules::{
-            blog::{
-                blog_post::BlogPostPreview, blog_section::BlogSection, featured_post::FeaturedPost,
-            },
-            footer::Footer,
-        },
-        schemas::props::ColorTemperature,
+        footer::Footer,
     },
     data::{
         context::{
@@ -277,13 +274,8 @@ pub fn BlogHome() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let Some(form_data) = get_form_data_from_form_ref(&subscription_form_ref) else {
-                    set_is_loading.set(false);
-                    return;
-                };
-
                 let Some(deserialized_form_data) =
-                    deserialize_form_data_to_struct::<SubscriberInput>(&form_data, false, None)
+                    deserialize_form::<SubscriberInput>(&subscription_form_ref, false, None)
                 else {
                     set_is_loading.set(false);
                     return;
@@ -492,18 +484,18 @@ pub fn BlogHome() -> impl IntoView {
                             store.show_mobile_search().set(false);
                         }
                     >
-                        <div class="bg-white w-full px-4 py-3 flex items-center gap-3 shadow-lg"
+                        <div class="bg-contrast-white w-full px-4 py-3 flex items-center gap-3 shadow-lg"
                             on:mousedown=move |e: MouseEvent| e.stop_propagation()
                         >
                             // Back/close button
-                            <button
-                                class="shrink-0"
+                            <BasicButton
+                                style_ext="shrink-0"
                                 on:click=move |_| {
                                     store.show_mobile_search().set(false);
                                 }
                             >
                                 <Icon icon=BsArrowLeft width="1.2rem" height="1.2rem" />
-                            </button>
+                            </BasicButton>
 
                             <div class="flex-1 relative">
                                 <InputField

@@ -1,5 +1,17 @@
 use std::collections::HashMap;
 
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        content::richtext_editor::{ExtraFormatingOption, RichTextEditor},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::reactive_form::ReactiveForm,
+    },
+    utils::{formatters::PipeOption, forms::deserialize_form},
+};
 use icondata::{
     AiHeartFilled, BiBookmarkRegular, BiShareAltRegular, BsGithub, BsLinkedin, BsTwitterX,
     FaCommentRegular, FaFaceAngryRegular, FaFaceGrinTearsRegular, FaFaceSadTearRegular,
@@ -16,18 +28,10 @@ use leptos_router::hooks::{use_location, use_params_map};
 use reactive_stores::Store;
 use web_sys::{HtmlDivElement, HtmlFormElement, MouseEvent};
 
-use crate::components::general::button::ButtonType;
-use crate::components::general::modal::modal::{BasicModal, UseCase};
-use crate::components::general::richtext_editor::ExtraFormatingOption;
-use crate::components::general::spinner::Spinner;
 use crate::components::molecules::blog::blog_comment::CommentReactionDetails;
-use crate::components::{
-    forms::reactive_form::ReactiveForm,
-    general::{button::BasicButton, richtext_editor::RichTextEditor},
-    molecules::{
-        blog::{blog_comment::BlogComment, blog_post_metadata::BlogDetailMetadata},
-        footer::Footer,
-    },
+use crate::components::molecules::{
+    blog::{blog_comment::BlogComment, blog_post_metadata::BlogDetailMetadata},
+    footer::Footer,
 };
 use crate::data::context::shared::{fetch_single_blog_post, fetch_single_user};
 use crate::data::models::graphql::acl::FetchSingleUserVars;
@@ -43,8 +47,6 @@ use crate::data::{
     models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
 use crate::utils::errors::handle_graphql_errors;
-use crate::utils::formatters::PipeOption;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
@@ -202,140 +204,134 @@ pub fn BlogPostDetail() -> impl IntoView {
         if comment_form_is_valid.get() && blog_post.get().is_some() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(main_form_data) = get_form_data_from_form_ref(&comment_form_ref) {
-                    let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                        BlogCommentInput,
-                    >(
-                        &main_form_data, false, None
-                    );
+                let deserialized_main_form_data =
+                    deserialize_form::<BlogCommentInput>(&comment_form_ref, false, None);
 
-                    if deserialized_main_form_data.is_none() {
-                        set_is_loading.set(false);
-                        return;
-                    }
+                if deserialized_main_form_data.is_none() {
+                    set_is_loading.set(false);
+                    return;
+                }
 
-                    let deserialized_main_form_data = deserialized_main_form_data.unwrap();
+                let deserialized_main_form_data = deserialized_main_form_data.unwrap();
 
-                    let input_vars = CreateBlogCommentVars {
-                        blog_comment: deserialized_main_form_data,
-                        blog_post_id: blog_post
-                            .get_untracked()
-                            .unwrap_or_default()
-                            .id
-                            .unwrap_or_default(),
-                    };
+                let input_vars = CreateBlogCommentVars {
+                    blog_comment: deserialized_main_form_data,
+                    blog_post_id: blog_post
+                        .get_untracked()
+                        .unwrap_or_default()
+                        .id
+                        .unwrap_or_default(),
+                };
 
-                    let query = r#"
-                        mutation AddCommentToBlogPost($blogComment: BlogCommentInput!, $blogPostId: String!) {
-                            addCommentToBlogPost(blogComment: $blogComment, blogPostId: $blogPostId) {
-                                data {
-                                    content
-                                    createdAt
-                                    updatedAt
-                                    id
-                                    replyCount
-                                    author
-                                }
-                                metadata {
-                                    requestId
-                                    newAccessToken
-                                }
+                let query = r#"
+                    mutation AddCommentToBlogPost($blogComment: BlogCommentInput!, $blogPostId: String!) {
+                        addCommentToBlogPost(blogComment: $blogComment, blogPostId: $blogPostId) {
+                            data {
+                                content
+                                createdAt
+                                updatedAt
+                                id
+                                replyCount
+                                author
+                            }
+                            metadata {
+                                requestId
+                                newAccessToken
                             }
                         }
-                       "#;
+                    }
+                   "#;
 
-                    let mut headers = HashMap::new() as HashMap<String, String>;
-                    headers.insert(
-                        "Authorization".into(),
-                        format!(
-                            "Bearer {}",
-                            store.user().auth_info().token().get_untracked()
-                        ),
-                    );
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
 
-                    let Some(shared_service_api) = SHARED_SERVICE_API else {
-                        return;
-                    };
+                let Some(shared_service_api) = SHARED_SERVICE_API else {
+                    return;
+                };
 
-                    let response = perform_mutation_or_query_with_vars::<
+                let response =
+                    perform_mutation_or_query_with_vars::<
                         CreateBlogCommentResponse,
                         CreateBlogCommentVars,
-                    >(
-                        Some(&headers), shared_service_api, query, input_vars
-                    )
+                    >(Some(&headers), shared_service_api, query, input_vars)
                     .await;
 
-                    match response.get_data() {
-                        Some(data) => {
-                            if let Some(form) = comment_form_ref
-                                .get_untracked()
-                                .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                            {
-                                form.reset();
-                                set_comment_form_is_valid.set(false);
-                            } else {
-                            }
+                match response.get_data() {
+                    Some(data) => {
+                        if let Some(form) = comment_form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_comment_form_is_valid.set(false);
+                        } else {
+                        }
 
-                            let mut new_comment = data
-                                .add_comment_to_blog_post
+                        let mut new_comment = data
+                            .add_comment_to_blog_post
+                            .as_ref()
+                            .unwrap_or(&Default::default())
+                            .get_data();
+
+                        let user_id_vars = FetchSingleUserVars {
+                            user_id: new_comment
+                                .author
                                 .as_ref()
                                 .unwrap_or(&Default::default())
-                                .get_data();
+                                .to_owned(),
+                        };
 
-                            let user_id_vars = FetchSingleUserVars {
-                                user_id: new_comment
-                                    .author
-                                    .as_ref()
-                                    .unwrap_or(&Default::default())
-                                    .to_owned(),
-                            };
-
-                            let fetch_user_info_query = r#"
-                                query FetchSingleUser($userId: String!) {
-                                    fetchSingleUser(userId: $userId) {
-                                        data {
-                                            profilePicture
-                                            bio
-                                            id
-                                            fullName
-                                            email
-                                        }
-                                        metadata {
-                                            requestId
-                                            newAccessToken
-                                        }
+                        let fetch_user_info_query = r#"
+                            query FetchSingleUser($userId: String!) {
+                                fetchSingleUser(userId: $userId) {
+                                    data {
+                                        profilePicture
+                                        bio
+                                        id
+                                        fullName
+                                        email
+                                    }
+                                    metadata {
+                                        requestId
+                                        newAccessToken
                                     }
                                 }
-                               "#;
+                            }
+                           "#;
 
-                            let author_details =
-                                fetch_single_user(&user_id_vars, None, fetch_user_info_query).await;
+                        let author_details =
+                            fetch_single_user(&user_id_vars, None, fetch_user_info_query).await;
 
-                            if let Ok(author_details) = author_details {
-                                new_comment.full_author_details = Some(author_details);
+                        if let Ok(author_details) = author_details {
+                            new_comment.full_author_details = Some(author_details);
+                        };
+
+                        set_blog_post.update(|prev| {
+                            if let Some(prev) = prev {
+                                prev.comments = prev.comments.as_ref().map(|c| {
+                                    let mut new_comments = c.to_vec();
+
+                                    new_comments.push(new_comment);
+                                    new_comments
+                                });
                             };
+                        });
 
-                            set_blog_post.update(|prev| {
-                                if let Some(prev) = prev {
-                                    prev.comments = prev.comments.as_ref().map(|c| {
-                                        let mut new_comments = c.to_vec();
+                        set_is_loading.set(false);
 
-                                        new_comments.push(new_comment);
-                                        new_comments
-                                    });
-                                };
-                            });
-
-                            set_is_loading.set(false);
-
-                            success_modal_is_open.update(|status| *status = true);
-                        }
-                        None => {
-                            let _handle_errors =
-                                handle_graphql_errors(&response, &store, Some(&redirect_to));
-                            set_is_loading.set(false);
-                        }
-                    };
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        let _handle_errors =
+                            handle_graphql_errors(&response, &store, Some(&redirect_to));
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }
@@ -809,12 +805,12 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 if show_reactions.get() { "opacity-100 translate-y-0 pointer-events-auto" }
                                                 else { "opacity-0 translate-y-2 pointer-events-none" }
                                             )>
-                                                {reactions.iter().map(|(reaction_type, emoji)| {
-                                                    let reaction_type = *reaction_type;
+                                                {reactions.clone().into_iter().map(|(reaction_type, emoji)| {
+
                                                     let is_selected = move || selected_reaction.get() == Some(reaction_type);
                                                     view! {
-                                                        <button
-                                                            class=move || format!(
+                                                        <BasicButton
+                                                            style_ext=format!(
                                                                 "text-xl transition-transform duration-150 cursor-pointer hover:scale-125 flex flex-col items-center gap-1 {}",
                                                                 if is_selected() { "scale-125" } else { "" }
                                                             )
@@ -824,8 +820,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                                 handle_reaction_click(reaction_type);
                                                             }
                                                         >
-                                                            {*emoji}
-                                                        </button>
+                                                            {emoji}
+                                                        </BasicButton>
                                                     }
                                                 }).collect::<Vec<_>>()}
                                             </div>

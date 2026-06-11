@@ -1,3 +1,4 @@
+use detaxine_ui::utils::time::convert_date_to_human_readable_format;
 use icondata::BsCalendar2Date;
 use leptos::prelude::*;
 use leptos_icons::Icon;
@@ -5,7 +6,6 @@ use leptos_icons::Icon;
 use crate::{
     components::molecules::blog::author_info::AuthorInfo,
     data::models::graphql::shared::BlogCategory,
-    utils::time::convert_date_to_human_readable_format,
 };
 
 /// This is a component that displays metadata for a blog post.

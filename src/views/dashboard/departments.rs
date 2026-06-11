@@ -1,6 +1,23 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::table::data_table::{Column, DataTable, TableCellData},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+    },
+    utils::forms::{deserialize_form, get_form_data_from_form_ref},
+};
+use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,33 +27,15 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::forms::select::{SelectInput, SelectOption};
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::{fetch_departments, fetch_organizations};
 use crate::data::models::graphql::acl::{
     CreateDepartmentResponse, CreateDepartmentVars, DepartmentInput, DepartmentMetadata,
 };
-use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
+use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
 
@@ -147,7 +146,7 @@ pub fn DepartmentsList() -> impl IntoView {
                 <A href="/dashboard/departments/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />
@@ -182,103 +181,90 @@ pub fn CreateDepartment() -> impl IntoView {
         if metadata_form_is_valid.get() && main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(metadata_form_data) = get_form_data_from_form_ref(&metadata_form_ref) {
-                    if let Some(main_form_data) = get_form_data_from_form_ref(&form_ref) {
-                        let deserialized_main_form_data = deserialize_form_data_to_struct::<
-                            DepartmentInput,
-                        >(
-                            &main_form_data, false, None
-                        );
-                        let deserialized_metadata_form_data = deserialize_form_data_to_struct::<
-                            DepartmentMetadata,
-                        >(
-                            &metadata_form_data, false, None
-                        );
+                let deserialized_main_form_data =
+                    deserialize_form::<DepartmentInput>(&form_ref, false, None);
+                let deserialized_metadata_form_data =
+                    deserialize_form::<DepartmentMetadata>(&metadata_form_ref, false, None);
 
-                        if deserialized_main_form_data.is_none()
-                            || deserialized_metadata_form_data.is_none()
+                if deserialized_main_form_data.is_none()
+                    || deserialized_metadata_form_data.is_none()
+                {
+                    set_is_loading.set(false);
+                    return;
+                }
+
+                let deserialized_main_form_data = deserialized_main_form_data.unwrap();
+                let deserialized_metadata_form_data = deserialized_metadata_form_data.unwrap();
+
+                let input_vars = CreateDepartmentVars {
+                    department_input: deserialized_main_form_data,
+                    department_metadata: deserialized_metadata_form_data,
+                };
+
+                let query = r#"
+                       mutation CreateDepartment($departmentInput: DepartmentInput!, $departmentMetadata: DepartmentMetadata!) {
+                            createDepartment(departmentInput: $departmentInput, departmentMetadata: $departmentMetadata) {
+                                data {
+                                    depName
+                                    createdAt
+                                    updatedAt
+                                    id
+                                    createdBy
+                                }
+                                metadata {
+                                    newAccessToken
+                                    requestId
+                                }
+                            }
+                       }
+                   "#;
+
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
+
+                let Some(acl_service_api) = ACL_SERVICE_API else {
+                    return;
+                };
+
+                let response = perform_mutation_or_query_with_vars::<
+                    CreateDepartmentResponse,
+                    CreateDepartmentVars,
+                >(Some(&headers), acl_service_api, query, input_vars)
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
                         {
-                            set_is_loading.set(false);
-                            return;
+                            form.reset();
+                            set_main_form_is_valid.set(false);
+                        } else {
                         }
 
-                        let deserialized_main_form_data = deserialized_main_form_data.unwrap();
-                        let deserialized_metadata_form_data =
-                            deserialized_metadata_form_data.unwrap();
+                        if let Some(form) = metadata_form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_main_form_is_valid.set(false);
+                        } else {
+                        }
 
-                        let input_vars = CreateDepartmentVars {
-                            department_input: deserialized_main_form_data,
-                            department_metadata: deserialized_metadata_form_data,
-                        };
+                        set_is_loading.set(false);
 
-                        let query = r#"
-                               mutation CreateDepartment($departmentInput: DepartmentInput!, $departmentMetadata: DepartmentMetadata!) {
-                                    createDepartment(departmentInput: $departmentInput, departmentMetadata: $departmentMetadata) {
-                                        data {
-                                            depName
-                                            createdAt
-                                            updatedAt
-                                            id
-                                            createdBy
-                                        }
-                                        metadata {
-                                            newAccessToken
-                                            requestId
-                                        }
-                                    }
-                               }
-                           "#;
-
-                        let mut headers = HashMap::new() as HashMap<String, String>;
-                        headers.insert(
-                            "Authorization".into(),
-                            format!(
-                                "Bearer {}",
-                                store.user().auth_info().token().get_untracked()
-                            ),
-                        );
-
-                        let Some(acl_service_api) = ACL_SERVICE_API else {
-                            return;
-                        };
-
-                        let response = perform_mutation_or_query_with_vars::<
-                            CreateDepartmentResponse,
-                            CreateDepartmentVars,
-                        >(
-                            Some(&headers), acl_service_api, query, input_vars
-                        )
-                        .await;
-
-                        match response.get_data() {
-                            Some(_data) => {
-                                if let Some(form) = form_ref
-                                    .get_untracked()
-                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                                {
-                                    form.reset();
-                                    set_main_form_is_valid.set(false);
-                                } else {
-                                }
-
-                                if let Some(form) = metadata_form_ref
-                                    .get_untracked()
-                                    .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                                {
-                                    form.reset();
-                                    set_main_form_is_valid.set(false);
-                                } else {
-                                }
-
-                                set_is_loading.set(false);
-
-                                success_modal_is_open.update(|status| *status = true);
-                            }
-                            None => {
-                                set_is_loading.set(false);
-                            }
-                        };
-                    };
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }
