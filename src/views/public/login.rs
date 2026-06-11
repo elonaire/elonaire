@@ -1,3 +1,14 @@
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        feedback::spinner::Spinner,
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+        },
+    },
+    utils::forms::deserialize_form,
+};
 use icondata::{AiGithubOutlined, AiGoogleOutlined};
 use leptos::ev;
 use leptos::prelude::*;
@@ -11,16 +22,6 @@ use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 use web_sys::window;
 
-use crate::components::{
-    forms::{
-        input::{InputField, InputFieldType},
-        reactive_form::ReactiveForm,
-    },
-    general::{
-        button::{BasicButton, ButtonType},
-        spinner::Spinner,
-    },
-};
 use crate::data::models::general::acl::OauthClientName;
 use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::acl::SignInResponse;
@@ -34,7 +35,6 @@ use crate::data::{
 };
 use crate::utils::auth::check_auth_and_update_store_auth_info;
 use crate::utils::errors::handle_graphql_errors;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 use crate::views::public::error_handler::ErrorHandler;
 
@@ -200,86 +200,81 @@ pub fn SignIn() -> impl IntoView {
                 if let Some(_submitter) = ev.submitter() {
                     set_is_loading.set(true);
                     spawn_local(async move {
-                        if let Some(form_data) = get_form_data_from_form_ref(&login_form_ref) {
-                            let deserialized_form_data =
-                                deserialize_form_data_to_struct::<UserLoginsInput>(
-                                    &form_data, true, None,
-                                );
+                        let deserialized_form_data =
+                            deserialize_form::<UserLoginsInput>(&login_form_ref, true, None);
 
-                            if deserialized_form_data.is_none() {
-                                set_is_loading.set(false);
-                                return;
-                            }
+                        if deserialized_form_data.is_none() {
+                            set_is_loading.set(false);
+                            return;
+                        }
 
-                            let deserialized_form_data = deserialized_form_data.unwrap();
+                        let deserialized_form_data = deserialized_form_data.unwrap();
 
-                            let user_logins = SignInVars {
-                                raw_user_details: deserialized_form_data,
-                            };
+                        let user_logins = SignInVars {
+                            raw_user_details: deserialized_form_data,
+                        };
 
-                            let query = r#"
-                                   mutation SignIn($rawUserDetails: UserLoginsInput!) {
-                                       signIn(rawUserDetails: $rawUserDetails) {
-                                            data {
-                                                token
-                                            }
-                                            metadata {
-                                                newAccessToken
-                                                requestId
-                                            }
-                                       }
+                        let query = r#"
+                               mutation SignIn($rawUserDetails: UserLoginsInput!) {
+                                   signIn(rawUserDetails: $rawUserDetails) {
+                                        data {
+                                            token
+                                        }
+                                        metadata {
+                                            newAccessToken
+                                            requestId
+                                        }
                                    }
-                               "#;
+                               }
+                           "#;
 
-                            let Some(acl_service_api) = ACL_SERVICE_API else {
-                                return;
-                            };
+                        let Some(acl_service_api) = ACL_SERVICE_API else {
+                            return;
+                        };
 
-                            let login_res = perform_mutation_or_query_with_vars::<
-                                SignInResponse,
-                                SignInVars,
-                            >(
-                                None, acl_service_api, query, user_logins
-                            )
-                            .await;
+                        let login_res = perform_mutation_or_query_with_vars::<
+                            SignInResponse,
+                            SignInVars,
+                        >(
+                            None, acl_service_api, query, user_logins
+                        )
+                        .await;
 
-                            match login_res.get_data() {
-                                Some(data) => {
-                                    match &data.sign_in {
-                                        Some(auth_details) => {
-                                            if let Some(form) =
-                                                login_form_ref.get_untracked().and_then(|el| {
-                                                    el.dyn_into::<HtmlFormElement>().ok()
-                                                })
-                                            {
-                                                form.reset();
-                                                set_form_is_valid.set(false);
-                                            } else {
+                        match login_res.get_data() {
+                            Some(data) => {
+                                match &data.sign_in {
+                                    Some(auth_details) => {
+                                        if let Some(form) = login_form_ref
+                                            .get_untracked()
+                                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                                        {
+                                            form.reset();
+                                            set_form_is_valid.set(false);
+                                        } else {
+                                        }
+
+                                        match auth_details.get_data().token {
+                                            Some(token) => {
+                                                check_auth_and_update_store_auth_info(
+                                                    &token, &store,
+                                                )
+                                                .await;
                                             }
+                                            None => {}
+                                        };
 
-                                            match auth_details.get_data().token {
-                                                Some(token) => {
-                                                    check_auth_and_update_store_auth_info(
-                                                        &token, &store,
-                                                    )
-                                                    .await;
-                                                }
-                                                None => {}
-                                            };
-
-                                            set_is_loading.set(false);
-                                        }
-                                        None => {
-                                            set_is_loading.set(false);
-                                        }
-                                    };
-                                }
-                                None => {
-                                    let _handle_errors =
-                                        handle_graphql_errors(&login_res, &store, None);
-                                    set_is_loading.set(false);
-                                }
-                            };
+                                        set_is_loading.set(false);
+                                    }
+                                    None => {
+                                        set_is_loading.set(false);
+                                    }
+                                };
+                            }
+                            None => {
+                                let _handle_errors =
+                                    handle_graphql_errors(&login_res, &store, None);
+                                set_is_loading.set(false);
+                            }
                         };
                     });
                 }

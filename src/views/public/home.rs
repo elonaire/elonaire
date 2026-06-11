@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use detaxine_ui::components::actions::button::BasicButton;
 use icondata::{BsChevronDoubleDown, BsGithub};
 use leptos::{prelude::*, task::spawn_local};
 use leptos_icons::Icon;
@@ -8,7 +9,6 @@ use leptos_router::components::A;
 use reactive_stores::Store;
 
 use crate::{
-    components::general::button::BasicButton,
     data::{
         context::{
             store::{AppStateContext, AppStateContextStoreFields},

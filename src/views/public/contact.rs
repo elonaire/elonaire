@@ -1,3 +1,16 @@
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        feedback::modal::modal::{BasicModal, UseCase},
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+            textarea::Textarea,
+        },
+    },
+    utils::forms::deserialize_form,
+};
 use icondata::{BsEnvelope, BsGithub, BsLinkedin, BsPerson, BsSend, BsTwitterX};
 use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
@@ -6,24 +19,16 @@ use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::{HtmlFormElement, SubmitEvent};
 
-use crate::components::forms::input::{InputField, InputFieldType};
-use crate::components::forms::reactive_form::ReactiveForm;
-use crate::components::forms::select::{SelectInput, SelectOption};
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::button::{BasicButton, ButtonType};
-use crate::components::general::modal::modal::{BasicModal, UseCase};
 use crate::data::models::graphql::shared::{
     MessageInput, SendMessageResponse, SendMessageVars, Subject,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
 
 #[component]
 pub fn Contact() -> impl IntoView {
-    let (collapsed, set_collapsed) = signal(false);
     let contact_form_ref = NodeRef::new();
     let (form_is_valid, set_form_is_valid) = signal(false);
     let (is_loading, set_is_loading) = signal(false);
@@ -44,13 +49,8 @@ pub fn Contact() -> impl IntoView {
             if ev.submitter().is_some() && form_is_valid.get() {
                 set_is_loading.set(true);
                 spawn_local(async move {
-                    let Some(form_data) = get_form_data_from_form_ref(&contact_form_ref) else {
-                        set_is_loading.set(false);
-                        return;
-                    };
-
                     let Some(message) =
-                        deserialize_form_data_to_struct::<MessageInput>(&form_data, false, None)
+                        deserialize_form::<MessageInput>(&contact_form_ref, false, None)
                     else {
                         set_is_loading.set(false);
                         return;

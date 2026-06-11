@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use icondata::{
-    BsInfoCircle, BsMoon, BsPower, BsRss, BsSun, CgMenuLeft, IoSearchOutline,
+    BsInfoCircle, BsMoon, BsPower, BsRss, BsSearch, BsSun, CgMenuLeft,
     MdiCardAccountDetailsOutline, MdiCertificateOutline, MdiStore, MdiTabletDashboard,
     MdiTrophyAward, RiArticleDocumentLine,
 };
@@ -15,11 +15,12 @@ use reactive_stores::Store;
 use leptos_router::components::A;
 use wasm_bindgen_futures::spawn_local;
 
-use crate::components::forms::toggle_switch::ToggleSwitch;
-use crate::components::general::button::BasicButton;
-use crate::components::general::hocs::permission_guard::PermissionGuard;
-use crate::components::general::hocs::permission_guard::PermissionMatch;
-use crate::components::general::popover::Popover;
+use detaxine_ui::components::{
+    actions::button::BasicButton, feedback::popover::Popover, forms::toggle_switch::ToggleSwitch,
+};
+
+use crate::components::hocs::permission_guard::PermissionGuard;
+use crate::components::hocs::permission_guard::PermissionMatch;
 use crate::data::context::users::sign_out;
 use crate::data::{
     context::store::{AppStateContext, AppStateContextStoreFields},
@@ -62,7 +63,6 @@ pub fn Nav(
     let store = expect_context::<Store<AppStateContext>>();
     let user_profile = store.user().user_profile();
     let dark_mode_is_active = store.dark_mode_is_active();
-    let dark_mode_signal = Signal::derive(move || dark_mode_is_active.get());
     let navigate = use_navigate();
     // To this — so it only tracks one signal:
     let token = store.user().auth_info().token();
@@ -109,12 +109,20 @@ pub fn Nav(
             <div class="display-constraints flex items-center justify-between h-[47px]">
 
                 // Left — hamburger (mobile only on non-dashboard, always on dashboard)
-                <button
-                    class=move || format!("border-none cursor-pointer shrink-0 {}", if !is_dashboard.get() { "md:hidden" } else { "" })
-                    on:click=move |ev| onmenuclick.run(ev)
-                >
-                    <Icon width="24" height="24" icon=CgMenuLeft />
-                </button>
+                {
+                    move || {
+                        let hidden = if !is_dashboard.get() { "md:hidden" } else { "" };
+
+                        view! {
+                            <BasicButton
+                                style_ext=format!("border-none cursor-pointer shrink-0 {}", hidden)
+                                on:click=move |ev| onmenuclick.run(ev)
+                            >
+                                <Icon width="24" height="24" icon=CgMenuLeft />
+                            </BasicButton>
+                        }
+                    }
+                }
 
                 // Center/Left — logo
                 <A href="/" attr:class="flex items-center h-full shrink-0">
@@ -151,19 +159,20 @@ pub fn Nav(
                     })}
 
                     // Dark mode toggle — desktop only
-                    <div class="hidden md:flex items-center gap-[5px]">
-                        <ToggleSwitch
-                            active=dark_mode_signal
-                            label_active=""
-                            label_inactive=""
-                            on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
-                            id_attr="dark_mode_toggle"
-                        />
-                        {move || {
-                            let icon = if dark_mode_is_active.get() { BsMoon } else { BsSun };
-                            view! { <Icon icon=icon /> }
-                        }}
-                    </div>
+                    {move || {
+                        let is_dark = dark_mode_is_active.get();
+                        let icon = if is_dark { BsMoon } else { BsSun };
+                        view! {
+                            <div class="hidden md:flex items-center gap-[5px]">
+                                <ToggleSwitch
+                                    initial_active_state=is_dark
+                                    on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
+                                    id_attr="dark_mode_toggle"
+                                />
+                                <Icon icon=icon />
+                            </div>
+                        }
+                    }}
 
                     // CTA — desktop, public only
                     {move || (!is_dashboard.get() && !is_blog.get()).then(|| view! {
@@ -181,7 +190,7 @@ pub fn Nav(
                             class="flex md:hidden items-center cursor-pointer"
                             on:click=move |_| store.show_mobile_search().set(true)
                         >
-                            <Icon width="24" height="24" icon=IoSearchOutline />
+                            <Icon width="16" height="16" icon=BsSearch />
                         </span>
                     })}
 

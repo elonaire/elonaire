@@ -1,11 +1,9 @@
+use detaxine_ui::components::feedback::modal::modal::{BasicModal, UseCase};
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
 
-use crate::{
-    components::general::modal::modal::{BasicModal, UseCase},
-    data::context::store::{AppStateContext, AppStateContextStoreFields},
-};
+use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 
 #[component]
 pub fn ErrorHandler() -> impl IntoView {

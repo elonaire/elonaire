@@ -1,23 +1,20 @@
 use std::collections::HashMap;
 
+use detaxine_ui::components::{
+    data_display::table::data_table::{Column, DataTable, TableCellData},
+    feedback::spinner::Spinner,
+    navigation::breadcrumbs::Breadcrumbs,
+};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos_meta::*;
 use leptos_router::components::Outlet;
 use reactive_stores::Store;
 
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_service_requests;
-use crate::{
-    components::general::{
-        breadcrumbs::Breadcrumbs,
-        table::data_table::{Column, DataTable},
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
 };
 
 #[component]

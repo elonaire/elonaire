@@ -1,7 +1,5 @@
-use crate::components::general::stepper::{Step, StepInfo, Stepper};
 use crate::data::models::general::shared::RestResponse;
 use crate::utils::errors::{handle_graphql_errors, unwrap_rest_response};
-use crate::utils::formatters::{Pipe, PipeOption};
 use crate::views::public::error_handler::ErrorHandler;
 use std::collections::HashMap;
 
@@ -15,17 +13,29 @@ use leptos_router::hooks::use_location;
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement, HtmlSelectElement, SubmitEvent};
 
-use crate::components::forms::checkbox::CheckboxInputField;
-use crate::components::forms::datepicker::DatePicker;
-use crate::components::forms::input::{CustomFileInput, InputField, InputFieldType};
-use crate::components::forms::reactive_form::ReactiveForm;
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::modal::modal::{BasicModal, UseCase};
-use crate::components::general::spinner::Spinner;
-use crate::components::{
-    forms::select::{SelectInput, SelectOption},
-    general::button::BasicButton,
+use detaxine_ui::{
+    components::{
+        actions::button::BasicButton,
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            checkbox::CheckboxInputField,
+            datepicker::DatePicker,
+            input::{CustomFileInput, InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{SelectInput, SelectOption},
+            textarea::Textarea,
+        },
+        navigation::stepper::{Step, StepInfo, Stepper},
+    },
+    utils::{
+        formatters::{Pipe, PipeOption},
+        forms::deserialize_form,
+    },
 };
+
 use crate::data::context::shared::fetch_billing_rate;
 use crate::data::context::store::{AppStateContext, AppStateContextStoreFields};
 use crate::data::models::general::{
@@ -38,7 +48,6 @@ use crate::data::models::graphql::shared::{
     UserService,
 };
 use crate::utils::custom_traits::EnumerableEnum;
-use crate::utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref};
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
 
 const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
@@ -109,40 +118,30 @@ pub fn RatecardComponent(
 
         if services_form_is_valid.get() && billing_interval_form_is_valid.get() {
             spawn_local(async move {
-                if let Some(billing_interval_form_data) =
-                    get_form_data_from_form_ref(&billing_interval_form_ref)
-                {
-                    if let Some(services_form_data) =
-                        get_form_data_from_form_ref(&services_form_ref)
-                    {
-                        let deserialized_billing_interval_form_data =
-                            deserialize_form_data_to_struct::<BillingIntervalForm>(
-                                &billing_interval_form_data,
-                                false,
-                                None,
-                            );
-                        let deserialized_services_form_data =
-                            deserialize_form_data_to_struct::<ServiceIdsForm>(
-                                &services_form_data,
-                                false,
-                                Some(&["service_ids"]),
-                            );
+                let deserialized_billing_interval_form_data = deserialize_form::<BillingIntervalForm>(
+                    &billing_interval_form_ref,
+                    false,
+                    None,
+                );
+                let deserialized_services_form_data = deserialize_form::<ServiceIdsForm>(
+                    &services_form_ref,
+                    false,
+                    Some(&["service_ids"]),
+                );
 
-                        if let Some(billing_interval) = deserialized_billing_interval_form_data {
-                            if let Some(services) = deserialized_services_form_data {
-                                let vars = FetchBillingRateVars {
-                                    billing_interval: billing_interval.billing_interval,
-                                    service_ids: services.service_ids,
-                                };
-
-                                let billing_rate = fetch_billing_rate(vars, None, &store).await;
-
-                                if let Ok(amount_str) = billing_rate {
-                                    // Process ratecards data here
-                                    set_amount.set(Some(amount_str.parse().unwrap_or(0.0)));
-                                }
-                            };
+                if let Some(billing_interval) = deserialized_billing_interval_form_data {
+                    if let Some(services) = deserialized_services_form_data {
+                        let vars = FetchBillingRateVars {
+                            billing_interval: billing_interval.billing_interval,
+                            service_ids: services.service_ids,
                         };
+
+                        let billing_rate = fetch_billing_rate(vars, None, &store).await;
+
+                        if let Ok(amount_str) = billing_rate {
+                            // Process ratecards data here
+                            set_amount.set(Some(amount_str.parse().unwrap_or(0.0)));
+                        }
                     };
                 };
             });
@@ -254,28 +253,10 @@ pub fn RatecardComponent(
                             set_is_loading.set(false);
                             return;
                         };
-                        let Ok(request_metadata_form_data) = FormData::new() else {
-                            set_is_loading.set(false);
-                            return;
-                        };
-
-                        let (Some(service_request_form_data), Some(services_form_data)) = (
-                            get_form_data_from_form_ref(&service_request_form_ref),
-                            get_form_data_from_form_ref(&services_form_ref),
-                        ) else {
-                            set_is_loading.set(false);
-                            return;
-                        };
-
-                        uploaded_files.iter().for_each(|uploaded_file| {
-                            request_metadata_form_data
-                                .append_with_str("supporting_docs_file_ids", &uploaded_file.file_id)
-                                .ok();
-                        });
 
                         let Some(deserialized_services_form_data) =
-                            deserialize_form_data_to_struct::<ServiceIdsForm>(
-                                &services_form_data,
+                            deserialize_form::<ServiceIdsForm>(
+                                &services_form_ref,
                                 false,
                                 Some(&["service_ids"]),
                             )
@@ -284,29 +265,22 @@ pub fn RatecardComponent(
                             return;
                         };
 
-                        deserialized_services_form_data
-                            .service_ids
-                            .iter()
-                            .for_each(|service_id| {
-                                request_metadata_form_data
-                                    .append_with_str("service_ids", service_id)
-                                    .ok();
-                            });
-
                         let (
                             Some(deserialized_service_request_form_data),
                             Some(deserialized_service_request_metadata_form_data),
                         ) = (
-                            deserialize_form_data_to_struct::<ServiceRequestInput>(
-                                &service_request_form_data,
+                            deserialize_form::<ServiceRequestInput>(
+                                &service_request_form_ref,
                                 false,
                                 None,
                             ),
-                            deserialize_form_data_to_struct::<ServiceRequestInputMetadata>(
-                                &request_metadata_form_data,
-                                false,
-                                Some(&["service_ids", "supporting_docs_file_ids"]),
-                            ),
+                            Some(ServiceRequestInputMetadata {
+                                supporting_docs_file_ids: uploaded_files
+                                    .iter()
+                                    .map(|uploaded_file| uploaded_file.file_id.clone())
+                                    .collect(),
+                                service_ids: deserialized_services_form_data.service_ids,
+                            }),
                         )
                         else {
                             set_is_loading.set(false);
@@ -438,8 +412,7 @@ pub fn RatecardComponent(
                    <Step>
                         <div class="flex flex-col gap-[20px]">
                             { move || if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
-                                let Some(form_data) = get_form_data_from_form_ref(first_form_ref) else { return None };
-                                let Some(data) = deserialize_form_data_to_struct::<ServiceRequestInput>(&form_data, false, None) else { return None };
+                                let Some(data) = deserialize_form::<ServiceRequestInput>(&first_form_ref, false, None) else { return None };
                                 Some(view! {
                                     <h4>"Basic Information"</h4>
                                     <table class="border-collapse border border-light-gray dark:border-mid-gray">
@@ -550,7 +523,7 @@ pub fn RatecardComponent(
                             name="billing_interval"
                             options=billing_interval
                             required=true
-                            initial_value=RwSignal::new("Hourly".into())
+                            initial_value="Hourly".to_string()
                             ext_input_styles=""
                             input_node_ref=billing_interval_field_ref
                             on:change=move |ev: ev::Event| {

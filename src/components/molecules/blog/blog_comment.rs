@@ -1,5 +1,6 @@
 use chrono::Utc;
 
+use detaxine_ui::{components::actions::button::BasicButton, utils::time::get_elapsed_time};
 use icondata::{
     AiHeartFilled, FaCommentRegular, FaFaceAngryRegular, FaFaceGrinTearsRegular,
     FaFaceSadTearRegular, FaFaceSurpriseRegular, IoStatsChart, LuThumbsDown, LuThumbsUp,
@@ -9,10 +10,7 @@ use leptos::prelude::*;
 use leptos::wasm_bindgen::JsCast;
 use web_sys::MouseEvent;
 
-use crate::{
-    components::general::button::BasicButton, data::models::graphql::shared::ReactionType,
-    utils::time::get_elapsed_time,
-};
+use crate::data::models::graphql::shared::ReactionType;
 
 #[derive(Clone, Debug)]
 pub struct CommentReactionDetails {
@@ -138,13 +136,12 @@ pub fn BlogComment(
                             if show_reactions.get() { "opacity-100 translate-y-0 pointer-events-auto" }
                             else { "opacity-0 translate-y-2 pointer-events-none" }
                         )>
-                            {reactions.iter().map(|(reaction_type, emoji)| {
-                                let reaction_type = *reaction_type;
+                            {reactions.into_iter().map(|(reaction_type, emoji)| {
                                 let is_selected = current_user_reaction == Some(reaction_type);
                                 let comment_id_clone = comment_id.clone();
                                 view! {
-                                    <button
-                                        class=move || format!(
+                                    <BasicButton
+                                        style_ext=format!(
                                             "text-xl transition-transform duration-150 cursor-pointer hover:scale-125 flex flex-col items-center gap-1 {}",
                                             if is_selected { "scale-125" } else { "" }
                                         )
@@ -158,8 +155,8 @@ pub fn BlogComment(
                                             });
                                         }
                                     >
-                                        {*emoji}
-                                    </button>
+                                        {emoji}
+                                    </BasicButton>
                                 }
                             }).collect::<Vec<_>>()}
                         </div>

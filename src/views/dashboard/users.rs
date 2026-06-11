@@ -1,6 +1,26 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::{
+            table::data_table::{Column, DataTable, TableCellData},
+            tag::LabelTag,
+        },
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            input::{InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+        schemas::props::ColorTemperature,
+    },
+    utils::forms::deserialize_form,
+};
+use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,34 +30,15 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::HtmlFormElement;
 
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
-use crate::components::general::tag::LabelTag;
-use crate::components::schemas::props::ColorTemperature;
 use crate::data::models::graphql::acl::{
     AccountStatus, FetchUsersResponse, SignUpResponse, SignUpVars, UserInput,
 };
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+};
 use crate::utils::graphql_client::{
     perform_mutation_or_query_with_vars, perform_query_without_vars,
-};
-use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
 };
 
 const ACL_SERVICE_API: Option<&str> = option_env!("ACL_SERVICE_API");
@@ -196,7 +197,7 @@ pub fn UsersList() -> impl IntoView {
                 <A href="/dashboard/users/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />
@@ -224,79 +225,75 @@ pub fn CreateUser() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                if let Some(form_data) = get_form_data_from_form_ref(&form_ref) {
-                    let deserialized_form_data =
-                        deserialize_form_data_to_struct::<UserInput>(&form_data, true, None);
+                let deserialized_form_data = deserialize_form::<UserInput>(&form_ref, true, None);
 
-                    if deserialized_form_data.is_none() {
-                        set_is_loading.set(false);
-                        return;
-                    }
+                if deserialized_form_data.is_none() {
+                    set_is_loading.set(false);
+                    return;
+                }
 
-                    let deserialized_form_data = deserialized_form_data.unwrap_or_default();
+                let deserialized_form_data = deserialized_form_data.unwrap_or_default();
 
-                    let input_vars = SignUpVars {
-                        user: deserialized_form_data,
-                    };
+                let input_vars = SignUpVars {
+                    user: deserialized_form_data,
+                };
 
-                    let query = r#"
-                           mutation SignUp($user: UserInput!) {
-                                signUp(user: $user) {
-                                    data {
-                                        id
-                                        fullName
-                                        email
-                                        status
-                                        oauthClient
-                                    }
-                                    metadata {
-                                        newAccessToken
-                                        requestId
-                                    }
+                let query = r#"
+                       mutation SignUp($user: UserInput!) {
+                            signUp(user: $user) {
+                                data {
+                                    id
+                                    fullName
+                                    email
+                                    status
+                                    oauthClient
                                 }
-                           }
-                       "#;
-
-                    let mut headers = HashMap::new() as HashMap<String, String>;
-                    headers.insert(
-                        "Authorization".into(),
-                        format!(
-                            "Bearer {}",
-                            store.user().auth_info().token().get_untracked()
-                        ),
-                    );
-
-                    let Some(acl_service_api) = ACL_SERVICE_API else {
-                        return;
-                    };
-
-                    let response =
-                        perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
-                            Some(&headers),
-                            acl_service_api,
-                            query,
-                            input_vars,
-                        )
-                        .await;
-
-                    match response.get_data() {
-                        Some(_data) => {
-                            if let Some(form) = form_ref
-                                .get_untracked()
-                                .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
-                            {
-                                form.reset();
-                                set_form_is_valid.set(false);
-                            } else {
+                                metadata {
+                                    newAccessToken
+                                    requestId
+                                }
                             }
-                            set_is_loading.set(false);
+                       }
+                   "#;
 
-                            success_modal_is_open.update(|status| *status = true);
+                let mut headers = HashMap::new() as HashMap<String, String>;
+                headers.insert(
+                    "Authorization".into(),
+                    format!(
+                        "Bearer {}",
+                        store.user().auth_info().token().get_untracked()
+                    ),
+                );
+
+                let Some(acl_service_api) = ACL_SERVICE_API else {
+                    return;
+                };
+
+                let response = perform_mutation_or_query_with_vars::<SignUpResponse, SignUpVars>(
+                    Some(&headers),
+                    acl_service_api,
+                    query,
+                    input_vars,
+                )
+                .await;
+
+                match response.get_data() {
+                    Some(_data) => {
+                        if let Some(form) = form_ref
+                            .get_untracked()
+                            .and_then(|el| el.dyn_into::<HtmlFormElement>().ok())
+                        {
+                            form.reset();
+                            set_form_is_valid.set(false);
+                        } else {
                         }
-                        None => {
-                            set_is_loading.set(false);
-                        }
-                    };
+                        set_is_loading.set(false);
+
+                        success_modal_is_open.update(|status| *status = true);
+                    }
+                    None => {
+                        set_is_loading.set(false);
+                    }
                 };
             });
         }

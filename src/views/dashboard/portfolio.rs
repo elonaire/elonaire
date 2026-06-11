@@ -1,7 +1,26 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
-use leptos::ev::{self, SubmitEvent};
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::table::data_table::{Column, DataTable, TableCellData},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            datepicker::DatePicker,
+            input::{CustomFileInput, InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            select::{CustomSelectInput, SelectInput, SelectOption},
+            textarea::Textarea,
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+    },
+    utils::forms::{deserialize_form, get_form_data_from_form_ref},
+};
+use icondata::BsPlusLg;
+use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::wasm_bindgen::JsCast;
@@ -10,48 +29,27 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::select::CustomSelectInput;
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
 use crate::data::context::shared::fetch_portfolio;
 use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::shared::{
     CreatePortfolioItemResponse, UserPortfolioCategory, UserPortfolioInputVars,
 };
+use crate::data::{
+    context::{
+        shared::fetch_skills,
+        store::{AppStateContext, AppStateContextStoreFields},
+    },
+    models::{
+        general::{
+            acl::{AuthInfoStoreFields, UserInfoStoreFields},
+            files::UploadedFileResponse,
+        },
+        graphql::shared::UserPortfolioInput,
+    },
+};
 use crate::utils::custom_traits::EnumerableEnum;
 use crate::utils::errors::unwrap_rest_response;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            datepicker::DatePicker,
-            input::{CustomFileInput, InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-            select::{SelectInput, SelectOption},
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::{
-            shared::fetch_skills,
-            store::{AppStateContext, AppStateContextStoreFields},
-        },
-        models::{
-            general::{
-                acl::{AuthInfoStoreFields, UserInfoStoreFields},
-                files::UploadedFileResponse,
-            },
-            graphql::shared::UserPortfolioInput,
-        },
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-};
 
 const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
@@ -188,7 +186,7 @@ pub fn PortfolioList() -> impl IntoView {
                 <A href="/dashboard/portfolio/create">
                     <BasicButton
                         button_text="Create"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />
@@ -215,7 +213,6 @@ pub fn CreatePortfolio() -> impl IntoView {
     let skills_select_options = RwSignal::new(vec![] as Vec<SelectOption>);
     let success_modal_is_open = RwSignal::new(false);
     let confirm_modal_is_open = RwSignal::new(false);
-    let init_date = RwSignal::new(None);
     let (is_loading, set_is_loading) = signal(false);
 
     let portfolio_categories = RwSignal::new(
@@ -311,9 +308,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form_data_to_struct::<UserPortfolioInput>(
-                                &form_data, false, None,
-                            )
+                            deserialize_form::<UserPortfolioInput>(&form_ref, false, None)
                         else {
                             set_is_loading.set(false);
                             return;
@@ -392,9 +387,9 @@ pub fn CreatePortfolio() -> impl IntoView {
         }
     });
 
-    let onreset_handler = Callback::new(move |_ev: ev::Event| {
-        init_date.set(None);
-    });
+    // let onreset_handler = Callback::new(move |_ev: ev::Event| {
+    //     init_date.set(None);
+    // });
 
     Effect::new(move || {
         skills().get().iter().for_each(|skill| {
@@ -457,12 +452,12 @@ pub fn CreatePortfolio() -> impl IntoView {
 
             <h1 class="display-constraints">Create New Portfolio Project</h1>
 
-            <ReactiveForm on:submit=handle_step_form_submit onreset=onreset_handler form_ref=form_ref>
+            <ReactiveForm on:submit=handle_step_form_submit form_ref=form_ref>
                 <div class="display-constraints flex flex-col gap-[20px]">
                     <InputField field_type=InputFieldType::Text label="Title" required=true id_attr="title" name="title" />
                     <Textarea label="Description" required=true id_attr="description" name="description" />
-                    <DatePicker label="Start Date" required=true id_attr="start_date" initial_value=init_date name="start_date" />
-                    <DatePicker label="End Date" required=true id_attr="end_date" initial_value=init_date name="end_date" />
+                    <DatePicker label="Start Date" required=true id_attr="start_date" name="start_date" />
+                    <DatePicker label="End Date" required=true id_attr="end_date" name="end_date" />
                     <InputField field_type=InputFieldType::Text label="Link" required=true id_attr="link" name="link" />
                     <SelectInput
                     label="Category"

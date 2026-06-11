@@ -1,6 +1,23 @@
 use std::collections::HashMap;
 
-use icondata as IconData;
+use detaxine_ui::{
+    components::{
+        actions::button::{BasicButton, ButtonType},
+        data_display::table::data_table::{Column, DataTable, TableCellData},
+        feedback::{
+            modal::modal::{BasicModal, UseCase},
+            spinner::Spinner,
+        },
+        forms::{
+            input::{CustomFileInput, InputField, InputFieldType},
+            reactive_form::ReactiveForm,
+            textarea::Textarea,
+        },
+        navigation::breadcrumbs::Breadcrumbs,
+    },
+    utils::forms::{deserialize_form, get_form_data_from_form_ref},
+};
+use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -10,10 +27,6 @@ use leptos_router::components::{A, Outlet};
 use reactive_stores::Store;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 
-use crate::components::forms::input::CustomFileInput;
-use crate::components::forms::textarea::Textarea;
-use crate::components::general::spinner::Spinner;
-use crate::components::general::table::data_table::TableCellData;
 use crate::data::models::general::shared::RestResponse;
 use crate::data::models::graphql::shared::{CreateUserServiceResponse, UserServiceInputVars};
 use crate::data::{
@@ -21,27 +34,12 @@ use crate::data::{
     models::{general::files::UploadedFileResponse, graphql::shared::UserServiceInput},
 };
 
+use crate::data::{
+    context::store::{AppStateContext, AppStateContextStoreFields},
+    models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
+};
 use crate::utils::errors::unwrap_rest_response;
 use crate::utils::graphql_client::perform_mutation_or_query_with_vars;
-use crate::{
-    components::{
-        forms::{
-            input::{InputField, InputFieldType},
-            reactive_form::ReactiveForm,
-        },
-        general::{
-            breadcrumbs::Breadcrumbs,
-            button::{BasicButton, ButtonType},
-            modal::modal::{BasicModal, UseCase},
-            table::data_table::{Column, DataTable},
-        },
-    },
-    data::{
-        context::store::{AppStateContext, AppStateContextStoreFields},
-        models::general::acl::{AuthInfoStoreFields, UserInfoStoreFields},
-    },
-    utils::forms::{deserialize_form_data_to_struct, get_form_data_from_form_ref},
-};
 
 const FILES_SERVICE_API: Option<&str> = option_env!("FILES_SERVICE_API");
 const SHARED_SERVICE_API: Option<&str> = option_env!("SHARED_SERVICE_API");
@@ -144,7 +142,7 @@ pub fn UserServicesList() -> impl IntoView {
                 <A href="/dashboard/services/create">
                     <BasicButton
                         button_text="Create Service"
-                        icon=Some(IconData::BsPlusLg)
+                        icon=Some(BsPlusLg)
                         icon_before=true
                         style_ext="bg-primary text-contrast-white"
                     />
@@ -254,9 +252,7 @@ pub fn CreateUserService() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form_data_to_struct::<UserServiceInput>(
-                                &form_data, false, None,
-                            )
+                            deserialize_form::<UserServiceInput>(&form_ref, false, None)
                         else {
                             set_is_loading.set(false);
                             return;
