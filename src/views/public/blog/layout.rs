@@ -1,4 +1,4 @@
-use detaxine_ui::components::forms::toggle_switch::ToggleSwitch;
+use detaxine_ui::components::{actions::button::BasicButton, forms::toggle_switch::ToggleSwitch};
 use icondata::{AiHomeOutlined, BsInfoCircle, BsMoon, BsRss, BsSun, IoClose};
 use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
@@ -73,12 +73,12 @@ pub fn BlogLayout() -> impl IntoView {
                             <div class="flex flex-col mx-[5%] min-h-svh">
                                 <div class="flex items-center justify-between h-[47px] border-b border-light-gray">
                                     <p class="font-medium">NAVIGATION</p>
-                                    <button
-                                        class="bg-transparent border-none"
+                                    <BasicButton
+                                        style_ext="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
                                         <Icon width="24" height="24" icon=IoClose />
-                                    </button>
+                                    </BasicButton>
                                 </div>
                                 <nav class="flex flex-col">
                                     <For
@@ -134,8 +134,7 @@ pub fn BlogLayout() -> impl IntoView {
                                                 <div class="flex md:hidden items-center gap-[5px]">
                                                     <ToggleSwitch
                                                     initial_active_state=is_dark
-                                                    label_active=""
-                                                    label_inactive=""
+                                                    on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
                                                     />
                                                     <Icon icon=icon />
                                                 </div>

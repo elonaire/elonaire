@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use icondata::{
-    BsInfoCircle, BsMoon, BsPower, BsRss, BsSun, CgMenuLeft, IoSearchOutline,
+    BsInfoCircle, BsMoon, BsPower, BsRss, BsSearch, BsSun, CgMenuLeft,
     MdiCardAccountDetailsOutline, MdiCertificateOutline, MdiStore, MdiTabletDashboard,
     MdiTrophyAward, RiArticleDocumentLine,
 };
@@ -109,12 +109,20 @@ pub fn Nav(
             <div class="display-constraints flex items-center justify-between h-[47px]">
 
                 // Left — hamburger (mobile only on non-dashboard, always on dashboard)
-                <button
-                    class=move || format!("border-none cursor-pointer shrink-0 {}", if !is_dashboard.get() { "md:hidden" } else { "" })
-                    on:click=move |ev| onmenuclick.run(ev)
-                >
-                    <Icon width="24" height="24" icon=CgMenuLeft />
-                </button>
+                {
+                    move || {
+                        let hidden = if !is_dashboard.get() { "md:hidden" } else { "" };
+
+                        view! {
+                            <BasicButton
+                                style_ext=format!("border-none cursor-pointer shrink-0 {}", hidden)
+                                on:click=move |ev| onmenuclick.run(ev)
+                            >
+                                <Icon width="24" height="24" icon=CgMenuLeft />
+                            </BasicButton>
+                        }
+                    }
+                }
 
                 // Center/Left — logo
                 <A href="/" attr:class="flex items-center h-full shrink-0">
@@ -161,9 +169,8 @@ pub fn Nav(
                                     on:change=move |_| dark_mode_is_active.set(!dark_mode_is_active.get())
                                     id_attr="dark_mode_toggle"
                                 />
-
+                                <Icon icon=icon />
                             </div>
-                            <Icon icon=icon />
                         }
                     }}
 
@@ -183,7 +190,7 @@ pub fn Nav(
                             class="flex md:hidden items-center cursor-pointer"
                             on:click=move |_| store.show_mobile_search().set(true)
                         >
-                            <Icon width="24" height="24" icon=IoSearchOutline />
+                            <Icon width="16" height="16" icon=BsSearch />
                         </span>
                     })}
 

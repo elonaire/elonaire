@@ -1,3 +1,4 @@
+use detaxine_ui::components::actions::button::BasicButton;
 use leptos::prelude::*;
 use leptos_router::hooks::use_navigate;
 use reactive_stores::Store;
@@ -23,20 +24,20 @@ pub fn NotFound() -> impl IntoView {
                     </p>
                 </div>
                 <div class="flex gap-3">
-                    <button
-                        class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-gray/5 dark:hover:bg-mid-gray/10 transition-colors"
+                    <BasicButton
+                        style_ext="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-gray/5 dark:hover:bg-mid-gray/10 transition-colors"
                         on:click=move |_| {
                             store.redirect_to().get().map(|route| navigate_404(&route, Default::default()));
                         }
                     >
                         "Go back"
-                    </button>
-                    <button
-                        class="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
+                    </BasicButton>
+                    <BasicButton
+                        style_ext="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
                         on:click=move |_| navigate("/", Default::default())
                     >
                         "Go home"
-                    </button>
+                    </BasicButton>
                 </div>
             </div>
         </div>
@@ -62,20 +63,20 @@ pub fn InternalServerError() -> impl IntoView {
                     </p>
                 </div>
                 <div class="flex gap-3">
-                    <button
-                        class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-gray/5 dark:hover:bg-mid-gray/10 transition-colors"
+                    <BasicButton
+                        style_ext="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-gray/5 dark:hover:bg-mid-gray/10 transition-colors"
                         on:click=move |_| navigate("/", Default::default())
                     >
                         "Go home"
-                    </button>
-                    <button
-                        class="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
+                    </BasicButton>
+                    <BasicButton
+                        style_ext="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
                         on:click=move |_| {
                             store.redirect_to().get().map(|route| navigate_500(&route, Default::default()));
                         }
                     >
                         "Try again"
-                    </button>
+                    </BasicButton>
                 </div>
             </div>
         </div>

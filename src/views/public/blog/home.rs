@@ -484,18 +484,18 @@ pub fn BlogHome() -> impl IntoView {
                             store.show_mobile_search().set(false);
                         }
                     >
-                        <div class="bg-white w-full px-4 py-3 flex items-center gap-3 shadow-lg"
+                        <div class="bg-contrast-white w-full px-4 py-3 flex items-center gap-3 shadow-lg"
                             on:mousedown=move |e: MouseEvent| e.stop_propagation()
                         >
                             // Back/close button
-                            <button
-                                class="shrink-0"
+                            <BasicButton
+                                style_ext="shrink-0"
                                 on:click=move |_| {
                                     store.show_mobile_search().set(false);
                                 }
                             >
                                 <Icon icon=BsArrowLeft width="1.2rem" height="1.2rem" />
-                            </button>
+                            </BasicButton>
 
                             <div class="flex-1 relative">
                                 <InputField

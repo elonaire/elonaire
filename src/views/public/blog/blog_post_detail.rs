@@ -805,12 +805,12 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 if show_reactions.get() { "opacity-100 translate-y-0 pointer-events-auto" }
                                                 else { "opacity-0 translate-y-2 pointer-events-none" }
                                             )>
-                                                {reactions.iter().map(|(reaction_type, emoji)| {
-                                                    let reaction_type = *reaction_type;
+                                                {reactions.clone().into_iter().map(|(reaction_type, emoji)| {
+
                                                     let is_selected = move || selected_reaction.get() == Some(reaction_type);
                                                     view! {
-                                                        <button
-                                                            class=move || format!(
+                                                        <BasicButton
+                                                            style_ext=format!(
                                                                 "text-xl transition-transform duration-150 cursor-pointer hover:scale-125 flex flex-col items-center gap-1 {}",
                                                                 if is_selected() { "scale-125" } else { "" }
                                                             )
@@ -820,8 +820,8 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                                 handle_reaction_click(reaction_type);
                                                             }
                                                         >
-                                                            {*emoji}
-                                                        </button>
+                                                            {emoji}
+                                                        </BasicButton>
                                                     }
                                                 }).collect::<Vec<_>>()}
                                             </div>

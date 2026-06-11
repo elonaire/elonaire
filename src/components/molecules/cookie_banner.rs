@@ -1,4 +1,4 @@
-use detaxine_ui::components::forms::toggle_switch::ToggleSwitch;
+use detaxine_ui::components::{actions::button::BasicButton, forms::toggle_switch::ToggleSwitch};
 use leptos::prelude::*;
 use web_sys::{Storage, window};
 
@@ -183,38 +183,38 @@ pub fn CookieBanner(
                     </Show>
 
                     <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
-                        <button
-                            class="text-sm text-gray/50 dark:text-mid-gray hover:text-gray dark:hover:text-contrast-white px-3 py-2 transition-colors"
+                        <BasicButton
+                            style_ext="text-sm text-gray/50 dark:text-mid-gray hover:text-gray dark:hover:text-contrast-white px-3 py-2 transition-colors"
                             on:click=reject_all
                         >
                             "Reject all"
-                        </button>
+                        </BasicButton>
 
                         <Show
                             when=move || show_details.get()
                             fallback=move || view! {
-                                <button
-                                    class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
+                                <BasicButton
+                                    style_ext="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                     on:click=move |_| set_show_details.set(true)
                                 >
                                     "Manage preferences"
-                                </button>
+                                </BasicButton>
                             }
                         >
-                            <button
-                                class="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
+                            <BasicButton
+                                style_ext="text-sm px-4 py-2 rounded-[5px] border border-gray/20 dark:border-mid-gray/30 text-gray dark:text-mid-gray hover:bg-secondary/10 dark:hover:bg-mid-gray/10 transition-colors"
                                 on:click=save_preferences_handler
                             >
                                 "Save preferences"
-                            </button>
+                            </BasicButton>
                         </Show>
 
-                        <button
-                            class="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
+                        <BasicButton
+                            style_ext="text-sm px-4 py-2 rounded-[5px] bg-primary text-contrast-white hover:opacity-90 transition-opacity font-medium"
                             on:click=accept_all
                         >
                             "Accept all"
-                        </button>
+                        </BasicButton>
                     </div>
 
                 </div>

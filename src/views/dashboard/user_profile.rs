@@ -33,9 +33,9 @@ pub fn ProfilePage() -> impl IntoView {
                                     src=format!("{}?width=300", user.profile_picture.unwrap_or_default())
                                     class="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
                                 />
-                                <button class="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1.5 shadow flex items-center justify-center">
+                                <BasicButton style_ext="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1.5! shadow flex items-center justify-center">
                                     <Icon icon=BsCamera />
-                                </button>
+                                </BasicButton>
                             </div>
                             <div>
                                 <h2 class="text-lg font-semibold">{user.full_name.text(None)}</h2>

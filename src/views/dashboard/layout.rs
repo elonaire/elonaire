@@ -1,3 +1,4 @@
+use detaxine_ui::components::actions::button::BasicButton;
 use icondata as IconData;
 use icondata::Icon as IconId;
 use leptos::{ev, prelude::*};
@@ -164,12 +165,12 @@ pub fn DashboardLayout() -> impl IntoView {
                             <div class="flex flex-col mx-[5%]">
                                 <div class="flex items-center justify-between h-[47px] border-b border-light-gray">
                                     <p class="font-medium">NAVIGATION</p>
-                                    <button
-                                        class="bg-transparent border-none"
+                                    <BasicButton
+                                        style_ext="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
                                         <Icon width="24" height="24" icon=IconData::IoClose />
-                                    </button>
+                                    </BasicButton>
                                 </div>
                                 <nav class="flex flex-col">
                                     <For
