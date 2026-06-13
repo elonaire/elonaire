@@ -46,6 +46,7 @@ pub fn Resources() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -158,6 +159,7 @@ pub fn ResourcesList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -403,5 +405,5 @@ pub fn CreateResource() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

@@ -231,5 +231,5 @@ pub fn Contact() -> impl IntoView {
                 </div>
             </div>
         </div>
-    }
+    }.into_any()
 }

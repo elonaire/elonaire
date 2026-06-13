@@ -32,4 +32,5 @@ pub fn ProtectedRoute(children: ChildrenFn) -> impl IntoView {
     view! {
         {move || is_authenticated.get().then(|| children().into_view())}
     }
+    .into_any()
 }

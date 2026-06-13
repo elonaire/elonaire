@@ -189,5 +189,5 @@ pub fn BlogComment(
                 </div>
             </div>
         </div>
-    }
+    }.into_any()
 }

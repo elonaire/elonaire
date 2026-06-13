@@ -6,5 +6,5 @@ pub fn SectionTitle(#[prop(into)] title: String) -> impl IntoView {
         <div class="flex justify-center items-center border-2 border-light-gray rounded-[5px] h-[50px]">
             <h2 class="text-center">{title}</h2>
         </div>
-    }
+    }.into_any()
 }

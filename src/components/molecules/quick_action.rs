@@ -26,5 +26,5 @@ pub fn QuickAction(
                 <Icon width="15" height="15" icon=IconData::BsChevronRight />
             </div>
         </div>
-    }
+    }.into_any()
 }

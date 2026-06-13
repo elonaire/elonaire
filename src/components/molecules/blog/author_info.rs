@@ -26,4 +26,5 @@ pub fn AuthorInfo(
             <p class="text-xs hidden md:block">{full_name}</p>
         </div>
     }
+    .into_any()
 }

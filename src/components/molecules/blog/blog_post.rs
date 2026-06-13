@@ -24,5 +24,5 @@ pub fn BlogPostPreview(
                 <BlogPostMetadata category=category read_time=read_time />
             </div>
         </div>
-    }
+    }.into_any()
 }

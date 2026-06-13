@@ -54,6 +54,7 @@ pub fn Roles() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -173,6 +174,7 @@ pub fn RolesList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -469,5 +471,5 @@ pub fn CreateRole() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

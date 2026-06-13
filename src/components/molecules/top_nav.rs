@@ -17,4 +17,5 @@ pub fn TopNav() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }

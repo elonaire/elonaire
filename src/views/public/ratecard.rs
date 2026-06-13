@@ -59,5 +59,5 @@ pub fn Ratecard() -> impl IntoView {
                 </div>
             </div>
         </main>
-    }
+    }.into_any()
 }

@@ -58,6 +58,7 @@ pub fn Skills() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -193,6 +194,7 @@ pub fn SkillsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -456,5 +458,5 @@ pub fn CreateSkill() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

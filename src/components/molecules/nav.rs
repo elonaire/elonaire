@@ -276,5 +276,5 @@ pub fn Nav(
             </div>
         </div>
         </>
-    }
+    }.into_any()
 }

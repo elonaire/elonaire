@@ -46,6 +46,7 @@ pub fn Ratecards() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -158,6 +159,7 @@ pub fn RatecardsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -363,5 +365,5 @@ pub fn CreateRatecard() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

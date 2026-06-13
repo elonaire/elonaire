@@ -18,8 +18,7 @@ use detaxine_ui::{
     },
     utils::forms::deserialize_form,
 };
-use icondata::BsPlusLg;
-use icondata::TbAwardOff;
+use icondata::{BsPlusLg, TbAwardOffOutline};
 use leptos::ev::{self, SubmitEvent};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -50,6 +49,7 @@ pub fn Resume() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -183,6 +183,7 @@ pub fn ResumeItemsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -373,7 +374,7 @@ pub fn CreateResumeItem() -> impl IntoView {
                         { move || if achievements.get().is_empty() {
                             Some(view!{
                                 <div class="flex flex-col">
-                                    <Icon icon=TbAwardOff />
+                                    <Icon icon=TbAwardOffOutline />
                                     <p class="text-sm">No achievements added yet.</p>
                                 </div>
                             })
@@ -406,5 +407,5 @@ pub fn CreateResumeItem() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

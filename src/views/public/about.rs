@@ -70,5 +70,5 @@ pub fn About() -> impl IntoView {
                 </div>
             </div>
         </main>
-    }
+    }.into_any()
 }
