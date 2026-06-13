@@ -46,6 +46,7 @@ pub fn ServiceRates() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -163,6 +164,7 @@ pub fn ServiceRatesList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -391,5 +393,5 @@ pub fn CreateServiceRate() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

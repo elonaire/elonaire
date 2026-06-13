@@ -65,4 +65,5 @@ pub fn PermissionGuard(
             {children()}
         </Show>
     }
+    .into_any()
 }

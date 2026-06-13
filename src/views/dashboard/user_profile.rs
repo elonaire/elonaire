@@ -108,5 +108,5 @@ pub fn ProfilePage() -> impl IntoView {
             }
 
         </div>
-    }
+    }.into_any()
 }

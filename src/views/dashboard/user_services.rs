@@ -51,6 +51,7 @@ pub fn UserService() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -154,6 +155,7 @@ pub fn UserServicesList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -379,5 +381,5 @@ pub fn CreateUserService() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

@@ -628,5 +628,5 @@ pub fn BlogHome() -> impl IntoView {
                 </div>
             </div>
         </main>
-    }
+    }.into_any()
 }

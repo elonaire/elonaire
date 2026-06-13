@@ -134,5 +134,5 @@ pub fn Faqs() -> impl IntoView {
                 }).collect::<Vec<_>>()}
             </div>
         </div>
-    }
+    }.into_any()
 }

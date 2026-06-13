@@ -75,5 +75,5 @@ pub fn DashboardHome() -> impl IntoView {
                 </div>
             </div>
         </>
-    }
+    }.into_any()
 }

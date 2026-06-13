@@ -579,5 +579,5 @@ pub fn RatecardComponent(
                 <BasicButton button_text="Request Service" icon=Some(BsArrowRight) style_ext="bg-primary text-contrast-white" disabled=submit_is_disabled onclick=Callback::new(move |_| { service_request_modal_is_open.set(true); }) />
             </div>
         </div>
-    }
+    }.into_any()
 }

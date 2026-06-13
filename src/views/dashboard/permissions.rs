@@ -52,6 +52,7 @@ pub fn Permissions() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -190,6 +191,7 @@ pub fn PermissionsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -438,5 +440,5 @@ pub fn CreatePermission() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

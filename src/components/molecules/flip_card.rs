@@ -47,5 +47,5 @@ pub fn FlipCard(
 
             </div>
         </div>
-    }
+    }.into_any()
 }

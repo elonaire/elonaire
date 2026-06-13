@@ -34,5 +34,5 @@ pub fn ErrorHandler() -> impl IntoView {
                 <p>{move || current_error.get()}</p>
             </div>
         </BasicModal>
-    }
+    }.into_any()
 }

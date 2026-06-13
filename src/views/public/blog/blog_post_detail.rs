@@ -951,5 +951,5 @@ pub fn BlogPostDetail() -> impl IntoView {
         <div class="mt-auto">
             <Footer />
         </div>
-    }
+    }.into_any()
 }

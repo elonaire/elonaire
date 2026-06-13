@@ -185,5 +185,5 @@ pub fn About() -> impl IntoView {
             <div class="w-full h-[1px] bg-mid-gray mt-1"></div>
             <div class="w-full h-[3px] bg-mid-gray mt-1"></div>
         </div>
-    }
+    }.into_any()
 }

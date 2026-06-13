@@ -82,6 +82,7 @@ pub fn App() -> impl IntoView {
         <Link rel="icon" type_="image/png" sizes="32x32" href="public/favicon-32x32.png"/>
         <Link rel="icon" type_="image/png" sizes="16x16" href="public/favicon-16x16.png"/>
         <Link rel="manifest" href="public/site.webmanifest"/>
+        <Stylesheet id="leptos" href="/style/output.css"/>
         <CookieBanner />
         <div id="modal-root"></div>
         <ErrorBoundary
@@ -192,5 +193,5 @@ pub fn App() -> impl IntoView {
                 </Routes>
             </Router>
         </ErrorBoundary>
-    }
+    }.into_any()
 }
