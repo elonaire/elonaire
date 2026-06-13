@@ -222,5 +222,5 @@ pub fn WaitList() -> impl IntoView {
                 </div>
             </div>
         </div>
-    }
+    }.into_any()
 }

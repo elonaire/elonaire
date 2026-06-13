@@ -61,6 +61,7 @@ pub fn Portfolio() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -198,6 +199,7 @@ pub fn PortfolioList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -492,5 +494,5 @@ pub fn CreatePortfolio() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

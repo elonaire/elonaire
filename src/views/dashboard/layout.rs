@@ -224,5 +224,5 @@ pub fn DashboardLayout() -> impl IntoView {
                 </div>
             </div>
         </main>
-    }
+    }.into_any()
 }

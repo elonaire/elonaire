@@ -396,5 +396,5 @@ pub fn SignUp() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </div>
-    }
+    }.into_any()
 }

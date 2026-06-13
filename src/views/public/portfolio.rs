@@ -188,5 +188,5 @@ pub fn Portfolio() -> impl IntoView {
                 </div>
             </div>
         </main>
-    }
+    }.into_any()
 }

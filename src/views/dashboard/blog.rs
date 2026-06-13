@@ -59,6 +59,7 @@ pub fn Blog() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -389,5 +390,5 @@ pub fn CreateBlog() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

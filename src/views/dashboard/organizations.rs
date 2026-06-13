@@ -45,6 +45,7 @@ pub fn Organizations() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -157,6 +158,7 @@ pub fn OrganizationsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -301,5 +303,5 @@ pub fn CreateOrganization() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

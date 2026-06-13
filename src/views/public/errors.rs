@@ -41,7 +41,7 @@ pub fn NotFound() -> impl IntoView {
                 </div>
             </div>
         </div>
-    }
+    }.into_any()
 }
 
 #[component]
@@ -80,5 +80,5 @@ pub fn InternalServerError() -> impl IntoView {
                 </div>
             </div>
         </div>
-    }
+    }.into_any()
 }

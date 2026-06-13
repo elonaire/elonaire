@@ -50,6 +50,7 @@ pub fn Users() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -209,6 +210,7 @@ pub fn UsersList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -354,5 +356,5 @@ pub fn CreateUser() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

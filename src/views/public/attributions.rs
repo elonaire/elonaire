@@ -118,5 +118,5 @@ pub fn Attributions() -> impl IntoView {
                 }).collect::<Vec<_>>()}
             </div>
         </div>
-    }
+    }.into_any()
 }

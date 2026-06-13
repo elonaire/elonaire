@@ -18,7 +18,7 @@ pub fn BlogPostMetadata(
         <div class="flex items-center gap-[16px]">
             <p class="text-xs">{category.to_string()}</p><div class="size-[5px] rounded-full bg-mid-gray" /><p class="text-xs">{format!("{} min read", read_time)}</p>
         </div>
-    }
+    }.into_any()
 }
 
 /// This is a component that displays metadata for a blog post detail.
@@ -39,5 +39,5 @@ pub fn BlogDetailMetadata(
             <div class="size-[5px] rounded-full bg-mid-gray" />
             <p class="text-xs">{format!("{} min read", read_time)}</p>
         </div>
-    }
+    }.into_any()
 }

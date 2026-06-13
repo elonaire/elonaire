@@ -55,6 +55,7 @@ pub fn ProfessionalDetails() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -184,6 +185,7 @@ pub fn ProfessionalDetailsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -343,5 +345,5 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

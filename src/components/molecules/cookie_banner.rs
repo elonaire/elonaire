@@ -220,7 +220,7 @@ pub fn CookieBanner(
                 </div>
             </div>
         </Show>
-    }
+    }.into_any()
 }
 
 #[component]
@@ -248,7 +248,7 @@ fn CookieRow(
                 />
             </div>
         </div>
-    }
+    }.into_any()
 }
 
 // Helper functions

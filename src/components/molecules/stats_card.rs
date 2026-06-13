@@ -42,5 +42,5 @@ pub fn StatsCard(
             <p class="font-extrabold text-3xl">{move || figures.get()}</p>
             <p>{title}</p>
         </div>
-    }
+    }.into_any()
 }

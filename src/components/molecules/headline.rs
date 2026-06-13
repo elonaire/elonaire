@@ -11,4 +11,5 @@ pub fn Headline(#[prop(into)] title: String, #[prop(into)] description: String) 
             </div>
         </div>
     }
+    .into_any()
 }

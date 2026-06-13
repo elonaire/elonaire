@@ -154,5 +154,5 @@ pub fn PrivacyPolicy() -> impl IntoView {
                 }).collect::<Vec<_>>()}
             </div>
         </div>
-    }
+    }.into_any()
 }

@@ -146,5 +146,5 @@ pub fn MainLayout() -> impl IntoView {
 
             </div>
         </main>
-    }
+    }.into_any()
 }

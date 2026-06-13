@@ -24,6 +24,7 @@ pub fn ServiceRequests() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -125,4 +126,5 @@ pub fn ServiceRequestsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }

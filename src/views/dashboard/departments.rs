@@ -46,6 +46,7 @@ pub fn Departments() -> impl IntoView {
             <Outlet />
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -158,6 +159,7 @@ pub fn DepartmentsList() -> impl IntoView {
             </div>
         </>
     }
+    .into_any()
 }
 
 #[component]
@@ -409,5 +411,5 @@ pub fn CreateDepartment() -> impl IntoView {
                 </div>
             </ReactiveForm>
         </>
-    }
+    }.into_any()
 }

@@ -11,4 +11,5 @@ pub fn BlogSection(#[prop(into)] title: String) -> impl IntoView {
             </div>
         </div>
     }
+    .into_any()
 }

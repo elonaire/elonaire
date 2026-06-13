@@ -72,5 +72,5 @@ pub fn TermsOfService() -> impl IntoView {
                 }).collect::<Vec<_>>()}
             </div>
         </div>
-    }
+    }.into_any()
 }

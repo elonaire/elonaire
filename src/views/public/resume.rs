@@ -115,6 +115,7 @@ pub fn Resume() -> impl IntoView {
             </div>
         </main>
     }
+    .into_any()
 }
 
 /// utility function to generate resume timeline items

@@ -46,5 +46,5 @@ pub fn FeaturedPost(
                 </A>
             </div>
         </div>
-    }
+    }.into_any()
 }

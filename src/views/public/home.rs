@@ -317,5 +317,5 @@ pub fn Home() -> impl IntoView {
                 </div>
             </div>
         </div>
-    }
+    }.into_any()
 }
