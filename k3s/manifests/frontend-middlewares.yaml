@@ -49,3 +49,12 @@ spec:
   stripPrefix:
     prefixes:
       - /api/payments
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: compress-artifacts
+  namespace: techietenka
+spec:
+  compress: {}
