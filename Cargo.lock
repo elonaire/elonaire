@@ -443,9 +443,9 @@ dependencies = [
 
 [[package]]
 name = "detaxine-ui"
-version = "0.8.33"
+version = "0.8.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28721f8c612a051e188d13d701d63fa68db08df0520a5deea16e8d74239ad8cb"
+checksum = "cd38d30550d515ab43d137405345dfe61e02f53f9255635fb979d5248b72ed34"
 dependencies = [
  "chrono",
  "gloo",

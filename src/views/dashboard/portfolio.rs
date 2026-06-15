@@ -17,7 +17,10 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form, get_form_data_from_form_ref},
+    utils::forms::{
+        deserialize_form, deserialize_form_checked, deserialize_form_data,
+        get_form_data_from_form_ref,
+    },
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -310,7 +313,7 @@ pub fn CreatePortfolio() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form::<UserPortfolioInput>(&form_ref, false, None)
+                            deserialize_form_data::<UserPortfolioInput>(&form_data, false, None)
                         else {
                             set_is_loading.set(false);
                             return;
