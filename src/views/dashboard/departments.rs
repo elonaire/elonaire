@@ -15,7 +15,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form, get_form_data_from_form_ref},
+    utils::forms::deserialize_form_with_options,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -183,10 +183,15 @@ pub fn CreateDepartment() -> impl IntoView {
         if metadata_form_is_valid.get() && main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let deserialized_main_form_data =
-                    deserialize_form::<DepartmentInput>(&form_ref, false, None);
-                let deserialized_metadata_form_data =
-                    deserialize_form::<DepartmentMetadata>(&metadata_form_ref, false, None);
+                let deserialized_main_form_data = deserialize_form_with_options::<DepartmentInput>(
+                    &form_ref,
+                    &Default::default(),
+                );
+                let deserialized_metadata_form_data = deserialize_form_with_options::<
+                    DepartmentMetadata,
+                >(
+                    &metadata_form_ref, &Default::default()
+                );
 
                 if deserialized_main_form_data.is_none()
                     || deserialized_metadata_form_data.is_none()

@@ -10,7 +10,7 @@ use detaxine_ui::{
             reactive_form::ReactiveForm,
         },
     },
-    utils::forms::deserialize_form,
+    utils::forms::{FormDeserializeOptions, deserialize_form_with_options},
 };
 use icondata::{AiGithubOutlined, AiGoogleOutlined};
 use leptos::ev;
@@ -196,9 +196,13 @@ pub fn SignUp() -> impl IntoView {
                 if let Some(_submitter) = ev.submitter() {
                     set_is_loading.set(true);
                     spawn_local(async move {
-                        let Some(deserialized) =
-                            deserialize_form::<UserInput>(&signup_form_ref, true, None)
-                        else {
+                        let Some(deserialized) = deserialize_form_with_options::<UserInput>(
+                            &signup_form_ref,
+                            &FormDeserializeOptions {
+                                deserialize_bool: true,
+                                ..Default::default()
+                            },
+                        ) else {
                             set_is_loading.set(false);
                             return;
                         };
@@ -287,7 +291,13 @@ pub fn SignUp() -> impl IntoView {
             return;
         };
 
-        let Some(deserialized) = deserialize_form::<UserInput>(&signup_form_ref, true, None) else {
+        let Some(deserialized) = deserialize_form_with_options::<UserInput>(
+            &signup_form_ref,
+            &FormDeserializeOptions {
+                deserialize_bool: true,
+                ..Default::default()
+            },
+        ) else {
             return;
         };
 

@@ -18,7 +18,7 @@ use detaxine_ui::{
         navigation::breadcrumbs::Breadcrumbs,
         schemas::props::ColorTemperature,
     },
-    utils::forms::deserialize_form,
+    utils::forms::{FormDeserializeOptions, deserialize_form_with_options},
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -227,7 +227,13 @@ pub fn CreateUser() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let deserialized_form_data = deserialize_form::<UserInput>(&form_ref, true, None);
+                let deserialized_form_data = deserialize_form_with_options::<UserInput>(
+                    &form_ref,
+                    &FormDeserializeOptions {
+                        deserialize_bool: true,
+                        ..Default::default()
+                    },
+                );
 
                 if deserialized_form_data.is_none() {
                     set_is_loading.set(false);

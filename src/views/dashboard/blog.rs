@@ -28,7 +28,9 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form, deserialize_form_data, get_form_data_from_form_ref},
+    utils::forms::{
+        FormDeserializeOptions, deserialize_form_data_with_options, get_form_data_from_form_ref,
+    },
 };
 
 use crate::data::models::general::shared::RestResponse;
@@ -229,7 +231,13 @@ pub fn CreateBlog() -> impl IntoView {
                         }
 
                         let Some(deserialized_form_data) =
-                            deserialize_form_data::<BlogPostInput>(&form_data, true, None)
+                            deserialize_form_data_with_options::<BlogPostInput>(
+                                &form_data,
+                                &FormDeserializeOptions {
+                                    deserialize_bool: true,
+                                    ..Default::default()
+                                },
+                            )
                         else {
                             set_is_loading.set(false);
                             return;

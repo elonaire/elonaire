@@ -9,7 +9,7 @@ use detaxine_ui::{
             textarea::Textarea,
         },
     },
-    utils::forms::deserialize_form,
+    utils::forms::deserialize_form_with_options,
 };
 use icondata::{BsEnvelope, BsGithub, BsLinkedin, BsPerson, BsSend, BsTwitterX};
 use leptos::prelude::*;
@@ -49,9 +49,10 @@ pub fn Contact() -> impl IntoView {
             if ev.submitter().is_some() && form_is_valid.get() {
                 set_is_loading.set(true);
                 spawn_local(async move {
-                    let Some(message) =
-                        deserialize_form::<MessageInput>(&contact_form_ref, false, None)
-                    else {
+                    let Some(message) = deserialize_form_with_options::<MessageInput>(
+                        &contact_form_ref,
+                        &Default::default(),
+                    ) else {
                         set_is_loading.set(false);
                         return;
                     };

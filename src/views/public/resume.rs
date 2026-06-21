@@ -3,7 +3,7 @@ use detaxine_ui::{
         content::collapse::{Collapse, PanelInfo},
         data_display::timeline::{Timeline, TimelineItem, TimelineStatus},
     },
-    utils::time::convert_date_to_human_readable_format,
+    utils::{formatters::PipeOption, time::convert_date_to_human_readable_format},
 };
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
@@ -29,51 +29,6 @@ pub fn Resume() -> impl IntoView {
     let skills = move || store.skills();
     let (is_loading, set_is_loading) = signal(false);
 
-    let education_timeline_items = RwSignal::new(vec![] as Vec<TimelineItem>);
-    let experience_timeline_items = RwSignal::new(vec![] as Vec<TimelineItem>);
-
-    let technical_skills = RwSignal::new(vec![] as Vec<PanelInfo>);
-    let soft_skills = RwSignal::new(vec![] as Vec<PanelInfo>);
-
-    Effect::new(move || {
-        education_timeline_items.set(
-            resume()
-                .get()
-                .iter()
-                .filter(|resume| resume.section.as_ref() == Some(&UserResumeSection::Education))
-                .map(|resume| generate_timeline_item(resume))
-                .collect(),
-        );
-
-        experience_timeline_items.set(
-            resume()
-                .get()
-                .iter()
-                .filter(|resume| resume.section.as_ref() == Some(&UserResumeSection::Experience))
-                .map(|resume| generate_timeline_item(resume))
-                .collect(),
-        );
-    });
-
-    Effect::new(move || {
-        technical_skills.set(
-            skills()
-                .get()
-                .iter()
-                .filter(|skill| skill.skill_type.as_ref() == Some(&UserSkillType::Technical))
-                .map(|skill| generate_panel_info(skill))
-                .collect(),
-        );
-        soft_skills.set(
-            skills()
-                .get()
-                .iter()
-                .filter(|skill| skill.skill_type.as_ref() == Some(&UserSkillType::Soft))
-                .map(|skill| generate_panel_info(skill))
-                .collect(),
-        );
-    });
-
     Effect::new(move || {
         set_is_loading.set(true);
         spawn_local(async move {
@@ -95,21 +50,73 @@ pub fn Resume() -> impl IntoView {
                 <div class="display-constraints flex flex-col md:flex-row gap-[40px]">
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Education" />
-                        <Timeline steps=education_timeline_items />
+                        {
+                            move || {
+                                let education_timeline_items = RwSignal::new(resume()
+                                    .get()
+                                    .iter()
+                                    .filter(|resume| resume.section.as_ref() == Some(&UserResumeSection::Education))
+                                    .map(|resume| generate_timeline_item(resume))
+                                    .collect::<Vec<TimelineItem>>());
+
+                                view! {
+                                    <Timeline steps=education_timeline_items />
+                                }
+                            }
+                        }
                     </div>
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Work Experience" />
-                        <Timeline steps=experience_timeline_items />
+                        {
+                            move || {
+                                let experience_timeline_items = RwSignal::new(resume()
+                                    .get()
+                                    .iter()
+                                    .filter(|resume| resume.section.as_ref() == Some(&UserResumeSection::Experience))
+                                    .map(|resume| generate_timeline_item(resume))
+                                    .collect::<Vec<TimelineItem>>());
+
+                                view! {
+                                    <Timeline steps=experience_timeline_items />
+                                }
+                            }
+                        }
                     </div>
                 </div>
                 <div class="display-constraints flex flex-col md:flex-row gap-[40px]">
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Technical Skills" />
-                        <Collapse is_accordion=true panel_items=technical_skills />
+                        {
+                            move || {
+                                let technical_skills = RwSignal::new(skills()
+                                    .get()
+                                    .iter()
+                                    .filter(|skill| skill.skill_type.as_ref() == Some(&UserSkillType::Technical))
+                                    .map(|skill| generate_panel_info(skill))
+                                    .collect::<Vec<PanelInfo>>());
+
+                                view!{
+                                    <Collapse is_accordion=true panel_items=technical_skills />
+                                }
+                            }
+                        }
                     </div>
                     <div class="w-full md:basis-1/2 flex flex-col gap-[10px]">
                         <SectionTitle title="Soft Skills" />
-                        <Collapse is_accordion=true panel_items=soft_skills />
+                        {
+                            move || {
+                                let soft_skills = RwSignal::new(skills()
+                                    .get()
+                                    .iter()
+                                    .filter(|skill| skill.skill_type.as_ref() == Some(&UserSkillType::Soft))
+                                    .map(|skill| generate_panel_info(skill))
+                                    .collect::<Vec<PanelInfo>>());
+
+                                view!{
+                                    <Collapse is_accordion=true panel_items=soft_skills />
+                                }
+                            }
+                        }
                     </div>
                 </div>
             </div>
@@ -172,10 +179,12 @@ fn generate_timeline_item(resume: &UserResume) -> TimelineItem {
 fn generate_panel_info(skill: &UserSkill) -> PanelInfo {
     let skill = skill.clone();
 
-    let title_skill = skill.clone();
-    let children_skill = skill.clone();
+    let skill_ref = &skill;
+    let title_skill = skill_ref.clone();
+    let children_skill = skill_ref.clone();
 
     PanelInfo {
+        id: skill_ref.id.as_ref().cloned().unwrap_or_default(),
         title: ViewFn::from(move || {
             let level = title_skill
                 .level
@@ -185,15 +194,15 @@ fn generate_panel_info(skill: &UserSkill) -> PanelInfo {
 
             view! {
                 <div class="flex-1 flex flex-row items-center justify-between">
-                    <img src={title_skill.thumbnail.as_ref().unwrap_or(&Default::default()).clone()} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
-                    <p class="font-bold">{title_skill.name.as_ref().unwrap_or(&Default::default()).clone()}</p>
+                    <img src={title_skill.thumbnail.text(None)} alt="skill-img" class="size-7 rounded-[5px] object-cover" />
+                    <p class="font-bold">{title_skill.name.text(None)}</p>
                     <p class="text-xs">{format!("{:?}", level)}</p>
                 </div>
             }
         }),
         children: ViewFn::from(move || {
             view! {
-                <p>{children_skill.description.as_ref().unwrap_or(&Default::default()).clone()}</p>
+                <p>{children_skill.description.text(None)}</p>
             }
         }),
         ..Default::default()

@@ -7,7 +7,7 @@ use detaxine_ui::{
             reactive_form::ReactiveForm,
         },
     },
-    utils::forms::deserialize_form,
+    utils::forms::deserialize_form_with_options,
 };
 use icondata::BsEnvelope;
 use leptos::prelude::*;
@@ -39,9 +39,10 @@ pub fn WaitList() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let Some(deserialized_form_data) =
-                    deserialize_form::<SubscriberInput>(&subscription_form_ref, false, None)
-                else {
+                let Some(deserialized_form_data) = deserialize_form_with_options::<SubscriberInput>(
+                    &subscription_form_ref,
+                    &Default::default(),
+                ) else {
                     set_is_loading.set(false);
                     return;
                 };

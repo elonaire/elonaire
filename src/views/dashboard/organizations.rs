@@ -14,7 +14,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::deserialize_form,
+    utils::forms::{FormDeserializeOptions, deserialize_form_with_options},
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -175,8 +175,10 @@ pub fn CreateOrganization() -> impl IntoView {
         if main_form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let deserialized_main_form_data =
-                    deserialize_form::<OrganizationInput>(&form_ref, false, None);
+                let deserialized_main_form_data = deserialize_form_with_options::<OrganizationInput>(
+                    &form_ref,
+                    &FormDeserializeOptions::default(),
+                );
 
                 if deserialized_main_form_data.is_none() {
                     set_is_loading.set(false);

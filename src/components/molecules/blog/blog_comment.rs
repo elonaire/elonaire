@@ -119,10 +119,6 @@ pub fn BlogComment(
                 <div inner_html={content} />
                 // Reactions
                 <div class="flex gap-[25px]">
-                    // <BasicButton icon=Some(BiHeartRegular) button_text="25" icon_before=true on:click=move |_| react_to_comment(CommentReactionDetails {
-                    //     comment_id: comment_id.clone(),
-                    //     reaction_type: ReactionType::Like
-                    // }) children_style_ext="text-xs" />
                     <div
                         class="relative"
                         on:mouseenter=on_mouse_enter
@@ -157,7 +153,7 @@ pub fn BlogComment(
                                     >
                                         {emoji}
                                     </BasicButton>
-                                }
+                                }.into_any()
                             }).collect::<Vec<_>>()}
                         </div>
 
@@ -179,7 +175,7 @@ pub fn BlogComment(
                                             style_ext=format!("{}", if current_user_reaction.is_some() { "text-primary" } else { "" })
                                             children_style_ext="text-xs"
                                         />
-                                    }
+                                    }.into_any()
                                 }
                             }
                         </div>
