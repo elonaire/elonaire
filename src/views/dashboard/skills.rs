@@ -17,7 +17,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::{deserialize_form, get_form_data_from_form_ref},
+    utils::forms::{deserialize_form, deserialize_form_with_options, get_form_data_from_form_ref},
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -307,9 +307,11 @@ pub fn CreateSkill() -> impl IntoView {
                             return;
                         }
 
-                        let Some(deserialized_form_data) =
-                            deserialize_form::<UserSkillInput>(&form_ref, false, None)
-                        else {
+                        let Some(deserialized_form_data) = deserialize_form_with_options::<
+                            UserSkillInput,
+                        >(
+                            &form_ref, &Default::default()
+                        ) else {
                             set_is_loading.set(false);
                             return;
                         };

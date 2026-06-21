@@ -43,7 +43,8 @@ web-sys = { version = "0.3.102", features = [
     "NodeList",
 ] }
 wasm-bindgen-futures = "0.4.75"
-detaxine-ui = "0.8.36"
+detaxine-ui = "0.8.38"
+# detaxine-ui = { git = "https://github.com/elonaire/detaxine-ui", branch = "dev" }
 
 [profile.wasm-release]
 inherits = "release"

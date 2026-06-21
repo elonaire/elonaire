@@ -32,7 +32,7 @@ use detaxine_ui::{
     },
     utils::{
         formatters::{Pipe, PipeOption},
-        forms::deserialize_form,
+        forms::{FormDeserializeOptions, deserialize_form_with_options},
     },
 };
 
@@ -118,15 +118,17 @@ pub fn RatecardComponent(
 
         if services_form_is_valid.get() && billing_interval_form_is_valid.get() {
             spawn_local(async move {
-                let deserialized_billing_interval_form_data = deserialize_form::<BillingIntervalForm>(
-                    &billing_interval_form_ref,
-                    false,
-                    None,
-                );
-                let deserialized_services_form_data = deserialize_form::<ServiceIdsForm>(
+                let deserialized_billing_interval_form_data =
+                    deserialize_form_with_options::<BillingIntervalForm>(
+                        &billing_interval_form_ref,
+                        &Default::default(),
+                    );
+                let deserialized_services_form_data = deserialize_form_with_options::<ServiceIdsForm>(
                     &services_form_ref,
-                    false,
-                    Some(&["service_ids"]),
+                    &FormDeserializeOptions {
+                        vec_fields: Some(&["service_ids"]),
+                        ..Default::default()
+                    },
                 );
 
                 if let Some(billing_interval) = deserialized_billing_interval_form_data {
@@ -255,10 +257,12 @@ pub fn RatecardComponent(
                         };
 
                         let Some(deserialized_services_form_data) =
-                            deserialize_form::<ServiceIdsForm>(
+                            deserialize_form_with_options::<ServiceIdsForm>(
                                 &services_form_ref,
-                                false,
-                                Some(&["service_ids"]),
+                                &FormDeserializeOptions {
+                                    vec_fields: Some(&["service_ids"]),
+                                    ..Default::default()
+                                },
                             )
                         else {
                             set_is_loading.set(false);
@@ -269,10 +273,9 @@ pub fn RatecardComponent(
                             Some(deserialized_service_request_form_data),
                             Some(deserialized_service_request_metadata_form_data),
                         ) = (
-                            deserialize_form::<ServiceRequestInput>(
+                            deserialize_form_with_options::<ServiceRequestInput>(
                                 &service_request_form_ref,
-                                false,
-                                None,
+                                &Default::default(),
                             ),
                             Some(ServiceRequestInputMetadata {
                                 supporting_docs_file_ids: uploaded_files
@@ -412,7 +415,7 @@ pub fn RatecardComponent(
                    <Step>
                         <div class="flex flex-col gap-[20px]">
                             { move || if let Some(first_form_ref) = stepper_form_refs.get().get(0) {
-                                let Some(data) = deserialize_form::<ServiceRequestInput>(&first_form_ref, false, None) else { return None };
+                                let Some(data) = deserialize_form_with_options::<ServiceRequestInput>(&first_form_ref, &Default::default()) else { return None };
                                 Some(view! {
                                     <h4>"Basic Information"</h4>
                                     <table class="border-collapse border border-light-gray dark:border-mid-gray">

@@ -10,7 +10,7 @@ use detaxine_ui::{
         },
         forms::reactive_form::ReactiveForm,
     },
-    utils::{formatters::PipeOption, forms::deserialize_form},
+    utils::{formatters::PipeOption, forms::deserialize_form_with_options},
 };
 use icondata::{
     AiHeartFilled, BiBookmarkRegular, BiShareAltRegular, BsGithub, BsLinkedin, BsTwitterX,
@@ -204,8 +204,10 @@ pub fn BlogPostDetail() -> impl IntoView {
         if comment_form_is_valid.get() && blog_post.get().is_some() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let deserialized_main_form_data =
-                    deserialize_form::<BlogCommentInput>(&comment_form_ref, false, None);
+                let deserialized_main_form_data = deserialize_form_with_options::<BlogCommentInput>(
+                    &comment_form_ref,
+                    &Default::default(),
+                );
 
                 if deserialized_main_form_data.is_none() {
                     set_is_loading.set(false);

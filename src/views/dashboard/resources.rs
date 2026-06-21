@@ -15,7 +15,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::deserialize_form,
+    utils::forms::deserialize_form_with_options,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -184,9 +184,12 @@ pub fn CreateResource() -> impl IntoView {
             set_is_loading.set(true);
             spawn_local(async move {
                 let deserialized_main_form_data =
-                    deserialize_form::<ResourceInput>(&form_ref, false, None);
-                let deserialized_metadata_form_data =
-                    deserialize_form::<ResourceMetadata>(&metadata_form_ref, false, None);
+                    deserialize_form_with_options::<ResourceInput>(&form_ref, &Default::default());
+                let deserialized_metadata_form_data = deserialize_form_with_options::<
+                    ResourceMetadata,
+                >(
+                    &metadata_form_ref, &Default::default()
+                );
 
                 if deserialized_main_form_data.is_none()
                     || deserialized_metadata_form_data.is_none()
