@@ -402,12 +402,12 @@ pub fn BlogHome() -> impl IntoView {
                                                             author_profile_pic=blog_post.full_author_details.as_ref().unwrap_or(&Default::default()).profile_picture.as_ref().unwrap_or(&String::new()).to_owned()
                                                             author_name=blog_post.full_author_details.as_ref().unwrap_or(&Default::default()).full_name.as_ref().unwrap_or(&String::new()).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned()
                                                         />
-                                                    }
+                                                    }.into_any()
                                                 })
                                                 .collect_view()
                                         }
                                 </Carousel>
-                            }
+                            }.into_any()
                         }
                     }
 
@@ -473,7 +473,7 @@ pub fn BlogHome() -> impl IntoView {
                                             })
                                         }}
                                     </div>
-                                })}
+                                }.into_any())}
                             </div>
                         </div>
                     </div>

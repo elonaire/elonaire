@@ -775,7 +775,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                         Some(
                                                             view! {
                                                                 <BlogDetailMetadata date_of_creation={blog_post.created_at.as_ref().unwrap_or(&Default::default()).to_owned()} read_time={blog_post.read_time.as_ref().unwrap_or(&Default::default()).to_owned()} author_profile_pic={author_details.profile_picture.as_ref().unwrap_or(&Default::default()).to_owned()} author_name={author_details.full_name.as_ref().unwrap_or(&Default::default()).to_owned()} />
-                                                            }
+                                                            }.into_any()
                                                         )
                                                     }
                                                     None => None
@@ -824,7 +824,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                         >
                                                             {emoji}
                                                         </BasicButton>
-                                                    }
+                                                    }.into_any()
                                                 }).collect::<Vec<_>>()}
                                             </div>
 
@@ -878,7 +878,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                             })
                                                             .collect_view()
                                                         }
-                                                    }
+                                                    }.into_any()
                                                 )
                                             }
                                             None => None
@@ -890,7 +890,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                 if comments.is_empty() {
                                                     Some(view! {
                                                         <p class="text-2xl text-center">"No Comments to display"</p>
-                                                    })
+                                                    }.into_any())
                                                 } else {
                                                     None
                                                 }
@@ -933,14 +933,14 @@ pub fn BlogPostDetail() -> impl IntoView {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        }
+                                                        }.into_any()
                                                     )
                                                 }
                                                 None => None
                                             }
                                         }
                                     </div>
-                                }
+                                }.into_any()
                             )
                         } else {
                             None
