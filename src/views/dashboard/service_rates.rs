@@ -15,7 +15,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::deserialize_form,
+    utils::forms::deserialize_form_with_options,
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -194,8 +194,10 @@ pub fn CreateServiceRate() -> impl IntoView {
         {
             set_is_loading.set(true);
             spawn_local(async move {
-                let deserialized_main_form_data =
-                    deserialize_form::<ServiceRateInput>(&form_ref, false, None);
+                let deserialized_main_form_data = deserialize_form_with_options::<ServiceRateInput>(
+                    &form_ref,
+                    &Default::default(),
+                );
 
                 if deserialized_main_form_data.is_none() {
                     set_is_loading.set(false);

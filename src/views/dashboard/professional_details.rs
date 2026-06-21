@@ -21,7 +21,7 @@ use detaxine_ui::{
         navigation::breadcrumbs::Breadcrumbs,
         schemas::props::ColorTemperature,
     },
-    utils::forms::deserialize_form,
+    utils::forms::{FormDeserializeOptions, deserialize_form_with_options},
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -203,7 +203,13 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
             set_is_loading.set(true);
             spawn_local(async move {
                 let deserialized_form_data =
-                    deserialize_form::<UserProfessionalInfoInput>(&form_ref, true, None);
+                    deserialize_form_with_options::<UserProfessionalInfoInput>(
+                        &form_ref,
+                        &FormDeserializeOptions {
+                            deserialize_bool: true,
+                            ..Default::default()
+                        },
+                    );
 
                 if deserialized_form_data.is_none() {
                     set_is_loading.set(false);
@@ -275,10 +281,6 @@ pub fn CreateProfessionalDetail() -> impl IntoView {
             });
         }
     });
-
-    // let onreset_handler = Callback::new(move |_ev: ev::Event| {
-    //     init_date.set(None);
-    // });
 
     let handle_step_form_submit = move |ev: SubmitEvent| {
         ev.prevent_default();

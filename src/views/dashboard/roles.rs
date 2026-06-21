@@ -20,7 +20,7 @@ use detaxine_ui::{
         navigation::breadcrumbs::Breadcrumbs,
         schemas::props::ColorTemperature,
     },
-    utils::forms::deserialize_form,
+    utils::forms::{FormDeserializeOptions, deserialize_form_with_options},
 };
 use icondata::BsPlusLg;
 use leptos::ev::SubmitEvent;
@@ -213,11 +213,13 @@ pub fn CreateRole() -> impl IntoView {
             set_is_loading.set(true);
             spawn_local(async move {
                 let deserialized_main_form_data =
-                    deserialize_form::<RoleInput>(&form_ref, false, None);
-                let deserialized_metadata_form_data = deserialize_form::<RoleMetadata>(
+                    deserialize_form_with_options::<RoleInput>(&form_ref, &Default::default());
+                let deserialized_metadata_form_data = deserialize_form_with_options::<RoleMetadata>(
                     &metadata_form_ref,
-                    false,
-                    Some(&["permission_ids"]),
+                    &FormDeserializeOptions {
+                        vec_fields: Some(&["permission_ids"]),
+                        ..Default::default()
+                    },
                 );
 
                 if deserialized_main_form_data.is_none()

@@ -12,7 +12,7 @@ use detaxine_ui::{
         },
         schemas::props::ColorTemperature,
     },
-    utils::{formatters::PipeOption, forms::deserialize_form},
+    utils::{formatters::PipeOption, forms::deserialize_form_with_options},
 };
 use icondata::{BsArrowLeft, BsSearch, VsSettings};
 use leptos::wasm_bindgen::JsCast;
@@ -274,9 +274,10 @@ pub fn BlogHome() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let Some(deserialized_form_data) =
-                    deserialize_form::<SubscriberInput>(&subscription_form_ref, false, None)
-                else {
+                let Some(deserialized_form_data) = deserialize_form_with_options::<SubscriberInput>(
+                    &subscription_form_ref,
+                    &Default::default(),
+                ) else {
                     set_is_loading.set(false);
                     return;
                 };
@@ -401,12 +402,12 @@ pub fn BlogHome() -> impl IntoView {
                                                             author_profile_pic=blog_post.full_author_details.as_ref().unwrap_or(&Default::default()).profile_picture.as_ref().unwrap_or(&String::new()).to_owned()
                                                             author_name=blog_post.full_author_details.as_ref().unwrap_or(&Default::default()).full_name.as_ref().unwrap_or(&String::new()).to_owned() link=blog_post.link.as_ref().unwrap_or(&String::new()).to_owned()
                                                         />
-                                                    }
+                                                    }.into_any()
                                                 })
                                                 .collect_view()
                                         }
                                 </Carousel>
-                            }
+                            }.into_any()
                         }
                     }
 
@@ -472,7 +473,7 @@ pub fn BlogHome() -> impl IntoView {
                                             })
                                         }}
                                     </div>
-                                })}
+                                }.into_any())}
                             </div>
                         </div>
                     </div>
@@ -510,7 +511,6 @@ pub fn BlogHome() -> impl IntoView {
                                 />
                                 // Results dropdown
                                 {move || {
-                                    let results = search_results.get();
                                     let q = query.get();
                                     (!q.is_empty()).then(|| view! {
                                         <div class="absolute top-full mt-2 w-full bg-white rounded-[5px] shadow-2xl max-h-[60svh] overflow-y-auto z-50">

@@ -16,7 +16,7 @@ use detaxine_ui::{
         },
         navigation::breadcrumbs::Breadcrumbs,
     },
-    utils::forms::deserialize_form,
+    utils::forms::{FormDeserializeOptions, deserialize_form_with_options},
 };
 use icondata::{BsPlusLg, TbAwardOffOutline};
 use leptos::ev::{self, SubmitEvent};
@@ -211,8 +211,13 @@ pub fn CreateResumeItem() -> impl IntoView {
         if form_is_valid.get() {
             set_is_loading.set(true);
             spawn_local(async move {
-                let deserialized_form_data =
-                    deserialize_form::<UserResumeInput>(&form_ref, true, None);
+                let deserialized_form_data = deserialize_form_with_options::<UserResumeInput>(
+                    &form_ref,
+                    &FormDeserializeOptions {
+                        deserialize_bool: true,
+                        ..Default::default()
+                    },
+                );
 
                 if deserialized_form_data.is_none() {
                     set_is_loading.set(false);
