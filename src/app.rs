@@ -1,3 +1,4 @@
+use detaxine_ui::stacks::z_stack::provide_z_stack;
 use leptos::{prelude::*, task::spawn_local};
 use leptos_meta::*;
 use leptos_router::{
@@ -65,6 +66,7 @@ use crate::{
 pub fn App() -> impl IntoView {
     provide_context(Store::new(AppStateContext::default()));
     provide_meta_context();
+    provide_z_stack();
     let store = expect_context::<Store<AppStateContext>>();
 
     // Effect to refresh user auth status

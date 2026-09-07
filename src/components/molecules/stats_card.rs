@@ -1,5 +1,4 @@
-use icondata as IconData;
-use icondata::Icon as IconId;
+use icondata::{FiTrendingDown, FiTrendingUp, Icon as IconId};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
@@ -21,9 +20,9 @@ pub fn StatsCard(
 
     let trend_icon = Memo::new(move |_| {
         if percentage.get() > 0 {
-            IconData::FiTrendingUp
+            FiTrendingUp
         } else {
-            IconData::FiTrendingDown
+            FiTrendingDown
         }
     });
 
