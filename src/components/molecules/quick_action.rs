@@ -1,5 +1,4 @@
-use icondata as IconData;
-use icondata::Icon as IconId;
+use icondata::{BsChevronRight, Icon as IconId};
 use leptos::prelude::*;
 use leptos_icons::Icon;
 
@@ -23,7 +22,7 @@ pub fn QuickAction(
             </div>
 
             <div>
-                <Icon width="15" height="15" icon=IconData::BsChevronRight />
+                <Icon width="15" height="15" icon=BsChevronRight />
             </div>
         </div>
     }.into_any()
