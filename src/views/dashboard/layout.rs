@@ -1,6 +1,11 @@
 use detaxine_ui::components::actions::button::BasicButton;
-use icondata as IconData;
-use icondata::Icon as IconId;
+use icondata::{
+    AiFileImageOutlined, BiCertificationRegular, BsBuildings, BsTools, BsWrenchAdjustable,
+    FaFileContractSolid, FaMoneyBillTransferSolid, FaMoneyCheckDollarSolid, FaUserGroupSolid,
+    FaUserLockSolid, FaUserShieldSolid, Icon as IconId, IoClose, MdiBadgeAccountHorizontalOutline,
+    MdiCertificateOutline, MdiFolderAccountOutline, MdiMonitorDashboard, MdiTrophyAward,
+    RiArticleDocumentLine,
+};
 use leptos::{ev, prelude::*};
 use leptos_icons::Icon;
 use leptos_router::{
@@ -45,103 +50,103 @@ pub fn DashboardLayout() -> impl IntoView {
         vec![
             MenuItem::new(
                 "Dashboard",
-                IconData::MdiMonitorDashboard,
+                MdiMonitorDashboard,
                 "/dashboard",
                 vec!["read:stats".into(), "write:portfolio".into()],
             ),
             MenuItem::new(
                 "Professional Details",
-                IconData::MdiBadgeAccountHorizontalOutline,
+                MdiBadgeAccountHorizontalOutline,
                 "/dashboard/professional-details",
                 vec!["write:professional_details".into()],
             ),
             MenuItem::new(
                 "Portfolio",
-                IconData::MdiTrophyAward,
+                MdiTrophyAward,
                 "/dashboard/portfolio",
                 vec!["write:portfolio".into()],
             ),
             MenuItem::new(
                 "Services",
-                IconData::BsWrenchAdjustable,
+                BsWrenchAdjustable,
                 "/dashboard/services",
                 vec!["write:service".into()],
             ),
             MenuItem::new(
                 "Service Rates",
-                IconData::FaMoneyBillTransferSolid,
+                FaMoneyBillTransferSolid,
                 "/dashboard/service-rates",
                 vec!["write:service_rate".into()],
             ),
             MenuItem::new(
                 "Service Requests",
-                IconData::FaFileContractSolid,
+                FaFileContractSolid,
                 "/dashboard/service-requests",
                 vec!["read:service_request".into()],
             ),
             MenuItem::new(
                 "Ratecards",
-                IconData::FaMoneyCheckDollarSolid,
+                FaMoneyCheckDollarSolid,
                 "/dashboard/ratecards",
                 vec!["write:ratecard".into()],
             ),
             MenuItem::new(
                 "Resume",
-                IconData::MdiCertificateOutline,
+                MdiCertificateOutline,
                 "/dashboard/resume",
                 vec!["write:resume".into()],
             ),
             MenuItem::new(
                 "Skills",
-                IconData::BiCertificationRegular,
+                BiCertificationRegular,
                 "/dashboard/skills",
                 vec!["write:skill".into()],
             ),
             MenuItem::new(
                 "Users",
-                IconData::FaUserGroupSolid,
+                FaUserGroupSolid,
                 "/dashboard/users",
                 vec!["write:user".into()],
             ),
             MenuItem::new(
                 "Roles",
-                IconData::FaUserLockSolid,
+                FaUserLockSolid,
                 "/dashboard/roles",
                 vec!["write:role".into()],
             ),
             MenuItem::new(
                 "Permissions",
-                IconData::FaUserShieldSolid,
+                FaUserShieldSolid,
                 "/dashboard/permissions",
                 vec!["write:permission".into()],
             ),
             MenuItem::new(
                 "Resources",
-                IconData::BsTools,
+                BsTools,
                 "/dashboard/resources",
                 vec!["write:resource".into()],
             ),
             MenuItem::new(
                 "Organizations",
-                IconData::BsBuildings,
+                BsBuildings,
                 "/dashboard/organizations",
                 vec!["write:organization".into()],
             ),
             MenuItem::new(
                 "Departments",
-                IconData::MdiFolderAccountOutline,
+                MdiFolderAccountOutline,
                 "/dashboard/departments",
                 vec!["write:department".into()],
             ),
             MenuItem::new(
                 "Blog",
-                IconData::RiArticleDocumentLine,
+                RiArticleDocumentLine,
                 "/dashboard/blog",
                 vec!["write:blog_post".into()],
             ),
             MenuItem::new(
                 "Media",
-                IconData::AiFileImageOutlined,
+                AiFileImageOutlined,
                 "/dashboard/media",
                 vec!["write:media".into()],
             ),
@@ -169,7 +174,7 @@ pub fn DashboardLayout() -> impl IntoView {
                                         style_ext="bg-transparent border-none"
                                         on:click=move |_| set_collapsed.set(false)
                                     >
-                                        <Icon width="24" height="24" icon=IconData::IoClose />
+                                        <Icon width="24" height="24" icon=IoClose />
                                     </BasicButton>
                                 </div>
                                 <nav class="flex flex-col">

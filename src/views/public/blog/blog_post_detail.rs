@@ -758,7 +758,7 @@ pub fn BlogPostDetail() -> impl IntoView {
                             Some(ReactionType::Wow)     => FaFaceSurpriseRegular,
                             Some(ReactionType::Sad)     => FaFaceSadTearRegular,
                             Some(ReactionType::Angry)   => FaFaceAngryRegular,
-                            None                        => LuThumbsUp,
+                            _                        => LuThumbsUp,
                         };
 
                         if let Some(blog_post) = blog_post {
